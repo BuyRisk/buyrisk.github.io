@@ -1,0 +1,281 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CompoundGrowthExplorer from "../../components/CompoundGrowthExplorer.tsx";
+
+const upcoming = [
+  {
+    title: "Portfolio Diversification Simulator",
+    blurb:
+      "Add uncorrelated holdings and watch a portfolio's volatility fall while expected return holds steady.",
+  },
+  {
+    title: "Risk Tolerance Questionnaire",
+    blurb:
+      "Answer a short set of questions to see where you sit on the risk/return spectrum — and what that implies.",
+  },
+  {
+    title: "Inflation & Fee Drag Calculator",
+    blurb:
+      "See how quietly inflation and a 1% fee can erode a lifetime of returns.",
+  },
+];
+---
+
+<BaseLayout
+  title="Tools"
+  description="Interactive financial simulators that make investing concepts tangible — starting with a compound growth explorer."
+>
+  <section class="container tools-intro">
+    <p class="eyebrow">Interactive Tools</p>
+    <h1>See the ideas move</h1>
+    <p class="lede">
+      Reading about compounding, risk, and diversification is one thing. Dragging
+      a slider and watching the numbers respond is another. These simulators turn
+      the concepts on our <a href="/blog">blog</a> into something you can play with.
+    </p>
+  </section>
+
+  <section class="container tool-section">
+    <div class="tool-heading">
+      <h2>Compound Growth Explorer</h2>
+      <p>
+        Adjust your starting amount, monthly contribution, expected return, and
+        time horizon to see how an investment could grow.
+      </p>
+    </div>
+
+    <div class="tool-frame">
+      <CompoundGrowthExplorer client:load />
+    </div>
+  </section>
+
+  <section class="container upcoming-section">
+    <h2 class="section-heading">More tools in the workshop</h2>
+    <ul class="grid grid--3 upcoming-grid">
+      {
+        upcoming.map((tool) => (
+          <li class="card upcoming-card">
+            <span class="badge">Coming soon</span>
+            <h3>{tool.title}</h3>
+            <p>{tool.blurb}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .tools-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .tool-section {
+    margin-top: var(--space-md);
+  }
+  .tool-heading {
+    max-width: var(--measure);
+    margin-bottom: var(--space-md);
+  }
+  .tool-heading h2 {
+    margin-bottom: 0.3rem;
+  }
+  .tool-heading p {
+    color: var(--color-text-soft);
+    margin: 0;
+  }
+  .tool-frame {
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow);
+  }
+  .upcoming-section {
+    margin-top: var(--space-xl);
+  }
+  .section-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .upcoming-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .upcoming-card {
+    height: 100%;
+  }
+  .upcoming-card h3 {
+    margin: 0.5rem 0 0.4rem;
+    font-size: var(--step-1);
+  }
+  .upcoming-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+  }
+  .badge {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+  }
+</style>
+
+<style is:global>
+  /* Styles for the CompoundGrowthExplorer React island. Global so they reach
+     the client-rendered component markup. */
+  .cge {
+    display: grid;
+    gap: var(--space-md);
+  }
+  @media (min-width: 820px) {
+    .cge {
+      grid-template-columns: 300px 1fr;
+      grid-template-areas: "controls output" "note note";
+      align-items: start;
+    }
+    .cge-controls {
+      grid-area: controls;
+    }
+    .cge-output {
+      grid-area: output;
+    }
+    .cge-note {
+      grid-area: note;
+    }
+  }
+  .cge-controls {
+    display: grid;
+    gap: var(--space-md);
+    align-content: start;
+  }
+  .cge-field {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .cge-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-label strong {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .cge-field input[type="range"] {
+    width: 100%;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+  .cge-chart {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .cge-gridline {
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+  .cge-axis-label {
+    fill: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+  .cge-area {
+    fill: var(--color-accent-soft);
+    opacity: 0.7;
+  }
+  .cge-line {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .cge-line--balance {
+    stroke: var(--color-accent);
+  }
+  .cge-line--contributed {
+    stroke: var(--color-muted);
+    stroke-dasharray: 5 5;
+    stroke-width: 2;
+  }
+  .cge-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .cge-swatch {
+    width: 1rem;
+    height: 0.35rem;
+    border-radius: 2px;
+  }
+  .cge-swatch--balance {
+    background: var(--color-accent);
+  }
+  .cge-swatch--contributed {
+    background: var(--color-muted);
+  }
+  .cge-stats {
+    display: grid;
+    gap: var(--space-sm);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    margin: var(--space-md) 0 0;
+  }
+  .cge-stat {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .cge-stat dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.25rem;
+  }
+  .cge-stat dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 650;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+  .cge-stat--big {
+    font-size: var(--step-2) !important;
+  }
+  .cge-stat--accent {
+    color: var(--color-accent) !important;
+  }
+  .cge-note {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+  }
+</style>
