@@ -1,0 +1,94 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+  { href: "/tools", label: "Tools" },
+  { href: "/about", label: "About" },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="Buy Risk home">
+      <span class="brand-mark" aria-hidden="true">△</span>
+      <span class="brand-name">Buy&nbsp;Risk</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class:list={["nav-link", { active: isActive(link.href) }]}
+            aria-current={isActive(link.href) ? "page" : undefined}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    backdrop-filter: saturate(160%) blur(8px);
+    border-bottom: var(--border);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    min-height: 4rem;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .brand-mark {
+    color: var(--color-accent);
+    font-size: 0.9em;
+  }
+  .site-nav {
+    display: flex;
+    gap: var(--space-sm);
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  .nav-link {
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    color: var(--color-text-soft);
+    text-decoration: none;
+    padding: 0.35rem 0.6rem;
+    border-radius: 7px;
+    transition: color var(--transition), background var(--transition);
+  }
+  .nav-link:hover {
+    color: var(--color-text);
+    background: var(--color-surface-alt);
+  }
+  .nav-link.active {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+</style>
