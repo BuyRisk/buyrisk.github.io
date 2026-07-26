@@ -1,0 +1,123 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const [featured, ...rest] = posts;
+---
+
+<BaseLayout
+  title="Blog"
+  description="Essays and explainers on investing, risk, and the mechanics of markets — in plain language."
+>
+  <section class="container blog-intro">
+    <p class="eyebrow">The Buy Risk Blog</p>
+    <h1>Ideas worth compounding</h1>
+    <p class="lede">
+      Clear, evidence-based writing on how markets work, why risk and return
+      travel together, and how to think like a long-term investor.
+    </p>
+  </section>
+
+  {
+    featured && (
+      <section class="container">
+        <a href={`/blog/${featured.id}/`} class="card featured">
+          <div>
+            <p class="eyebrow">Featured</p>
+            <h2>{featured.data.title}</h2>
+            <p class="excerpt">{featured.data.description}</p>
+            <p class="meta">
+              <FormattedDate date={featured.data.pubDate} /> ·{" "}
+              {featured.data.author}
+            </p>
+          </div>
+        </a>
+      </section>
+    )
+  }
+
+  <section class="container post-list-section">
+    <h2 class="section-heading">More articles</h2>
+    {
+      rest.length === 0 ? (
+        <p class="empty">More articles are on the way.</p>
+      ) : (
+        <ul class="grid grid--2 post-grid">
+          {rest.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}/`} class="card post-card">
+                <h3>{post.data.title}</h3>
+                <p class="excerpt">{post.data.description}</p>
+                <p class="meta">
+                  <FormattedDate date={post.data.pubDate} />
+                </p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .featured {
+    display: block;
+    padding: var(--space-lg);
+    background: linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-accent-soft)
+    );
+  }
+  .featured h2 {
+    margin: 0.3rem 0 var(--space-sm);
+  }
+  .post-list-section {
+    margin-top: var(--space-lg);
+  }
+  .section-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .post-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .post-card {
+    height: 100%;
+  }
+  .post-card h3 {
+    margin: 0 0 0.4rem;
+  }
+  .excerpt {
+    color: var(--color-text-soft);
+    margin: 0 0 var(--space-sm);
+  }
+  .meta {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin: 0;
+  }
+  .empty {
+    color: var(--color-muted);
+  }
+</style>
