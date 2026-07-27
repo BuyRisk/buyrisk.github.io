@@ -219,8 +219,12 @@ export default function PortfolioLab() {
   const curSharpe = sharpe(curMu, curVol, RISK_FREE);
   const diversificationSaved = Math.max(0, naiveVol - curVol);
 
-  // --- Canvas: one static simulated time series, with a time axis --------
+  // --- Canvas: one simulated series, revealed once (no looping) ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const revealedRef = useRef(0);
+  const drawRef = useRef<() => void>(() => {});
+  const latest = useRef({ assetSim, portfolioPath, fanPaths, assets, years, showFan });
+  latest.current = { assetSim, portfolioPath, fanPaths, assets, years, showFan };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -247,6 +251,7 @@ export default function PortfolioLab() {
     }
 
     function draw() {
+      const { assetSim, portfolioPath, fanPaths, years, showFan } = latest.current;
       const rect = canvas!.getBoundingClientRect();
       const W = rect.width;
       const H = rect.height;
@@ -259,6 +264,7 @@ export default function PortfolioLab() {
       ctx!.clearRect(0, 0, W, H);
 
       const steps = assetSim.steps;
+      const revealed = Math.min(revealedRef.current, steps);
 
       // vertical scale across everything shown
       let maxV = 100;
@@ -335,7 +341,8 @@ export default function PortfolioLab() {
         ctx!.lineWidth = w;
         ctx!.lineJoin = "round";
         ctx!.beginPath();
-        for (let t = 0; t < path.length; t++) {
+        const end = Math.min(revealed, path.length - 1);
+        for (let t = 0; t <= end; t++) {
           const px = xStep(t);
           const py = y(path[t]);
           if (t === 0) ctx!.moveTo(px, py);
@@ -367,15 +374,50 @@ export default function PortfolioLab() {
       ctx!.fillText("Years", padL + plotW / 2, H - 6);
     }
 
+    drawRef.current = draw;
     sizeCanvas();
-    draw();
+
     const onResize = () => {
       sizeCanvas();
       draw();
     };
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [assetSim, portfolioPath, fanPaths, showFan, assets, years]);
+
+    // Reveal the new series left-to-right, once. If the tab is hidden (rAF is
+    // paused) or the user prefers reduced motion, just show the whole series.
+    const steps = latest.current.assetSim.steps;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    if (reduced || document.hidden) {
+      revealedRef.current = steps;
+      draw();
+    } else {
+      revealedRef.current = 0;
+      const durationMs = 1400;
+      let startTs = 0;
+      const tick = (ts: number) => {
+        if (!startTs) startTs = ts;
+        const frac = Math.min(1, (ts - startTs) / durationMs);
+        revealedRef.current = Math.round(frac * steps);
+        draw();
+        if (frac < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
+    // Re-run (and re-animate) only when a NEW series is generated.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetSim]);
+
+  // Redraw at the current reveal point when the mix or overlays change,
+  // without restarting the animation.
+  useEffect(() => {
+    drawRef.current();
+  }, [portfolioPath, fanPaths, showFan, assets, years]);
 
   // --- Handlers ----------------------------------------------------------
   const setWeight = (i: number, v: number) =>
@@ -503,41 +545,47 @@ export default function PortfolioLab() {
               <div className="pl-params">
                 <label>
                   <span>Return</span>
-                  <input
-                    type="number"
-                    step={0.5}
-                    disabled={locked}
-                    value={+(a.mu * 100).toFixed(2)}
-                    onChange={(e) => updateAsset(i, { mu: Number(e.target.value) / 100 })}
-                  />
-                  <em>%</em>
+                  <span className="pl-field-row">
+                    <input
+                      type="number"
+                      step={0.5}
+                      disabled={locked}
+                      value={+(a.mu * 100).toFixed(2)}
+                      onChange={(e) => updateAsset(i, { mu: Number(e.target.value) / 100 })}
+                    />
+                    <em>%</em>
+                  </span>
                 </label>
                 <label>
                   <span>Risk</span>
-                  <input
-                    type="number"
-                    step={0.5}
-                    disabled={locked}
-                    value={+(a.sigma * 100).toFixed(2)}
-                    onChange={(e) => updateAsset(i, { sigma: Number(e.target.value) / 100 })}
-                  />
-                  <em>%</em>
+                  <span className="pl-field-row">
+                    <input
+                      type="number"
+                      step={0.5}
+                      disabled={locked}
+                      value={+(a.sigma * 100).toFixed(2)}
+                      onChange={(e) => updateAsset(i, { sigma: Number(e.target.value) / 100 })}
+                    />
+                    <em>%</em>
+                  </span>
                 </label>
                 <label>
                   <span>Mkt corr</span>
-                  <input
-                    type="number"
-                    step={0.05}
-                    min={-1}
-                    max={1}
-                    disabled={locked}
-                    value={+a.marketCorr.toFixed(2)}
-                    onChange={(e) =>
-                      updateAsset(i, {
-                        marketCorr: Math.max(-1, Math.min(1, Number(e.target.value))),
-                      })
-                    }
-                  />
+                  <span className="pl-field-row">
+                    <input
+                      type="number"
+                      step={0.05}
+                      min={-1}
+                      max={1}
+                      disabled={locked}
+                      value={+a.marketCorr.toFixed(2)}
+                      onChange={(e) =>
+                        updateAsset(i, {
+                          marketCorr: Math.max(-1, Math.min(1, Number(e.target.value))),
+                        })
+                      }
+                    />
+                  </span>
                 </label>
               </div>
             </div>
