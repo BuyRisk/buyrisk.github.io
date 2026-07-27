@@ -269,12 +269,70 @@ import WaveformLab from "../../components/WaveformLab.tsx";
     border-radius: var(--radius);
     box-shadow: var(--shadow);
   }
+  .wl-lower {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  @media (min-width: 1100px) {
+    .wl-lower {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
   .wl-readout {
     background: var(--color-surface);
     border: var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: var(--space-md);
+  }
+  .wl-frontier {
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--space-md);
+    min-width: 0;
+  }
+  .wl-frontier h3 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--step-1);
+  }
+  .wl-flegend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .wl-flegend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .wl-fdot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    flex: none;
+  }
+  .wl-fdot--cur {
+    background: var(--color-accent);
+  }
+  .wl-fdot--mv {
+    background: var(--color-link);
+  }
+  .wl-fdot--as {
+    background: var(--color-muted);
+  }
+  .wl-fnote {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-style: italic;
+    margin: var(--space-sm) 0 0;
   }
   .wl-bar {
     display: grid;

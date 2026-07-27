@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PRESET_ASSETS } from "../data/assets";
+import FrontierChart from "./FrontierChart";
+import {
+  covarianceMatrix,
+  randomPortfolios,
+  efficientFrontier,
+  minVariance,
+  portfolioReturn,
+} from "../lib/portfolio";
 
 /**
  * Deterministic "diversification as wave interference" illustration.
@@ -18,11 +26,14 @@ type WaveAsset = {
   name: string;
   amp: number; // volatility, e.g. 0.16
   corr: number; // correlation with the common factor, in [-1, 1]
+  ret: number; // expected return (used only for the frontier's y-axis)
   custom?: boolean;
 };
 
 const MAX_ASSETS = 5;
 const MIN_ASSETS = 2;
+const CLOUD_COUNT = 2500;
+const CLOUD_SEED = 20260727;
 const DEFAULT_IDS = ["us-stocks", "treasuries"];
 const THETA_SPAN = 4 * Math.PI; // two full cycles across the width
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
@@ -33,7 +44,7 @@ let customCounter = 0;
 
 function makeWaveAsset(id: string): WaveAsset {
   const p = PRESET_ASSETS.find((a) => a.id === id)!;
-  return { id: p.id, name: p.name, amp: p.sigma, corr: p.marketCorr };
+  return { id: p.id, name: p.name, amp: p.sigma, corr: p.marketCorr, ret: p.mu };
 }
 
 function normalize(raw: number[]): number[] {
@@ -75,6 +86,27 @@ export default function WaveformLab() {
   }, [assets, weights, amps, phases]);
 
   const cancelled = avgAmp > 1e-9 ? (avgAmp - portAmp) / avgAmp : 0;
+
+  // Efficient frontier, using the same correlation model that drives the waves:
+  // corr(i, j) = cos(phase_i - phase_j). The y-axis uses each asset's expected
+  // return; the current mix's volatility is exactly the portfolio wave's swing.
+  const mus = useMemo(() => assets.map((a) => a.ret), [assets]);
+  const cov = useMemo(() => {
+    const n = assets.length;
+    const C = Array.from({ length: n }, (_, i) =>
+      Array.from({ length: n }, (_, j) => Math.cos(phases[i] - phases[j]))
+    );
+    return covarianceMatrix(C, amps);
+  }, [assets.length, phases, amps]);
+  const modelKey = JSON.stringify({ mus, cov });
+  const cloud = useMemo(
+    () => randomPortfolios(mus, cov, CLOUD_COUNT, CLOUD_SEED),
+    [modelKey] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const frontier = useMemo(() => efficientFrontier(cloud), [cloud]);
+  const minVar = useMemo(() => minVariance(cloud), [cloud]);
+  const assetPoints = useMemo(() => amps.map((a, i) => ({ vol: a, mu: mus[i] })), [amps, mus]);
+  const curReturn = portfolioReturn(weights, mus);
 
   // --- Canvas ------------------------------------------------------------
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -240,7 +272,7 @@ export default function WaveformLab() {
       customCounter += 1;
       setAssets((prev) => [
         ...prev,
-        { id: `custom-${customCounter}`, name: `Custom ${customCounter}`, amp: 0.15, corr: 0.3, custom: true },
+        { id: `custom-${customCounter}`, name: `Custom ${customCounter}`, amp: 0.15, corr: 0.3, ret: 0.08, custom: true },
       ]);
     } else {
       setAssets((prev) => [...prev, makeWaveAsset(value)]);
@@ -390,29 +422,53 @@ export default function WaveformLab() {
       <div className="wl-stage">
         <canvas ref={canvasRef} className="wl-canvas" />
 
-        <div className="wl-readout">
-          <div className="wl-bar">
-            <span className="wl-bar-label">If the swings simply added up</span>
-            <div className="wl-bar-track">
-              <div className="wl-bar-fill wl-bar-fill--avg" style={{ width: "100%" }} />
+        <div className="wl-lower">
+          <div className="wl-readout">
+            <div className="wl-bar">
+              <span className="wl-bar-label">If the swings simply added up</span>
+              <div className="wl-bar-track">
+                <div className="wl-bar-fill wl-bar-fill--avg" style={{ width: "100%" }} />
+              </div>
+              <span className="wl-bar-value">{pct(avgAmp)}</span>
             </div>
-            <span className="wl-bar-value">{pct(avgAmp)}</span>
-          </div>
-          <div className="wl-bar">
-            <span className="wl-bar-label">Actual portfolio swing</span>
-            <div className="wl-bar-track">
-              <div
-                className="wl-bar-fill wl-bar-fill--port"
-                style={{ width: `${avgAmp > 0 ? Math.min(100, (portAmp / avgAmp) * 100) : 0}%` }}
-              />
+            <div className="wl-bar">
+              <span className="wl-bar-label">Actual portfolio swing</span>
+              <div className="wl-bar-track">
+                <div
+                  className="wl-bar-fill wl-bar-fill--port"
+                  style={{ width: `${avgAmp > 0 ? Math.min(100, (portAmp / avgAmp) * 100) : 0}%` }}
+                />
+              </div>
+              <span className="wl-bar-value">{pct(portAmp)}</span>
             </div>
-            <span className="wl-bar-value">{pct(portAmp)}</span>
+            <p className="wl-saved">
+              Out-of-phase waves cancel <strong>{pct(cancelled, 0)}</strong> of the
+              swing. That shrinkage is diversification — exactly the portfolio's
+              volatility falling below the average of its parts.
+            </p>
           </div>
-          <p className="wl-saved">
-            Out-of-phase waves cancel <strong>{pct(cancelled, 0)}</strong> of the swing.
-            That shrinkage is diversification — and it's exactly the portfolio's
-            volatility falling below the average of its parts.
-          </p>
+
+          <div className="wl-frontier">
+            <h3>On the efficient frontier</h3>
+            <FrontierChart
+              cloud={cloud}
+              frontier={frontier}
+              assetPoints={assetPoints}
+              minVar={minVar}
+              current={{ vol: portAmp, mu: curReturn }}
+              ariaLabel="Efficient frontier showing where this portfolio's risk sits"
+            />
+            <div className="wl-flegend">
+              <span><span className="wl-fdot wl-fdot--cur" /> Your mix</span>
+              <span><span className="wl-fdot wl-fdot--mv" /> Min variance</span>
+              <span><span className="wl-fdot wl-fdot--as" /> Single asset</span>
+            </div>
+            <p className="wl-fnote">
+              Your portfolio's swing above is its <em>risk</em> here — its spot on
+              the horizontal axis. As you lower correlation, the frontier bows out
+              and your mix slides left. (Return uses each asset's typical figure.)
+            </p>
+          </div>
         </div>
 
         <p className="wl-note">
