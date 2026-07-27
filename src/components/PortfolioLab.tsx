@@ -24,6 +24,7 @@ import { PRESET_ASSETS, DEFAULT_ASSET_IDS } from "../data/assets";
 
 const STEPS_PER_YEAR = 52;
 const CLOUD_SEED = 20260726;
+const DIST_SEED = 424242;
 const CLOUD_COUNT = 5000;
 const MAX_ASSETS = 5;
 const MIN_ASSETS = 2;
@@ -382,6 +383,7 @@ export default function PortfolioLab() {
   const [riskFree, setRiskFree] = useState(0.03);
   const [pairCorr, setPairCorr] = useState(-0.2);
   const [scenarioNote, setScenarioNote] = useState<string | null>(null);
+  const [simMode, setSimMode] = useState<"single" | "live">("single");
 
   const isPair = assets.length === 2;
   const weights = useMemo(() => normalizeWeights(rawWeights), [rawWeights]);
@@ -423,10 +425,12 @@ export default function PortfolioLab() {
     [paramsKey, weightsKey, years, seed, showFan] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  // Distribution of outcomes across many runs.
+  // Distribution of outcomes across many runs. Uses a fixed seed (independent
+  // of the live-sim seed) so the histogram is a stable property of the
+  // portfolio and doesn't churn every cycle in Live mode.
   const outcomes = useMemo(
-    () => simulateOutcomeStats(mus, sigmas, chol, weights, years, STEPS_PER_YEAR, OUTCOME_RUNS, seed + 3),
-    [paramsKey, weightsKey, years, seed] // eslint-disable-line react-hooks/exhaustive-deps
+    () => simulateOutcomeStats(mus, sigmas, chol, weights, years, STEPS_PER_YEAR, OUTCOME_RUNS, DIST_SEED),
+    [paramsKey, weightsKey, years] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   // Efficient-frontier cloud (stable seed so it doesn't jitter).
@@ -448,8 +452,8 @@ export default function PortfolioLab() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const revealedRef = useRef(0);
   const drawRef = useRef<() => void>(() => {});
-  const latest = useRef({ assetSim, portfolioPath, fanPaths, assets, years, showFan });
-  latest.current = { assetSim, portfolioPath, fanPaths, assets, years, showFan };
+  const latest = useRef({ assetSim, portfolioPath, fanPaths, assets, years, showFan, simMode });
+  latest.current = { assetSim, portfolioPath, fanPaths, assets, years, showFan, simMode };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -608,8 +612,10 @@ export default function PortfolioLab() {
     };
     window.addEventListener("resize", onResize);
 
-    // Reveal the new series left-to-right, once. If the tab is hidden (rAF is
-    // paused) or the user prefers reduced motion, just show the whole series.
+    // Reveal the series left-to-right. In Single mode it plays once and holds.
+    // In Live mode it holds briefly at the end, then draws a fresh series and
+    // repeats. If the tab is hidden (rAF is paused) or reduced motion is
+    // preferred, just show the whole series statically.
     const steps = latest.current.assetSim.steps;
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     let raf = 0;
@@ -618,14 +624,27 @@ export default function PortfolioLab() {
       draw();
     } else {
       revealedRef.current = 0;
-      const durationMs = 1400;
+      const durationMs = 1600;
+      const holdMs = 700;
       let startTs = 0;
+      let doneTs = 0;
       const tick = (ts: number) => {
         if (!startTs) startTs = ts;
         const frac = Math.min(1, (ts - startTs) / durationMs);
         revealedRef.current = Math.round(frac * steps);
         draw();
-        if (frac < 1) raf = requestAnimationFrame(tick);
+        if (frac < 1) {
+          raf = requestAnimationFrame(tick);
+        } else if (latest.current.simMode === "live") {
+          // hold on the completed chart, then start a fresh cycle
+          if (!doneTs) doneTs = ts;
+          if (ts - doneTs < holdMs) {
+            raf = requestAnimationFrame(tick);
+          } else {
+            revealedRef.current = 0;
+            setSeed((s) => s + 1); // new draw -> effect re-runs -> re-reveals
+          }
+        }
       };
       raf = requestAnimationFrame(tick);
     }
@@ -634,9 +653,9 @@ export default function PortfolioLab() {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
     };
-    // Re-run (and re-animate) only when a NEW series is generated.
+    // Re-run (and re-animate) when a new series is generated or the mode flips.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assetSim]);
+  }, [assetSim, simMode]);
 
   // Redraw at the current reveal point when the mix or overlays change,
   // without restarting the animation.
@@ -927,8 +946,26 @@ export default function PortfolioLab() {
         )}
         <div className="pl-panel">
           <div className="pl-panel-head">
-            <h3>Live simulation</h3>
+            <h3>Simulation</h3>
             <div className="pl-panel-tools">
+              <div className="pl-simmode" role="group" aria-label="Simulation mode">
+                <button
+                  type="button"
+                  className={simMode === "single" ? "active" : ""}
+                  aria-pressed={simMode === "single"}
+                  onClick={() => setSimMode("single")}
+                >
+                  Single
+                </button>
+                <button
+                  type="button"
+                  className={simMode === "live" ? "active" : ""}
+                  aria-pressed={simMode === "live"}
+                  onClick={() => setSimMode("live")}
+                >
+                  Live
+                </button>
+              </div>
               <label className="pl-check">
                 <input type="checkbox" checked={showFan} onChange={(e) => setShowFan(e.target.checked)} />
                 Show outcome fan
@@ -950,10 +987,11 @@ export default function PortfolioLab() {
             </span>
           </div>
           <p className="pl-caption">
-            One simulated path over {years} years: each thin line is an asset's
+            A simulated path over {years} years: each thin line is an asset's
             price, the bold line is your rebalanced portfolio. Notice how the
             portfolio rides steadier than its riskiest holdings — that steadiness
-            is diversification. Hit “New draw” for a fresh random scenario.
+            is diversification. <strong>Single</strong> plays one draw and holds;
+            <strong> Live</strong> cycles fresh scenarios continuously.
           </p>
         </div>
 

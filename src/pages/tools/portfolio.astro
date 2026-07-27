@@ -370,6 +370,29 @@ import PortfolioLab from "../../components/PortfolioLab.tsx";
     gap: 0.5rem;
     flex-wrap: wrap;
   }
+  .pl-simmode {
+    display: inline-flex;
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: 3px;
+    gap: 3px;
+  }
+  .pl-simmode button {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.3rem 0.7rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .pl-simmode button.active {
+    background: var(--color-surface);
+    color: var(--color-accent);
+    box-shadow: var(--shadow);
+  }
   .pl-check {
     display: inline-flex;
     align-items: center;
