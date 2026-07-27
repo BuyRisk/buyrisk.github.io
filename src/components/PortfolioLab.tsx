@@ -3,6 +3,9 @@ import {
   type Asset,
   type PortfolioPoint,
   normalizeWeights,
+  correlationMatrix,
+  covarianceMatrix,
+  cholesky,
   portfolioReturn,
   portfolioVol,
   weightedAverageVol,
@@ -10,19 +13,22 @@ import {
   randomPortfolios,
   minVariance,
   maxSharpe,
+  efficientFrontier,
   simulateAssetPaths,
   rebalancedPortfolioPath,
   simulatePortfolioFan,
+  simulateOutcomeStats,
+  percentile,
 } from "../lib/portfolio";
 import { PRESET_ASSETS, DEFAULT_ASSET_IDS } from "../data/assets";
 
-const RISK_FREE = 0.03;
 const STEPS_PER_YEAR = 52;
 const CLOUD_SEED = 20260726;
-const CLOUD_COUNT = 1600;
+const CLOUD_COUNT = 5000;
 const MAX_ASSETS = 5;
 const MIN_ASSETS = 2;
 const FAN_RUNS = 12;
+const OUTCOME_RUNS = 400;
 
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
 
@@ -56,38 +62,89 @@ function makeAssetFromPreset(id: string): Asset {
   };
 }
 
+type Scenario = {
+  id: string;
+  label: string;
+  note: string;
+  assetIds: string[];
+  weights: number[];
+  pairCorr?: number;
+};
+
+const SCENARIOS: Scenario[] = [
+  {
+    id: "perfect-pos",
+    label: "ρ = +1",
+    note: "Perfectly correlated assets move in lockstep. The frontier collapses to a straight line — mixing them buys you no risk reduction at all. This is the 'no free lunch' case.",
+    assetIds: ["us-stocks", "intl-stocks"],
+    weights: [50, 50],
+    pairCorr: 0.99,
+  },
+  {
+    id: "perfect-neg",
+    label: "ρ = −1",
+    note: "Perfect negative correlation is the free lunch made literal: the frontier kinks sharply left, and there's a blend that is almost completely risk-free. Real assets never quite reach this.",
+    assetIds: ["us-stocks", "treasuries"],
+    weights: [50, 50],
+    pairCorr: -0.99,
+  },
+  {
+    id: "sixty-forty",
+    label: "Classic 60/40",
+    note: "The classic balanced portfolio: 60% stocks, 40% bonds. Because their correlation is low, the mix sits well inside the two single-asset points — less risk than stocks alone, most of the return.",
+    assetIds: ["us-stocks", "treasuries"],
+    weights: [60, 40],
+    pairCorr: -0.1,
+  },
+  {
+    id: "diversifier",
+    label: "Add a diversifier",
+    note: "Gold has a weak link to the stock market, so adding a slice pushes the whole efficient frontier up-and-to-the-left — better return for the same risk — even though gold alone is mediocre.",
+    assetIds: ["us-stocks", "treasuries", "gold"],
+    weights: [50, 35, 15],
+  },
+];
+
 // ---------------------------------------------------------------------------
 // Efficient frontier panel (SVG)
 // ---------------------------------------------------------------------------
 
 function FrontierChart({
   cloud,
+  frontier,
   assets,
   minVar,
-  maxShp,
+  tangency,
   current,
+  riskFree,
 }: {
   cloud: PortfolioPoint[];
+  frontier: { vol: number; mu: number }[];
   assets: Asset[];
   minVar: PortfolioPoint;
-  maxShp: PortfolioPoint;
+  tangency: PortfolioPoint;
   current: { mu: number; vol: number };
+  riskFree: number;
 }) {
   const width = 520;
   const height = 360;
   const pad = { top: 20, right: 20, bottom: 44, left: 56 };
+  const clipId = "pl-frontier-clip";
 
   const vols = cloud.map((p) => p.vol).concat(assets.map((a) => a.sigma), current.vol);
-  const rets = cloud.map((p) => p.mu).concat(assets.map((a) => a.mu), current.mu);
-  const maxVol = Math.max(...vols) * 1.08;
+  const rets = cloud.map((p) => p.mu).concat(assets.map((a) => a.mu), current.mu, riskFree);
+  const maxVol = Math.max(...vols) * 1.1;
   const minRet = Math.min(...rets, 0);
-  const maxRet = Math.max(...rets) * 1.05;
+  const maxRet = Math.max(...rets) * 1.08;
 
   const x = (v: number) => pad.left + (v / maxVol) * (width - pad.left - pad.right);
   const y = (r: number) =>
     height - pad.bottom - ((r - minRet) / (maxRet - minRet)) * (height - pad.top - pad.bottom);
 
-  const bestSharpe = Math.max(...cloud.map((p) => p.sharpe), 0.001);
+  const tanSharpe = sharpe(tangency.mu, tangency.vol, riskFree);
+  const cmlEndR = riskFree + tanSharpe * maxVol; // Capital Market Line at the right edge
+
+  const frontierPath = frontier.map((p, i) => `${i === 0 ? "M" : "L"}${x(p.vol)},${y(p.mu)}`).join(" ");
 
   const xTicks = 5;
   const yTicks = 5;
@@ -97,8 +154,19 @@ function FrontierChart({
       className="pl-frontier"
       viewBox={`0 0 ${width} ${height}`}
       role="img"
-      aria-label="Efficient frontier: a cloud of possible portfolios plotted by risk and expected return"
+      aria-label="Efficient frontier with the capital market line, plotting portfolios by risk and expected return"
     >
+      <defs>
+        <clipPath id={clipId}>
+          <rect
+            x={pad.left}
+            y={pad.top}
+            width={width - pad.left - pad.right}
+            height={height - pad.top - pad.bottom}
+          />
+        </clipPath>
+      </defs>
+
       {Array.from({ length: yTicks + 1 }, (_, i) => {
         const r = minRet + ((maxRet - minRet) / yTicks) * i;
         return (
@@ -120,27 +188,53 @@ function FrontierChart({
       })}
 
       {/* Random portfolios, tinted by Sharpe ratio */}
-      {cloud.map((p, i) => (
-        <circle
-          key={i}
-          cx={x(p.vol)}
-          cy={y(p.mu)}
-          r={2}
-          className="pl-cloud-dot"
-          style={{ opacity: 0.15 + 0.6 * Math.max(0, p.sharpe / bestSharpe) }}
+      {cloud.map((p, i) => {
+        const s = sharpe(p.mu, p.vol, riskFree);
+        return (
+          <circle
+            key={i}
+            cx={x(p.vol)}
+            cy={y(p.mu)}
+            r={2}
+            className="pl-cloud-dot"
+            style={{ opacity: 0.12 + 0.6 * Math.max(0, s / (tanSharpe || 1)) }}
+          />
+        );
+      })}
+
+      <g clipPath={`url(#${clipId})`}>
+        {/* Capital Market Line: from the risk-free rate, tangent to the frontier */}
+        <line
+          x1={x(0)}
+          y1={y(riskFree)}
+          x2={x(maxVol)}
+          y2={y(cmlEndR)}
+          className="pl-cml"
         />
-      ))}
+        {/* Efficient frontier curve */}
+        {frontier.length > 1 && <path d={frontierPath} className="pl-frontier-line" />}
+      </g>
+
+      {/* Risk-free point */}
+      <circle cx={x(0)} cy={y(riskFree)} r={4} className="pl-marker pl-marker--rf" />
+      <text x={x(0) + 8} y={y(riskFree) - 6} className="pl-point-label">rf</text>
 
       {/* Individual asset endpoints */}
       {assets.map((a, i) => (
-        <g key={a.id}>
-          <circle cx={x(a.sigma)} cy={y(a.mu)} r={5} fill={paletteColor(i)} stroke="var(--color-surface)" strokeWidth={1.5} />
-        </g>
+        <circle
+          key={a.id}
+          cx={x(a.sigma)}
+          cy={y(a.mu)}
+          r={5}
+          fill={paletteColor(i)}
+          stroke="var(--color-surface)"
+          strokeWidth={1.5}
+        />
       ))}
 
       {/* Special portfolios */}
       <circle cx={x(minVar.vol)} cy={y(minVar.mu)} r={6} className="pl-marker pl-marker--minvar" />
-      <circle cx={x(maxShp.vol)} cy={y(maxShp.mu)} r={6} className="pl-marker pl-marker--sharpe" />
+      <circle cx={x(tangency.vol)} cy={y(tangency.mu)} r={6} className="pl-marker pl-marker--sharpe" />
 
       {/* Current portfolio */}
       <circle cx={x(current.vol)} cy={y(current.mu)} r={8} className="pl-marker pl-marker--current" />
@@ -163,6 +257,113 @@ function FrontierChart({
 }
 
 // ---------------------------------------------------------------------------
+// Outcome distribution panel (SVG histogram of terminal values)
+// ---------------------------------------------------------------------------
+
+function OutcomeDistribution({
+  outcomes,
+  years,
+  runs,
+}: {
+  outcomes: { terminals: number[]; drawdowns: number[]; probLoss: number };
+  years: number;
+  runs: number;
+}) {
+  const { terminals, drawdowns, probLoss } = outcomes;
+  const start = 100;
+  const p5 = percentile(terminals, 0.05);
+  const p50 = percentile(terminals, 0.5);
+  const p95 = percentile(terminals, 0.95);
+  const ddMed = percentile(drawdowns, 0.5);
+  const ddBad = percentile(drawdowns, 0.95);
+
+  const width = 720;
+  const height = 210;
+  const pad = { top: 14, right: 16, bottom: 34, left: 16 };
+  const cap = Math.max(percentile(terminals, 0.98), p50 * 1.25, start * 1.5);
+  const bins = 30;
+  const binW = cap / bins;
+  const counts = new Array(bins).fill(0);
+  for (const t of terminals) {
+    let b = Math.floor(t / binW);
+    if (b < 0) b = 0;
+    if (b > bins - 1) b = bins - 1;
+    counts[b]++;
+  }
+  const maxCount = Math.max(...counts, 1);
+
+  const x = (v: number) => pad.left + (v / cap) * (width - pad.left - pad.right);
+  const barH = (c: number) => (c / maxCount) * (height - pad.top - pad.bottom);
+  const baseY = height - pad.bottom;
+  const mult = (v: number) => `${(v / start).toFixed(1)}×`;
+
+  return (
+    <div className="pl-panel">
+      <div className="pl-panel-head">
+        <h3>Range of outcomes</h3>
+        <span className="pl-panel-sub">{runs.toLocaleString()} simulated {years}-year runs</span>
+      </div>
+
+      <svg
+        className="pl-hist"
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Histogram of simulated ending portfolio values"
+      >
+        {/* 5th–95th percentile band */}
+        <rect
+          x={x(p5)}
+          y={pad.top}
+          width={Math.max(0, x(p95) - x(p5))}
+          height={height - pad.top - pad.bottom}
+          className="pl-hist-band"
+        />
+        {/* bars */}
+        {counts.map((c, i) => (
+          <rect
+            key={i}
+            x={x(i * binW) + 1}
+            y={baseY - barH(c)}
+            width={Math.max(1, (width - pad.left - pad.right) / bins - 1.5)}
+            height={barH(c)}
+            className={i * binW + binW <= start ? "pl-hist-bar pl-hist-bar--loss" : "pl-hist-bar"}
+          />
+        ))}
+        {/* break-even (start) line */}
+        <line x1={x(start)} x2={x(start)} y1={pad.top} y2={baseY} className="pl-hist-start" />
+        <text x={x(start)} y={pad.top - 2} className="pl-axis" textAnchor="middle">break-even</text>
+        {/* median line */}
+        <line x1={x(p50)} x2={x(p50)} y1={pad.top} y2={baseY} className="pl-hist-median" />
+        {/* x-axis ticks in multiples of start */}
+        {Array.from({ length: 6 }, (_, i) => {
+          const v = (cap / 5) * i;
+          return (
+            <text key={i} x={x(v)} y={baseY + 16} className="pl-axis" textAnchor="middle">
+              {mult(v)}
+            </text>
+          );
+        })}
+        <text x={(pad.left + width - pad.right) / 2} y={height - 4} className="pl-axis-title" textAnchor="middle">
+          Ending value (multiple of what you started with)
+        </text>
+      </svg>
+
+      <dl className="pl-stats pl-stats--4">
+        <div><dt>Typical (median)</dt><dd>{mult(p50)}</dd></div>
+        <div><dt>Unlucky → lucky (5–95%)</dt><dd>{mult(p5)} – {mult(p95)}</dd></div>
+        <div><dt>Chance of a loss</dt><dd>{pct(probLoss, 0)}</dd></div>
+        <div><dt>Worst dip (typical / bad run)</dt><dd>−{pct(ddMed, 0)} / −{pct(ddBad, 0)}</dd></div>
+      </dl>
+      <p className="pl-caption">
+        The single path above is just one draw. Across {runs.toLocaleString()} runs,
+        outcomes fan out enormously — and even good portfolios suffer deep
+        temporary drops along the way. That spread is the risk you're paid for.
+      </p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -178,45 +379,69 @@ export default function PortfolioLab() {
   const [seed, setSeed] = useState(1);
   const [showFan, setShowFan] = useState(false);
   const [addValue, setAddValue] = useState("");
+  const [riskFree, setRiskFree] = useState(0.03);
+  const [pairCorr, setPairCorr] = useState(-0.2);
+  const [scenarioNote, setScenarioNote] = useState<string | null>(null);
 
+  const isPair = assets.length === 2;
   const weights = useMemo(() => normalizeWeights(rawWeights), [rawWeights]);
 
+  const mus = useMemo(() => assets.map((a) => a.mu), [assets]);
+  const sigmas = useMemo(() => assets.map((a) => a.sigma), [assets]);
+
   const paramsKey = useMemo(
-    () => assets.map((a) => `${a.id}:${a.mu}:${a.sigma}:${a.marketCorr}`).join("|"),
-    [assets]
+    () =>
+      assets.map((a) => `${a.id}:${a.mu}:${a.sigma}:${a.marketCorr}`).join("|") +
+      (isPair ? `|pc:${pairCorr.toFixed(3)}` : ""),
+    [assets, isPair, pairCorr]
   );
   const weightsKey = weights.map((w) => w.toFixed(4)).join(",");
+
+  // Correlation matrix -> covariance + Cholesky factor drive all the math.
+  const corr = useMemo(
+    () => correlationMatrix(assets, isPair ? pairCorr : null),
+    [paramsKey] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const cov = useMemo(() => covarianceMatrix(corr, sigmas), [corr, sigmas]);
+  const chol = useMemo(() => cholesky(corr), [corr]);
 
   // Asset price paths — independent of weights, so weight tweaks don't reset
   // the animation.
   const assetSim = useMemo(
-    () => simulateAssetPaths(assets, years, STEPS_PER_YEAR, seed),
-    [paramsKey, years, seed]
+    () => simulateAssetPaths(mus, sigmas, chol, years, STEPS_PER_YEAR, seed),
+    [paramsKey, years, seed] // eslint-disable-line react-hooks/exhaustive-deps
   );
   const portfolioPath = useMemo(
     () => rebalancedPortfolioPath(assetSim.assetPaths, weights),
-    [assetSim, weightsKey]
+    [assetSim, weightsKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
   const fanPaths = useMemo(
     () =>
       showFan
-        ? simulatePortfolioFan(assets, weights, years, STEPS_PER_YEAR, FAN_RUNS, seed + 101)
+        ? simulatePortfolioFan(mus, sigmas, chol, weights, years, STEPS_PER_YEAR, FAN_RUNS, seed + 101)
         : [],
-    [paramsKey, weightsKey, years, seed, showFan]
+    [paramsKey, weightsKey, years, seed, showFan] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  // Distribution of outcomes across many runs.
+  const outcomes = useMemo(
+    () => simulateOutcomeStats(mus, sigmas, chol, weights, years, STEPS_PER_YEAR, OUTCOME_RUNS, seed + 3),
+    [paramsKey, weightsKey, years, seed] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   // Efficient-frontier cloud (stable seed so it doesn't jitter).
   const cloud = useMemo(
-    () => randomPortfolios(assets, CLOUD_COUNT, RISK_FREE, CLOUD_SEED),
-    [paramsKey]
+    () => randomPortfolios(mus, cov, CLOUD_COUNT, CLOUD_SEED),
+    [paramsKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
+  const frontier = useMemo(() => efficientFrontier(cloud), [cloud]);
   const minVar = useMemo(() => minVariance(cloud), [cloud]);
-  const maxShp = useMemo(() => maxSharpe(cloud), [cloud]);
+  const tangency = useMemo(() => maxSharpe(cloud, riskFree), [cloud, riskFree]);
 
-  const curMu = portfolioReturn(weights, assets);
-  const curVol = portfolioVol(weights, assets);
-  const naiveVol = weightedAverageVol(weights, assets);
-  const curSharpe = sharpe(curMu, curVol, RISK_FREE);
+  const curMu = portfolioReturn(weights, mus);
+  const curVol = portfolioVol(weights, cov);
+  const naiveVol = weightedAverageVol(weights, sigmas);
+  const curSharpe = sharpe(curMu, curVol, riskFree);
   const diversificationSaved = Math.max(0, naiveVol - curVol);
 
   // --- Canvas: one simulated series, revealed once (no looping) ----------
@@ -460,6 +685,15 @@ export default function PortfolioLab() {
 
   const equalWeight = () => setRawWeights(assets.map(() => 100 / assets.length));
 
+  const applyScenario = (s: Scenario) => {
+    setAssets(s.assetIds.map(makeAssetFromPreset));
+    setRawWeights([...s.weights]);
+    if (s.pairCorr != null) setPairCorr(s.pairCorr);
+    setMode("historical");
+    setScenarioNote(s.note);
+    setSeed((x) => x + 1);
+  };
+
   const setModeSafe = (m: "historical" | "custom") => {
     if (m === "historical") {
       // snap preset assets back to their reference figures
@@ -592,6 +826,26 @@ export default function PortfolioLab() {
           ))}
         </div>
 
+        {isPair && (
+          <label className="pl-corr">
+            <span className="pl-corr-label">
+              Correlation ({assets[0].name} ↔ {assets[1].name}):{" "}
+              <strong>{pairCorr.toFixed(2)}</strong>
+            </span>
+            <input
+              type="range"
+              min={-1}
+              max={1}
+              step={0.05}
+              value={pairCorr}
+              onChange={(e) => setPairCorr(Number(e.target.value))}
+            />
+            <span className="pl-corr-hint">
+              Drag toward −1 and watch the frontier bow out — that's diversification.
+            </span>
+          </label>
+        )}
+
         <div className="pl-add-row">
           <select
             className="pl-add"
@@ -626,10 +880,51 @@ export default function PortfolioLab() {
             onChange={(e) => setYears(Number(e.target.value))}
           />
         </label>
+
+        <label className="pl-horizon">
+          <span>Risk-free rate: <strong>{pct(riskFree, 1)}</strong></span>
+          <input
+            type="range"
+            min={0}
+            max={0.08}
+            step={0.0025}
+            value={riskFree}
+            onChange={(e) => setRiskFree(Number(e.target.value))}
+          />
+        </label>
+
+        <div className="pl-scenarios">
+          <span className="pl-scenarios-title">Guided scenarios</span>
+          <div className="pl-scenario-btns">
+            {SCENARIOS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className="pl-btn pl-scenario-btn"
+                onClick={() => applyScenario(s)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ---------------- Visuals ---------------- */}
       <div className="pl-visuals">
+        {scenarioNote && (
+          <div className="pl-scenario-note" role="status">
+            <p>{scenarioNote}</p>
+            <button
+              type="button"
+              className="pl-scenario-dismiss"
+              aria-label="Dismiss scenario note"
+              onClick={() => setScenarioNote(null)}
+            >
+              ×
+            </button>
+          </div>
+        )}
         <div className="pl-panel">
           <div className="pl-panel-head">
             <h3>Live simulation</h3>
@@ -669,17 +964,28 @@ export default function PortfolioLab() {
             </div>
             <FrontierChart
               cloud={cloud}
+              frontier={frontier}
               assets={assets}
               minVar={minVar}
-              maxShp={maxShp}
+              tangency={tangency}
               current={{ mu: curMu, vol: curVol }}
+              riskFree={riskFree}
             />
             <div className="pl-legend pl-legend--frontier">
               <span className="pl-legend-item"><span className="pl-dot pl-dot--current" /> Your mix</span>
               <span className="pl-legend-item"><span className="pl-dot pl-dot--minvar" /> Min variance</span>
-              <span className="pl-legend-item"><span className="pl-dot pl-dot--sharpe" /> Max Sharpe</span>
+              <span className="pl-legend-item"><span className="pl-dot pl-dot--sharpe" /> Tangency (max Sharpe)</span>
+              <span className="pl-legend-item"><span className="pl-line-key pl-line-key--cml" /> Capital market line</span>
+              <span className="pl-legend-item"><span className="pl-line-key pl-line-key--frontier" /> Efficient frontier</span>
               <span className="pl-legend-item"><span className="pl-dot pl-dot--asset" /> Single asset</span>
             </div>
+            <p className="pl-caption">
+              Each dot is a possible mix. The curve is the efficient frontier —
+              the best return for each level of risk. Add cash at the risk-free
+              rate and the straight <strong>capital market line</strong> beats
+              the curve: every investor should hold the tangency portfolio and
+              dial risk with cash. Its slope is the Sharpe ratio.
+            </p>
           </div>
 
           <div className="pl-panel pl-readout">
@@ -715,11 +1021,15 @@ export default function PortfolioLab() {
             </div>
           </div>
         </div>
+
+        <OutcomeDistribution outcomes={outcomes} years={years} runs={OUTCOME_RUNS} />
       </div>
 
       <p className="pl-disclaimer">
-        A simplified single-factor model for learning, not a forecast or advice.
-        Correlations are driven by each asset's link to a common market factor.
+        A simplified model for learning, not a forecast or advice. It assumes
+        returns are normally distributed and inputs are stable and known — real
+        markets have fatter tails, and these estimates are uncertain. See the
+        notes below on what mean-variance theory leaves out.
       </p>
     </div>
   );
