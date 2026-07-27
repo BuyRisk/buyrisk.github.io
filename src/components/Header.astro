@@ -1,10 +1,13 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import { TOOLS } from "../data/tools";
 
-const links = [
+type NavItem = { href: string; label: string; children?: typeof TOOLS };
+
+const navItems: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/blog", label: "Blog" },
-  { href: "/tools", label: "Tools" },
+  { href: "/tools", label: "Tools", children: TOOLS },
   { href: "/about", label: "About" },
 ];
 
@@ -22,15 +25,56 @@ const isActive = (href: string) =>
 
     <nav class="site-nav" aria-label="Primary">
       {
-        links.map((link) => (
-          <a
-            href={link.href}
-            class:list={["nav-link", { active: isActive(link.href) }]}
-            aria-current={isActive(link.href) ? "page" : undefined}
-          >
-            {link.label}
-          </a>
-        ))
+        navItems.map((item) =>
+          item.children ? (
+            <div class="nav-item nav-dropdown">
+              <a
+                href={item.href}
+                class:list={["nav-link", { active: isActive(item.href) }]}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                aria-haspopup="true"
+              >
+                {item.label}
+                <svg
+                  class="nav-caret"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </a>
+              <ul class="nav-menu">
+                {item.children.map((child) => (
+                  <li>
+                    <a
+                      href={child.href}
+                      class:list={["nav-menu-link", { active: isActive(child.href) }]}
+                      aria-current={isActive(child.href) ? "page" : undefined}
+                    >
+                      <span class="nav-menu-title">{child.title}</span>
+                      <span class="nav-menu-blurb">{child.blurb}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <a
+              href={item.href}
+              class:list={["nav-link", { active: isActive(item.href) }]}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          )
+        )
       }
     </nav>
 
@@ -70,11 +114,15 @@ const isActive = (href: string) =>
   }
   .site-nav {
     display: flex;
+    align-items: center;
     gap: var(--space-sm);
     margin-left: auto;
     flex-wrap: wrap;
   }
   .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     font-family: var(--font-sans);
     font-size: var(--step-0);
     color: var(--color-text-soft);
@@ -90,5 +138,91 @@ const isActive = (href: string) =>
   .nav-link.active {
     color: var(--color-accent);
     font-weight: 600;
+  }
+
+  /* Dropdown */
+  .nav-item {
+    position: relative;
+  }
+  .nav-caret {
+    transition: transform var(--transition);
+    opacity: 0.7;
+  }
+  .nav-dropdown:hover .nav-caret,
+  .nav-dropdown:focus-within .nav-caret {
+    transform: rotate(180deg);
+  }
+  /* Invisible bridge so the menu doesn't close when crossing the gap. */
+  .nav-dropdown:hover::after,
+  .nav-dropdown:focus-within::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 0.6rem;
+  }
+  .nav-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 60;
+    min-width: 17rem;
+    max-width: calc(100vw - 2rem);
+    margin: 0;
+    padding: 0.4rem;
+    list-style: none;
+    display: grid;
+    gap: 0.1rem;
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity var(--transition), transform var(--transition);
+  }
+  .nav-dropdown:hover .nav-menu,
+  .nav-dropdown:focus-within .nav-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .nav-menu-link {
+    display: block;
+    padding: 0.5rem 0.6rem;
+    border-radius: 7px;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+  .nav-menu-link:hover {
+    background: var(--color-surface-alt);
+  }
+  .nav-menu-link.active {
+    background: var(--color-accent-soft);
+  }
+  .nav-menu-title {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--step-0);
+  }
+  .nav-menu-link.active .nav-menu-title {
+    color: var(--color-accent);
+  }
+  .nav-menu-blurb {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.35;
+    color: var(--color-text-soft);
+    margin-top: 0.1rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-menu {
+      transition: none;
+    }
   }
 </style>

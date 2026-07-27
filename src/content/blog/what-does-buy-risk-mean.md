@@ -47,5 +47,5 @@ intuition to answer questions like:
 2. Why does diversification give you a "free lunch"?
 3. How do fees and inflation eat into returns you never see?
 
-Start by playing with the [compound growth explorer](/tools) — then come back
+Start by playing with the [compound growth explorer](/tools/compound-growth/) — then come back
 and read on. Seeing the numbers move is worth a thousand words.

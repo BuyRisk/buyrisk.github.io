@@ -55,6 +55,6 @@ of a lower return vivid.
 ## Try it yourself
 
 Numbers on a page are easy to nod at and forget. Head to our
-[compound growth explorer](/tools) and drag the sliders: change the years, the
+[compound growth explorer](/tools/compound-growth/) and drag the sliders: change the years, the
 rate, and the monthly contribution, and watch the curve bend upward. The moment
 the line goes near-vertical is the moment compounding stops being an abstraction.

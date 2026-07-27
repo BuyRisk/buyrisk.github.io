@@ -1,8 +1,13 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import CompoundGrowthExplorer from "../../components/CompoundGrowthExplorer.tsx";
+import { TOOLS } from "../../data/tools";
 
 const upcoming = [
+  {
+    title: "Diversification: Waveforms",
+    blurb:
+      "How uncorrelated ups and downs cancel out — diversification as wave interference, from first principles.",
+  },
   {
     title: "Risk Tolerance Questionnaire",
     blurb:
@@ -18,7 +23,7 @@ const upcoming = [
 
 <BaseLayout
   title="Tools"
-  description="Interactive financial simulators that make investing concepts tangible — starting with a compound growth explorer."
+  description="Interactive financial simulators that make investing concepts tangible — from compounding to Modern Portfolio Theory."
 >
   <section class="container tools-intro">
     <p class="eyebrow">Interactive Tools</p>
@@ -30,34 +35,21 @@ const upcoming = [
     </p>
   </section>
 
-  <section class="container tool-section">
-    <div class="tool-heading">
-      <h2>Compound Growth Explorer</h2>
-      <p>
-        Adjust your starting amount, monthly contribution, expected return, and
-        time horizon to see how an investment could grow.
-      </p>
-    </div>
-
-    <div class="tool-frame">
-      <CompoundGrowthExplorer client:load />
-    </div>
-  </section>
-
-  <section class="container tool-section">
-    <a href="/tools/portfolio" class="card portfolio-promo">
-      <div>
-        <span class="badge">New</span>
-        <h2>Portfolio Diversification Lab</h2>
-        <p>
-          Mix up to five assets and watch a live Monte Carlo of correlated price
-          waveforms, your rebalanced portfolio, and where the mix lands on the
-          efficient frontier. See exactly how weights and correlations — not
-          individual assets — set your risk.
-        </p>
-        <span class="promo-cta">Open the lab →</span>
-      </div>
-    </a>
+  <section class="container">
+    <ul class="grid grid--2 tool-grid">
+      {
+        TOOLS.map((tool) => (
+          <li>
+            <a href={tool.href} class="card tool-card">
+              {tool.tag && <span class="badge">{tool.tag}</span>}
+              <h2>{tool.title}</h2>
+              <p>{tool.blurb}</p>
+              <span class="tool-cta">Open →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
   <section class="container upcoming-section">
@@ -86,26 +78,36 @@ const upcoming = [
     color: var(--color-text-soft);
     line-height: 1.5;
   }
-  .tool-section {
-    margin-top: var(--space-md);
-  }
-  .tool-heading {
-    max-width: var(--measure);
-    margin-bottom: var(--space-md);
-  }
-  .tool-heading h2 {
-    margin-bottom: 0.3rem;
-  }
-  .tool-heading p {
-    color: var(--color-text-soft);
+  .tool-grid {
+    list-style: none;
+    padding: 0;
     margin: 0;
   }
-  .tool-frame {
-    background: var(--color-surface);
-    border: var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-md);
-    box-shadow: var(--shadow);
+  .tool-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.4rem;
+    background: linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-accent-soft)
+    );
+  }
+  .tool-card h2 {
+    margin: 0.3rem 0 0;
+    font-size: var(--step-1);
+  }
+  .tool-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .tool-cta {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-top: var(--space-xs);
   }
   .upcoming-section {
     margin-top: var(--space-xl);
@@ -134,6 +136,7 @@ const upcoming = [
   }
   .badge {
     display: inline-block;
+    align-self: flex-start;
     font-family: var(--font-sans);
     font-size: var(--step--1);
     font-weight: 600;
@@ -143,211 +146,5 @@ const upcoming = [
     background: var(--color-accent-soft);
     padding: 0.15rem 0.6rem;
     border-radius: 999px;
-  }
-  .portfolio-promo {
-    display: block;
-    padding: var(--space-lg);
-    background: linear-gradient(
-      135deg,
-      var(--color-surface),
-      var(--color-accent-soft)
-    );
-  }
-  .portfolio-promo h2 {
-    margin: 0.4rem 0 var(--space-sm);
-  }
-  .portfolio-promo p {
-    color: var(--color-text-soft);
-    max-width: var(--measure);
-    margin: 0 0 var(--space-sm);
-  }
-  .promo-cta {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    color: var(--color-accent);
-  }
-</style>
-
-<style is:global>
-  /* Styles for the CompoundGrowthExplorer React island. Global so they reach
-     the client-rendered component markup. */
-  .cge {
-    display: grid;
-    gap: var(--space-md);
-  }
-  @media (min-width: 820px) {
-    .cge {
-      grid-template-columns: 300px 1fr;
-      grid-template-areas: "controls output" "note note";
-      align-items: start;
-    }
-    .cge-controls {
-      grid-area: controls;
-    }
-    .cge-output {
-      grid-area: output;
-    }
-    .cge-note {
-      grid-area: note;
-    }
-  }
-  .cge-controls {
-    display: grid;
-    gap: var(--space-md);
-    align-content: start;
-  }
-  .cge-field {
-    display: grid;
-    gap: 0.5rem;
-  }
-  .cge-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-value-box {
-    display: inline-flex;
-    align-items: baseline;
-    white-space: pre;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    padding: 0.15rem 0.45rem;
-    background: var(--color-surface);
-    color: var(--color-text);
-    transition: border-color var(--transition);
-  }
-  .cge-value-box:focus-within {
-    border-color: var(--color-accent);
-  }
-  .cge-value-box[data-invalid] {
-    border-color: var(--color-error);
-  }
-  .cge-adorn {
-    font-weight: 650;
-    font-variant-numeric: tabular-nums;
-  }
-  .cge-value-input {
-    width: 6.5em;
-    border: none;
-    padding: 0;
-    background: transparent;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: 650;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  .cge-value-input:focus {
-    outline: none;
-  }
-  .cge-error {
-    justify-self: end;
-    color: var(--color-error);
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-  }
-  .cge-field input[type="range"] {
-    width: 100%;
-    accent-color: var(--color-accent);
-    cursor: pointer;
-  }
-  .cge-chart {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .cge-gridline {
-    stroke: var(--color-border);
-    stroke-width: 1;
-  }
-  .cge-axis-label {
-    fill: var(--color-muted);
-    font-family: var(--font-sans);
-    font-size: 11px;
-  }
-  .cge-area {
-    fill: var(--color-accent-soft);
-    opacity: 0.7;
-  }
-  .cge-line {
-    fill: none;
-    stroke-width: 2.5;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-  }
-  .cge-line--balance {
-    stroke: var(--color-accent);
-  }
-  .cge-line--contributed {
-    stroke: var(--color-muted);
-    stroke-dasharray: 5 5;
-    stroke-width: 2;
-  }
-  .cge-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-    margin-top: var(--space-sm);
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .cge-swatch {
-    width: 1rem;
-    height: 0.35rem;
-    border-radius: 2px;
-  }
-  .cge-swatch--balance {
-    background: var(--color-accent);
-  }
-  .cge-swatch--contributed {
-    background: var(--color-muted);
-  }
-  .cge-stats {
-    display: grid;
-    gap: var(--space-sm);
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    margin: var(--space-md) 0 0;
-  }
-  .cge-stat {
-    background: var(--color-surface-alt);
-    border-radius: var(--radius);
-    padding: var(--space-sm);
-  }
-  .cge-stat dt {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    margin-bottom: 0.25rem;
-  }
-  .cge-stat dd {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-weight: 650;
-    font-size: var(--step-1);
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
-  .cge-stat--big {
-    font-size: var(--step-2) !important;
-  }
-  .cge-stat--accent {
-    color: var(--color-accent) !important;
-  }
-  .cge-note {
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    font-style: italic;
-    margin: 0;
   }
 </style>

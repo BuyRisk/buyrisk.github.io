@@ -1,0 +1,28 @@
+/**
+ * The canonical list of interactive tools. Both the Tools dropdown in the
+ * header and the /tools overview page read from this, so a new tool added here
+ * automatically appears in both places.
+ */
+export type Tool = {
+  title: string;
+  href: string;
+  blurb: string;
+  /** Optional short badge, e.g. "New". */
+  tag?: string;
+};
+
+export const TOOLS: Tool[] = [
+  {
+    title: "Compound Growth Explorer",
+    href: "/tools/compound-growth",
+    blurb:
+      "See how a starting balance, regular contributions, return, and time compound into long-run growth.",
+  },
+  {
+    title: "Portfolio Diversification Lab",
+    href: "/tools/portfolio",
+    blurb:
+      "Mix assets and watch correlations, the efficient frontier, and the range of outcomes come to life.",
+    tag: "New",
+  },
+];
