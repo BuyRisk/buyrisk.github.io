@@ -1,0 +1,519 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PortfolioLab from "../../components/PortfolioLab.tsx";
+---
+
+<BaseLayout
+  title="Portfolio Diversification Lab"
+  description="An interactive Modern Portfolio Theory tool: watch correlated asset waveforms, a live Monte Carlo simulation, and where your mix sits on the efficient frontier."
+>
+  <section class="container lab-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Portfolio Diversification Lab</h1>
+    <p class="lede">
+      Mix up to five assets and watch what happens. The left panel simulates each
+      asset's price as a living waveform and draws your rebalanced portfolio on
+      top; the right panel shows where your mix lands on the
+      <strong>efficient frontier</strong>. The lesson hiding inside: returns add
+      up in a straight line, but risk doesn't — because assets don't all move
+      together. That gap is diversification.
+    </p>
+  </section>
+
+  <section class="container lab-host">
+    <PortfolioLab client:load />
+  </section>
+
+  <section class="container lab-explainer">
+    <div class="prose">
+      <h2>How to read it</h2>
+      <ul>
+        <li>
+          <strong>Weights</strong> set how much of each asset you hold. Drag them
+          and watch both panels respond instantly.
+        </li>
+        <li>
+          <strong>Market correlation</strong> is the key dial. It's how tightly an
+          asset moves with the broader market. Low or negative correlation is what
+          lets a portfolio be less risky than its parts.
+        </li>
+        <li>
+          <strong>The frontier</strong> plots thousands of possible mixes by risk
+          (left–right) and expected return (up–down). The upper-left edge is
+          "efficient" — the most return for a given level of risk.
+        </li>
+      </ul>
+      <p>
+        Try this: build a 100% stock portfolio, note its risk, then blend in
+        bonds. The portfolio's risk falls faster than its return — often you can
+        <em>lower risk and barely touch return</em>. That's the free lunch
+        <a href="/blog/diversification-the-only-free-lunch/">we wrote about</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .lab-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .lab-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  /* Categorical asset palette — mid-tones that read on light and dark. */
+  :root {
+    --pl-c1: #4c78a8;
+    --pl-c2: #f58518;
+    --pl-c3: #54a24b;
+    --pl-c4: #e45756;
+    --pl-c5: #b279a2;
+    --pl-c6: #72b7b2;
+    --pl-c7: #d9a441;
+    --pl-c8: #9d755d;
+  }
+
+  .pl {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 940px) {
+    .pl {
+      grid-template-columns: 340px 1fr;
+      align-items: start;
+    }
+  }
+
+  /* ---- Controls ---- */
+  .pl-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow);
+  }
+  .pl-mode {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    background: var(--color-surface-alt);
+    padding: 4px;
+    border-radius: var(--radius);
+  }
+  .pl-mode button {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.45rem 0.5rem;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .pl-mode button.active {
+    background: var(--color-surface);
+    color: var(--color-accent);
+    box-shadow: var(--shadow);
+  }
+  .pl-mode-note {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  .pl-assets {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .pl-asset {
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+    background: var(--color-bg);
+  }
+  .pl-asset-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+  }
+  .pl-swatch {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 3px;
+    flex: none;
+  }
+  .pl-swatch--port {
+    background: var(--color-accent);
+  }
+  .pl-asset-name {
+    font-weight: 600;
+    font-size: var(--step-0);
+  }
+  .pl-name-input {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--step-0);
+    border: none;
+    border-bottom: 1px dashed var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    width: 8rem;
+  }
+  .pl-name-input:focus {
+    outline: none;
+    border-bottom-color: var(--color-accent);
+  }
+  .pl-weight-badge {
+    margin-left: auto;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+  .pl-remove {
+    border: none;
+    background: transparent;
+    color: var(--color-muted);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.2rem;
+  }
+  .pl-remove:hover:not(:disabled) {
+    color: var(--color-error);
+  }
+  .pl-remove:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .pl-weight input[type="range"] {
+    width: 100%;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+    margin: 0.4rem 0;
+  }
+  .pl-params {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  .pl-params label {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .pl-params label span {
+    flex: none;
+  }
+  .pl-params input {
+    width: 100%;
+    min-width: 0;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    padding: 0.2rem 0.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .pl-params input:disabled {
+    opacity: 0.7;
+    background: var(--color-surface-alt);
+  }
+  .pl-params em {
+    color: var(--color-muted);
+    font-style: normal;
+  }
+
+  .pl-add-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .pl-add {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    padding: 0.5rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .pl-btn {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .pl-btn:hover {
+    border-color: var(--color-accent);
+  }
+  .pl-horizon {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .pl-horizon strong {
+    color: var(--color-text);
+  }
+  .pl-horizon input[type="range"] {
+    width: 100%;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+    margin-top: 0.4rem;
+  }
+
+  /* ---- Visuals ---- */
+  .pl-visuals {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    min-width: 0;
+  }
+  .pl-panel {
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+  .pl-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    flex-wrap: wrap;
+  }
+  .pl-panel-head h3 {
+    margin: 0;
+    font-size: var(--step-1);
+  }
+  .pl-panel-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .pl-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .pl-canvas {
+    width: 100%;
+    height: 300px;
+    display: block;
+  }
+  .pl-panel-row {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 1180px) {
+    .pl-panel-row {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  .pl-frontier {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .pl-grid {
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+  .pl-axis {
+    fill: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+  .pl-axis-title {
+    fill: var(--color-text-soft);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .pl-cloud-dot {
+    fill: var(--color-accent);
+  }
+  .pl-marker {
+    stroke: var(--color-surface);
+    stroke-width: 2;
+  }
+  .pl-marker--current {
+    fill: var(--color-accent);
+  }
+  .pl-marker-ring {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    opacity: 0.5;
+  }
+  .pl-marker--minvar {
+    fill: var(--color-link);
+  }
+  .pl-marker--sharpe {
+    fill: var(--color-warn);
+  }
+
+  .pl-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .pl-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .pl-legend-item--port .pl-swatch--port {
+    width: 1.1rem;
+    height: 0.3rem;
+    border-radius: 2px;
+  }
+  .pl-dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    flex: none;
+  }
+  .pl-dot--current {
+    background: var(--color-accent);
+  }
+  .pl-dot--minvar {
+    background: var(--color-link);
+  }
+  .pl-dot--sharpe {
+    background: var(--color-warn);
+  }
+  .pl-dot--asset {
+    background: var(--color-muted);
+  }
+  .pl-caption {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-style: italic;
+  }
+
+  /* ---- Readout ---- */
+  .pl-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .pl-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .pl-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .pl-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+  .pl-diversify-title {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--step-0);
+    margin: 0 0 var(--space-sm);
+  }
+  .pl-bar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.2rem 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .pl-bar-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .pl-bar-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    grid-row: span 1;
+  }
+  .pl-bar-track {
+    grid-column: 1 / -1;
+    height: 0.6rem;
+    background: var(--color-surface-alt);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .pl-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+  .pl-bar-fill--naive {
+    background: var(--color-muted);
+  }
+  .pl-bar-fill--actual {
+    background: var(--color-accent);
+  }
+  .pl-saved {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    margin: var(--space-sm) 0 0;
+  }
+  .pl-saved strong {
+    color: var(--color-accent);
+  }
+
+  .pl-disclaimer {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-style: italic;
+    margin: var(--space-sm) 0 0;
+  }
+</style>
