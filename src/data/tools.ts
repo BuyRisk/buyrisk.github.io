@@ -19,10 +19,16 @@ export const TOOLS: Tool[] = [
       "See how a starting balance, regular contributions, return, and time compound into long-run growth.",
   },
   {
+    title: "Diversification: Waveforms",
+    href: "/tools/waveforms",
+    blurb:
+      "The idea behind diversification, from first principles: how out-of-phase ups and downs cancel out.",
+    tag: "New",
+  },
+  {
     title: "Portfolio Diversification Lab",
     href: "/tools/portfolio",
     blurb:
       "Mix assets and watch correlations, the efficient frontier, and the range of outcomes come to life.",
-    tag: "New",
   },
 ];
