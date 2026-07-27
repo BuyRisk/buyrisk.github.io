@@ -343,7 +343,7 @@ import PortfolioLab from "../../components/PortfolioLab.tsx";
   }
   @media (min-width: 1180px) {
     .pl-panel-row {
-      grid-template-columns: 3fr 2fr;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 4fr);
     }
   }
 
@@ -437,11 +437,12 @@ import PortfolioLab from "../../components/PortfolioLab.tsx";
   /* ---- Readout ---- */
   .pl-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-sm);
     margin: 0 0 var(--space-md);
   }
   .pl-stats > div {
+    min-width: 0;
     background: var(--color-surface-alt);
     border-radius: var(--radius);
     padding: var(--space-sm);

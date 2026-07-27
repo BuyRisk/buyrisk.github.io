@@ -230,6 +230,12 @@ export default function PortfolioLab() {
 
     const css = getComputedStyle(document.documentElement);
     const color = (name: string) => css.getPropertyValue(name).trim() || "#888";
+    // Asset colors are stored as "var(--pl-cN)"; canvas can't parse var(),
+    // so resolve the custom property to its literal value.
+    const resolveColor = (c: string) => {
+      const m = c.match(/var\((--[\w-]+)\)/);
+      return m ? css.getPropertyValue(m[1]).trim() || "#888" : c;
+    };
 
     function sizeCanvas() {
       const dpr = window.devicePixelRatio || 1;
@@ -292,7 +298,7 @@ export default function PortfolioLab() {
       }
       // individual asset waveforms
       assetSim.assetPaths.forEach((p, i) => {
-        drawPath(p, revealed, color(assets[i].color) || assets[i].color, 1.5, 0.55);
+        drawPath(p, revealed, resolveColor(assets[i].color), 1.5, 0.7);
       });
       // the portfolio itself
       drawPath(portfolioPath, revealed, color("--color-accent"), 3, 1);
