@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 /**
  * Interactive compound-growth explorer.
@@ -126,6 +126,113 @@ function Chart({ points }: { points: Projection["points"] }) {
   );
 }
 
+type NumberFieldProps = {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  prefix?: string;
+  suffix?: string;
+  integer?: boolean;
+  onCommit: (value: number) => void;
+};
+
+/**
+ * A labelled control that can be set either by dragging the slider or by
+ * typing an exact value. Typed values outside [min, max] surface a small
+ * "value out of range" message and are not applied to the projection until
+ * corrected; the slider always reflects the last valid committed value.
+ */
+function NumberField({
+  label,
+  value,
+  min,
+  max,
+  step,
+  prefix,
+  suffix,
+  integer,
+  onCommit,
+}: NumberFieldProps) {
+  const [text, setText] = useState(() => String(value));
+  const [error, setError] = useState(false);
+  const errorId = useId();
+
+  const parse = (raw: string) => Number(raw.replace(/[,$%\s]/g, ""));
+
+  const handleType = (raw: string) => {
+    setText(raw);
+    const cleaned = raw.replace(/[,$%\s]/g, "");
+    if (cleaned === "") {
+      setError(false); // empty while editing isn't an error, just don't commit
+      return;
+    }
+    const parsed = parse(raw);
+    if (!Number.isFinite(parsed) || parsed < min || parsed > max) {
+      setError(true);
+      return;
+    }
+    setError(false);
+    onCommit(integer ? Math.round(parsed) : parsed);
+  };
+
+  const handleSlider = (n: number) => {
+    setError(false);
+    setText(String(n));
+    onCommit(n);
+  };
+
+  const handleBlur = () => {
+    const parsed = parse(text);
+    if (Number.isFinite(parsed) && parsed >= min && parsed <= max) {
+      const v = integer ? Math.round(parsed) : parsed;
+      setText(integer ? v.toLocaleString("en-US") : String(v));
+      setError(false);
+    } else if (text.replace(/[,$%\s]/g, "") === "") {
+      setText(String(value)); // restore last valid value if left blank
+      setError(false);
+    }
+  };
+
+  return (
+    <div className="cge-field">
+      <div className="cge-label">
+        <span>{label}</span>
+        <span className="cge-value-box" data-invalid={error || undefined}>
+          {prefix && <span className="cge-adorn">{prefix}</span>}
+          <input
+            className="cge-value-input"
+            type="text"
+            inputMode="decimal"
+            value={text}
+            aria-label={label}
+            aria-invalid={error}
+            aria-describedby={error ? errorId : undefined}
+            onChange={(e) => handleType(e.target.value)}
+            onBlur={handleBlur}
+          />
+          {suffix && <span className="cge-adorn">{suffix}</span>}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        aria-label={`${label} slider`}
+        onChange={(e) => handleSlider(Number(e.target.value))}
+      />
+      {error && (
+        <span className="cge-error" id={errorId} role="alert">
+          value out of range
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function CompoundGrowthExplorer() {
   const [principal, setPrincipal] = useState(10_000);
   const [monthly, setMonthly] = useState(300);
@@ -140,61 +247,45 @@ export default function CompoundGrowthExplorer() {
   return (
     <div className="cge">
       <div className="cge-controls">
-        <label className="cge-field">
-          <span className="cge-label">
-            Starting amount <strong>{currency(principal)}</strong>
-          </span>
-          <input
-            type="range"
-            min={0}
-            max={5_000_000}
-            step={5_000}
-            value={principal}
-            onChange={(e) => setPrincipal(Number(e.target.value))}
-          />
-        </label>
-
-        <label className="cge-field">
-          <span className="cge-label">
-            Monthly contribution <strong>{currency(monthly)}</strong>
-          </span>
-          <input
-            type="range"
-            min={0}
-            max={20_000}
-            step={100}
-            value={monthly}
-            onChange={(e) => setMonthly(Number(e.target.value))}
-          />
-        </label>
-
-        <label className="cge-field">
-          <span className="cge-label">
-            Annual return <strong>{rate}%</strong>
-          </span>
-          <input
-            type="range"
-            min={0}
-            max={20}
-            step={0.5}
-            value={rate}
-            onChange={(e) => setRate(Number(e.target.value))}
-          />
-        </label>
-
-        <label className="cge-field">
-          <span className="cge-label">
-            Time horizon <strong>{years} years</strong>
-          </span>
-          <input
-            type="range"
-            min={1}
-            max={300}
-            step={1}
-            value={years}
-            onChange={(e) => setYears(Number(e.target.value))}
-          />
-        </label>
+        <NumberField
+          label="Starting amount"
+          value={principal}
+          min={0}
+          max={5_000_000}
+          step={5_000}
+          prefix="$"
+          integer
+          onCommit={setPrincipal}
+        />
+        <NumberField
+          label="Monthly contribution"
+          value={monthly}
+          min={0}
+          max={20_000}
+          step={100}
+          prefix="$"
+          integer
+          onCommit={setMonthly}
+        />
+        <NumberField
+          label="Annual return"
+          value={rate}
+          min={0}
+          max={15}
+          step={0.5}
+          suffix="%"
+          onCommit={setRate}
+        />
+        <NumberField
+          label="Time horizon"
+          value={years}
+          min={1}
+          max={100}
+          step={1}
+          suffix={" years"}
+          integer
+          onCommit={setYears}
+        />
       </div>
 
       <div className="cge-output">

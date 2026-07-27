@@ -169,15 +169,54 @@ const upcoming = [
   }
   .cge-label {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
     font-family: var(--font-sans);
     font-size: var(--step--1);
     color: var(--color-text-soft);
   }
-  .cge-label strong {
+  .cge-value-box {
+    display: inline-flex;
+    align-items: baseline;
+    white-space: pre;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 0.15rem 0.45rem;
+    background: var(--color-surface);
     color: var(--color-text);
+    transition: border-color var(--transition);
+  }
+  .cge-value-box:focus-within {
+    border-color: var(--color-accent);
+  }
+  .cge-value-box[data-invalid] {
+    border-color: var(--color-error);
+  }
+  .cge-adorn {
+    font-weight: 650;
     font-variant-numeric: tabular-nums;
+  }
+  .cge-value-input {
+    width: 6.5em;
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 650;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .cge-value-input:focus {
+    outline: none;
+  }
+  .cge-error {
+    justify-self: end;
+    color: var(--color-error);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
   }
   .cge-field input[type="range"] {
     width: 100%;

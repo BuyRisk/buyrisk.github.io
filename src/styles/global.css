@@ -49,6 +49,7 @@
   --color-accent-contrast: #ffffff;
   --color-link: #1a6b8a;
   --color-warn: #b4531f;
+  --color-error: #c0392b;
 }
 
 /* ---------- Dark theme ---------- */
@@ -66,6 +67,7 @@
   --color-accent-contrast: #0c1512;
   --color-link: #6cc4e0;
   --color-warn: #e6935e;
+  --color-error: #f28b82;
 }
 
 /* ---------- Reset-ish ---------- */
