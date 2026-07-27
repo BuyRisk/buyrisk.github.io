@@ -45,12 +45,24 @@ function project(
   };
 }
 
-const currency = (n: number) =>
-  n.toLocaleString("en-US", {
+// Format a dollar amount, staying readable across a huge dynamic range.
+// Realistic figures show in full ($447,156); once numbers get absurd — as they
+// do over centuries of compounding — we switch to compact (…B, …T) and then
+// scientific notation so labels and stat cards never overflow.
+function formatCurrency(n: number, { alwaysCompact = false } = {}): string {
+  const abs = Math.abs(n);
+  const notation =
+    abs >= 1e15 ? "scientific" : alwaysCompact || abs >= 1e9 ? "compact" : "standard";
+  return n.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0,
+    notation,
+    maximumFractionDigits: notation === "standard" ? 0 : 1,
   });
+}
+
+const currency = (n: number) => formatCurrency(n);
+const compactCurrency = (n: number) => formatCurrency(n, { alwaysCompact: true });
 
 function Chart({ points }: { points: Projection["points"] }) {
   const width = 640;
@@ -95,7 +107,7 @@ function Chart({ points }: { points: Projection["points"] }) {
             className="cge-gridline"
           />
           <text x={pad.left - 8} y={t.y + 4} className="cge-axis-label" textAnchor="end">
-            {currency(t.value)}
+            {compactCurrency(t.value)}
           </text>
         </g>
       ))}
@@ -135,8 +147,8 @@ export default function CompoundGrowthExplorer() {
           <input
             type="range"
             min={0}
-            max={100_000}
-            step={1_000}
+            max={5_000_000}
+            step={5_000}
             value={principal}
             onChange={(e) => setPrincipal(Number(e.target.value))}
           />
@@ -149,8 +161,8 @@ export default function CompoundGrowthExplorer() {
           <input
             type="range"
             min={0}
-            max={2_000}
-            step={25}
+            max={20_000}
+            step={100}
             value={monthly}
             onChange={(e) => setMonthly(Number(e.target.value))}
           />
@@ -163,7 +175,7 @@ export default function CompoundGrowthExplorer() {
           <input
             type="range"
             min={0}
-            max={12}
+            max={20}
             step={0.5}
             value={rate}
             onChange={(e) => setRate(Number(e.target.value))}
@@ -177,7 +189,7 @@ export default function CompoundGrowthExplorer() {
           <input
             type="range"
             min={1}
-            max={50}
+            max={300}
             step={1}
             value={years}
             onChange={(e) => setYears(Number(e.target.value))}
