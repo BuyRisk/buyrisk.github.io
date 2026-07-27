@@ -26,6 +26,22 @@ const FAN_RUNS = 12;
 
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
 
+/** A "nice" round tick step (1/2/5 × 10ⁿ) covering `range` in ~`ticks` steps. */
+function niceStep(range: number, ticks: number): number {
+  const raw = range / Math.max(1, ticks);
+  const mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  const norm = raw / mag;
+  const step = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+  return step * mag;
+}
+
+/**
+ * Asset color by position in the portfolio, not by asset identity. The palette
+ * (defined in tools/portfolio.astro) is contrast-ordered, so a 2-3 asset mix
+ * always uses the most distinct, easiest-to-tell-apart colors.
+ */
+const paletteColor = (i: number) => `var(--pl-c${(i % 8) + 1})`;
+
 let customCounter = 0;
 
 function makeAssetFromPreset(id: string): Asset {
@@ -116,9 +132,9 @@ function FrontierChart({
       ))}
 
       {/* Individual asset endpoints */}
-      {assets.map((a) => (
+      {assets.map((a, i) => (
         <g key={a.id}>
-          <circle cx={x(a.sigma)} cy={y(a.mu)} r={5} fill={a.color} stroke="var(--color-surface)" strokeWidth={1.5} />
+          <circle cx={x(a.sigma)} cy={y(a.mu)} r={5} fill={paletteColor(i)} stroke="var(--color-surface)" strokeWidth={1.5} />
         </g>
       ))}
 
@@ -160,13 +176,8 @@ export default function PortfolioLab() {
   const [mode, setMode] = useState<"historical" | "custom">("historical");
   const [years, setYears] = useState(20);
   const [seed, setSeed] = useState(1);
-  const [running, setRunning] = useState(true);
-  const [showFan, setShowFan] = useState(true);
+  const [showFan, setShowFan] = useState(false);
   const [addValue, setAddValue] = useState("");
-
-  const reduced =
-    typeof window !== "undefined" &&
-    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
   const weights = useMemo(() => normalizeWeights(rawWeights), [rawWeights]);
 
@@ -208,19 +219,8 @@ export default function PortfolioLab() {
   const curSharpe = sharpe(curMu, curVol, RISK_FREE);
   const diversificationSaved = Math.max(0, naiveVol - curVol);
 
-  // --- Canvas animation --------------------------------------------------
+  // --- Canvas: one static simulated time series, with a time axis --------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const revealedRef = useRef(0);
-  const drawRef = useRef<(() => void) | null>(null);
-
-  // Keep the latest data reachable from the persistent animation loop.
-  const latest = useRef({ assetSim, portfolioPath, fanPaths, assets, running, showFan });
-  latest.current = { assetSim, portfolioPath, fanPaths, assets, running, showFan };
-
-  // Reset the reveal when the structure changes (new seed / horizon / assets).
-  useEffect(() => {
-    revealedRef.current = 0;
-  }, [paramsKey, years, seed]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -236,6 +236,7 @@ export default function PortfolioLab() {
       const m = c.match(/var\((--[\w-]+)\)/);
       return m ? css.getPropertyValue(m[1]).trim() || "#888" : c;
     };
+    const SANS = '11px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif';
 
     function sizeCanvas() {
       const dpr = window.devicePixelRatio || 1;
@@ -244,46 +245,98 @@ export default function PortfolioLab() {
       canvas!.height = Math.max(1, Math.floor(rect.height * dpr));
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-    sizeCanvas();
 
     function draw() {
-      const { assetSim, portfolioPath, fanPaths, assets, showFan } = latest.current;
       const rect = canvas!.getBoundingClientRect();
       const W = rect.width;
       const H = rect.height;
-      const padL = 8;
-      const padR = 8;
-      const padT = 10;
-      const padB = 18;
+      const padL = 50;
+      const padR = 14;
+      const padT = 16;
+      const padB = 38;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
       ctx!.clearRect(0, 0, W, H);
 
       const steps = assetSim.steps;
-      const revealed = Math.min(revealedRef.current, steps);
 
-      // vertical scale across all shown series
+      // vertical scale across everything shown
       let maxV = 100;
-      for (const p of assetSim.assetPaths) for (const v of p) if (v > maxV) maxV = v;
-      for (const v of portfolioPath) if (v > maxV) maxV = v;
-      maxV *= 1.05;
+      let minV = 100;
+      const consider = (v: number) => {
+        if (v > maxV) maxV = v;
+        if (v < minV) minV = v;
+      };
+      assetSim.assetPaths.forEach((p) => p.forEach(consider));
+      portfolioPath.forEach(consider);
+      if (showFan) fanPaths.forEach((p) => p.forEach(consider));
+      const yMax = maxV * 1.06;
+      const yMin = Math.max(0, Math.min(100, minV) * 0.97);
 
-      const x = (t: number) => padL + (t / steps) * (W - padL - padR);
-      const y = (v: number) => padT + (1 - v / maxV) * (H - padT - padB);
+      const xStep = (t: number) => padL + (t / steps) * plotW;
+      const xYear = (yr: number) => padL + (yr / years) * plotW;
+      const y = (v: number) => padT + (1 - (v - yMin) / (yMax - yMin)) * plotH;
 
-      // baseline (starting value)
-      ctx!.strokeStyle = color("--color-border");
+      ctx!.font = SANS;
+
+      // horizontal gridlines + value labels
+      const yStep = niceStep(yMax - yMin, 4);
+      ctx!.textAlign = "right";
+      ctx!.textBaseline = "middle";
+      for (let gv = Math.ceil(yMin / yStep) * yStep; gv <= yMax; gv += yStep) {
+        ctx!.strokeStyle = color("--color-border");
+        ctx!.globalAlpha = 0.7;
+        ctx!.lineWidth = 1;
+        ctx!.beginPath();
+        ctx!.moveTo(padL, y(gv));
+        ctx!.lineTo(W - padR, y(gv));
+        ctx!.stroke();
+        ctx!.globalAlpha = 1;
+        ctx!.fillStyle = color("--color-muted");
+        ctx!.fillText(Math.round(gv).toLocaleString(), padL - 8, y(gv));
+      }
+
+      // vertical year gridlines + labels
+      const yearStep = years <= 6 ? 1 : niceStep(years, 5);
+      const ticks: number[] = [];
+      for (let yr = 0; yr < years - 1e-9; yr += yearStep) ticks.push(yr);
+      ticks.push(years);
+      ctx!.textAlign = "center";
+      ctx!.textBaseline = "top";
+      for (const yr of ticks) {
+        const px = xYear(yr);
+        ctx!.strokeStyle = color("--color-border");
+        ctx!.globalAlpha = 0.4;
+        ctx!.lineWidth = 1;
+        ctx!.beginPath();
+        ctx!.moveTo(px, padT);
+        ctx!.lineTo(px, H - padB);
+        ctx!.stroke();
+        ctx!.globalAlpha = 1;
+        ctx!.fillStyle = color("--color-muted");
+        ctx!.fillText(String(Math.round(yr)), px, H - padB + 7);
+      }
+
+      // starting-value baseline (dashed)
+      ctx!.strokeStyle = color("--color-muted");
+      ctx!.globalAlpha = 0.55;
+      ctx!.setLineDash([4, 4]);
       ctx!.lineWidth = 1;
       ctx!.beginPath();
-      ctx!.moveTo(x(0), y(100));
-      ctx!.lineTo(x(steps), y(100));
+      ctx!.moveTo(padL, y(100));
+      ctx!.lineTo(W - padR, y(100));
       ctx!.stroke();
+      ctx!.setLineDash([]);
+      ctx!.globalAlpha = 1;
 
-      const drawPath = (path: number[], upto: number, stroke: string, w: number, alpha: number) => {
+      const drawPath = (path: number[], stroke: string, w: number, alpha: number) => {
         ctx!.strokeStyle = stroke;
         ctx!.globalAlpha = alpha;
         ctx!.lineWidth = w;
+        ctx!.lineJoin = "round";
         ctx!.beginPath();
-        for (let t = 0; t <= upto; t++) {
-          const px = x(t);
+        for (let t = 0; t < path.length; t++) {
+          const px = xStep(t);
           const py = y(path[t]);
           if (t === 0) ctx!.moveTo(px, py);
           else ctx!.lineTo(px, py);
@@ -292,57 +345,37 @@ export default function PortfolioLab() {
         ctx!.globalAlpha = 1;
       };
 
-      // fan of alternate portfolio outcomes
       if (showFan) {
-        for (const f of fanPaths) drawPath(f, revealed, color("--color-accent"), 1, 0.1);
+        for (const f of fanPaths) drawPath(f, color("--color-accent"), 1, 0.12);
       }
-      // individual asset waveforms
       assetSim.assetPaths.forEach((p, i) => {
-        drawPath(p, revealed, resolveColor(assets[i].color), 1.5, 0.7);
+        drawPath(p, resolveColor(paletteColor(i)), 1.5, 0.85);
       });
-      // the portfolio itself
-      drawPath(portfolioPath, revealed, color("--color-accent"), 3, 1);
+      drawPath(portfolioPath, color("--color-accent"), 3, 1);
+
+      // labels: y meaning (top-left) and x title (bottom center)
+      ctx!.fillStyle = color("--color-muted");
+      ctx!.font = SANS;
+      ctx!.textAlign = "left";
+      ctx!.textBaseline = "top";
+      ctx!.fillText("Value · start = 100", padL, 1);
+
+      ctx!.fillStyle = color("--color-text-soft");
+      ctx!.font = '600 12px ui-sans-serif, system-ui, sans-serif';
+      ctx!.textAlign = "center";
+      ctx!.textBaseline = "alphabetic";
+      ctx!.fillText("Years", padL + plotW / 2, H - 6);
     }
 
-    drawRef.current = draw;
-
+    sizeCanvas();
+    draw();
     const onResize = () => {
       sizeCanvas();
-      if (reduced) revealedRef.current = latest.current.assetSim.steps;
       draw();
     };
     window.addEventListener("resize", onResize);
-
-    // Reduced motion: render the completed paths once, statically.
-    if (reduced) {
-      revealedRef.current = assetSim.steps;
-      draw();
-      return () => window.removeEventListener("resize", onResize);
-    }
-
-    draw(); // paint an initial frame immediately, before the first rAF tick
-    let raf = 0;
-    function frame() {
-      const { running } = latest.current;
-      const steps = latest.current.assetSim.steps;
-      if (running) {
-        revealedRef.current += Math.max(1, Math.round(steps / 360));
-        if (revealedRef.current >= steps) {
-          revealedRef.current = 0;
-          setSeed((s) => s + 1); // loop with a fresh draw
-        }
-      }
-      draw();
-      raf = requestAnimationFrame(frame);
-    }
-    raf = requestAnimationFrame(frame);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", onResize);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced]);
+    return () => window.removeEventListener("resize", onResize);
+  }, [assetSim, portfolioPath, fanPaths, showFan, assets, years]);
 
   // --- Handlers ----------------------------------------------------------
   const setWeight = (i: number, v: number) =>
@@ -432,7 +465,7 @@ export default function PortfolioLab() {
           {assets.map((a, i) => (
             <div className="pl-asset" key={a.id}>
               <div className="pl-asset-head">
-                <span className="pl-swatch" style={{ background: a.color }} />
+                <span className="pl-swatch" style={{ background: paletteColor(i) }} />
                 {a.custom && !locked ? (
                   <input
                     className="pl-name-input"
@@ -557,9 +590,6 @@ export default function PortfolioLab() {
                 <input type="checkbox" checked={showFan} onChange={(e) => setShowFan(e.target.checked)} />
                 Show outcome fan
               </label>
-              <button type="button" className="pl-btn" onClick={() => setRunning((r) => !r)}>
-                {running ? "Pause" : "Play"}
-              </button>
               <button type="button" className="pl-btn" onClick={() => setSeed((s) => s + 1)}>
                 New draw
               </button>
@@ -567,9 +597,9 @@ export default function PortfolioLab() {
           </div>
           <canvas ref={canvasRef} className="pl-canvas" />
           <div className="pl-legend">
-            {assets.map((a) => (
+            {assets.map((a, i) => (
               <span className="pl-legend-item" key={a.id}>
-                <span className="pl-swatch" style={{ background: a.color }} /> {a.name}
+                <span className="pl-swatch" style={{ background: paletteColor(i) }} /> {a.name}
               </span>
             ))}
             <span className="pl-legend-item pl-legend-item--port">
@@ -577,9 +607,10 @@ export default function PortfolioLab() {
             </span>
           </div>
           <p className="pl-caption">
-            Each thin line is an asset's simulated price; the bold line is your
-            rebalanced portfolio. Notice how the portfolio rides steadier than
-            its riskiest holdings — that steadiness is diversification.
+            One simulated path over {years} years: each thin line is an asset's
+            price, the bold line is your rebalanced portfolio. Notice how the
+            portfolio rides steadier than its riskiest holdings — that steadiness
+            is diversification. Hit “New draw” for a fresh random scenario.
           </p>
         </div>
 
