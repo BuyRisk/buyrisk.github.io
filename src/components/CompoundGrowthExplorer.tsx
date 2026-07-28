@@ -359,7 +359,9 @@ export default function CompoundGrowthExplorer() {
   const [mode, setMode] = useState<"project" | "goal">("project");
   const [principal, setPrincipal] = useState(10_000);
   const [monthly, setMonthly] = useState(300);
-  const [rate, setRate] = useState(7);
+  const [rate, setRate] = useState(10);
+  const [inflation, setInflation] = useState(3);
+  const [fee, setFee] = useState(0.5);
   const [years, setYears] = useState(30);
   const [target, setTarget] = useState(1_000_000);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
@@ -375,18 +377,35 @@ export default function CompoundGrowthExplorer() {
   // Life phases only apply in project mode (goal mode solves for one monthly).
   const activePhases = mode === "project" ? phases : [];
 
+  // Fees come straight out of your return, in every period — a 0.5% fee on a
+  // 10% return leaves 9.5% to compound. Everything downstream uses this
+  // after-fee rate, so the drag flows through all contribution phases too.
+  const effectiveRate = rate - fee;
+
   // In goal mode the monthly contribution becomes the answer: solve for it, then
   // project forward with that value so the chart still reaches the target.
   const rawRequired =
-    mode === "goal" ? requiredMonthly(target, principal, rate, years) : monthly;
+    mode === "goal"
+      ? requiredMonthly(target, principal, effectiveRate, years)
+      : monthly;
   const effectiveMonthly = Math.max(0, rawRequired);
   const alreadyThere = mode === "goal" && rawRequired <= 0;
 
   const phasesKey = activePhases.map((p) => `${p.startYear}:${p.monthly}`).join("|");
   const result = useMemo(
+    () => project(principal, effectiveMonthly, effectiveRate, years, activePhases),
+    [principal, effectiveMonthly, effectiveRate, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  // Same projection without the fee, to show what the fee cost over the horizon.
+  const resultNoFee = useMemo(
     () => project(principal, effectiveMonthly, rate, years, activePhases),
     [principal, effectiveMonthly, rate, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
+  // Inflation doesn't touch the dollar balance — it erodes what those dollars
+  // buy. Deflate by cumulative inflation to express the result in today's money.
+  const inflationFactor = Math.pow(1 + inflation / 100, years);
+  const realFinal = result.finalBalance / inflationFactor;
+  const feeCost = Math.max(0, resultNoFee.finalBalance - result.finalBalance);
 
   const addPhase = () => {
     setPhases((prev) => {
@@ -406,6 +425,7 @@ export default function CompoundGrowthExplorer() {
   // Bengen 4%-rule sustainable retirement income from the ending balance.
   const annualIncome = (result.finalBalance * withdrawalRate) / 100;
   const monthlyIncome = annualIncome / 12;
+  const monthlyIncomeReal = monthlyIncome / inflationFactor;
 
   // Lifecycle: financial capital (the balance) vs human capital (PV of income).
   const lifecycle = useMemo(
@@ -482,13 +502,33 @@ export default function CompoundGrowthExplorer() {
         )}
         <NumberField
           label="Annual return"
-          info="Your assumed average yearly return, compounded monthly. Historically stocks have averaged roughly 7% after inflation — but real returns are bumpy."
+          info="Your assumed average yearly return before inflation and fees (a nominal return), compounded monthly. US stocks have averaged roughly 10% nominal — about 7% after inflation — over the long run, but real returns are bumpy."
           value={rate}
           min={0}
           max={15}
           step={0.5}
           suffix="%"
           onCommit={setRate}
+        />
+        <NumberField
+          label="Inflation"
+          info="How fast prices rise each year. It doesn't shrink your dollar balance, but it erodes what those dollars buy — so we also show your result in today's purchasing power. The US long-run average is around 3%."
+          value={inflation}
+          min={0}
+          max={10}
+          step={0.25}
+          suffix="%"
+          onCommit={setInflation}
+        />
+        <NumberField
+          label="Annual fees"
+          info="Yearly investing costs — fund expense ratios plus any advisory fee — as a share of your balance. Fees come straight out of your return every year, so even 1% compounds into a surprisingly large drag over decades. Broad index funds run under 0.1%."
+          value={fee}
+          min={0}
+          max={3}
+          step={0.05}
+          suffix="%"
+          onCommit={setFee}
         />
         <NumberField
           label="Time horizon"
@@ -598,6 +638,23 @@ export default function CompoundGrowthExplorer() {
           </dl>
         )}
 
+        <div className="cge-realfee">
+          <span className="cge-realfee-item">
+            {mode === "goal" ? "Target in today's dollars" : "In today's dollars"}
+            <strong>{currency(realFinal)}</strong>
+          </span>
+          <span className="cge-realfee-item">
+            {fee > 0 ? (
+              <>
+                {fee}% fee costs you{" "}
+                <strong className="cge-realfee-cost">{currency(feeCost)}</strong>
+              </>
+            ) : (
+              <>No fee drag</>
+            )}
+          </span>
+        </div>
+
         {alreadyThere && (
           <p className="cge-goal-note">
             Your starting amount alone already grows past this target — no monthly
@@ -650,6 +707,9 @@ export default function CompoundGrowthExplorer() {
             ≈ <strong>{currency(monthlyIncome)}</strong> / month
             <span className="cge-retire-year"> · {currency(annualIncome)} / year</span>
           </p>
+          <p className="cge-retire-real">
+            ≈ {currency(monthlyIncomeReal)} / month in today's dollars
+          </p>
           <p className="cge-retire-note">
             Bengen's {withdrawalRate}% rule: a first-year withdrawal you raise with
             inflation each year, which historically lasted ~30 years.{" "}
@@ -692,8 +752,8 @@ export default function CompoundGrowthExplorer() {
 
       <p className="cge-note">
         A simplified model: it assumes a steady average return, compounded
-        monthly, with no taxes or fees. Real markets are far bumpier — this is a
-        tool for intuition, not a forecast.
+        monthly, with fees and inflation applied evenly and taxes left out. Real
+        markets are far bumpier — this is a tool for intuition, not a forecast.
       </p>
     </div>
   );

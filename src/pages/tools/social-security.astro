@@ -76,15 +76,16 @@ import "../../styles/simtool.css";
 <style is:global>
   .ss-compare {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.4rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.3rem;
     margin-top: var(--space-xs);
   }
   .ss-compare-item {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
-    padding: 0.4rem 0.5rem;
+    min-width: 0;
+    padding: 0.35rem 0.3rem;
     border: var(--border);
     border-radius: var(--radius);
     background: var(--color-bg);
@@ -95,12 +96,14 @@ import "../../styles/simtool.css";
     background: var(--color-accent-soft);
   }
   .ss-compare-age {
-    font-size: var(--step--1);
+    font-size: 0.72rem;
     color: var(--color-muted);
   }
   .ss-compare-amt {
+    font-size: 0.78rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
     color: var(--color-text);
   }
   .ss-legend {

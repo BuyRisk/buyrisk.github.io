@@ -372,6 +372,34 @@ import NextTool from "../../components/NextTool.astro";
     font-style: italic;
     margin: 0;
   }
+  .cge-realfee {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-realfee-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  .cge-realfee-item strong {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+  .cge-realfee-cost {
+    color: var(--color-error) !important;
+  }
+  .cge-retire-real {
+    margin: 0 0 0.3rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    font-variant-numeric: tabular-nums;
+  }
   .cge-retire {
     margin-top: var(--space-md);
     padding: var(--space-md);
