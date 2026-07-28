@@ -123,6 +123,53 @@ import NextTool from "../../components/NextTool.astro";
     font-size: var(--step--1);
     color: var(--color-warn);
   }
+  .cge-phase {
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+  }
+  .cge-phase-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+  }
+  .cge-phase-remove {
+    border: none;
+    background: transparent;
+    color: var(--color-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.2rem;
+  }
+  .cge-phase-remove:hover {
+    color: var(--color-error);
+  }
+  .cge-phase-add {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.5rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .cge-phase-add:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
   .cge-label {
     display: flex;
     align-items: center;

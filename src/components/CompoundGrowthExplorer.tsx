@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
 
 /**
@@ -9,30 +9,52 @@ import InfoTip from "./InfoTip";
  * growth curve as an inline SVG. Pure client-side math — no dependencies.
  */
 
+type Phase = { id: number; startYear: number; monthly: number };
+
 type Projection = {
   points: { year: number; balance: number; contributed: number }[];
   finalBalance: number;
   totalContributed: number;
   totalGrowth: number;
+  depletedYear: number | null;
 };
 
 function project(
   principal: number,
   monthly: number,
   annualRatePct: number,
-  years: number
+  years: number,
+  phases: Phase[] = []
 ): Projection {
   const monthlyRate = annualRatePct / 100 / 12;
+  const sorted = [...phases].sort((a, b) => a.startYear - b.startYear);
+  // Contribution in effect during a given (fractional) year. Later phases with
+  // startYear <= the current year override earlier ones; negative = withdrawal.
+  const monthlyFor = (year: number) => {
+    let m = monthly;
+    for (const p of sorted) if (year >= p.startYear) m = p.monthly;
+    return m;
+  };
+
   const points: Projection["points"] = [
     { year: 0, balance: principal, contributed: principal },
   ];
-
   let balance = principal;
   let contributed = principal;
+  let depletedYear: number | null = null;
 
   for (let month = 1; month <= years * 12; month++) {
-    balance = balance * (1 + monthlyRate) + monthly;
-    contributed += monthly;
+    const grown = balance * (1 + monthlyRate);
+    const wanted = monthlyFor((month - 1) / 12);
+    let applied = wanted;
+    balance = grown + wanted;
+    if (balance < 0) {
+      // Can't withdraw more than the account holds.
+      applied = -grown;
+      balance = 0;
+      if (depletedYear === null) depletedYear = month / 12;
+    }
+    contributed += applied;
     if (month % 12 === 0) {
       points.push({ year: month / 12, balance, contributed });
     }
@@ -43,6 +65,7 @@ function project(
     finalBalance: balance,
     totalContributed: contributed,
     totalGrowth: balance - contributed,
+    depletedYear,
   };
 }
 
@@ -268,6 +291,11 @@ export default function CompoundGrowthExplorer() {
   const [years, setYears] = useState(30);
   const [target, setTarget] = useState(1_000_000);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
+  const [phases, setPhases] = useState<Phase[]>([]);
+  const phaseCounter = useRef(0);
+
+  // Life phases only apply in project mode (goal mode solves for one monthly).
+  const activePhases = mode === "project" ? phases : [];
 
   // In goal mode the monthly contribution becomes the answer: solve for it, then
   // project forward with that value so the chart still reaches the target.
@@ -276,10 +304,26 @@ export default function CompoundGrowthExplorer() {
   const effectiveMonthly = Math.max(0, rawRequired);
   const alreadyThere = mode === "goal" && rawRequired <= 0;
 
+  const phasesKey = activePhases.map((p) => `${p.startYear}:${p.monthly}`).join("|");
   const result = useMemo(
-    () => project(principal, effectiveMonthly, rate, years),
-    [principal, effectiveMonthly, rate, years]
+    () => project(principal, effectiveMonthly, rate, years, activePhases),
+    [principal, effectiveMonthly, rate, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
+
+  const addPhase = () => {
+    setPhases((prev) => {
+      if (prev.length >= 2) return prev;
+      phaseCounter.current += 1;
+      const lastStart = prev.length ? prev[prev.length - 1].startYear : 0;
+      const startYear = Math.min(years, Math.max(lastStart + 5, Math.round(years / 2)));
+      // First extra phase: a changed contribution. Second: a retirement drawdown.
+      const monthlyDefault = prev.length === 0 ? monthly * 2 : -2000;
+      return [...prev, { id: phaseCounter.current, startYear, monthly: monthlyDefault }];
+    });
+  };
+  const removePhase = (id: number) => setPhases((prev) => prev.filter((p) => p.id !== id));
+  const updatePhase = (id: number, patch: Partial<Phase>) =>
+    setPhases((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
 
   // Bengen 4%-rule sustainable retirement income from the ending balance.
   const annualIncome = (result.finalBalance * withdrawalRate) / 100;
@@ -366,6 +410,55 @@ export default function CompoundGrowthExplorer() {
           integer
           onCommit={setYears}
         />
+
+        {mode === "project" && (
+          <>
+            {activePhases.map((ph) => (
+              <div className="cge-phase" key={ph.id}>
+                <div className="cge-phase-head">
+                  <span>{ph.monthly < 0 ? "Retirement drawdown" : "Life change"}</span>
+                  <button
+                    type="button"
+                    className="cge-phase-remove"
+                    aria-label="Remove phase"
+                    onClick={() => removePhase(ph.id)}
+                  >
+                    ×
+                  </button>
+                </div>
+                <NumberField
+                  key={`start-${ph.id}`}
+                  label="Starting in year"
+                  info="The year this new contribution level kicks in — for example, when the kids leave home, or when you retire."
+                  value={ph.startYear}
+                  min={1}
+                  max={years}
+                  step={1}
+                  suffix={" yr"}
+                  integer
+                  onCommit={(v) => updatePhase(ph.id, { startYear: v })}
+                />
+                <NumberField
+                  key={`amt-${ph.id}`}
+                  label="Monthly amount"
+                  info="From that year on: positive keeps contributing, negative withdraws each month (e.g. spending in retirement)."
+                  value={ph.monthly}
+                  min={-20_000}
+                  max={20_000}
+                  step={100}
+                  prefix="$"
+                  integer
+                  onCommit={(v) => updatePhase(ph.id, { monthly: v })}
+                />
+              </div>
+            ))}
+            {activePhases.length < 2 && (
+              <button type="button" className="cge-phase-add" onClick={addPhase}>
+                + {activePhases.length === 0 ? "Add a life change" : "Add a retirement drawdown"}
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       <div className="cge-output">
@@ -418,6 +511,13 @@ export default function CompoundGrowthExplorer() {
           <p className="cge-goal-note">
             Your starting amount alone already grows past this target — no monthly
             saving required.
+          </p>
+        )}
+
+        {result.depletedYear !== null && (
+          <p className="cge-goal-note">
+            Heads up: your withdrawals outpace the balance — the money runs out in
+            year {Math.round(result.depletedYear)}.
           </p>
         )}
 
