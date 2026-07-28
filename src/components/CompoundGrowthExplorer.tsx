@@ -418,13 +418,30 @@ export default function CompoundGrowthExplorer() {
               <input
                 type="range"
                 min={2}
-                max={8}
+                max={10}
                 step={0.25}
                 value={withdrawalRate}
                 aria-label="Withdrawal rate"
                 onChange={(e) => setWithdrawalRate(Number(e.target.value))}
               />
-              <strong>{withdrawalRate}%</strong>
+              <span className="cge-retire-ratebox">
+                <input
+                  type="number"
+                  className="cge-retire-rateinput"
+                  min={1}
+                  max={10}
+                  step={0.25}
+                  value={withdrawalRate}
+                  aria-label="Withdrawal rate percent"
+                  onChange={(e) => {
+                    const v = Number(e.target.value);
+                    if (Number.isFinite(v)) {
+                      setWithdrawalRate(Math.min(10, Math.max(1, v)));
+                    }
+                  }}
+                />
+                %
+              </span>
             </label>
           </div>
           <p className="cge-retire-figure">

@@ -306,10 +306,29 @@ import NextTool from "../../components/NextTool.astro";
     accent-color: var(--color-accent);
     cursor: pointer;
   }
-  .cge-retire-rate strong {
+  .cge-retire-ratebox {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.1rem;
+    color: var(--color-text);
+    font-weight: 700;
+  }
+  .cge-retire-rateinput {
+    width: 3.2rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-align: right;
+    padding: 0.15rem 0.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    background: var(--color-surface);
     color: var(--color-text);
     font-variant-numeric: tabular-nums;
-    min-width: 3ch;
+  }
+  .cge-retire-rateinput:focus {
+    outline: none;
+    border-color: var(--color-accent);
   }
   .cge-retire-figure {
     margin: 0.4rem 0 0.3rem;
