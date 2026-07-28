@@ -20,6 +20,12 @@ export const TOOLS: Tool[] = [
       "See how a starting balance, regular contributions, return, and time compound into long-run growth.",
   },
   {
+    title: "Retirement Burn-Rate Calculator",
+    href: "/tools/burn-rate",
+    blurb:
+      "Estimate your monthly costs in retirement and see the nest egg they imply — the flip side of the 4% rule.",
+  },
+  {
     title: "Diversification: Waveforms",
     href: "/tools/waveforms",
     blurb:

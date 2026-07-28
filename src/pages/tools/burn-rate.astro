@@ -1,0 +1,186 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BurnRateLab from "../../components/BurnRateLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Retirement Burn-Rate Calculator"
+  description="Estimate your monthly costs in retirement and see the nest egg you'd need — the flip side of the 4% rule — and whether a portfolio can sustain it."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>What will retirement cost?</h1>
+    <p class="lede">
+      The 4% rule works both ways. Instead of asking what a portfolio can pay
+      out, start from the other end: estimate what you'll actually spend each
+      month, and see how big a nest egg that spending implies — and whether a
+      given portfolio can keep up.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <BurnRateLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The 25× shortcut</h2>
+      <p>
+        Flip the 4% rule around and it becomes a rule of thumb for how much you
+        need: divide your annual spending by your withdrawal rate. At 4% that's
+        the same as multiplying annual spending by <strong>25</strong> — so
+        $50,000 a year implies a $1.25M nest egg. Choose a more cautious 3% and
+        it jumps to 33×; a bolder 5% drops it to 20×.
+      </p>
+      <ul>
+        <li>
+          <strong>Spending drives everything.</strong> Because of the multiplier,
+          trimming $500/month of costs cuts the nest egg you need by roughly
+          $150,000 (at 4%). Lowering the number you need can be far easier than
+          growing the pile.
+        </li>
+        <li>
+          <strong>It's a sketch, not a plan.</strong> Real retirements have lumpy,
+          rising costs — healthcare especially — and markets don't deliver steady
+          returns. Treat the figure as a target to aim at, not a promise.
+        </li>
+      </ul>
+      <p>Educational only, not financial advice.</p>
+    </div>
+  </section>
+
+  <NextTool current="/tools/burn-rate" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .br-group {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    margin: var(--space-xs) 0 0;
+  }
+  .br-group:first-child {
+    margin-top: 0;
+  }
+  .br-dot {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+  .br-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .br-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .br-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .br-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+  .br-breakdown {
+    display: flex;
+    height: 0.9rem;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--color-surface-alt);
+    margin-bottom: var(--space-md);
+  }
+  .br-seg {
+    height: 100%;
+  }
+  .br-hero {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+  }
+  .br-hero-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .br-hero-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .br-hero-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .br-verdict h3 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--step-1);
+  }
+  .br-verdict-line {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text-soft);
+  }
+  .br-verdict-line strong {
+    color: var(--color-text);
+  }
+  .br-verdict-tag {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    margin: 0 0 var(--space-sm);
+  }
+  .br-ok .br-verdict-tag {
+    color: var(--color-accent);
+  }
+  .br-short .br-verdict-tag {
+    color: var(--color-error);
+  }
+  .br-verdict {
+    border-left: 4px solid var(--color-border);
+  }
+  .br-ok {
+    border-left-color: var(--color-accent);
+  }
+  .br-short {
+    border-left-color: var(--color-error);
+  }
+</style>
