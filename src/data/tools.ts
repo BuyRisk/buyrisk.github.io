@@ -73,4 +73,10 @@ export const TOOLS: Tool[] = [
     blurb:
       "Beyond CAPM: attribute a portfolio's return to size, value, profitability, and investment tilts.",
   },
+  {
+    title: "Can You Beat the Market?",
+    href: "/tools/beat-the-market",
+    blurb:
+      "An efficient-markets game: predict the next move, and learn why you're at coin-flip odds.",
+  },
 ];

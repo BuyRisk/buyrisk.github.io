@@ -1,0 +1,243 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EmhLab from "../../components/EmhLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+---
+
+<BaseLayout
+  title="Can You Beat the Market?"
+  description="An efficient-markets game: predict a stock's next move and discover you're at coin-flip odds — and that trying to time the market usually trails just holding."
+>
+  <section class="container emh-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Can you beat the market?</h1>
+    <p class="lede">
+      A stock chart is unfolding. You can see its whole history — the trend, the
+      dips, the "momentum." All you have to do is call the next move: up or down.
+      Simple, right? Play a few rounds and watch what happens to your score.
+    </p>
+  </section>
+
+  <section class="container emh-host">
+    <EmhLab client:load />
+  </section>
+
+  <section class="container emh-explainer">
+    <div class="prose">
+      <h2>Why you can't win</h2>
+      <p>
+        This chart is a simulated random walk — but that's exactly the point:
+        <strong>real stock charts are nearly indistinguishable from random ones.</strong>
+        The trends and patterns your eye finds are mostly illusions in noise. If
+        the past reliably predicted the future, everyone would trade on it, and
+        the pattern would vanish the instant it appeared. So your accuracy sits
+        near <strong>50%</strong> — a coin flip.
+      </p>
+      <p>
+        That's the <strong>Efficient Markets Hypothesis</strong>: prices already
+        reflect the available information, so you can't systematically beat them.
+        Economists sort it into three strengths:
+      </p>
+      <ul>
+        <li><strong>Weak form</strong> — prices already reflect all <em>past prices</em>, so chart-reading (technical analysis) can't give an edge. That's the game above.</li>
+        <li><strong>Semi-strong form</strong> — prices reflect all <em>public information</em>. By the time you read the news (📰 flags above), the price has already jumped. You can't profit from it.</li>
+        <li><strong>Strong form</strong> — prices reflect <em>even private information</em>. The strongest claim, and the most debated.</li>
+      </ul>
+      <p>
+        And notice the second scoreboard: jumping in and out ("timing the market")
+        usually <em>trails</em> simply holding, because you inevitably sit out some
+        of the market's biggest up-days — which arrive unpredictably. That's the
+        practical punchline, and it rhymes with the
+        <a href="/tools/superstocks">superstock problem</a>: the case for owning
+        the whole market and staying put.
+      </p>
+      <p>
+        Markets aren't <em>perfectly</em> efficient — mispricings exist, and a few
+        investors genuinely exploit them. But it's far harder than it looks, which
+        is the honest lesson here. Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <NextTool current="/tools/beat-the-market" />
+</BaseLayout>
+
+<style>
+  .emh-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .emh-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .emh {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 940px) {
+    .emh {
+      grid-template-columns: 1.4fr 1fr;
+      align-items: start;
+    }
+  }
+  .emh-chart-wrap {
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--space-md);
+    min-width: 0;
+  }
+  .emh-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: var(--space-sm);
+    flex-wrap: wrap;
+  }
+  .emh-prompt {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-text-soft);
+  }
+  .emh-btn {
+    font-family: var(--font-sans);
+    font-size: var(--step-1);
+    font-weight: 700;
+    padding: 0.5rem 1.3rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: transform var(--transition), border-color var(--transition);
+  }
+  .emh-btn:hover {
+    transform: translateY(-1px);
+  }
+  .emh-btn--up:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .emh-btn--down:hover {
+    border-color: var(--color-error);
+    color: var(--color-error);
+  }
+  .emh-btn--new {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border-color: var(--color-accent);
+  }
+  .emh-side {
+    display: grid;
+    gap: var(--space-md);
+    min-width: 0;
+  }
+  .emh-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+    margin: 0;
+  }
+  .emh-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .emh-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .emh-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+  .emh-acc {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+  .emh-good {
+    color: var(--color-accent);
+  }
+  .emh-bad {
+    color: var(--color-error);
+  }
+  .emh-verdict {
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+  .emh-verdict p {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text-soft);
+  }
+  .emh-verdict p:last-child {
+    margin-bottom: 0;
+  }
+  .emh-verdict-head {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    color: var(--color-text) !important;
+  }
+  .emh-hint {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    font-style: italic;
+    margin: 0;
+  }
+  .emh-cumulative {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: var(--space-sm);
+    border-top: var(--border);
+  }
+  .emh-cum-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-text-soft);
+  }
+  .emh-cum-bar {
+    position: relative;
+    height: 0.7rem;
+    background: var(--color-surface-alt);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .emh-cum-fill {
+    height: 100%;
+    background: var(--color-accent);
+    border-radius: 999px;
+    transition: width var(--transition);
+  }
+  .emh-cum-mid {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: 50%;
+    width: 2px;
+    background: var(--color-text);
+    opacity: 0.5;
+  }
+  .emh-cum-val {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+</style>
