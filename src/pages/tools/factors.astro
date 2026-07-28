@@ -1,0 +1,177 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import FactorLab from "../../components/FactorLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Factor Models (Fama–French)"
+  description="Beyond CAPM: the Fama–French factors. Attribute a portfolio's expected return to size, value, profitability, and investment tilts, and watch CAPM's alpha become explained factor exposure."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Beyond beta: the factor zoo</h1>
+    <p class="lede">
+      CAPM says one thing drives returns: the market. But decades of data show
+      small stocks, cheap "value" stocks, and profitable, conservative firms have
+      all earned <em>more</em> than their market beta can explain. Fama and French
+      turned those patterns into extra <strong>factors</strong> — and what CAPM
+      called mysterious "alpha" became exposure you can dial on purpose.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <FactorLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The five factors</h2>
+      <ul>
+        <li><strong>Market (Mkt−RF)</strong> — the whole market's return over T-bills. CAPM's only factor.</li>
+        <li><strong>Size (SMB)</strong> — small companies minus big.</li>
+        <li><strong>Value (HML)</strong> — cheap stocks minus expensive ones.</li>
+        <li><strong>Profitability (RMW)</strong> — robustly profitable firms minus weak.</li>
+        <li><strong>Investment (CMA)</strong> — conservative firms minus aggressive.</li>
+      </ul>
+      <p>
+        A portfolio's <strong>loading</strong> (β) on each factor says how exposed
+        it is. Multiply each loading by that factor's historical premium and you
+        get its contribution to expected return. Switch from CAPM to the 3- and
+        5-factor models and watch a tilted portfolio's "alpha" collapse into
+        explained factor bets.
+      </p>
+
+      <h2>Where it gets hazy</h2>
+      <p>
+        Factor premia are real but <em>noisy and slippery</em>. Value spent much of
+        the 2010s underwater; premia shrink after they're published; and with
+        enough data-mining you can "discover" factors that are just luck. Treat
+        these as tendencies over decades, not guarantees — and remember the
+        <a href="/tools/superstocks">superstock problem</a>: even a good tilt still
+        needs broad diversification.
+      </p>
+      <p>
+        Premia and volatilities are long-run annualized US figures (≈1963–present)
+        from the <a href="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html" target="_blank" rel="noopener noreferrer">Kenneth French Data Library</a>;
+        loadings are illustrative. Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <NextTool current="/tools/factors" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .fl-model {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .fl-model button {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.4rem 0.5rem;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .fl-model button.active {
+    background: var(--color-surface);
+    color: var(--color-accent);
+    box-shadow: var(--shadow);
+  }
+  .fl-group {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    margin: var(--space-xs) 0 0;
+  }
+  .fl-dot {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+  .fl-dim {
+    opacity: 0.5;
+  }
+  .fl-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+    margin-bottom: var(--space-md);
+  }
+  .fl-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .fl-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .fl-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .fl-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .fl-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .fl-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .fl-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

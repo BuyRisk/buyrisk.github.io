@@ -67,4 +67,10 @@ export const TOOLS: Tool[] = [
     blurb:
       "Measure an asset's beta from a return scatter, then see how beta alone sets its fair expected return.",
   },
+  {
+    title: "Factor Models (Fama–French)",
+    href: "/tools/factors",
+    blurb:
+      "Beyond CAPM: attribute a portfolio's return to size, value, profitability, and investment tilts.",
+  },
 ];
