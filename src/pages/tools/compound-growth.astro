@@ -70,18 +70,70 @@ import NextTool from "../../components/NextTool.astro";
   @media (min-width: 820px) {
     .cge {
       grid-template-columns: 300px 1fr;
-      grid-template-areas: "controls output" "note note";
       align-items: start;
     }
-    .cge-controls {
-      grid-area: controls;
+    .cge-note,
+    .cge-lifecycle-wrap {
+      grid-column: 1 / -1;
     }
-    .cge-output {
-      grid-area: output;
-    }
-    .cge-note {
-      grid-area: note;
-    }
+  }
+  .cge-lifecycle-wrap {
+    display: grid;
+    gap: var(--space-sm);
+  }
+  .cge-life-toggle {
+    justify-self: start;
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: 600;
+    padding: 0.5rem 0.9rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .cge-life-toggle:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .cge-lifecycle {
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--space-md);
+    display: grid;
+    gap: var(--space-md);
+  }
+  .cge-life-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-md);
+  }
+  .cge-life-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-life-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .cge-life-key {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 3px;
+    flex: none;
+  }
+  .cge-life-insight {
+    margin: 0;
+    max-width: var(--measure);
+    color: var(--color-text-soft);
   }
   .cge-controls {
     display: grid;

@@ -90,6 +90,29 @@ function requiredMonthly(
   return (target - fvPrincipal) / annuityFactor;
 }
 
+/**
+ * Human capital at a given age: the present value of remaining labor income up
+ * to retirement. Income grows at `growthPct`/yr from its value at `startAge`,
+ * discounted back at `discountPct`/yr. Falls to zero at retirement.
+ */
+function humanCapital(
+  atAge: number,
+  startAge: number,
+  income: number,
+  growthPct: number,
+  discountPct: number,
+  retireAge: number
+): number {
+  const g = growthPct / 100;
+  const d = discountPct / 100;
+  let hc = 0;
+  for (let a = Math.floor(atAge); a < retireAge; a++) {
+    const inc = income * Math.pow(1 + g, a - startAge);
+    hc += inc / Math.pow(1 + d, a - atAge);
+  }
+  return hc;
+}
+
 // Format a dollar amount, staying readable across a huge dynamic range.
 // Realistic figures show in full ($447,156); once numbers get absurd — as they
 // do over centuries of compounding — we switch to compact (…B, …T) and then
@@ -283,6 +306,55 @@ function NumberField({
   );
 }
 
+type LifePoint = { age: number; fin: number; hc: number; total: number };
+
+function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: number }) {
+  const width = 680;
+  const height = 280;
+  const pad = { top: 16, right: 16, bottom: 36, left: 62 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const ageMin = data[0]?.age ?? 30;
+  const ageMax = data[data.length - 1]?.age ?? 65;
+  const maxTotal = Math.max(...data.map((d) => d.total), 1);
+
+  const x = (age: number) => pad.left + ((age - ageMin) / (ageMax - ageMin || 1)) * plotW;
+  const y = (v: number) => height - pad.bottom - (v / maxTotal) * plotH;
+
+  const finArea =
+    "M" + data.map((d) => `${x(d.age)},${y(d.fin)}`).join(" L") +
+    ` L${x(ageMax)},${y(0)} L${x(ageMin)},${y(0)} Z`;
+  const hcArea =
+    "M" + data.map((d) => `${x(d.age)},${y(d.total)}`).join(" L") + " L" +
+    [...data].reverse().map((d) => `${x(d.age)},${y(d.fin)}`).join(" L") + " Z";
+
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const showRetire = retireAge > ageMin && retireAge < ageMax;
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Human capital and financial capital over your lifetime">
+      {[0, 0.25, 0.5, 0.75, 1].map((f) => (
+        <g key={f}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(maxTotal * f)} y2={y(maxTotal * f)} stroke="var(--color-border)" />
+          <text x={pad.left - 8} y={y(maxTotal * f) + 4} textAnchor="end" style={axisText}>{compactCurrency(maxTotal * f)}</text>
+        </g>
+      ))}
+      <path d={finArea} fill="var(--color-accent)" opacity={0.75} />
+      <path d={hcArea} fill="var(--pl-c3)" opacity={0.55} />
+      {showRetire && (
+        <>
+          <line x1={x(retireAge)} x2={x(retireAge)} y1={pad.top} y2={height - pad.bottom} stroke="var(--color-text)" strokeWidth={1} strokeDasharray="3 3" />
+          <text x={x(retireAge)} y={pad.top + 2} textAnchor="middle" style={{ ...axisText, fontSize: 10 }}>retire {retireAge}</text>
+        </>
+      )}
+      {data.filter((_, i) => i % Math.ceil(data.length / 6) === 0).map((d) => (
+        <text key={d.age} x={x(d.age)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{Math.round(d.age)}</text>
+      ))}
+      <text x={pad.left + plotW / 2} y={height - 3} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Age →</text>
+    </svg>
+  );
+}
+
 export default function CompoundGrowthExplorer() {
   const [mode, setMode] = useState<"project" | "goal">("project");
   const [principal, setPrincipal] = useState(10_000);
@@ -293,6 +365,12 @@ export default function CompoundGrowthExplorer() {
   const [withdrawalRate, setWithdrawalRate] = useState(4);
   const [phases, setPhases] = useState<Phase[]>([]);
   const phaseCounter = useRef(0);
+  const [showLifecycle, setShowLifecycle] = useState(false);
+  const [currentAge, setCurrentAge] = useState(30);
+  const [income, setIncome] = useState(70_000);
+  const [incomeGrowth, setIncomeGrowth] = useState(2);
+  const [retireAge, setRetireAge] = useState(65);
+  const [stockPct, setStockPct] = useState(90);
 
   // Life phases only apply in project mode (goal mode solves for one monthly).
   const activePhases = mode === "project" ? phases : [];
@@ -328,6 +406,19 @@ export default function CompoundGrowthExplorer() {
   // Bengen 4%-rule sustainable retirement income from the ending balance.
   const annualIncome = (result.finalBalance * withdrawalRate) / 100;
   const monthlyIncome = annualIncome / 12;
+
+  // Lifecycle: financial capital (the balance) vs human capital (PV of income).
+  const lifecycle = useMemo(
+    () =>
+      result.points.map((pt) => {
+        const age = currentAge + pt.year;
+        const hc = humanCapital(age, currentAge, income, incomeGrowth, rate, retireAge);
+        return { age, fin: pt.balance, hc, total: pt.balance + hc };
+      }),
+    [result, currentAge, income, incomeGrowth, rate, retireAge]
+  );
+  const hcNow = humanCapital(currentAge, currentAge, income, incomeGrowth, rate, retireAge);
+  const trueEquity = principal + hcNow > 0 ? (principal * (stockPct / 100)) / (principal + hcNow) : 0;
 
   return (
     <div className="cge">
@@ -566,6 +657,38 @@ export default function CompoundGrowthExplorer() {
           </p>
         </div>
       </div>
+
+      {mode === "project" && (
+        <div className="cge-lifecycle-wrap">
+          <button type="button" className="cge-life-toggle" onClick={() => setShowLifecycle((v) => !v)}>
+            {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view — human &amp; financial capital
+          </button>
+          {showLifecycle && (
+            <div className="cge-lifecycle">
+              <div className="cge-life-controls">
+                <NumberField label="Current age" info="Your age today — the left edge of the lifecycle chart." value={currentAge} min={18} max={80} step={1} integer onCommit={setCurrentAge} />
+                <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks." value={income} min={0} max={1_000_000} step={5_000} prefix="$" integer onCommit={setIncome} />
+                <NumberField label="Income growth" info="How fast your pay rises each year." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
+                <NumberField label="Retirement age" info="When labor income stops — where human capital reaches zero." value={retireAge} min={40} max={90} step={1} integer onCommit={setRetireAge} />
+                <NumberField label="Stocks in portfolio" info="The share of your invested savings held in stocks — used to gauge your true, total-wealth stock exposure." value={stockPct} min={0} max={100} step={5} suffix="%" integer onCommit={setStockPct} />
+              </div>
+              <LifecycleChart data={lifecycle} retireAge={retireAge} />
+              <div className="cge-life-legend">
+                <span><span className="cge-life-key" style={{ background: "var(--color-accent)" }} /> Financial capital (your savings)</span>
+                <span><span className="cge-life-key" style={{ background: "var(--pl-c3)" }} /> Human capital (future earnings)</span>
+              </div>
+              <p className="cge-life-insight">
+                At age {currentAge}, your wealth is mostly <strong>human capital</strong>:
+                about {compactCurrency(hcNow)} of future earnings versus {compactCurrency(principal)} saved.
+                So even a {stockPct}%-stock portfolio is only{" "}
+                <strong>{Math.round(trueEquity * 100)}%</strong> of your <em>total</em> capital
+                in stocks — the classic case that the young can afford more equity risk, and
+                why target-date funds start aggressive and glide safer as human capital runs out.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       <p className="cge-note">
         A simplified model: it assumes a steady average return, compounded
