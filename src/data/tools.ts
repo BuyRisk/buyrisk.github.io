@@ -37,4 +37,11 @@ export const TOOLS: Tool[] = [
     blurb:
       "Mix assets and watch correlations, the efficient frontier, and the range of outcomes come to life.",
   },
+  {
+    title: "CAPM & the Security Market Line",
+    href: "/tools/capm",
+    blurb:
+      "Measure an asset's beta from a return scatter, then see how beta alone sets its fair expected return.",
+    tag: "New",
+  },
 ];
