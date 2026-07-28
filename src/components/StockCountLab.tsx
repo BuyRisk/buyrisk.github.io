@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
+import InfoTip from "./InfoTip";
 
 /**
  * "How many stocks is enough?" — diversification WITHIN one asset class.
@@ -129,6 +130,9 @@ export default function StockCountLab() {
       ctx!.textBaseline = "top";
       ctx!.fillText(`${N} individual stocks`, padL, 2);
       ctx!.fillText("Equal-weight portfolio", padL, bandH + gap + 2);
+      ctx!.textAlign = "right";
+      ctx!.fillText("time →", W - padR, 2);
+      ctx!.textAlign = "left";
 
       // individual stocks (faint)
       ctx!.strokeStyle = color("--color-text-soft");
@@ -220,15 +224,27 @@ export default function StockCountLab() {
         </div>
 
         <label className="wl-slider">
-          <span>Number of stocks <strong>{n}</strong></span>
+          <span>
+            Number of stocks
+            <InfoTip text="How many equally-weighted stocks you hold. Adding more averages away each company's own risk." />{" "}
+            <strong>{n}</strong>
+          </span>
           <input type="range" min={1} max={MAX_N} step={1} value={n} onChange={(e) => setN(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Volatility per stock <strong>{pct(sigma, 0)}</strong></span>
+          <span>
+            Volatility per stock
+            <InfoTip text="How jumpy a single stock is on its own. Individual stocks are far more volatile than the market — often 30%+ a year." />{" "}
+            <strong>{pct(sigma, 0)}</strong>
+          </span>
           <input type="range" min={0.1} max={0.6} step={0.01} value={sigma} onChange={(e) => setSigma(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Average correlation <strong>{rho.toFixed(2)}</strong></span>
+          <span>
+            Average correlation
+            <InfoTip text="How much the stocks move together (0 to 1). It sets the risk floor you can't diversify away: the more correlated, the higher the floor." />{" "}
+            <strong>{rho.toFixed(2)}</strong>
+          </span>
           <input type="range" min={0} max={0.8} step={0.01} value={rho} onChange={(e) => setRho(+e.target.value)} />
         </label>
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>

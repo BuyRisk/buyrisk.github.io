@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PRESET_ASSETS } from "../data/assets";
 import FrontierChart from "./FrontierChart";
+import InfoTip from "./InfoTip";
 import {
   type Asset,
   correlationMatrix,
@@ -170,6 +171,9 @@ export default function RandomnessLab() {
       ctx!.textBaseline = "top";
       ctx!.fillText("Each asset (noisy returns)", padL, 2);
       ctx!.fillText("Your portfolio", padL, bandH + gap + 2);
+      ctx!.textAlign = "right";
+      ctx!.fillText("time →", W - padR, 2);
+      ctx!.textAlign = "left";
 
       const clampY = (yy: number, center: number) =>
         clamp(yy, center - bandH / 2 + 1, center + bandH / 2 - 1);
@@ -353,7 +357,11 @@ export default function RandomnessLab() {
               </label>
 
               <label className="wl-slider">
-                <span>Swing <strong>{pct(a.sigma, 0)}</strong></span>
+                <span>
+                  Swing
+                  <InfoTip text="The asset's volatility — the typical size of its random ups and downs each period." />{" "}
+                  <strong>{pct(a.sigma, 0)}</strong>
+                </span>
                 <input
                   type="range"
                   min={0.02}
@@ -366,7 +374,11 @@ export default function RandomnessLab() {
 
               {!isPair && (
                 <label className="wl-slider">
-                  <span>Correlation <strong>{a.marketCorr.toFixed(2)}</strong></span>
+                  <span>
+                    Correlation
+                    <InfoTip text="How closely this asset's returns track the others, from −1 to +1. Higher correlation means they tend to fall together." />{" "}
+                    <strong>{a.marketCorr.toFixed(2)}</strong>
+                  </span>
                   <input
                     type="range"
                     min={-1}
@@ -384,7 +396,8 @@ export default function RandomnessLab() {
         {isPair && (
           <label className="wl-corr">
             <span className="wl-corr-label">
-              Correlation ({assets[0].name} ↔ {assets[1].name}):{" "}
+              Correlation ({assets[0].name} ↔ {assets[1].name})
+              <InfoTip text="How the two assets move together (−1 to +1). Even near −1, real randomness leaves a residual wobble — perfect cancellation never happens." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input

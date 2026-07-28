@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
+import InfoTip from "./InfoTip";
 
 /**
  * CAPM teaching tool — two linked panels:
@@ -116,35 +117,35 @@ export default function CapmLab() {
       <div className="wl-controls">
         <p className="cl-group">The market</p>
         <label className="wl-slider">
-          <span>Risk-free rate <strong>{pct(rf)}</strong></span>
+          <span>Risk-free rate<InfoTip text="The return on a safe asset like Treasury bills — the reward for taking no risk. It's where the Security Market Line starts." /> <strong>{pct(rf)}</strong></span>
           <input type="range" min={0} max={0.08} step={0.0025} value={rf} onChange={(e) => setRf(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Market risk premium <strong>{pct(premium)}</strong></span>
+          <span>Market risk premium<InfoTip text="How much extra return the overall market is expected to earn above the risk-free rate — the payoff for bearing market risk." /> <strong>{pct(premium)}</strong></span>
           <input type="range" min={0.01} max={0.1} step={0.0025} value={premium} onChange={(e) => setPremium(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Market volatility <strong>{pct(sigM, 0)}</strong></span>
+          <span>Market volatility<InfoTip text="How much the overall market bounces around. It sets the horizontal spread of the return scatter on the left." /> <strong>{pct(sigM, 0)}</strong></span>
           <input type="range" min={0.08} max={0.25} step={0.005} value={sigM} onChange={(e) => setSigM(+e.target.value)} />
         </label>
 
         <p className="cl-group">Your asset</p>
         <label className="wl-slider">
-          <span>Beta (β) <strong>{beta.toFixed(2)}</strong></span>
+          <span>Beta (β)<InfoTip text="How much the asset amplifies the market. β=1 moves with it, β=2 swings twice as hard, β=0.5 half. It's the slope of the scatter." /> <strong>{beta.toFixed(2)}</strong></span>
           <input type="range" min={-0.5} max={2.5} step={0.05} value={beta} onChange={(e) => setBeta(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Alpha (α) <strong>{signedPct(alpha)}</strong></span>
+          <span>Alpha (α)<InfoTip text="Return the market doesn't explain — skill or mispricing. Positive alpha sits above the Security Market Line (a bargain); negative below." /> <strong>{signedPct(alpha)}</strong></span>
           <input type="range" min={-0.05} max={0.05} step={0.0025} value={alpha} onChange={(e) => setAlpha(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Idiosyncratic noise <strong>{pct(idio, 0)}</strong></span>
+          <span>Idiosyncratic noise<InfoTip text="Company-specific wobble unrelated to the market. More noise scatters the dots and lowers R² — this is the risk diversification removes." /> <strong>{pct(idio, 0)}</strong></span>
           <input type="range" min={0} max={0.25} step={0.005} value={idio} onChange={(e) => setIdio(+e.target.value)} />
         </label>
 
         <p className="cl-group">Estimating beta</p>
         <label className="wl-slider">
-          <span>Sample size <strong>{n} periods</strong></span>
+          <span>Sample size<InfoTip text="How many periods of data are used to estimate beta. More data tightens the estimate; with few periods, β̂ jumps around the true value." /> <strong>{n} periods</strong></span>
           <input type="range" min={20} max={240} step={4} value={n} onChange={(e) => setN(+e.target.value)} />
         </label>
         <div className="wl-simmode" role="group" aria-label="Sampling mode">
@@ -161,7 +162,7 @@ export default function CapmLab() {
 
         <p className="cl-group">Move along the line</p>
         <label className="wl-slider">
-          <span>Cash ⇄ Market blend <strong>{pct(blend, 0)} market</strong></span>
+          <span>Cash ⇄ Market blend<InfoTip text="Mix cash (safe) with the market to slide along the line: 0% is all cash, 100% is the market, above 100% means borrowing to invest more." /> <strong>{pct(blend, 0)} market</strong></span>
           <input type="range" min={0} max={1.5} step={0.05} value={blend} onChange={(e) => setBlend(+e.target.value)} />
         </label>
       </div>

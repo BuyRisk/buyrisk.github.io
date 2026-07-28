@@ -21,6 +21,7 @@ import {
   percentile,
 } from "../lib/portfolio";
 import { PRESET_ASSETS, DEFAULT_ASSET_IDS } from "../data/assets";
+import InfoTip from "./InfoTip";
 
 const STEPS_PER_YEAR = 52;
 const CLOUD_SEED = 20260726;
@@ -797,7 +798,7 @@ export default function PortfolioLab() {
 
               <div className="pl-params">
                 <label>
-                  <span>Return</span>
+                  <span>Return<InfoTip text="The asset's expected annual return — its reward. In Historical mode these are illustrative long-run figures." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"
@@ -810,7 +811,7 @@ export default function PortfolioLab() {
                   </span>
                 </label>
                 <label>
-                  <span>Risk</span>
+                  <span>Risk<InfoTip text="The asset's volatility (standard deviation) — how much its return swings year to year." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"
@@ -823,7 +824,7 @@ export default function PortfolioLab() {
                   </span>
                 </label>
                 <label>
-                  <span>Mkt corr</span>
+                  <span>Mkt corr<InfoTip text="Correlation with the common market factor (−1 to +1). It drives how this asset moves with the others; low or negative values diversify best." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"
@@ -848,7 +849,8 @@ export default function PortfolioLab() {
         {isPair && (
           <label className="pl-corr">
             <span className="pl-corr-label">
-              Correlation ({assets[0].name} ↔ {assets[1].name}):{" "}
+              Correlation ({assets[0].name} ↔ {assets[1].name})
+              <InfoTip text="How the two assets move together, from −1 to +1. Drag toward −1 and the efficient frontier bows out — the essence of diversification." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input
@@ -901,7 +903,7 @@ export default function PortfolioLab() {
         </label>
 
         <label className="pl-horizon">
-          <span>Risk-free rate: <strong>{pct(riskFree, 1)}</strong></span>
+          <span>Risk-free rate:<InfoTip text="The return on cash/Treasuries. It anchors the capital market line and determines the tangency (max-Sharpe) portfolio." /> <strong>{pct(riskFree, 1)}</strong></span>
           <input
             type="range"
             min={0}

@@ -1,4 +1,5 @@
 import { useId, useMemo, useState } from "react";
+import InfoTip from "./InfoTip";
 
 /**
  * Interactive compound-growth explorer.
@@ -156,6 +157,7 @@ type NumberFieldProps = {
   prefix?: string;
   suffix?: string;
   integer?: boolean;
+  info?: string;
   onCommit: (value: number) => void;
 };
 
@@ -174,6 +176,7 @@ function NumberField({
   prefix,
   suffix,
   integer,
+  info,
   onCommit,
 }: NumberFieldProps) {
   const [text, setText] = useState(() => String(value));
@@ -219,7 +222,10 @@ function NumberField({
   return (
     <div className="cge-field">
       <div className="cge-label">
-        <span>{label}</span>
+        <span>
+          {label}
+          {info && <InfoTip text={info} />}
+        </span>
         <span className="cge-value-box" data-invalid={error || undefined}>
           {prefix && <span className="cge-adorn">{prefix}</span>}
           <input
@@ -303,6 +309,7 @@ export default function CompoundGrowthExplorer() {
 
         <NumberField
           label="Starting amount"
+          info="What you're investing today, before any monthly contributions."
           value={principal}
           min={0}
           max={5_000_000}
@@ -315,6 +322,7 @@ export default function CompoundGrowthExplorer() {
           <NumberField
             key="contribution"
             label="Monthly contribution"
+            info="How much you add every month. Contributions are invested and compound alongside your starting amount."
             value={monthly}
             min={0}
             max={20_000}
@@ -327,6 +335,7 @@ export default function CompoundGrowthExplorer() {
           <NumberField
             key="target"
             label="Target balance"
+            info="The ending balance you're aiming for. The tool solves for the monthly contribution that gets you there."
             value={target}
             min={0}
             max={10_000_000}
@@ -338,6 +347,7 @@ export default function CompoundGrowthExplorer() {
         )}
         <NumberField
           label="Annual return"
+          info="Your assumed average yearly return, compounded monthly. Historically stocks have averaged roughly 7% after inflation — but real returns are bumpy."
           value={rate}
           min={0}
           max={15}
@@ -347,6 +357,7 @@ export default function CompoundGrowthExplorer() {
         />
         <NumberField
           label="Time horizon"
+          info="How many years you stay invested. Time is compounding's biggest lever — the curve bends sharply upward in the later years."
           value={years}
           min={1}
           max={100}

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { mulberry32, makeNormal, percentile } from "../lib/portfolio";
+import InfoTip from "./InfoTip";
 
 /**
  * Bessembinder's skewness, made interactive. Individual stock lifetime returns
@@ -67,7 +68,11 @@ export default function SuperstockLab() {
     <div className="wl">
       <div className="wl-controls">
         <label className="wl-slider">
-          <span>Stocks you hand-pick <strong>{n}</strong></span>
+          <span>
+            Stocks you hand-pick
+            <InfoTip text="How many stocks you'd hold, chosen at random from the universe. The fewer you pick, the more likely you miss the rare superstocks." />{" "}
+            <strong>{n}</strong>
+          </span>
           <input type="range" min={1} max={200} step={1} value={n} onChange={(e) => setN(Number(e.target.value))} />
         </label>
         <div className="sk-quicks">

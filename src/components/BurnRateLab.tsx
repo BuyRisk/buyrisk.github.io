@@ -1,4 +1,5 @@
 import { useState } from "react";
+import InfoTip from "./InfoTip";
 
 /**
  * Rudimentary retirement burn-rate calculator. The user estimates typical
@@ -67,11 +68,19 @@ export default function BurnRateLab() {
 
         <p className="br-group">Assumptions</p>
         <label className="wl-slider">
-          <span>Withdrawal rate <strong>{withdrawalRate}%</strong></span>
+          <span>
+            Withdrawal rate
+            <InfoTip text="The share of your portfolio you spend in the first year (then adjust for inflation). Bengen's 4% rule is the classic starting point." />{" "}
+            <strong>{withdrawalRate}%</strong>
+          </span>
           <input type="range" min={2} max={8} step={0.25} value={withdrawalRate} onChange={(e) => setWithdrawalRate(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
-          <span>Your nest egg <strong>{currency(portfolio)}</strong></span>
+          <span>
+            Your nest egg
+            <InfoTip text="The savings you'd retire with. Compare it to the nest egg your spending requires to see if you're covered." />{" "}
+            <strong>{currency(portfolio)}</strong>
+          </span>
           <input type="range" min={0} max={5_000_000} step={25_000} value={portfolio} onChange={(e) => setPortfolio(Number(e.target.value))} />
         </label>
       </div>

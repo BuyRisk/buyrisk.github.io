@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PRESET_ASSETS } from "../data/assets";
 import FrontierChart from "./FrontierChart";
+import InfoTip from "./InfoTip";
 import {
   covarianceMatrix,
   randomPortfolios,
@@ -174,6 +175,9 @@ export default function WaveformLab() {
       ctx!.textBaseline = "top";
       ctx!.fillText("Each asset's swing", padL, 2);
       ctx!.fillText("Your portfolio", padL, bandH + gap + 2);
+      ctx!.textAlign = "right";
+      ctx!.fillText("time →", W - padR, 2);
+      ctx!.textAlign = "left";
 
       const theta = (x: number) => (x / plotW) * THETA_SPAN + phase0;
       const step = 2;
@@ -347,7 +351,11 @@ export default function WaveformLab() {
               </label>
 
               <label className="wl-slider">
-                <span>Swing <strong>{pct(a.amp, 0)}</strong></span>
+                <span>
+                  Swing
+                  <InfoTip text="The asset's volatility — how big its ups and downs are. Here it sets the height (amplitude) of the wave." />{" "}
+                  <strong>{pct(a.amp, 0)}</strong>
+                </span>
                 <input
                   type="range"
                   min={0.02}
@@ -360,7 +368,11 @@ export default function WaveformLab() {
 
               {!isPair && (
                 <label className="wl-slider">
-                  <span>Correlation <strong>{a.corr.toFixed(2)}</strong></span>
+                  <span>
+                    Correlation
+                    <InfoTip text="How closely this asset moves with the others (−1 to +1). It sets the wave's phase: +1 lines up, −1 is the mirror image." />{" "}
+                    <strong>{a.corr.toFixed(2)}</strong>
+                  </span>
                   <input
                     type="range"
                     min={-1}
@@ -378,7 +390,8 @@ export default function WaveformLab() {
         {isPair && (
           <label className="wl-corr">
             <span className="wl-corr-label">
-              Correlation ({assets[0].name} ↔ {assets[1].name}):{" "}
+              Correlation ({assets[0].name} ↔ {assets[1].name})
+              <InfoTip text="How the two assets move together, from −1 (opposite) to +1 (in lockstep). Lower correlation means the waves cancel more — more diversification." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input
