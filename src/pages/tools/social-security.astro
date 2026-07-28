@@ -1,0 +1,205 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SocialSecurityLab from "../../components/SocialSecurityLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="When to Claim Social Security"
+  description="The core trade-off in claiming Social Security: bigger checks later versus more checks sooner. See delayed-retirement credits, the breakeven age, and longevity risk."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>When should you claim Social Security?</h1>
+    <p class="lede">
+      You can start Social Security anytime from 62 to 70 — and the choice
+      matters enormously. Claim early and the checks are smaller but start
+      sooner; wait, and each year adds roughly 8% to your monthly benefit for
+      life. The question is really about how long you'll live.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <SocialSecurityLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Bigger checks, or more of them?</h2>
+      <ul>
+        <li>
+          <strong>Claiming at 62</strong> permanently shrinks your check to about
+          70% of the full amount — but you collect for up to eight extra years.
+        </li>
+        <li>
+          <strong>Waiting until 70</strong> boosts it to about 124% via delayed
+          retirement credits, but you forgo those early years of income.
+        </li>
+        <li>
+          <strong>The breakeven age</strong> — usually around 80–81 — is where
+          waiting pulls ahead. Live longer and delaying wins; die sooner and
+          claiming early wins. Since you can't know, delaying acts as
+          <em>longevity insurance</em>: it protects the scenario you can least
+          afford — running low on money while still alive.
+        </li>
+      </ul>
+      <p>
+        This tool teaches the intuition with a single benefit amount. Real
+        decisions also involve spousal and survivor benefits, taxes, your
+        earnings record, and whether you're still working. For an actual,
+        personalized claiming strategy, use the free, open-source
+        <a href="https://opensocialsecurity.com/" target="_blank" rel="noopener noreferrer">Open Social Security</a>
+        by Mike Piper. Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <NextTool current="/tools/social-security" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .ss-compare {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    margin-top: var(--space-xs);
+  }
+  .ss-compare-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.4rem 0.5rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    font-family: var(--font-sans);
+  }
+  .ss-compare-item.active {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .ss-compare-age {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+  .ss-compare-amt {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text);
+  }
+  .ss-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ss-key {
+    width: 1.1rem;
+    height: 0;
+    flex: none;
+    border-top-width: 3px;
+    border-top-style: solid;
+  }
+  .ss-key--c1 {
+    border-top-color: var(--pl-c1);
+  }
+  .ss-key--c2 {
+    border-top-color: var(--pl-c2);
+  }
+  .ss-key--c3 {
+    border-top-color: var(--pl-c3);
+  }
+  .ss-key--sel {
+    border-top-color: var(--color-accent);
+    border-top-width: 4px;
+  }
+  .ss-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+    margin-bottom: var(--space-md);
+  }
+  .ss-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .ss-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .ss-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .ss-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-oss h3 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--step-1);
+  }
+  .ss-oss p {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text-soft);
+  }
+  .ss-oss-link {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+  }
+</style>

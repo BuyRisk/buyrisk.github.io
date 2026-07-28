@@ -26,6 +26,12 @@ export const TOOLS: Tool[] = [
       "Estimate your monthly costs in retirement and see the nest egg they imply — the flip side of the 4% rule.",
   },
   {
+    title: "When to Claim Social Security",
+    href: "/tools/social-security",
+    blurb:
+      "Bigger checks later or more checks sooner? See delayed-retirement credits, the breakeven age, and longevity risk.",
+  },
+  {
     title: "Diversification: Waveforms",
     href: "/tools/waveforms",
     blurb:
