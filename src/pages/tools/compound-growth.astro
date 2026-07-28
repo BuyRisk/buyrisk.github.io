@@ -273,4 +273,62 @@ import NextTool from "../../components/NextTool.astro";
     font-style: italic;
     margin: 0;
   }
+  .cge-retire {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+  }
+  .cge-retire-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .cge-retire-title {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    color: var(--color-text);
+  }
+  .cge-retire-rate {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-retire-rate input[type="range"] {
+    width: 6rem;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+  .cge-retire-rate strong {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+    min-width: 3ch;
+  }
+  .cge-retire-figure {
+    margin: 0.4rem 0 0.3rem;
+    font-family: var(--font-sans);
+    font-size: var(--step-1);
+    color: var(--color-text);
+  }
+  .cge-retire-figure strong {
+    color: var(--color-accent);
+    font-size: var(--step-2);
+  }
+  .cge-retire-year {
+    color: var(--color-text-soft);
+    font-size: var(--step-0);
+  }
+  .cge-retire-note {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
 </style>

@@ -261,6 +261,7 @@ export default function CompoundGrowthExplorer() {
   const [rate, setRate] = useState(7);
   const [years, setYears] = useState(30);
   const [target, setTarget] = useState(1_000_000);
+  const [withdrawalRate, setWithdrawalRate] = useState(4);
 
   // In goal mode the monthly contribution becomes the answer: solve for it, then
   // project forward with that value so the chart still reaches the target.
@@ -273,6 +274,10 @@ export default function CompoundGrowthExplorer() {
     () => project(principal, effectiveMonthly, rate, years),
     [principal, effectiveMonthly, rate, years]
   );
+
+  // Bengen 4%-rule sustainable retirement income from the ending balance.
+  const annualIncome = (result.finalBalance * withdrawalRate) / 100;
+  const monthlyIncome = annualIncome / 12;
 
   return (
     <div className="cge">
@@ -404,6 +409,34 @@ export default function CompoundGrowthExplorer() {
             saving required.
           </p>
         )}
+
+        <div className="cge-retire">
+          <div className="cge-retire-top">
+            <span className="cge-retire-title">Retirement income</span>
+            <label className="cge-retire-rate">
+              Withdraw{" "}
+              <input
+                type="range"
+                min={2}
+                max={8}
+                step={0.25}
+                value={withdrawalRate}
+                aria-label="Withdrawal rate"
+                onChange={(e) => setWithdrawalRate(Number(e.target.value))}
+              />
+              <strong>{withdrawalRate}%</strong>
+            </label>
+          </div>
+          <p className="cge-retire-figure">
+            ≈ <strong>{currency(monthlyIncome)}</strong> / month
+            <span className="cge-retire-year"> · {currency(annualIncome)} / year</span>
+          </p>
+          <p className="cge-retire-note">
+            Bengen's {withdrawalRate}% rule: a first-year withdrawal you raise with
+            inflation each year, which historically lasted ~30 years.{" "}
+            <a href="/tools/burn-rate">Will it cover your costs? →</a>
+          </p>
+        </div>
       </div>
 
       <p className="cge-note">
