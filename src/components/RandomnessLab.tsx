@@ -2,102 +2,103 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PRESET_ASSETS } from "../data/assets";
 import FrontierChart from "./FrontierChart";
 import {
+  type Asset,
+  normalizeWeights,
+  correlationMatrix,
   covarianceMatrix,
+  cholesky,
+  portfolioReturn,
+  portfolioVol,
+  weightedAverageVol,
   randomPortfolios,
   efficientFrontier,
   minVariance,
-  portfolioReturn,
+  simulateOU,
 } from "../lib/portfolio";
 
 /**
- * Deterministic "diversification as wave interference" illustration.
- *
- * Each asset is a clean sine wave: amplitude = its volatility, and its phase
- * comes from correlation (in-phase = +1, quarter-turn = 0, opposite = -1). The
- * weighted portfolio is the sum of those waves, drawn below. When the waves are
- * out of phase they partly cancel, so the portfolio swings less than its parts.
- *
- * This is exact, not hand-wavy: the portfolio wave's amplitude equals the
- * portfolio volatility sqrt(wᵀΣw) under corr(i,j) = cos(phase_i − phase_j).
+ * The noisy sequel to the waveforms tool. Each asset is a correlated
+ * mean-reverting random series (amplitude ≈ volatility) rather than a clean
+ * sine wave. The weighted portfolio still swings less than its parts — but with
+ * real randomness the cancellation is never perfect, it varies run to run, and
+ * sometimes every asset falls at once.
  */
 
-type WaveAsset = {
-  id: string;
-  name: string;
-  amp: number; // volatility, e.g. 0.16
-  corr: number; // correlation with the common factor, in [-1, 1]
-  ret: number; // expected return (used only for the frontier's y-axis)
-  custom?: boolean;
-};
+type WaveAsset = Asset;
 
 const MAX_ASSETS = 5;
 const MIN_ASSETS = 2;
 const CLOUD_COUNT = 2500;
-const CLOUD_SEED = 20260727;
+const CLOUD_SEED = 20260728;
+const SERIES_LEN = 1400;
+const VISIBLE = 320;
+const SCROLL_SPEED = 26; // logical points per second
 const DEFAULT_IDS = ["us-stocks", "treasuries"];
-const THETA_SPAN = 4 * Math.PI; // two full cycles across the width
+
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 const paletteColor = (i: number) => `var(--pl-c${(i % 8) + 1})`;
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
 
 let customCounter = 0;
 
-function makeWaveAsset(id: string): WaveAsset {
+function makeAsset(id: string): WaveAsset {
   const p = PRESET_ASSETS.find((a) => a.id === id)!;
-  return { id: p.id, name: p.name, amp: p.sigma, corr: p.marketCorr, ret: p.mu };
+  return { id: p.id, name: p.name, mu: p.mu, sigma: p.sigma, marketCorr: p.marketCorr, color: p.color };
 }
 
-function normalize(raw: number[]): number[] {
-  const total = raw.reduce((s, w) => s + Math.max(0, w), 0);
-  if (total <= 0) return raw.map(() => 1 / raw.length);
-  return raw.map((w) => Math.max(0, w) / total);
-}
-
-export default function WaveformLab() {
-  const [assets, setAssets] = useState<WaveAsset[]>(() => DEFAULT_IDS.map(makeWaveAsset));
+export default function RandomnessLab() {
+  const [assets, setAssets] = useState<WaveAsset[]>(() => DEFAULT_IDS.map(makeAsset));
   const [rawWeights, setRawWeights] = useState<number[]>(() => DEFAULT_IDS.map(() => 50));
   const [pairCorr, setPairCorr] = useState(-0.2);
   const [mode, setMode] = useState<"continuous" | "single">("continuous");
+  const [seed, setSeed] = useState(1);
   const [addValue, setAddValue] = useState("");
 
   const isPair = assets.length === 2;
   const weights = useMemo(() => normalize(rawWeights), [rawWeights]);
+  const mus = useMemo(() => assets.map((a) => a.mu), [assets]);
+  const sigmas = useMemo(() => assets.map((a) => a.sigma), [assets]);
+  const corr = useMemo(
+    () => correlationMatrix(assets, isPair ? pairCorr : null),
+    [assets, isPair, pairCorr]
+  );
+  const cov = useMemo(() => covarianceMatrix(corr, sigmas), [corr, sigmas]);
+  const chol = useMemo(() => cholesky(corr), [corr]);
 
-  // Phase per asset: correlation -> angle. +1 in-phase (0), 0 = 90°, -1 = 180°.
-  const phases = useMemo(() => {
-    if (isPair) return [0, Math.acos(clamp(pairCorr, -1, 1))];
-    return assets.map((a) => Math.acos(clamp(a.corr, -1, 1)));
-  }, [assets, isPair, pairCorr]);
+  const regenKey = JSON.stringify({ sigmas, corr, seed });
+  const series = useMemo(
+    () => simulateOU(sigmas, chol, SERIES_LEN, seed),
+    [regenKey] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
-  const amps = useMemo(() => assets.map((a) => a.amp), [assets]);
+  const portVol = portfolioVol(weights, cov);
+  const avgVol = weightedAverageVol(weights, sigmas);
+  const cancelled = avgVol > 1e-9 ? (avgVol - portVol) / avgVol : 0;
 
-  // Portfolio wave amplitude = |Σ w_i A_i e^{iφ_i}| = portfolio volatility.
-  const { portAmp, avgAmp } = useMemo(() => {
-    let re = 0;
-    let im = 0;
-    let avg = 0;
-    for (let i = 0; i < assets.length; i++) {
-      const c = weights[i] * amps[i];
-      re += c * Math.cos(phases[i]);
-      im += c * Math.sin(phases[i]);
-      avg += c;
+  const weightsKey = weights.map((w) => w.toFixed(4)).join(",");
+  const { realizedVol, allDownFrac } = useMemo(() => {
+    const L = series[0]?.length || 0;
+    let sum = 0;
+    let sumsq = 0;
+    let allDown = 0;
+    for (let t = 0; t < L; t++) {
+      let p = 0;
+      let allNeg = true;
+      for (let i = 0; i < assets.length; i++) {
+        const v = series[i][t];
+        p += weights[i] * v;
+        if (v >= 0) allNeg = false;
+      }
+      sum += p;
+      sumsq += p * p;
+      if (allNeg) allDown++;
     }
-    return { portAmp: Math.sqrt(re * re + im * im), avgAmp: avg };
-  }, [assets, weights, amps, phases]);
+    const mean = L ? sum / L : 0;
+    const varr = L ? Math.max(0, sumsq / L - mean * mean) : 0;
+    return { realizedVol: Math.sqrt(varr), allDownFrac: L ? allDown / L : 0 };
+  }, [series, weightsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const cancelled = avgAmp > 1e-9 ? (avgAmp - portAmp) / avgAmp : 0;
-
-  // Efficient frontier, using the same correlation model that drives the waves:
-  // corr(i, j) = cos(phase_i - phase_j). The y-axis uses each asset's expected
-  // return; the current mix's volatility is exactly the portfolio wave's swing.
-  const mus = useMemo(() => assets.map((a) => a.ret), [assets]);
-  const cov = useMemo(() => {
-    const n = assets.length;
-    const C = Array.from({ length: n }, (_, i) =>
-      Array.from({ length: n }, (_, j) => Math.cos(phases[i] - phases[j]))
-    );
-    return covarianceMatrix(C, amps);
-  }, [assets.length, phases, amps]);
+  // Frontier
   const modelKey = JSON.stringify({ mus, cov });
   const cloud = useMemo(
     () => randomPortfolios(mus, cov, CLOUD_COUNT, CLOUD_SEED),
@@ -105,20 +106,15 @@ export default function WaveformLab() {
   );
   const frontier = useMemo(() => efficientFrontier(cloud), [cloud]);
   const minVar = useMemo(() => minVariance(cloud), [cloud]);
-  const assetPoints = useMemo(() => amps.map((a, i) => ({ vol: a, mu: mus[i] })), [amps, mus]);
+  const assetPoints = useMemo(() => sigmas.map((s, i) => ({ vol: s, mu: mus[i] })), [sigmas, mus]);
   const curReturn = portfolioReturn(weights, mus);
 
   // --- Canvas ------------------------------------------------------------
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const phaseRef = useRef(0);
-
-  const drawKey = JSON.stringify({
-    ids: assets.map((a) => a.id),
-    amps,
-    phases,
-    w: weights,
-    mode,
-  });
+  const offsetRef = useRef(0);
+  const drawRef = useRef<() => void>(() => {});
+  const latest = useRef({ series, weights, sigmas, assets });
+  latest.current = { series, weights, sigmas, assets };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -143,6 +139,7 @@ export default function WaveformLab() {
     }
 
     function draw() {
+      const { series, weights, sigmas, assets } = latest.current;
       const rect = canvas!.getBoundingClientRect();
       const W = rect.width;
       const H = rect.height;
@@ -155,11 +152,11 @@ export default function WaveformLab() {
       const bandH = (H - gap) / 2;
       const topCenter = bandH / 2;
       const botCenter = bandH + gap + bandH / 2;
-      const maxAmp = Math.max(...amps, 0.01);
-      const ampScale = (bandH / 2) * 0.88 / (maxAmp * 1.05);
-      const phase0 = phaseRef.current;
+      const maxAmp = Math.max(...sigmas, 0.01);
+      const ampScale = ((bandH / 2) * 0.92) / (maxAmp * 2.8);
+      const off = Math.floor(offsetRef.current);
+      const len = series[0]?.length || 1;
 
-      // band centerlines + labels
       ctx!.strokeStyle = color("--color-border");
       ctx!.lineWidth = 1;
       for (const cy of [topCenter, botCenter]) {
@@ -172,59 +169,48 @@ export default function WaveformLab() {
       ctx!.font = SANS;
       ctx!.textAlign = "left";
       ctx!.textBaseline = "top";
-      ctx!.fillText("Each asset's swing", padL, 2);
+      ctx!.fillText("Each asset (noisy returns)", padL, 2);
       ctx!.fillText("Your portfolio", padL, bandH + gap + 2);
 
-      const theta = (x: number) => (x / plotW) * THETA_SPAN + phase0;
-      const step = 2;
+      const clampY = (yy: number, center: number) =>
+        clamp(yy, center - bandH / 2 + 1, center + bandH / 2 - 1);
 
-      // asset waves (top band)
+      // asset series (top band)
       assets.forEach((_, i) => {
         ctx!.strokeStyle = resolveColor(paletteColor(i));
-        ctx!.globalAlpha = 0.85;
-        ctx!.lineWidth = 2;
+        ctx!.globalAlpha = 0.8;
+        ctx!.lineWidth = 1.5;
         ctx!.lineJoin = "round";
         ctx!.beginPath();
-        for (let x = 0; x <= plotW; x += step) {
-          const y = topCenter - amps[i] * Math.sin(theta(x) + phases[i]) * ampScale;
-          if (x === 0) ctx!.moveTo(padL + x, y);
-          else ctx!.lineTo(padL + x, y);
+        for (let k = 0; k <= VISIBLE; k++) {
+          const idx = Math.min(off + k, len - 1);
+          const y = clampY(topCenter - series[i][idx] * ampScale, topCenter);
+          const px = padL + (k / VISIBLE) * plotW;
+          if (k === 0) ctx!.moveTo(px, y);
+          else ctx!.lineTo(px, y);
         }
         ctx!.stroke();
       });
       ctx!.globalAlpha = 1;
 
-      // portfolio wave (bottom band)
+      // portfolio series (bottom band)
       ctx!.strokeStyle = color("--color-accent");
       ctx!.lineWidth = 3;
       ctx!.lineJoin = "round";
       ctx!.beginPath();
-      for (let x = 0; x <= plotW; x += step) {
+      for (let k = 0; k <= VISIBLE; k++) {
+        const idx = Math.min(off + k, len - 1);
         let v = 0;
-        for (let i = 0; i < assets.length; i++) {
-          v += weights[i] * amps[i] * Math.sin(theta(x) + phases[i]);
-        }
-        const y = botCenter - v * ampScale;
-        if (x === 0) ctx!.moveTo(padL + x, y);
-        else ctx!.lineTo(padL + x, y);
+        for (let i = 0; i < assets.length; i++) v += weights[i] * series[i][idx];
+        const y = clampY(botCenter - v * ampScale, botCenter);
+        const px = padL + (k / VISIBLE) * plotW;
+        if (k === 0) ctx!.moveTo(px, y);
+        else ctx!.lineTo(px, y);
       }
       ctx!.stroke();
-
-      // faint guide showing the max possible swing (weighted-average amplitude)
-      ctx!.strokeStyle = color("--color-muted");
-      ctx!.globalAlpha = 0.4;
-      ctx!.setLineDash([4, 4]);
-      ctx!.lineWidth = 1;
-      for (const s of [-1, 1]) {
-        ctx!.beginPath();
-        ctx!.moveTo(padL, botCenter - s * avgAmp * ampScale);
-        ctx!.lineTo(W - padR, botCenter - s * avgAmp * ampScale);
-        ctx!.stroke();
-      }
-      ctx!.setLineDash([]);
-      ctx!.globalAlpha = 1;
     }
 
+    drawRef.current = draw;
     sizeCanvas();
     draw();
 
@@ -242,7 +228,12 @@ export default function WaveformLab() {
         if (!last) last = ts;
         const dt = Math.min(0.05, (ts - last) / 1000);
         last = ts;
-        phaseRef.current += 1.1 * dt; // scroll speed (rad/s)
+        offsetRef.current += SCROLL_SPEED * dt;
+        const len = latest.current.series[0]?.length || SERIES_LEN;
+        if (offsetRef.current + VISIBLE >= len - 1) {
+          offsetRef.current = 0;
+          setSeed((s) => s + 1); // fresh random series
+        }
         draw();
         raf = requestAnimationFrame(tick);
       };
@@ -254,7 +245,12 @@ export default function WaveformLab() {
       window.removeEventListener("resize", onResize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [drawKey]);
+  }, [mode]);
+
+  // Redraw on data changes (single mode / param tweaks) without re-animating.
+  useEffect(() => {
+    drawRef.current();
+  }, [regenKey, weightsKey]);
 
   // --- Handlers ----------------------------------------------------------
   const setWeight = (i: number, v: number) =>
@@ -272,10 +268,18 @@ export default function WaveformLab() {
       customCounter += 1;
       setAssets((prev) => [
         ...prev,
-        { id: `custom-${customCounter}`, name: `Custom ${customCounter}`, amp: 0.15, corr: 0.3, ret: 0.08, custom: true },
+        {
+          id: `custom-${customCounter}`,
+          name: `Custom ${customCounter}`,
+          mu: 0.08,
+          sigma: 0.15,
+          marketCorr: 0.3,
+          color: paletteColor(prev.length),
+          custom: true,
+        },
       ]);
     } else {
-      setAssets((prev) => [...prev, makeWaveAsset(value)]);
+      setAssets((prev) => [...prev, makeAsset(value)]);
     }
     setRawWeights((prev) => [...prev, 30]);
     setAddValue("");
@@ -304,6 +308,9 @@ export default function WaveformLab() {
             onClick={() => setMode("single")}
           >
             Snapshot
+          </button>
+          <button type="button" className="wl-btn" onClick={() => setSeed((s) => s + 1)}>
+            New draw
           </button>
         </div>
 
@@ -347,27 +354,27 @@ export default function WaveformLab() {
               </label>
 
               <label className="wl-slider">
-                <span>Swing <strong>{pct(a.amp, 0)}</strong></span>
+                <span>Swing <strong>{pct(a.sigma, 0)}</strong></span>
                 <input
                   type="range"
                   min={0.02}
                   max={0.3}
                   step={0.01}
-                  value={a.amp}
-                  onChange={(e) => updateAsset(i, { amp: Number(e.target.value) })}
+                  value={a.sigma}
+                  onChange={(e) => updateAsset(i, { sigma: Number(e.target.value) })}
                 />
               </label>
 
               {!isPair && (
                 <label className="wl-slider">
-                  <span>Correlation <strong>{a.corr.toFixed(2)}</strong></span>
+                  <span>Correlation <strong>{a.marketCorr.toFixed(2)}</strong></span>
                   <input
                     type="range"
                     min={-1}
                     max={1}
                     step={0.05}
-                    value={a.corr}
-                    onChange={(e) => updateAsset(i, { corr: Number(e.target.value) })}
+                    value={a.marketCorr}
+                    onChange={(e) => updateAsset(i, { marketCorr: Number(e.target.value) })}
                   />
                 </label>
               )}
@@ -390,7 +397,8 @@ export default function WaveformLab() {
               onChange={(e) => setPairCorr(Number(e.target.value))}
             />
             <span className="wl-corr-hint">
-              +1: waves line up (no cancellation). −1: opposite waves cancel completely.
+              Even near −1, real randomness leaves a residual wobble — it never
+              fully cancels.
             </span>
           </label>
         )}
@@ -429,22 +437,33 @@ export default function WaveformLab() {
               <div className="wl-bar-track">
                 <div className="wl-bar-fill wl-bar-fill--avg" style={{ width: "100%" }} />
               </div>
-              <span className="wl-bar-value">{pct(avgAmp)}</span>
+              <span className="wl-bar-value">{pct(avgVol)}</span>
             </div>
             <div className="wl-bar">
-              <span className="wl-bar-label">Actual portfolio swing</span>
+              <span className="wl-bar-label">Portfolio swing — in theory</span>
               <div className="wl-bar-track">
                 <div
                   className="wl-bar-fill wl-bar-fill--port"
-                  style={{ width: `${avgAmp > 0 ? Math.min(100, (portAmp / avgAmp) * 100) : 0}%` }}
+                  style={{ width: `${avgVol > 0 ? Math.min(100, (portVol / avgVol) * 100) : 0}%` }}
                 />
               </div>
-              <span className="wl-bar-value">{pct(portAmp)}</span>
+              <span className="wl-bar-value">{pct(portVol)}</span>
+            </div>
+            <div className="wl-bar">
+              <span className="wl-bar-label">…in this actual run</span>
+              <div className="wl-bar-track">
+                <div
+                  className="wl-bar-fill wl-bar-fill--realized"
+                  style={{ width: `${avgVol > 0 ? Math.min(100, (realizedVol / avgVol) * 100) : 0}%` }}
+                />
+              </div>
+              <span className="wl-bar-value">{pct(realizedVol)}</span>
             </div>
             <p className="wl-saved">
-              Out-of-phase waves cancel <strong>{pct(cancelled, 0)}</strong> of the
-              swing. That shrinkage is diversification — exactly the portfolio's
-              volatility falling below the average of its parts.
+              Diversification should cancel <strong>{pct(cancelled, 0)}</strong> of the
+              swing — but this run came out to {pct(realizedVol)}, not the theoretical{" "}
+              {pct(portVol)}. Randomness means it's never exact, and every asset fell
+              together <strong>{pct(allDownFrac, 0)}</strong> of the time.
             </p>
           </div>
 
@@ -455,7 +474,7 @@ export default function WaveformLab() {
               frontier={frontier}
               assetPoints={assetPoints}
               minVar={minVar}
-              current={{ vol: portAmp, mu: curReturn }}
+              current={{ vol: portVol, mu: curReturn }}
               ariaLabel="Efficient frontier showing where this portfolio's risk sits"
             />
             <div className="wl-flegend">
@@ -464,20 +483,25 @@ export default function WaveformLab() {
               <span><span className="wl-fdot wl-fdot--as" /> Single asset</span>
             </div>
             <p className="wl-fnote">
-              Your portfolio's swing above is its <em>risk</em> here — its spot on
-              the horizontal axis. As you lower correlation, the frontier bows out
-              and your mix slides left. (Return uses each asset's typical figure.)
+              The marker uses the theoretical volatility; the run-to-run wobble on
+              the left is why real results scatter around it. (Return uses each
+              asset's typical figure.)
             </p>
           </div>
         </div>
 
         <p className="wl-note">
-          An idealized model: perfectly smooth, repeating waves. Real returns are
-          noisy and never cancel this cleanly — that's
-          <a href="/tools/randomness"> Part 2</a>. Correlation sets each wave's
-          phase; amplitude is its volatility.
+          A simple Monte Carlo of correlated, mean-reverting returns — no fat tails
+          or real history yet. Hit “New draw” a few times: the cancellation, and
+          how often assets sink together, shifts every run.
         </p>
       </div>
     </div>
   );
+}
+
+function normalize(raw: number[]): number[] {
+  const total = raw.reduce((s, w) => s + Math.max(0, w), 0);
+  if (total <= 0) return raw.map(() => 1 / raw.length);
+  return raw.map((w) => Math.max(0, w) / total);
 }

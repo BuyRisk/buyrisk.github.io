@@ -23,6 +23,12 @@ export const TOOLS: Tool[] = [
     href: "/tools/waveforms",
     blurb:
       "The idea behind diversification, from first principles: how out-of-phase ups and downs cancel out.",
+  },
+  {
+    title: "Diversification: Randomness",
+    href: "/tools/randomness",
+    blurb:
+      "The noisy sequel: with real randomness, variance never fully cancels — and assets sometimes fall together.",
     tag: "New",
   },
   {

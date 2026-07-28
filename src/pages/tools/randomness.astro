@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RandomnessLab from "../../components/RandomnessLab.tsx";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Diversification: Randomness"
+  description="The noisy sequel to the waveforms tool: with real randomness, variance never fully cancels — and assets sometimes fall together."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool · Part 2</p>
+    <h1>Diversification meets randomness</h1>
+    <p class="lede">
+      In <a href="/tools/waveforms">Part 1</a>, tidy waves cancelled almost
+      perfectly. Real markets aren't tidy. Here each asset is a <em>noisy</em>,
+      mean-reverting return series. The portfolio below still wobbles less than
+      its parts — but the cancellation is never perfect, it changes every run,
+      and every so often everything drops at once.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <RandomnessLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>What's different from the waves</h2>
+      <ul>
+        <li>
+          <strong>It's random.</strong> The theory bar (what diversification
+          "should" deliver) and the actual bar (what this particular run gave
+          you) rarely match — and the gap jumps around every time you hit
+          <strong>New draw</strong>.
+        </li>
+        <li>
+          <strong>Nothing cancels perfectly.</strong> Even at strong negative
+          correlation, the portfolio keeps a residual wobble. There is no truly
+          risk-free blend of risky assets.
+        </li>
+        <li>
+          <strong>Assets sink together.</strong> Watch the "fell together"
+          figure. The higher the correlation, the more often every holding is
+          down at the same moment — exactly when diversification helps least.
+        </li>
+      </ul>
+      <p>
+        This is still a simplified model — the randomness is well-behaved, with
+        no fat tails or real history. To bring it all together with the efficient
+        frontier, capital market line, and a distribution of outcomes, head to the
+        <a href="/tools/portfolio">Portfolio Diversification Lab</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>

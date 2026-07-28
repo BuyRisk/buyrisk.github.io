@@ -300,6 +300,45 @@ export function simulatePortfolioFan(
   return paths;
 }
 
+/**
+ * Correlated mean-reverting (Ornstein–Uhlenbeck) series, centered at zero — the
+ * noisy analog of a wave. Each series has stationary std ≈ sigma_i and the
+ * cross-correlations of the correlation matrix behind L. Used to show that with
+ * real randomness, diversification never cancels variance perfectly.
+ */
+export function simulateOU(
+  sigmas: number[],
+  L: number[][],
+  length: number,
+  seed: number,
+  theta = 0.07,
+  warmup = 200
+): number[][] {
+  const n = sigmas.length;
+  const rng = mulberry32(seed);
+  const normal = makeNormal(rng);
+  const persist = 1 - theta;
+  const shock = sigmas.map((s) => s * Math.sqrt(2 * theta - theta * theta));
+  const X = new Array(n).fill(0);
+  const series = sigmas.map(() => new Array(length).fill(0));
+  const eps = new Array(n);
+  const z = new Array(n);
+  const total = warmup + length;
+  for (let t = 0; t < total; t++) {
+    for (let i = 0; i < n; i++) eps[i] = normal();
+    for (let i = 0; i < n; i++) {
+      let s = 0;
+      for (let k = 0; k <= i; k++) s += L[i][k] * eps[k];
+      z[i] = s;
+    }
+    for (let i = 0; i < n; i++) {
+      X[i] = X[i] * persist + shock[i] * z[i];
+      if (t >= warmup) series[i][t - warmup] = X[i];
+    }
+  }
+  return series;
+}
+
 export type OutcomeStats = {
   terminals: number[]; // ending portfolio value per run (start = 100)
   drawdowns: number[]; // worst peak-to-trough drop per run, as a fraction
