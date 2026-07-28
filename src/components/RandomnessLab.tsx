@@ -3,7 +3,6 @@ import { PRESET_ASSETS } from "../data/assets";
 import FrontierChart from "./FrontierChart";
 import {
   type Asset,
-  normalizeWeights,
   correlationMatrix,
   covarianceMatrix,
   cholesky,

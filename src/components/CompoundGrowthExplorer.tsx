@@ -45,6 +45,27 @@ function project(
   };
 }
 
+/**
+ * Inverse of `project`: the monthly contribution needed to reach `target` by
+ * the end of the horizon, holding everything else constant. Closed-form annuity
+ * solution — no iteration. Can be negative if the starting amount alone already
+ * overshoots the target (the caller clamps at zero and explains).
+ */
+function requiredMonthly(
+  target: number,
+  principal: number,
+  annualRatePct: number,
+  years: number
+): number {
+  const r = annualRatePct / 100 / 12;
+  const n = Math.round(years * 12);
+  if (n <= 0) return 0;
+  const fvPrincipal = principal * Math.pow(1 + r, n);
+  if (Math.abs(r) < 1e-12) return (target - principal) / n;
+  const annuityFactor = (Math.pow(1 + r, n) - 1) / r;
+  return (target - fvPrincipal) / annuityFactor;
+}
+
 // Format a dollar amount, staying readable across a huge dynamic range.
 // Realistic figures show in full ($447,156); once numbers get absurd — as they
 // do over centuries of compounding — we switch to compact (…B, …T) and then
@@ -234,19 +255,47 @@ function NumberField({
 }
 
 export default function CompoundGrowthExplorer() {
+  const [mode, setMode] = useState<"project" | "goal">("project");
   const [principal, setPrincipal] = useState(10_000);
   const [monthly, setMonthly] = useState(300);
   const [rate, setRate] = useState(7);
   const [years, setYears] = useState(30);
+  const [target, setTarget] = useState(1_000_000);
+
+  // In goal mode the monthly contribution becomes the answer: solve for it, then
+  // project forward with that value so the chart still reaches the target.
+  const rawRequired =
+    mode === "goal" ? requiredMonthly(target, principal, rate, years) : monthly;
+  const effectiveMonthly = Math.max(0, rawRequired);
+  const alreadyThere = mode === "goal" && rawRequired <= 0;
 
   const result = useMemo(
-    () => project(principal, monthly, rate, years),
-    [principal, monthly, rate, years]
+    () => project(principal, effectiveMonthly, rate, years),
+    [principal, effectiveMonthly, rate, years]
   );
 
   return (
     <div className="cge">
       <div className="cge-controls">
+        <div className="cge-mode" role="group" aria-label="Calculation mode">
+          <button
+            type="button"
+            className={mode === "project" ? "active" : ""}
+            aria-pressed={mode === "project"}
+            onClick={() => setMode("project")}
+          >
+            Project a balance
+          </button>
+          <button
+            type="button"
+            className={mode === "goal" ? "active" : ""}
+            aria-pressed={mode === "goal"}
+            onClick={() => setMode("goal")}
+          >
+            Reach a goal
+          </button>
+        </div>
+
         <NumberField
           label="Starting amount"
           value={principal}
@@ -257,16 +306,31 @@ export default function CompoundGrowthExplorer() {
           integer
           onCommit={setPrincipal}
         />
-        <NumberField
-          label="Monthly contribution"
-          value={monthly}
-          min={0}
-          max={20_000}
-          step={100}
-          prefix="$"
-          integer
-          onCommit={setMonthly}
-        />
+        {mode === "project" ? (
+          <NumberField
+            key="contribution"
+            label="Monthly contribution"
+            value={monthly}
+            min={0}
+            max={20_000}
+            step={100}
+            prefix="$"
+            integer
+            onCommit={setMonthly}
+          />
+        ) : (
+          <NumberField
+            key="target"
+            label="Target balance"
+            value={target}
+            min={0}
+            max={10_000_000}
+            step={10_000}
+            prefix="$"
+            integer
+            onCommit={setTarget}
+          />
+        )}
         <NumberField
           label="Annual return"
           value={rate}
@@ -300,20 +364,46 @@ export default function CompoundGrowthExplorer() {
           </span>
         </div>
 
-        <dl className="cge-stats">
-          <div className="cge-stat">
-            <dt>Final balance</dt>
-            <dd className="cge-stat--big">{currency(result.finalBalance)}</dd>
-          </div>
-          <div className="cge-stat">
-            <dt>You contributed</dt>
-            <dd>{currency(result.totalContributed)}</dd>
-          </div>
-          <div className="cge-stat">
-            <dt>Growth from returns</dt>
-            <dd className="cge-stat--accent">{currency(result.totalGrowth)}</dd>
-          </div>
-        </dl>
+        {mode === "project" ? (
+          <dl className="cge-stats">
+            <div className="cge-stat">
+              <dt>Final balance</dt>
+              <dd className="cge-stat--big">{currency(result.finalBalance)}</dd>
+            </div>
+            <div className="cge-stat">
+              <dt>You contributed</dt>
+              <dd>{currency(result.totalContributed)}</dd>
+            </div>
+            <div className="cge-stat">
+              <dt>Growth from returns</dt>
+              <dd className="cge-stat--accent">{currency(result.totalGrowth)}</dd>
+            </div>
+          </dl>
+        ) : (
+          <dl className="cge-stats">
+            <div className="cge-stat">
+              <dt>Required monthly contribution</dt>
+              <dd className="cge-stat--big cge-stat--accent">
+                {currency(effectiveMonthly)}
+              </dd>
+            </div>
+            <div className="cge-stat">
+              <dt>You'd contribute in total</dt>
+              <dd>{currency(result.totalContributed)}</dd>
+            </div>
+            <div className="cge-stat">
+              <dt>Growth from returns</dt>
+              <dd>{currency(result.totalGrowth)}</dd>
+            </div>
+          </dl>
+        )}
+
+        {alreadyThere && (
+          <p className="cge-goal-note">
+            Your starting amount alone already grows past this target — no monthly
+            saving required.
+          </p>
+        )}
       </div>
 
       <p className="cge-note">
