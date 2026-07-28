@@ -1,0 +1,155 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SuperstockLab from "../../components/SuperstockLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="The Superstock Problem"
+  description="Most individual stocks lose to Treasury bills; a tiny few create all the market's wealth. See why hand-picking a few stocks usually underperforms."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Why a few stocks do all the work</h1>
+    <p class="lede">
+      "How Many Stocks?" showed diversification smooths the ride. This is the
+      deeper, stranger reason to own lots of them. Research by Hendrik
+      Bessembinder found that <strong>most individual stocks actually lose to
+      Treasury bills</strong> over their lifetime — and nearly all of the stock
+      market's wealth comes from a tiny handful of runaway winners. Miss those,
+      and you lose.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <SuperstockLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Skewness, and the superstocks</h2>
+      <p>
+        Stock returns aren't a tidy bell curve. A stock can only fall 100%, but it
+        can rise 1,000% or 10,000% — so the distribution is violently
+        <strong>right-skewed</strong>. The <em>median</em> stock is mediocre or a
+        loser; the <em>average</em> is dragged upward by a few enormous winners
+        like the Apples and Amazons. In Bessembinder's data, just the top
+        handful of companies accounted for the majority of all net wealth created.
+      </p>
+      <ul>
+        <li>
+          <strong>The math of missing.</strong> If a few percent of stocks drive
+          everything, a portfolio of five or ten names probably doesn't contain
+          one of them. So your <em>typical</em> outcome lands below the market —
+          even though the market's average is great.
+        </li>
+        <li>
+          <strong>Concentration cuts both ways — badly.</strong> It's not just
+          more volatile; it's tilted so the likely result is underperformance,
+          with a small chance of a jackpot. That's a lottery, not an edge.
+        </li>
+        <li>
+          <strong>The fix is to own them all.</strong> Index the whole market and
+          you're guaranteed to hold every superstock. You give up the jackpot
+          dream, but you capture the returns that actually show up.
+        </li>
+      </ul>
+      <p>
+        This is a simulation calibrated to illustrate the shape of Bessembinder's
+        result — not exact historical returns. Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <NextTool current="/tools/superstocks" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .sk-quicks {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .sk-quicks .wl-btn {
+    flex: 1;
+  }
+  .sk-reseed {
+    width: 100%;
+  }
+  .sk-ustats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    margin-top: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .sk-ustats strong {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .sk-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+    margin-bottom: var(--space-md);
+  }
+  .sk-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .sk-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .sk-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .sk-stats > div {
+    min-width: 0;
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .sk-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .sk-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

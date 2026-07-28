@@ -44,6 +44,12 @@ export const TOOLS: Tool[] = [
       "Diversifying within stocks cuts risk — but only to a floor. Watch the classic risk-vs-count curve.",
   },
   {
+    title: "The Superstock Problem",
+    href: "/tools/superstocks",
+    blurb:
+      "Most stocks lose to T-bills; a few create all the wealth. See why hand-picking a few usually loses.",
+  },
+  {
     title: "Portfolio Diversification Lab",
     href: "/tools/portfolio",
     blurb:
