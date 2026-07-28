@@ -1,0 +1,78 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import StockCountLab from "../../components/StockCountLab.tsx";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="How Many Stocks Is Enough?"
+  description="Diversifying within stocks reduces risk — but only down to a floor. See the classic risk-vs-number-of-stocks curve and the systematic risk it can't remove."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>How many stocks is enough?</h1>
+    <p class="lede">
+      Diversification isn't just about mixing asset classes — it works
+      <em>within</em> stocks too. Hold more of them and your portfolio steadies,
+      because each company's own quirks average out. But there's a catch: because
+      stocks tend to move together, you can only push risk down to a floor, never
+      to zero.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <StockCountLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The math, in one line</h2>
+      <p>
+        For <strong>N</strong> equally-weighted stocks, each with volatility
+        <strong>σ</strong> and sharing an average correlation <strong>ρ</strong>,
+        the portfolio's volatility is:
+      </p>
+      <p style="text-align:center;font-size:var(--step-1)">
+        σ<sub>portfolio</sub> = σ · √( ρ + (1 − ρ) / N )
+      </p>
+      <ul>
+        <li>
+          The <strong>(1 − ρ)/N</strong> piece is company-specific risk. It
+          shrinks toward zero as you add stocks — this is what diversification
+          removes, for free.
+        </li>
+        <li>
+          The <strong>ρ</strong> piece never leaves. As N grows, volatility bottoms
+          out at <strong>σ√ρ</strong> — the systematic, market-wide risk.
+        </li>
+        <li>
+          In variance terms you've removed <strong>(N − 1)/N</strong> of the
+          diversifiable risk — 90% by 10 stocks, 95% by 20. Hence the old rule of
+          thumb that a few dozen stocks gets you most of the way.
+        </li>
+      </ul>
+      <p>
+        That irreducible floor is the bridge to the next idea: it's exactly the
+        systematic risk that the <a href="/tools/capm">Capital Asset Pricing
+        Model</a> says you're paid for — measured by beta. Company-specific risk,
+        by contrast, is unpaid, because anyone can diversify it away.
+      </p>
+      <p>Educational only, not advice.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>

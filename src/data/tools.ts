@@ -38,6 +38,12 @@ export const TOOLS: Tool[] = [
       "Mix assets and watch correlations, the efficient frontier, and the range of outcomes come to life.",
   },
   {
+    title: "How Many Stocks Is Enough?",
+    href: "/tools/how-many-stocks",
+    blurb:
+      "Diversifying within stocks cuts risk — but only to a floor. Watch the classic risk-vs-count curve.",
+  },
+  {
     title: "CAPM & the Security Market Line",
     href: "/tools/capm",
     blurb:
