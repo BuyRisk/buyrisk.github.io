@@ -184,6 +184,41 @@
   border-color: var(--color-accent);
 }
 
+/* Real-fee quick presets (Fees tool) */
+.wl-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+.wl-presets-label {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  width: 100%;
+}
+.wl-chip {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  padding: 0.3rem 0.6rem;
+  border: var(--border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wl-chip:hover {
+  border-color: var(--color-accent);
+}
+.wl-chip[aria-pressed="true"] {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
 /* Stage */
 .wl-stage {
   display: flex;
@@ -393,24 +428,4 @@
 }
 
 /* "Restore defaults" control — shared across all interactive tools. */
-.tool-reset {
-  align-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin-top: var(--space-xs);
-  padding: 0.4rem 0.8rem;
-  font-family: var(--font-sans);
-  font-size: var(--step--1);
-  font-weight: 600;
-  color: var(--color-text-soft);
-  background: transparent;
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: color var(--transition), border-color var(--transition);
-}
-.tool-reset:hover {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
-}
+/* .tool-reset now lives in global.css so every tool page styles it identically. */

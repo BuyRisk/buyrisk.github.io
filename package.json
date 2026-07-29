@@ -18,7 +18,8 @@
     "data:ssa": "node scripts/reduce-ssa.mjs",
     "data:capm": "node scripts/reduce-capm.mjs",
     "data:assets": "node scripts/reduce-asset-stats.mjs",
-    "data:inflation": "node scripts/reduce-inflation.mjs"
+    "data:inflation": "node scripts/reduce-inflation.mjs",
+    "data:fees": "node scripts/reduce-fees.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

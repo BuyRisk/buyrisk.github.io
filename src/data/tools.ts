@@ -26,6 +26,12 @@ export const TOOLS: Tool[] = [
       "Rebase real US prices to any year and watch inflation split apart — college and healthcare soaring while toys and clothing fall.",
   },
   {
+    title: "The Real Cost of Fees",
+    href: "/tools/fees",
+    blurb:
+      "A fraction of a percent sounds harmless — but see how fund fees compound into a startling share of your lifetime wealth, and what investors really pay.",
+  },
+  {
     title: "Retirement Burn-Rate Calculator",
     href: "/tools/burn-rate",
     blurb:

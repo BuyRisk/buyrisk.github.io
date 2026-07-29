@@ -253,6 +253,37 @@ blockquote {
   filter: brightness(1.05);
 }
 
+/*
+ * Shared "Restore defaults" control for every interactive tool (ResetButton.tsx).
+ * Lives in the global sheet so all tool pages style it identically, regardless of
+ * whether they import the simtool utilities. A quiet, compact secondary action.
+ */
+.tool-reset {
+  /* Shrink to content whether the parent lays out as flex (align-self) or grid
+     (justify-self) — otherwise the button stretches to the full control column. */
+  align-self: start;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: auto;
+  margin-top: var(--space-xs);
+  padding: 0.4rem 0.8rem;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--color-text-soft);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+.tool-reset:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
 /* ---------- Cards ---------- */
 .card {
   display: block;

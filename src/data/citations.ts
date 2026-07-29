@@ -393,6 +393,12 @@ export const DATASETS: Record<string, Dataset> = {
     publisher: "U.S. Social Security Administration",
     url: "https://www.ssa.gov/oact/",
   },
+  ici: {
+    name: "Trends in the Expenses and Fees of Funds",
+    publisher: "Investment Company Institute",
+    url: "https://www.ici.org/research/stats/fees",
+    note: "Aggregate industry averages; only the reduced figures are published here.",
+  },
 };
 
 export interface ToolSources {
@@ -409,6 +415,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   inflation: {
     studies: [],
     datasets: ["fred"],
+  },
+  fees: {
+    studies: ["sharpe1991", "malkiel1973"],
+    datasets: ["ici"],
   },
   "burn-rate": {
     studies: ["bengen1994", "cooley1998"],
