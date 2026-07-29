@@ -1,5 +1,6 @@
 import { useId, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
+import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
 
 /**
  * Interactive compound-growth explorer.
@@ -355,6 +356,141 @@ function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: num
   );
 }
 
+// --- Historical (block-bootstrap) accumulation panel --------------------------
+
+const HIST_PATHS = 1200;
+const HIST_BLOCK = 5;
+const HIST_SEED = 135790;
+
+/**
+ * The honest counterpart to the smooth-curve projection: run the same starting
+ * amount + monthly contributions through {@link HIST_PATHS} alternate histories
+ * stitched from real US returns, and show the *range* of where you might land —
+ * plus the skew that a single "average return" hides. Everything is in today's
+ * dollars (real returns), so no separate inflation step is needed.
+ */
+function HistoricalGrowthPanel({
+  principal,
+  monthly,
+  years,
+  stockPct,
+  target,
+  isGoal,
+}: {
+  principal: number;
+  monthly: number;
+  years: number;
+  stockPct: number;
+  target: number;
+  isGoal: boolean;
+}) {
+  const stats = useMemo(() => {
+    const annual = monthly * 12;
+    const paths = bootstrapReturns({
+      years,
+      paths: HIST_PATHS,
+      blockLen: HIST_BLOCK,
+      stockPct: stockPct / 100,
+      real: true,
+      seed: HIST_SEED,
+    });
+    const balances: number[][] = new Array(HIST_PATHS);
+    for (let p = 0; p < HIST_PATHS; p++) {
+      const row = new Array<number>(years + 1);
+      row[0] = principal;
+      let bal = principal;
+      for (let y = 0; y < years; y++) {
+        bal = bal * (1 + paths[p][y]) + annual;
+        row[y + 1] = bal;
+      }
+      balances[p] = row;
+    }
+    const finals = balances.map((b) => b[years]);
+    return {
+      bands: bandsOverTime(balances, [0.1, 0.25, 0.5, 0.75, 0.9]),
+      median: quantile(finals, 0.5),
+      mean: mean(finals),
+      p10: quantile(finals, 0.1),
+      p90: quantile(finals, 0.9),
+      hitTarget: target > 0 ? finals.filter((f) => f >= target).length / finals.length : null,
+    };
+  }, [principal, monthly, years, stockPct, target]);
+
+  return (
+    <div className="cge-output">
+      <div className="sk-headline">
+        <span className="sk-headline-label">Typical ending balance (today's dollars)</span>
+        <span className="sk-headline-value">{compactCurrency(stats.median)}</span>
+      </div>
+      <GrowthFan bands={stats.bands} years={years} />
+      <dl className="cge-stats" style={{ marginTop: "var(--space-md)" }}>
+        <div className="cge-stat">
+          <dt>Typical (median)</dt>
+          <dd>{currency(stats.median)}</dd>
+        </div>
+        <div className="cge-stat">
+          <dt>Average (mean)</dt>
+          <dd className="cge-stat--accent">{currency(stats.mean)}</dd>
+        </div>
+        <div className="cge-stat">
+          <dt>Unlucky 10% below</dt>
+          <dd>{currency(stats.p10)}</dd>
+        </div>
+      </dl>
+      <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
+        The <strong>average is well above the typical</strong> result — a handful of
+        lucky return-sequences drag the mean up while most outcomes land lower. Real
+        growth isn't a smooth line; it's a wide, right-skewed fan.{" "}
+        {isGoal && stats.hitTarget !== null && (
+          <>
+            About <strong>{Math.round(stats.hitTarget * 100)}%</strong> of histories
+            reached your target.
+          </>
+        )}
+      </p>
+      <p className="cge-note">
+        {HIST_PATHS.toLocaleString()} alternate timelines, block-bootstrapped from
+        real US returns ({HISTORY.span[0]}–{HISTORY.span[1]}). Data: Aswath Damodaran.
+      </p>
+    </div>
+  );
+}
+
+function GrowthFan({ bands, years }: { bands: { p: number; series: number[] }[]; years: number }) {
+  const width = 640;
+  const height = 260;
+  const pad = { top: 14, right: 14, bottom: 28, left: 58 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const byP = (p: number) => bands.find((b) => Math.abs(b.p - p) < 1e-9)!.series;
+  const b10 = byP(0.1), b25 = byP(0.25), b50 = byP(0.5), b75 = byP(0.75), b90 = byP(0.9);
+  const yMax = Math.max(...b90, 1) * 1.05;
+  const x = (t: number) => pad.left + (t / years) * plotW;
+  const y = (v: number) => height - pad.bottom - (Math.max(0, v) / yMax) * plotH;
+  const areaPath = (lo: number[], hi: number[]) =>
+    "M" + hi.map((v, t) => `${x(t)},${y(v)}`).join(" L") + " L" +
+    lo.map((v, t) => ({ v, t })).reverse().map(({ v, t }) => `${x(t)},${y(v)}`).join(" L") + " Z";
+  const median = "M" + b50.map((v, t) => `${x(t)},${y(v)}`).join(" L");
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+
+  return (
+    <svg className="cge-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Fan chart of possible balances across simulated histories">
+      {[0, 0.25, 0.5, 0.75, 1].map((f) => (
+        <g key={f}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(yMax * f)} y2={y(yMax * f)} className="cge-gridline" />
+          <text x={pad.left - 6} y={y(yMax * f) + 4} textAnchor="end" style={axisText}>{compactCurrency(yMax * f)}</text>
+        </g>
+      ))}
+      <path d={areaPath(b10, b90)} fill="var(--color-accent)" opacity={0.16} />
+      <path d={areaPath(b25, b75)} fill="var(--color-accent)" opacity={0.28} />
+      <path d={median} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} />
+      {[0, Math.round(years / 2), years].map((t) => (
+        <text key={t} x={x(t)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{t === 0 ? "now" : `yr ${t}`}</text>
+      ))}
+    </svg>
+  );
+}
+
 export default function CompoundGrowthExplorer() {
   const [mode, setMode] = useState<"project" | "goal">("project");
   const [principal, setPrincipal] = useState(10_000);
@@ -373,6 +509,8 @@ export default function CompoundGrowthExplorer() {
   const [incomeGrowth, setIncomeGrowth] = useState(2);
   const [retireAge, setRetireAge] = useState(65);
   const [stockPct, setStockPct] = useState(90);
+  const [simMode, setSimMode] = useState<"simple" | "historical">("simple");
+  const [histStock, setHistStock] = useState(90);
 
   // Life phases only apply in project mode (goal mode solves for one monthly).
   const activePhases = mode === "project" ? phases : [];
@@ -443,6 +581,14 @@ export default function CompoundGrowthExplorer() {
   return (
     <div className="cge">
       <div className="cge-controls">
+        <div className="wl-simmode" role="group" aria-label="Projection mode">
+          <button type="button" className={simMode === "simple" ? "active" : ""} aria-pressed={simMode === "simple"} onClick={() => setSimMode("simple")}>
+            Simplified
+          </button>
+          <button type="button" className={simMode === "historical" ? "active" : ""} aria-pressed={simMode === "historical"} onClick={() => setSimMode("historical")}>
+            Historical
+          </button>
+        </div>
         <div className="cge-mode" role="group" aria-label="Calculation mode">
           <button
             type="button"
@@ -542,7 +688,21 @@ export default function CompoundGrowthExplorer() {
           onCommit={setYears}
         />
 
-        {mode === "project" && (
+        {simMode === "historical" && (
+          <NumberField
+            label="Stocks in portfolio"
+            info="Stock share of your portfolio; the rest is 10-year Treasuries. More stocks lifts the median outcome but widens the fan — the range of where you might land."
+            value={histStock}
+            min={0}
+            max={100}
+            step={5}
+            suffix="%"
+            integer
+            onCommit={setHistStock}
+          />
+        )}
+
+        {simMode === "simple" && mode === "project" && (
           <>
             {activePhases.map((ph) => (
               <div className="cge-phase" key={ph.id}>
@@ -592,6 +752,16 @@ export default function CompoundGrowthExplorer() {
         )}
       </div>
 
+      {simMode === "historical" ? (
+        <HistoricalGrowthPanel
+          principal={principal}
+          monthly={effectiveMonthly}
+          years={years}
+          stockPct={histStock}
+          target={target}
+          isGoal={mode === "goal"}
+        />
+      ) : (
       <div className="cge-output">
         <Chart points={result.points} />
 
@@ -717,8 +887,9 @@ export default function CompoundGrowthExplorer() {
           </p>
         </div>
       </div>
+      )}
 
-      {mode === "project" && (
+      {simMode === "simple" && mode === "project" && (
         <div className="cge-lifecycle-wrap">
           <button type="button" className="cge-life-toggle" onClick={() => setShowLifecycle((v) => !v)}>
             {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view — human &amp; financial capital
@@ -750,11 +921,14 @@ export default function CompoundGrowthExplorer() {
         </div>
       )}
 
-      <p className="cge-note">
-        A simplified model: it assumes a steady average return, compounded
-        monthly, with fees and inflation applied evenly and taxes left out. Real
-        markets are far bumpier — this is a tool for intuition, not a forecast.
-      </p>
+      {simMode === "simple" && (
+        <p className="cge-note">
+          A simplified model: it assumes a steady average return, compounded
+          monthly, with fees and inflation applied evenly and taxes left out. Real
+          markets are far bumpier — switch to <strong>Historical</strong> to see
+          the real, block-bootstrapped range instead of a single line.
+        </p>
+      )}
     </div>
   );
 }
