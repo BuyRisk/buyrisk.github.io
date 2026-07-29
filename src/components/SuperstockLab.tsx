@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { mulberry32, makeNormal, percentile } from "../lib/portfolio";
+import { crspSuperstock } from "../data/generated/crsp-superstock";
 import InfoTip from "./InfoTip";
 
 /**
@@ -104,6 +105,8 @@ export default function SuperstockLab() {
           </div>
         </div>
 
+        <RealRecord />
+
         <div className="wl-lower">
           <div className="wl-frontier">
             <h3>Your {n}-stock portfolio, {K.toLocaleString()} ways</h3>
@@ -139,6 +142,52 @@ export default function SuperstockLab() {
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * The real record: aggregate figures computed from every US common stock in CRSP
+ * (1925–2026), shown beside the simulation the reader is playing with. These are
+ * the actual numbers the model above is calibrated to — see
+ * src/data/generated/crsp-superstock.ts.
+ */
+function RealRecord() {
+  const d = crspSuperstock;
+  const pct0 = (x: number) => `${Math.round(x * 100)}%`;
+  const pct1 = (x: number) => `${(x * 100).toFixed(1)}%`;
+  const [startYear, endYear] = [d.dateSpan[0].slice(0, 4), d.dateSpan[1].slice(0, 4)];
+  return (
+    <div className="rd-callout">
+      <div className="rd-head">
+        <span className="rd-badge">Real data</span>
+        <h3>The actual record — every US stock, {startYear}–{endYear}</h3>
+      </div>
+      <div className="rd-grid">
+        <div>
+          <strong>{pct0(d.pctLostMoney)}</strong>
+          <span>lost money outright</span>
+        </div>
+        <div>
+          <strong>{pct0(1 - d.pctBeatTbills)}</strong>
+          <span>trailed one-month T-bills</span>
+        </div>
+        <div>
+          <strong>
+            {d.medianLifetimeMultiple.toFixed(2)}× vs {Math.round(d.meanLifetimeMultiple)}×
+          </strong>
+          <span>median vs mean lifetime</span>
+        </div>
+        <div>
+          <strong>{pct1(d.concentration.dollarWealthCreation.pctFirmsForAllNetCreation)}</strong>
+          <span>of stocks made all the net wealth</span>
+        </div>
+      </div>
+      <p className="rd-credit">
+        {d.nStocks.toLocaleString()} US common stocks, delisting-adjusted. The
+        simulation above is calibrated to this shape — these are the figures it's
+        drawn from. {d.source}
+      </p>
+    </div>
+  );
+}
 
 function UniverseHistogram({
   universe,

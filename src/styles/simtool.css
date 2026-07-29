@@ -318,3 +318,76 @@
   font-style: italic;
   margin: 0;
 }
+
+/* Real-data anchor — CRSP-derived aggregates shown beside the live simulation. */
+.rd-callout {
+  background: var(--color-surface);
+  border: var(--border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-md);
+  min-width: 0;
+}
+.rd-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: var(--space-sm);
+}
+.rd-head h3 {
+  margin: 0;
+  font-size: var(--step-1);
+}
+.rd-badge {
+  font-family: var(--font-sans);
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+}
+.rd-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+.rd-grid > div {
+  min-width: 0;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.rd-grid strong {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--step-1);
+  line-height: 1.1;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.rd-grid span {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-muted);
+}
+.rd-credit {
+  margin: var(--space-sm) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+@media (max-width: 640px) {
+  .rd-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

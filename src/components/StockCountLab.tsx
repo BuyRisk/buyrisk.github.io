@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
+import { crspDiversification } from "../data/generated/crsp-diversification";
 import InfoTip from "./InfoTip";
 
 /**
@@ -221,6 +222,16 @@ export default function StockCountLab() {
           <button type="button" className="wl-btn" onClick={() => setSeed((s) => s + 1)}>
             New draw
           </button>
+          <button
+            type="button"
+            className="wl-btn"
+            onClick={() => {
+              setSigma(crspDiversification.sigmaAnnualMedian);
+              setRho(crspDiversification.avgPairwiseCorr);
+            }}
+          >
+            Real US stocks
+          </button>
         </div>
 
         <label className="wl-slider">
@@ -292,7 +303,9 @@ export default function StockCountLab() {
             <RiskCurve sigma={sigma} rho={rho} n={n} />
             <p className="wl-fnote">
               Most of the benefit comes early — about 20–30 stocks captures the bulk
-              of it. Beyond that the curve flattens against the floor.
+              of it. Beyond that the curve flattens against the floor. The dots are
+              the <strong>actual</strong> curve for US stocks; hit “Real US stocks”
+              to snap the model onto them. {crspDiversification.source}
             </p>
           </div>
         </div>
@@ -312,7 +325,9 @@ function RiskCurve({ sigma, rho, n }: { sigma: number; rho: number; n: number })
   const height = 300;
   const pad = { top: 16, right: 18, bottom: 40, left: 52 };
   const NMAX = MAX_N;
-  const yMax = sigma * 1.05;
+  const empirical = crspDiversification.curve.filter((p) => p.n <= NMAX);
+  const empiricalMax = empirical.length ? empirical[0].volAnnual : 0;
+  const yMax = Math.max(sigma, empiricalMax) * 1.05;
   const floor = sigma * Math.sqrt(rho);
 
   const x = (k: number) => pad.left + ((k - 1) / (NMAX - 1)) * (width - pad.left - pad.right);
@@ -344,6 +359,26 @@ function RiskCurve({ sigma, rho, n }: { sigma: number; rho: number; n: number })
       </text>
       {/* curve */}
       <path d={path} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinejoin="round" />
+      {/* empirical (real CRSP) curve — a fixed reference the model can be fit to */}
+      <polyline
+        points={empirical.map((p) => `${x(p.n)},${y(p.volAnnual)}`).join(" ")}
+        fill="none"
+        stroke="var(--color-text-soft)"
+        strokeWidth={1.25}
+        strokeDasharray="2 3"
+        opacity={0.9}
+      />
+      {empirical.map((p) => (
+        <circle key={p.n} cx={x(p.n)} cy={y(p.volAnnual)} r={2.6} fill="var(--color-text-soft)" />
+      ))}
+      <text
+        x={x(empirical[empirical.length - 1].n)}
+        y={y(empirical[empirical.length - 1].volAnnual) + 16}
+        textAnchor="end"
+        style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}
+      >
+        actual US stocks
+      </text>
       {/* current N marker */}
       <circle cx={x(n)} cy={y(portVol(sigma, rho, n))} r={6} fill="var(--color-accent)" stroke="var(--color-surface)" strokeWidth={2} />
       <text x={(pad.left + width - pad.right) / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
