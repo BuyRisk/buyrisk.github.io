@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import ResetButton from "./ResetButton";
 import { mulberry32, makeNormal } from "../lib/portfolio";
 
 /**
@@ -131,6 +132,15 @@ export default function EmhLab() {
             {cum.total >= 10 && <> — the 50% line is where a coin flip lands.</>}
           </span>
         </div>
+
+        <ResetButton
+          onReset={() => {
+            setSeed(1);
+            setRevealed(0);
+            setCalls([]);
+            setCum({ correct: 0, total: 0 });
+          }}
+        />
       </div>
     </div>
   );

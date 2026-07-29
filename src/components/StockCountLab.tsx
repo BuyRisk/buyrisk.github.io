@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
 import { crspDiversification } from "../data/generated/crsp-diversification";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 
 /**
  * "How many stocks is enough?" — diversification WITHIN one asset class.
@@ -212,6 +213,11 @@ export default function StockCountLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setN(10); setSigma(0.3); setRho(0.2); setMode("continuous"); setSeed(1);
+          }}
+        />
         <div className="wl-simmode" role="group" aria-label="Simulation mode">
           <button type="button" className={mode === "continuous" ? "active" : ""} aria-pressed={mode === "continuous"} onClick={() => setMode("continuous")}>
             Continuous

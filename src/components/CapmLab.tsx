@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
 import { capmSml } from "../data/generated/capm-sml";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 
 /**
  * CAPM teaching tool — two linked panels:
@@ -117,6 +118,12 @@ export default function CapmLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setRf(0.03); setPremium(0.05); setSigM(0.15); setBeta(1.2); setAlpha(0.01);
+            setIdio(0.1); setN(60); setBlend(1); setSeed(1); setMode("static"); setShowReal(false);
+          }}
+        />
         <p className="cl-group">The market</p>
         <label className="wl-slider">
           <span>Risk-free rate<InfoTip text="The return on a safe asset like Treasury bills — the reward for taking no risk. It's where the Security Market Line starts." /> <strong>{pct(rf)}</strong></span>

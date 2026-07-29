@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { mulberry32, percentile } from "../lib/portfolio";
 import { crspSuperstock } from "../data/generated/crsp-superstock";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 
 /**
  * Bessembinder's skewness, made interactive. Individual stock lifetime returns
@@ -183,6 +184,7 @@ export default function SuperstockLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton onReset={() => { setN(5); setSeed(1); }} />
         <label className="wl-slider">
           <span>
             Stocks you hand-pick

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PRESET_ASSETS } from "../data/assets";
 import FrontierChart from "./FrontierChart";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 import {
   type Asset,
   correlationMatrix,
@@ -295,6 +296,12 @@ export default function RandomnessLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setAssets(DEFAULT_IDS.map(makeAsset)); setRawWeights(DEFAULT_IDS.map(() => 50));
+            setPairCorr(-0.2); setMode("continuous"); setSeed(1); setAddValue("");
+          }}
+        />
         <div className="wl-simmode" role="group" aria-label="Simulation mode">
           <button
             type="button"

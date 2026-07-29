@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 import {
   optimize,
   monthsToLabel,
@@ -85,6 +86,12 @@ export default function SocialSecurityLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male");
+            setSmoking("former"); setExercise("moderate"); setDiscountRate(2);
+          }}
+        />
         <div className="ss-credit">
           Inspired by <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a> by
           Mike Piper — the free, open-source gold standard. Use his for a real

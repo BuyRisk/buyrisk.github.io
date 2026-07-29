@@ -22,6 +22,7 @@ import {
 } from "../lib/portfolio";
 import { PRESET_ASSETS, DEFAULT_ASSET_IDS } from "../data/assets";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 
 const STEPS_PER_YEAR = 52;
 const CLOUD_SEED = 20260726;
@@ -735,6 +736,15 @@ export default function PortfolioLab() {
     <div className="pl">
       {/* ---------------- Controls ---------------- */}
       <div className="pl-controls">
+        <ResetButton
+          onReset={() => {
+            setAssets(DEFAULT_ASSET_IDS.map(makeAssetFromPreset));
+            setRawWeights(DEFAULT_ASSET_IDS.map(() => 50));
+            setMode("historical"); setYears(20); setSeed(1); setShowFan(false);
+            setAddValue(""); setRiskFree(0.03); setPairCorr(-0.2);
+            setScenarioNote(null); setSimMode("single");
+          }}
+        />
         <div className="pl-mode" role="group" aria-label="Parameter source">
           <button
             type="button"

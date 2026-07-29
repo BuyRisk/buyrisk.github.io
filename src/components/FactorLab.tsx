@@ -1,5 +1,6 @@
 import { useState } from "react";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 import { FACTORS, FACTOR_PRESETS, RISK_FREE, type Loadings } from "../data/factors";
 
 /**
@@ -51,6 +52,13 @@ export default function FactorLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setLoadings({ ...FACTOR_PRESETS[2].loadings });
+            setModel("ff5");
+            setPresetName(FACTOR_PRESETS[2].name);
+          }}
+        />
         <label className="wl-slider">
           <span>
             Portfolio style

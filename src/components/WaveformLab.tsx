@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PRESET_ASSETS } from "../data/assets";
 import FrontierChart from "./FrontierChart";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 import {
   covarianceMatrix,
   randomPortfolios,
@@ -292,6 +293,12 @@ export default function WaveformLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setAssets(DEFAULT_IDS.map(makeWaveAsset)); setRawWeights(DEFAULT_IDS.map(() => 50));
+            setPairCorr(-0.2); setMode("continuous"); setAddValue("");
+          }}
+        />
         <div className="wl-simmode" role="group" aria-label="Simulation mode">
           <button
             type="button"

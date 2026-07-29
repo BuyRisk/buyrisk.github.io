@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
 
 /**
@@ -130,6 +131,12 @@ export default function BurnRateLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
+        <ResetButton
+          onReset={() => {
+            setMode("plan"); setCats(DEFAULT_CATEGORIES); setWithdrawalRate(4);
+            setPortfolio(1_000_000); setStockPct(60); setHorizon(30);
+          }}
+        />
         <div className="wl-simmode" role="group" aria-label="Mode">
           <button type="button" className={mode === "plan" ? "active" : ""} aria-pressed={mode === "plan"} onClick={() => setMode("plan")}>
             Simple plan

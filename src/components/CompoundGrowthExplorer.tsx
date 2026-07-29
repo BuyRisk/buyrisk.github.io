@@ -1,5 +1,6 @@
 import { useId, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
 
 /**
@@ -581,6 +582,15 @@ export default function CompoundGrowthExplorer() {
   return (
     <div className="cge">
       <div className="cge-controls">
+        <ResetButton
+          onReset={() => {
+            setMode("project"); setPrincipal(10_000); setMonthly(300); setRate(10);
+            setInflation(3); setFee(0.5); setYears(30); setTarget(1_000_000);
+            setWithdrawalRate(4); setPhases([]); setShowLifecycle(false); setCurrentAge(30);
+            setIncome(70_000); setIncomeGrowth(2); setRetireAge(65); setStockPct(90);
+            setSimMode("simple"); setHistStock(90);
+          }}
+        />
         <div className="wl-simmode" role="group" aria-label="Projection mode">
           <button type="button" className={simMode === "simple" ? "active" : ""} aria-pressed={simMode === "simple"} onClick={() => setSimMode("simple")}>
             Simplified
