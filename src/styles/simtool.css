@@ -24,30 +24,8 @@
   padding: var(--space-md);
   box-shadow: var(--shadow);
 }
-.wl-simmode {
-  display: inline-flex;
-  align-self: flex-start;
-  background: var(--color-surface-alt);
-  border-radius: var(--radius);
-  padding: 3px;
-  gap: 3px;
-}
-.wl-simmode button {
-  font-family: var(--font-sans);
-  font-size: var(--step--1);
-  font-weight: 600;
-  padding: 0.3rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--color-text-soft);
-  cursor: pointer;
-}
-.wl-simmode button.active {
-  background: var(--color-surface);
-  color: var(--color-accent);
-  box-shadow: var(--shadow);
-}
+/* .wl-simmode now lives in global.css so every tool page styles it identically
+   and it wraps instead of overflowing. The --wrap modifier below still applies. */
 .wl-assets {
   display: flex;
   flex-direction: column;

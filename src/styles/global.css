@@ -284,6 +284,42 @@ blockquote {
   border-color: var(--color-accent);
 }
 
+/*
+ * Shared segmented "pill" toggle used across the interactive tools (Simplified/
+ * Historical, Project/Reach a goal, simulation modes, …). Lives in the global
+ * sheet so every tool page styles it identically — even the pages that don't
+ * import the simtool utilities — and wraps to a second row instead of
+ * overflowing when a control carries several buttons.
+ */
+.wl-simmode {
+  display: flex;
+  flex-wrap: wrap;
+  width: fit-content;
+  max-width: 100%;
+  align-self: flex-start;
+  justify-self: start;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 3px;
+}
+.wl-simmode button {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-soft);
+  cursor: pointer;
+}
+.wl-simmode button.active {
+  background: var(--color-surface);
+  color: var(--color-accent);
+  box-shadow: var(--shadow);
+}
+
 /* ---------- Cards ---------- */
 .card {
   display: block;
