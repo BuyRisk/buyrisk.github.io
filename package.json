@@ -14,7 +14,8 @@
     "data:crsp:superstock": "node scripts/reduce-crsp-superstock.mjs",
     "data:crsp:diversification": "node scripts/reduce-crsp-diversification.mjs",
     "data:crsp": "npm run data:crsp:superstock && npm run data:crsp:diversification",
-    "data:historical": "node scripts/reduce-damodaran-returns.mjs"
+    "data:historical": "node scripts/reduce-damodaran-returns.mjs",
+    "data:ssa": "node scripts/reduce-ssa.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

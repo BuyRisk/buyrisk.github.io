@@ -14,10 +14,12 @@ import "../../styles/simtool.css";
     <p class="eyebrow">Interactive Tool</p>
     <h1>When should you claim Social Security?</h1>
     <p class="lede">
-      You can start Social Security anytime from 62 to 70 — and the choice
-      matters enormously. Claim early and the checks are smaller but start
-      sooner; wait, and each year adds roughly 8% to your monthly benefit for
-      life. The question is really about how long you'll live.
+      You can start Social Security anytime from 62 to 70, and the choice is
+      worth tens of thousands of dollars. This optimizer weighs every age by how
+      likely you are to <em>live to collect it</em> — then lets you personalize
+      the two levers that actually move the answer: your <strong>health</strong>
+      (how long you'll likely live) and your <strong>discount rate</strong>
+      (including whether you'd use the money to pay down debt).
     </p>
   </section>
 
@@ -27,31 +29,40 @@ import "../../styles/simtool.css";
 
   <section class="container wl-explainer">
     <div class="prose">
-      <h2>Bigger checks, or more of them?</h2>
+      <h2>How the optimizer thinks</h2>
       <ul>
         <li>
-          <strong>Claiming at 62</strong> permanently shrinks your check to about
-          70% of the full amount — but you collect for up to eight extra years.
+          <strong>Bigger checks vs. more of them.</strong> Claiming at 62 shrinks
+          your check to ~70% of the full amount but starts eight years sooner;
+          waiting to 70 lifts it to ~124% via delayed-retirement credits. The
+          breakeven for waiting is usually around age 80–81.
         </li>
         <li>
-          <strong>Waiting until 70</strong> boosts it to about 124% via delayed
-          retirement credits, but you forgo those early years of income.
+          <strong>Survival-weighting.</strong> Rather than pick a single "live
+          until" age, we weight each future check by your probability of being
+          alive to cash it, using the SSA life table — then present-value the
+          whole stream. The tallest bar is the age that maximizes it.
         </li>
         <li>
-          <strong>The breakeven age</strong> — usually around 80–81 — is where
-          waiting pulls ahead. Live longer and delaying wins; die sooner and
-          claiming early wins. Since you can't know, delaying acts as
-          <em>longevity insurance</em>: it protects the scenario you can least
-          afford — running low on money while still alive.
+          <strong>The health premium.</strong> Not smoking and staying active
+          meaningfully shift your survival curve — which changes both your
+          expected lifetime benefits and the optimal claim age. Longevity is a
+          return no portfolio guarantees, and it's badly under-appreciated.
+        </li>
+        <li>
+          <strong>Debt is a discount rate.</strong> Using early benefits to retire
+          a 6% mortgage <em>is</em> a 6% return. So carrying costly debt raises
+          your effective discount rate and tilts the answer toward claiming
+          earlier — which the discount-rate slider lets you model directly.
         </li>
       </ul>
       <p>
-        This tool teaches the intuition with a single benefit amount. Real
-        decisions also involve spousal and survivor benefits, taxes, your
-        earnings record, and whether you're still working. For an actual,
-        personalized claiming strategy, use the free, open-source
+        A single-earner teaching model: it leaves out spousal and survivor
+        benefits, taxes, the earnings test, and your exact record. For an actual,
+        personalized filing strategy, use the free, open-source
         <a href="https://opensocialsecurity.com/" target="_blank" rel="noopener noreferrer">Open Social Security</a>
-        by Mike Piper. Educational only, not advice.
+        by Mike Piper — the reference this tool is modeled on and cross-checked
+        against. Educational only, not advice.
       </p>
     </div>
   </section>
@@ -207,5 +218,64 @@ import "../../styles/simtool.css";
     font-family: var(--font-sans);
     font-weight: 700;
     font-size: var(--step-0);
+  }
+  .ss-credit {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--color-text-soft);
+    background: var(--color-surface-alt);
+    border: var(--border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  .ss-credit a {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+  .ss-seg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .ss-seg-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-seg {
+    display: flex;
+    gap: 4px;
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .ss-seg button {
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.4rem 0.3rem;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--color-text-soft);
+    cursor: pointer;
+    min-width: 0;
+  }
+  .ss-seg button.active {
+    background: var(--color-surface);
+    color: var(--color-accent);
+    box-shadow: var(--shadow);
+  }
+  .ss-health h3 {
+    margin: 0 0 var(--space-sm);
+    font-size: var(--step-1);
+  }
+  .ss-health p {
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text-soft);
   }
 </style>

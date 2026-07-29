@@ -1,150 +1,197 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
+import {
+  optimize,
+  monthsToLabel,
+  type Sex,
+  type Smoking,
+  type Exercise,
+  type OptimizeResult,
+} from "../lib/socialSecurity";
 
 /**
- * Conceptual "when to claim Social Security" illustrator. Teaches the core
- * trade-off — bigger checks later vs. more checks sooner — via delayed
- * retirement credits, the breakeven age, and longevity risk. It is NOT a
- * precise optimizer (no spousal/survivor/tax/earnings-test rules); for that we
- * point to Mike Piper's Open Social Security.
+ * A survival-weighted Social Security claiming optimizer — our take on Mike
+ * Piper's Open Social Security, with two extra levers: a health-based mortality
+ * adjustment (the longevity "premium" of not smoking / staying active) and a
+ * discount rate you can tie to paying down debt. Educational, single-earner; for
+ * a real filing strategy we point to Open Social Security.
  */
 
-const FRA = 67; // full retirement age (born 1960+)
 const currency = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: Math.abs(n) >= 1e6 ? "compact" : "standard",
+    maximumFractionDigits: Math.abs(n) >= 1e6 ? 2 : 0,
+  });
 
-/** Benefit as a fraction of the FRA amount (PIA) for a given claiming age. */
-function benefitMultiplier(claimAge: number): number {
-  const diff = (claimAge - FRA) * 12; // months relative to FRA
-  if (diff >= 0) return 1 + (2 / 3 / 100) * diff; // +2/3% per month (8%/yr)
-  const early = -diff;
-  const first = Math.min(early, 36);
-  const rest = Math.max(0, early - 36);
-  return 1 - (5 / 9 / 100) * first - (5 / 12 / 100) * rest;
+function Segmented<T extends string>({
+  label,
+  info,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  info?: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="ss-seg-field">
+      <span className="ss-seg-label">
+        {label}
+        {info && <InfoTip text={info} />}
+      </span>
+      <div className="ss-seg" role="group" aria-label={label}>
+        {options.map((o) => (
+          <button key={o.value} type="button" className={value === o.value ? "active" : ""} aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-const monthlyAt = (pia: number, claimAge: number) => pia * benefitMultiplier(claimAge);
-const cumulativeAt = (pia: number, claimAge: number, atAge: number) =>
-  Math.max(0, atAge - claimAge) * 12 * monthlyAt(pia, claimAge);
-
 export default function SocialSecurityLab() {
-  const [pia, setPia] = useState(2000);
-  const [claimAge, setClaimAge] = useState(67);
-  const [planningAge, setPlanningAge] = useState(85);
+  const [pia, setPia] = useState(2400);
+  const [birthYear, setBirthYear] = useState(1965);
+  const [currentAge, setCurrentAge] = useState(62);
+  const [sex, setSex] = useState<Sex>("male");
+  const [smoking, setSmoking] = useState<Smoking>("former");
+  const [exercise, setExercise] = useState<Exercise>("moderate");
+  const [discountRate, setDiscountRate] = useState(2);
 
-  const monthly = monthlyAt(pia, claimAge);
-  const cumChosen = cumulativeAt(pia, claimAge, planningAge);
+  const health = { sex, smoking, exercise };
+  const result = useMemo(
+    () => optimize({ pia, birthYear, currentAge, discountRate, health }),
+    [pia, birthYear, currentAge, discountRate, sex, smoking, exercise]
+  );
+  // Population-average reference (former/moderate ⇒ hazard multiplier 1.0), to
+  // isolate the health "premium".
+  const ref = useMemo(
+    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" } }),
+    [pia, birthYear, currentAge, discountRate, sex]
+  );
 
-  // Breakeven age: claim-at-62 vs claim-at-70 cumulative crossover.
-  const b62 = benefitMultiplier(62);
-  const b70 = benefitMultiplier(70);
-  const breakeven = (62 * b62 - 70 * b70) / (b62 - b70);
-
-  // Best integer claim age for the chosen planning age.
-  const best = useMemo(() => {
-    let bestAge = 62;
-    let bestCum = -1;
-    for (let c = 62; c <= 70; c++) {
-      const cum = cumulativeAt(pia, c, planningAge);
-      if (cum > bestCum) {
-        bestCum = cum;
-        bestAge = c;
-      }
-    }
-    return { age: bestAge, cum: bestCum };
-  }, [pia, planningAge]);
+  const bestAgeLabel = monthsToLabel(result.best.ageMonths);
+  const leDelta = result.lifeExpectancy - ref.lifeExpectancy;
+  const valueDelta = result.best.npv - ref.best.npv;
+  const at62 = result.points.find((p) => p.age === 62)!;
+  const at70 = result.points.find((p) => p.age === 70)!;
 
   return (
     <div className="wl">
       <div className="wl-controls">
+        <div className="ss-credit">
+          Inspired by <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a> by
+          Mike Piper — the free, open-source gold standard. Use his for a real
+          filing strategy; ours adds health &amp; debt levers for intuition.
+        </div>
+
         <label className="wl-slider">
           <span>
-            Benefit at full retirement (age {FRA})
-            <InfoTip text="Your 'primary insurance amount' — the monthly check you'd get by claiming exactly at full retirement age. Your real figure is on your Social Security statement." />{" "}
+            Benefit at full retirement
+            <InfoTip text="Your Primary Insurance Amount — the monthly check at full retirement age. Your real figure is on your Social Security statement (ssa.gov)." />{" "}
             <strong>{currency(pia)}/mo</strong>
           </span>
           <input type="range" min={800} max={4000} step={50} value={pia} onChange={(e) => setPia(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>
-            Age you claim
-            <InfoTip text="When you start benefits, from 62 to 70. Earlier means smaller checks; each year you wait past full retirement adds about 8%." />{" "}
-            <strong>{claimAge}</strong>
+            Birth year
+            <InfoTip text="Sets your full retirement age (66 for 1943–1954, sliding up to 67 for 1960 and later)." />{" "}
+            <strong>{birthYear}</strong> · FRA {monthsToLabel(result.fraMonths)}
           </span>
-          <input type="range" min={62} max={70} step={1} value={claimAge} onChange={(e) => setClaimAge(Number(e.target.value))} />
+          <input type="range" min={1943} max={1975} step={1} value={birthYear} onChange={(e) => setBirthYear(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>
-            Live until (plan for)
-            <InfoTip text="The age you plan to live to. Delaying pays off only if you live past the breakeven age, so longer lifespans favor claiming later." />{" "}
-            <strong>{planningAge}</strong>
+            Your age now
+            <InfoTip text="The age you're deciding at. Survival is conditioned on being alive today." />{" "}
+            <strong>{currentAge}</strong>
           </span>
-          <input type="range" min={70} max={100} step={1} value={planningAge} onChange={(e) => setPlanningAge(Number(e.target.value))} />
+          <input type="range" min={50} max={69} step={1} value={currentAge} onChange={(e) => setCurrentAge(Number(e.target.value))} />
         </label>
 
-        <div className="ss-compare">
-          {[62, FRA, 70].map((c) => (
-            <div key={c} className={`ss-compare-item ${c === claimAge ? "active" : ""}`}>
-              <span className="ss-compare-age">Claim {c}</span>
-              <span className="ss-compare-amt">{currency(monthlyAt(pia, c))}/mo</span>
-            </div>
-          ))}
-        </div>
+        <Segmented label="Sex (for life table)" value={sex} onChange={setSex} options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} />
+        <Segmented label="Smoking" info="Current smoking roughly doubles all-cause mortality; quitting recovers most of the gap over time. Illustrative hazard multipliers, not a medical model." value={smoking} onChange={setSmoking} options={[{ value: "never", label: "Never" }, { value: "former", label: "Former" }, { value: "current", label: "Current" }]} />
+        <Segmented label="Exercise" info="Regular activity is associated with ~20–30% lower mortality. Illustrative." value={exercise} onChange={setExercise} options={[{ value: "sedentary", label: "Little" }, { value: "moderate", label: "Some" }, { value: "active", label: "Active" }, { value: "daily", label: "Daily" }]} />
 
-        <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          A teaching model only — no spousal, survivor, tax, or earnings-test rules,
-          and benefits are shown in today's dollars.
+        <label className="wl-slider">
+          <span>
+            Discount rate (real)
+            <InfoTip text="How much you value a dollar today vs. later. If you'd use early benefits to pay off debt, set this near that debt's rate — retiring a 6% mortgage IS a 6% return, and it favors claiming earlier." />{" "}
+            <strong>{discountRate}%</strong>
+          </span>
+          <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
+        </label>
+        <p className="wl-note" style={{ marginTop: "0.4rem" }}>
+          Single-earner teaching model — no spousal, survivor, tax, or earnings-test
+          rules. Benefits are in today's dollars. Data: SSA period life table, AWI,
+          bend points, COLA.
         </p>
       </div>
 
       <div className="wl-stage">
         <div className="wl-frontier">
-          <h3>Lifetime benefits by claiming age</h3>
-          <CumulativeChart pia={pia} claimAge={claimAge} planningAge={planningAge} breakeven={breakeven} />
-          <div className="ss-legend">
-            <span><span className="ss-key ss-key--c1" /> Claim 62</span>
-            <span><span className="ss-key ss-key--c2" /> Claim {FRA}</span>
-            <span><span className="ss-key ss-key--c3" /> Claim 70</span>
-            <span><span className="ss-key ss-key--sel" /> Your choice ({claimAge})</span>
-          </div>
+          <h3>Lifetime value by claiming age</h3>
+          <ValueChart result={result} />
+          <p className="wl-fnote">
+            Each bar is the expected lifetime benefit (survival-weighted, discounted
+            to today) if you first claim at that age. The tallest is your optimum —
+            delaying trades smaller-but-sooner checks for bigger-but-later ones, and
+            wins only if you're likely to live to collect them.
+          </p>
         </div>
 
         <div className="wl-lower">
           <div className="wl-readout">
             <div className="ss-headline">
-              <span className="ss-headline-label">Monthly check if you claim at {claimAge}</span>
-              <span className="ss-headline-value">{currency(monthly)}</span>
-              <span className="ss-headline-sub">
-                {benefitMultiplier(claimAge) >= 1
-                  ? `+${Math.round((benefitMultiplier(claimAge) - 1) * 100)}% vs. full retirement`
-                  : `−${Math.round((1 - benefitMultiplier(claimAge)) * 100)}% vs. full retirement`}
-              </span>
+              <span className="ss-headline-label">Your optimal age to claim</span>
+              <span className="ss-headline-value">{bestAgeLabel}</span>
             </div>
             <dl className="ss-stats">
-              <div><dt>Collected by age {planningAge}</dt><dd>{currency(cumChosen)}</dd></div>
-              <div><dt>Breakeven age (62 vs 70)</dt><dd>{breakeven.toFixed(1)}</dd></div>
+              <div><dt>Monthly check then</dt><dd>{currency(result.best.monthly)}</dd></div>
+              <div><dt>vs. claiming at 62</dt><dd>{currency(at62.monthly)}</dd></div>
+              <div><dt>vs. claiming at 70</dt><dd>{currency(at70.monthly)}</dd></div>
             </dl>
             <p className="wl-saved">
-              To live to <strong>{planningAge}</strong>, claiming at{" "}
-              <strong>{best.age}</strong> collects the most ({currency(best.cum)}).
-              Delaying is longevity insurance: it wins only if you live past the
-              breakeven — but that's exactly the case you most need to fund.
+              At a {discountRate}% discount and your longevity, claiming at{" "}
+              <strong>{bestAgeLabel}</strong> maximizes expected lifetime benefits
+              ({currency(result.best.npv)} in today's dollars). Breakeven for
+              delaying to 70 is about age <strong>{result.breakevenAge.toFixed(0)}</strong>.
             </p>
           </div>
 
-          <div className="wl-readout ss-oss">
-            <h3>Want the real number?</h3>
+          <div className="wl-readout ss-health">
+            <h3>The health premium</h3>
             <p>
-              This is the intuition. For an actual claiming strategy — spousal and
-              survivor benefits, taxes, your real earnings record — use the
-              excellent free, open-source calculator:
+              Your habits imply a life expectancy of{" "}
+              <strong>{result.lifeExpectancy.toFixed(1)}</strong> — {" "}
+              {Math.abs(leDelta) < 0.1 ? (
+                <>right around the population average.</>
+              ) : leDelta > 0 ? (
+                <>
+                  <strong>{leDelta.toFixed(1)} years longer</strong> than an average
+                  profile, worth about{" "}
+                  <strong>{currency(Math.abs(valueDelta))}</strong> more in lifetime
+                  benefits (and it pushes your optimal claim age later).
+                </>
+              ) : (
+                <>
+                  <strong>{Math.abs(leDelta).toFixed(1)} years shorter</strong> than
+                  average, about {currency(Math.abs(valueDelta))} less in lifetime
+                  benefits — and a reason to claim earlier.
+                </>
+              )}
             </p>
-            <p>
-              <a href="https://opensocialsecurity.com/" target="_blank" rel="noopener noreferrer" className="ss-oss-link">
-                Open Social Security →
-              </a>
+            <p className="wl-fnote">
+              Fitness and not smoking buy longevity no portfolio can guarantee — an
+              under-priced return that also happens to reshape this very decision.
             </p>
-            <p className="wl-fnote">by Mike Piper (MIT-licensed, opensocialsecurity.com).</p>
           </div>
         </div>
       </div>
@@ -152,69 +199,40 @@ export default function SocialSecurityLab() {
   );
 }
 
-// ---------------------------------------------------------------------------
-
-function CumulativeChart({
-  pia,
-  claimAge,
-  planningAge,
-  breakeven,
-}: {
-  pia: number;
-  claimAge: number;
-  planningAge: number;
-  breakeven: number;
-}) {
+function ValueChart({ result }: { result: OptimizeResult }) {
   const width = 720;
   const height = 300;
-  const pad = { top: 16, right: 16, bottom: 38, left: 60 };
-  const ageMin = 62;
-  const ageMax = 100;
+  const pad = { top: 18, right: 16, bottom: 40, left: 64 };
   const plotW = width - pad.left - pad.right;
-
-  const anchors = [
-    { age: 62, color: "var(--pl-c1)" },
-    { age: FRA, color: "var(--pl-c2)" },
-    { age: 70, color: "var(--pl-c3)" },
-  ];
-  const maxY = Math.max(...anchors.map((a) => cumulativeAt(pia, a.age, ageMax)), 1);
-
-  const x = (age: number) => pad.left + ((age - ageMin) / (ageMax - ageMin)) * plotW;
-  const y = (v: number) => height - pad.bottom - (v / maxY) * (height - pad.top - pad.bottom);
-
-  const linePath = (c: number) => {
-    let d = "";
-    for (let age = ageMin; age <= ageMax; age += 1) {
-      d += `${d ? "L" : "M"}${x(age)},${y(cumulativeAt(pia, c, age))}`;
-    }
-    return d;
-  };
+  const plotH = height - pad.top - pad.bottom;
+  const pts = result.points;
+  const maxV = Math.max(...pts.map((p) => p.npv), 1);
+  const bestAge = Math.round(result.best.ageMonths / 12);
+  const bw = plotW / pts.length;
+  const y = (v: number) => pad.top + plotH - (v / maxV) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const fmt = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : `$${Math.round(v / 1e3)}k`);
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Cumulative lifetime Social Security benefits versus age, for different claiming ages">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Expected lifetime Social Security value by claiming age">
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
         <g key={f}>
-          <line x1={pad.left} x2={width - pad.right} y1={y(maxY * f)} y2={y(maxY * f)} stroke="var(--color-border)" />
-          <text x={pad.left - 8} y={y(maxY * f) + 4} textAnchor="end" style={axisText}>{currency(maxY * f)}</text>
+          <line x1={pad.left} x2={width - pad.right} y1={y(maxV * f)} y2={y(maxV * f)} stroke="var(--color-border)" />
+          <text x={pad.left - 8} y={y(maxV * f) + 4} textAnchor="end" style={axisText}>{fmt(maxV * f)}</text>
         </g>
       ))}
-      {[65, 70, 75, 80, 85, 90, 95, 100].map((age) => (
-        <text key={age} x={x(age)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{age}</text>
-      ))}
-      {/* breakeven + planning markers */}
-      <line x1={x(breakeven)} x2={x(breakeven)} y1={pad.top} y2={height - pad.bottom} stroke="var(--color-muted)" strokeWidth={1} strokeDasharray="3 3" />
-      <text x={x(breakeven)} y={pad.top + 2} textAnchor="middle" style={{ ...axisText, fontSize: 10 }}>breakeven {breakeven.toFixed(0)}</text>
-      <line x1={x(planningAge)} x2={x(planningAge)} y1={pad.top} y2={height - pad.bottom} stroke="var(--color-accent)" strokeWidth={1.5} />
-      {/* anchor strategy lines */}
-      {anchors.map((a) => (
-        <path key={a.age} d={linePath(a.age)} fill="none" stroke={a.color} strokeWidth={a.age === claimAge ? 1 : 2} opacity={a.age === claimAge ? 0.35 : 0.85} />
-      ))}
-      {/* chosen strategy (bold) */}
-      <path d={linePath(claimAge)} fill="none" stroke="var(--color-accent)" strokeWidth={3.5} strokeLinejoin="round" />
-      <text x={width / 2} y={height - 3} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Age →
-      </text>
+      {pts.map((p, i) => {
+        const isBest = p.age === bestAge;
+        const bx = pad.left + i * bw + bw * 0.15;
+        const bwFill = bw * 0.7;
+        return (
+          <g key={p.age}>
+            <rect x={bx} y={y(p.npv)} width={bwFill} height={pad.top + plotH - y(p.npv)} rx={3} fill={isBest ? "var(--color-accent)" : "var(--color-accent-soft)"} stroke={isBest ? "var(--color-accent)" : "var(--color-border)"} />
+            <text x={bx + bwFill / 2} y={height - pad.bottom + 16} textAnchor="middle" style={{ ...axisText, fontWeight: isBest ? 700 : 400, fill: isBest ? "var(--color-accent)" : "var(--color-muted)" }}>{p.age}</text>
+          </g>
+        );
+      })}
+      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Claiming age →</text>
     </svg>
   );
 }
