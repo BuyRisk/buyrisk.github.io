@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SuperstockLab from "../../components/SuperstockLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -56,11 +57,15 @@ import "../../styles/simtool.css";
         </li>
       </ul>
       <p>
-        This is a simulation calibrated to illustrate the shape of Bessembinder's
-        result — not exact historical returns. Educational only, not advice.
+        This is a simulation that samples the real CRSP lifetime-return
+        distribution behind Bessembinder's result — the shape is the actual one,
+        though the individual draws aren't specific historical stocks. Educational
+        only, not advice.
       </p>
     </div>
   </section>
+
+  <Sources tool="superstocks" />
 
   <NextTool current="/tools/superstocks" />
 </BaseLayout>

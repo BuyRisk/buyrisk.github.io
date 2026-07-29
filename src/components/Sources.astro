@@ -1,0 +1,182 @@
+---
+import {
+  STUDIES,
+  DATASETS,
+  TOOL_SOURCES,
+  STUDY_CATEGORY_ORDER,
+  type Study,
+  type StudyCategory,
+} from "../data/citations";
+
+interface Props {
+  /** Tool slug — pulls its study/dataset ids from TOOL_SOURCES. */
+  tool?: string;
+  /** Explicit study ids (overrides `tool`). */
+  studies?: string[];
+  /** Explicit dataset ids (overrides `tool`). */
+  datasets?: string[];
+  /** Heading text. */
+  title?: string;
+  /** Optional lead paragraph under the heading. */
+  intro?: string;
+  /** Group studies by category with sub-headings (used on the About page). */
+  grouped?: boolean;
+}
+
+const { tool, studies, datasets, title, intro, grouped = false } = Astro.props;
+
+const src = tool ? TOOL_SOURCES[tool] : undefined;
+const studyIds = studies ?? src?.studies ?? [];
+const datasetIds = datasets ?? src?.datasets ?? [];
+
+const studyList = studyIds.map((id) => STUDIES[id]).filter(Boolean) as Study[];
+const dataList = datasetIds.map((id) => DATASETS[id]).filter(Boolean);
+
+// For grouped mode, bucket studies by category in the canonical order.
+const groups: { category: StudyCategory; items: Study[] }[] = grouped
+  ? STUDY_CATEGORY_ORDER.map((category) => ({
+      category,
+      items: studyList.filter((s) => s.category === category),
+    })).filter((g) => g.items.length > 0)
+  : [{ category: "" as StudyCategory, items: studyList }];
+
+const heading = title ?? "Sources & further reading";
+const showResearchLabel = !grouped && dataList.length > 0;
+const hasContent = studyList.length > 0 || dataList.length > 0;
+
+/** True if a title already ends in terminal punctuation (avoid doubling it). */
+const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
+---
+
+{
+  hasContent && (
+    <section class="container sources">
+      <h2>{heading}</h2>
+      {intro && <p class="src-intro">{intro}</p>}
+
+      {studyList.length > 0 &&
+        groups.map((g) => (
+          <div class="src-block">
+            {grouped ? (
+              <h3>{g.category}</h3>
+            ) : (
+              showResearchLabel && <h3>Research</h3>
+            )}
+            <ul class="src-list">
+              {g.items.map((s) => (
+                <li>
+                  {s.authors} ({s.year}).{" "}
+                  {s.kind === "book" ? (
+                    <Fragment>
+                      <cite>
+                        {s.title}
+                        {endsPunct(s.title) ? "" : "."}
+                      </cite>{" "}
+                      {s.venue}.
+                    </Fragment>
+                  ) : (
+                    <Fragment>
+                      “{s.title}
+                      {endsPunct(s.title) ? "" : "."}” <cite>{s.venue}</cite>.
+                    </Fragment>
+                  )}
+                  {s.note && (
+                    <Fragment>
+                      {" "}
+                      <span class="src-note">{s.note}</span>
+                    </Fragment>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+      {dataList.length > 0 && (
+        <div class="src-block">
+          <h3>Data</h3>
+          <ul class="src-list">
+            {dataList.map((d) => (
+              <li>
+                <a href={d.url} target="_blank" rel="noopener noreferrer">
+                  {d.name}
+                </a>{" "}
+                — {d.publisher}.
+                {d.note && (
+                  <Fragment>
+                    {" "}
+                    <span class="src-note">{d.note}</span>
+                  </Fragment>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <p class="src-foot">
+        Educational use only — not financial advice. Figures are calculated from
+        the sources above; each tool's own notes describe its method.
+      </p>
+    </section>
+  )
+}
+
+<style>
+  .sources {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: var(--border);
+  }
+  .sources h2 {
+    font-size: var(--step-1);
+    margin: 0 0 var(--space-sm);
+  }
+  .src-intro {
+    color: var(--color-text-soft);
+    max-width: var(--measure);
+    margin: 0 0 var(--space-md);
+  }
+  .src-block {
+    margin-bottom: var(--space-md);
+  }
+  .src-block h3 {
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-xs);
+  }
+  .src-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .src-list li {
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--color-text-soft);
+    padding-left: 1.1rem;
+    text-indent: -1.1rem; /* hanging indent for wrapped references */
+  }
+  .src-list cite {
+    font-style: italic;
+  }
+  .src-list a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .src-list a:hover {
+    text-decoration: underline;
+  }
+  .src-note {
+    color: var(--color-muted);
+  }
+  .src-foot {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin: var(--space-md) 0 0;
+  }
+</style>

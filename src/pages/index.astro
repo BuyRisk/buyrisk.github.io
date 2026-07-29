@@ -1,11 +1,5 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import FormattedDate from "../components/FormattedDate.astro";
-
-const posts = (await getCollection("blog", ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
 
 const principles = [
   {
@@ -38,8 +32,8 @@ const principles = [
         yourself.
       </p>
       <div class="hero-actions">
-        <a href="/blog" class="btn btn--primary">Read the blog</a>
-        <a href="/tools" class="btn">Try the tools</a>
+        <a href="/tools" class="btn btn--primary">Explore the tools</a>
+        <a href="/about" class="btn">About Buy Risk</a>
       </div>
     </div>
   </section>
@@ -87,28 +81,6 @@ const principles = [
         </svg>
       </div>
     </div>
-  </section>
-
-  <section class="container latest">
-    <div class="latest-head">
-      <h2 class="section-heading">Latest from the blog</h2>
-      <a href="/blog" class="see-all">See all →</a>
-    </div>
-    <ul class="grid grid--3 post-grid">
-      {
-        posts.map((post) => (
-          <li>
-            <a href={`/blog/${post.id}/`} class="card post-card">
-              <h3>{post.data.title}</h3>
-              <p class="excerpt">{post.data.description}</p>
-              <p class="meta">
-                <FormattedDate date={post.data.pubDate} />
-              </p>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
   </section>
 </BaseLayout>
 
@@ -186,48 +158,5 @@ const principles = [
   .spotlight-visual svg {
     width: 100%;
     height: auto;
-  }
-
-  .latest {
-    margin-top: var(--space-xl);
-  }
-  .latest-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-md);
-    margin-bottom: var(--space-md);
-  }
-  .section-heading {
-    font-size: var(--step-1);
-    margin: 0;
-  }
-  .see-all {
-    font-family: var(--font-sans);
-    font-size: var(--step-0);
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .post-grid {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .post-card {
-    height: 100%;
-  }
-  .post-card h3 {
-    margin: 0 0 0.4rem;
-    font-size: var(--step-1);
-  }
-  .excerpt {
-    color: var(--color-text-soft);
-    margin: 0 0 var(--space-sm);
-  }
-  .meta {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    margin: 0;
   }
 </style>

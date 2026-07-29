@@ -1,5 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Sources from "../components/Sources.astro";
+import { STUDIES, DATASETS } from "../data/citations";
+
+const allStudyIds = Object.keys(STUDIES);
+const allDatasetIds = Object.keys(DATASETS);
 ---
 
 <BaseLayout
@@ -54,14 +59,23 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </p>
 
       <p>
-        Ready to dig in? Start with
-        <a href="/blog/what-does-buy-risk-mean/">
-          “What Does It Actually Mean to Buy Risk?”</a
-        >
-        or jump straight to the <a href="/tools/compound-growth">compound growth explorer</a>.
+        Ready to dig in? Jump straight to the
+        <a href="/tools/compound-growth">compound growth explorer</a>, or browse
+        the full <a href="/tools">Portfolio Playground</a>.
       </p>
     </div>
   </section>
+
+  {/* Author bio slots in here when ready — Northwestern faculty; frame as the
+      project's scholarship / academic-service note. */}
+
+  <Sources
+    studies={allStudyIds}
+    datasets={allDatasetIds}
+    grouped
+    title="Data & research"
+    intro="Buy Risk is built on the primary sources of evidence-based finance. Every figure on the site traces back to peer-reviewed research or a public dataset; the works below anchor the tools, grouped by theme."
+  />
 </BaseLayout>
 
 <style>

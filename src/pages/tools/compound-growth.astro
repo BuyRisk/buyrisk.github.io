@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CompoundGrowthExplorer from "../../components/CompoundGrowthExplorer.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 ---
 
 <BaseLayout
@@ -26,12 +27,13 @@ import NextTool from "../../components/NextTool.astro";
 
   <section class="container tool-more">
     <p>
-      Curious why the curve bends the way it does? Read
-      <a href="/blog/the-magic-of-compounding/">The Quiet Magic of Compounding</a>,
-      or head to the <a href="/tools/portfolio">Portfolio Diversification Lab</a>
+      Curious what to explore next? Head to the
+      <a href="/tools/portfolio">Portfolio Diversification Lab</a>
       to see how risk and return interact.
     </p>
   </section>
+
+  <Sources tool="compound-growth" />
 
   <NextTool current="/tools/compound-growth" />
 </BaseLayout>

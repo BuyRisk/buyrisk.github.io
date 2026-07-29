@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CapmLab from "../../components/CapmLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -67,6 +68,8 @@ import "../../styles/simtool.css";
       </p>
     </div>
   </section>
+
+  <Sources tool="capm" />
 
   <NextTool current="/tools/capm" />
 </BaseLayout>

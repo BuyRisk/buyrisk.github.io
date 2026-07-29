@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import FactorLab from "../../components/FactorLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -59,6 +60,8 @@ import "../../styles/simtool.css";
       </p>
     </div>
   </section>
+
+  <Sources tool="factors" />
 
   <NextTool current="/tools/factors" />
 </BaseLayout>

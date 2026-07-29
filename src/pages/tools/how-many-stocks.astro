@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import StockCountLab from "../../components/StockCountLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -61,6 +62,8 @@ import "../../styles/simtool.css";
       <p>Educational only, not advice.</p>
     </div>
   </section>
+
+  <Sources tool="how-many-stocks" />
 
   <NextTool current="/tools/how-many-stocks" />
 </BaseLayout>

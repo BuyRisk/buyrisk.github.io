@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import WaveformLab from "../../components/WaveformLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -55,6 +56,8 @@ import "../../styles/simtool.css";
       </p>
     </div>
   </section>
+
+  <Sources tool="waveforms" />
 
   <NextTool current="/tools/waveforms" />
 </BaseLayout>

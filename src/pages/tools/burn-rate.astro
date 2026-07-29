@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import BurnRateLab from "../../components/BurnRateLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -50,6 +51,8 @@ import "../../styles/simtool.css";
       <p>Educational only, not financial advice.</p>
     </div>
   </section>
+
+  <Sources tool="burn-rate" />
 
   <NextTool current="/tools/burn-rate" />
 </BaseLayout>

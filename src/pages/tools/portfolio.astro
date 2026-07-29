@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PortfolioLab from "../../components/PortfolioLab.tsx";
 import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
 ---
 
 <BaseLayout
@@ -47,8 +48,8 @@ import NextTool from "../../components/NextTool.astro";
       <p>
         Try this: build a 100% stock portfolio, note its risk, then blend in
         bonds. The portfolio's risk falls faster than its return — often you can
-        <em>lower risk and barely touch return</em>. That's the free lunch
-        <a href="/blog/diversification-the-only-free-lunch/">we wrote about</a>.
+        <em>lower risk and barely touch return</em>. That's the closest thing to
+        a free lunch in investing.
       </p>
 
       <h2>What this model leaves out</h2>
@@ -94,6 +95,8 @@ import NextTool from "../../components/NextTool.astro";
       </p>
     </div>
   </section>
+
+  <Sources tool="portfolio" />
 
   <NextTool current="/tools/portfolio" />
 </BaseLayout>
