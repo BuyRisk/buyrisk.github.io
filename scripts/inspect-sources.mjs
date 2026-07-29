@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { parseFrench } from "./lib/parse-french.mjs";
 import { readWorkbook } from "./lib/read-xlsx.mjs";
 import { parseFred } from "./lib/parse-fred.mjs";
+import { parseDta } from "./lib/parse-dta.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sourcesDir = join(root, "data", "sources");
@@ -110,7 +111,44 @@ function inspectFred() {
   console.log("");
 }
 
+/** Catalog the Jordà-Schularick-Taylor Macrohistory .dta (formats 117/118). */
+function inspectJst() {
+  const dir = join(sourcesDir, "jst");
+  if (!existsSync(dir)) return;
+  const files = readdirSync(dir)
+    .filter((f) => f.toLowerCase().endsWith(".dta"))
+    .sort();
+  if (!files.length) return;
+
+  console.log(`\n=== Jordà-Schularick-Taylor Macrohistory — ${files.length} file(s) ===\n`);
+  for (const file of files) {
+    const path = join(dir, file);
+    const bytes = readFileSync(path).length;
+    const d = parseDta(path);
+    const years = d.rows.map((r) => r.year).filter((y) => Number.isFinite(y));
+    const countries = [...new Set(d.rows.map((r) => r.country))].filter(Boolean);
+    console.log(
+      `▸ ${file}  (${fmtBytes(bytes)})  Stata dta v${d.release}, ${d.byteorder}`
+    );
+    console.log(
+      `    • ${d.nobs.toLocaleString()} rows × ${d.nvar} vars  ` +
+        `${Math.min(...years)}–${Math.max(...years)}  ${countries.length} countries`
+    );
+    // Non-missing coverage for the load-bearing return columns.
+    const key = ["eq_tr", "housing_tr", "bond_tr", "bill_rate", "cpi"];
+    const cov = key
+      .filter((k) => d.columns.some((c) => c.name === k))
+      .map((k) => {
+        const n = d.rows.filter((r) => r[k] !== null && r[k] !== undefined).length;
+        return `${k} ${Math.round((n / d.nobs) * 100)}%`;
+      });
+    console.log(`    • coverage: ${cov.join(", ")}`);
+  }
+  console.log("");
+}
+
 inspectFrench();
 inspectXlsProvider("damodaran", "Aswath Damodaran (NYU Stern)");
 inspectXlsProvider("shiller", "Robert Shiller (Yale)");
 inspectFred();
+inspectJst();

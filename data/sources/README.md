@@ -28,6 +28,9 @@ evidence-based teaching site.
 | `shiller/` | Robert Shiller long-run US data (Yale) | ✅ ingested |
 | `fred/` | Federal Reserve Economic Data (FRED) | ✅ ingested |
 | `crsp/` | CRSP individual-stock returns (via WRDS) | 🔒 licensed — pull script ready, raw git-ignored ([details](crsp/README.md)) |
+| `jst/` | Jordà-Schularick-Taylor Macrohistory (global, 1870–) | ✅ ingested — CC BY-NC-SA, raw git-ignored ([details](jst/README.md)) |
+| `aqr/` | AQR Capital factor data sets | ✅ ingested — terms restrict redistribution, raw git-ignored ([details](aqr/README.md)) |
+| `ssa/` | Social Security Administration life tables | ✅ ingested — public domain ([details](ssa/README.md)) |
 
 **One licensed exception:** every provider above is free to redistribute *except*
 `crsp/`. CRSP (via WRDS) is a paid subscription whose raw rows may **not** be
