@@ -21,6 +21,7 @@ import {
   percentile,
 } from "../lib/portfolio";
 import { PRESET_ASSETS, DEFAULT_ASSET_IDS } from "../data/assets";
+import { assetStats } from "../data/generated/asset-stats";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
@@ -63,6 +64,35 @@ function makeAssetFromPreset(id: string): Asset {
     marketCorr: p.marketCorr,
     color: p.color,
   };
+}
+
+/** Overlay an asset with its real historical μ/σ (Damodaran) where available. */
+function applyHistorical(a: Asset): Asset {
+  const s = assetStats.assets[a.id];
+  return s ? { ...a, mu: s.mu, sigma: s.sigma } : a;
+}
+
+const histAssets = (ids: string[]) => ids.map((id) => applyHistorical(makeAssetFromPreset(id)));
+
+/**
+ * Correlation matrix from the real pairwise correlations of annual returns,
+ * falling back to the single-market-factor approximation (ρᵢ·ρⱼ) for any asset
+ * not in the historical dataset (international stocks, custom assets).
+ */
+function realCorrelationMatrix(assets: Asset[]): number[][] {
+  const n = assets.length;
+  const M: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (i === j) {
+        M[i][j] = 1;
+        continue;
+      }
+      const c = assetStats.correlation[assets[i].id]?.[assets[j].id];
+      M[i][j] = c ?? assets[i].marketCorr * assets[j].marketCorr;
+    }
+  }
+  return M;
 }
 
 type Scenario = {
@@ -371,9 +401,7 @@ function OutcomeDistribution({
 // ---------------------------------------------------------------------------
 
 export default function PortfolioLab() {
-  const [assets, setAssets] = useState<Asset[]>(() =>
-    DEFAULT_ASSET_IDS.map(makeAssetFromPreset)
-  );
+  const [assets, setAssets] = useState<Asset[]>(() => histAssets(DEFAULT_ASSET_IDS));
   const [rawWeights, setRawWeights] = useState<number[]>(() =>
     DEFAULT_ASSET_IDS.map(() => 50)
   );
@@ -403,8 +431,11 @@ export default function PortfolioLab() {
 
   // Correlation matrix -> covariance + Cholesky factor drive all the math.
   const corr = useMemo(
-    () => correlationMatrix(assets, isPair ? pairCorr : null),
-    [paramsKey] // eslint-disable-line react-hooks/exhaustive-deps
+    () =>
+      mode === "historical"
+        ? realCorrelationMatrix(assets)
+        : correlationMatrix(assets, isPair ? pairCorr : null),
+    [paramsKey, mode] // eslint-disable-line react-hooks/exhaustive-deps
   );
   const cov = useMemo(() => covarianceMatrix(corr, sigmas), [corr, sigmas]);
   const chol = useMemo(() => cholesky(corr), [corr]);
@@ -698,7 +729,8 @@ export default function PortfolioLab() {
       setRawWeights((prev) => [...prev, 20]);
       setMode("custom"); // custom assets need editable params
     } else {
-      setAssets((prev) => [...prev, makeAssetFromPreset(value)]);
+      const na = makeAssetFromPreset(value);
+      setAssets((prev) => [...prev, mode === "historical" ? applyHistorical(na) : na]);
       setRawWeights((prev) => [...prev, 20]);
     }
     setAddValue("");
@@ -707,7 +739,7 @@ export default function PortfolioLab() {
   const equalWeight = () => setRawWeights(assets.map(() => 100 / assets.length));
 
   const applyScenario = (s: Scenario) => {
-    setAssets(s.assetIds.map(makeAssetFromPreset));
+    setAssets(histAssets(s.assetIds));
     setRawWeights([...s.weights]);
     if (s.pairCorr != null) setPairCorr(s.pairCorr);
     setMode("historical");
@@ -717,11 +749,11 @@ export default function PortfolioLab() {
 
   const setModeSafe = (m: "historical" | "custom") => {
     if (m === "historical") {
-      // snap preset assets back to their reference figures
+      // snap to real historical μ/σ, restoring preset market correlation
       setAssets((prev) =>
         prev.map((a) => {
           const p = PRESET_ASSETS.find((x) => x.id === a.id);
-          return p ? { ...a, mu: p.mu, sigma: p.sigma, marketCorr: p.marketCorr } : a;
+          return applyHistorical(p ? { ...a, marketCorr: p.marketCorr } : a);
         })
       );
     }
@@ -738,7 +770,7 @@ export default function PortfolioLab() {
       <div className="pl-controls">
         <ResetButton
           onReset={() => {
-            setAssets(DEFAULT_ASSET_IDS.map(makeAssetFromPreset));
+            setAssets(histAssets(DEFAULT_ASSET_IDS));
             setRawWeights(DEFAULT_ASSET_IDS.map(() => 50));
             setMode("historical"); setYears(20); setSeed(1); setShowFan(false);
             setAddValue(""); setRiskFree(0.03); setPairCorr(-0.2);
@@ -763,7 +795,7 @@ export default function PortfolioLab() {
         </div>
         <p className="pl-mode-note">
           {locked
-            ? "Illustrative long-run figures (locked). Switch to Custom to edit."
+            ? `Real historical estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
             : "Edit each asset's expected return, volatility, and market correlation."}
         </p>
 
@@ -808,7 +840,7 @@ export default function PortfolioLab() {
 
               <div className="pl-params">
                 <label>
-                  <span>Return<InfoTip text="The asset's expected annual return — its reward. In Historical mode these are illustrative long-run figures." /></span>
+                  <span>Return<InfoTip text="The asset's expected annual return — its reward. In Historical mode this is the real annualized average from Damodaran's data (1928–present)." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"
@@ -856,7 +888,7 @@ export default function PortfolioLab() {
           ))}
         </div>
 
-        {isPair && (
+        {isPair && mode === "custom" && (
           <label className="pl-corr">
             <span className="pl-corr-label">
               Correlation ({assets[0].name} ↔ {assets[1].name})
@@ -875,6 +907,14 @@ export default function PortfolioLab() {
               Drag toward −1 and watch the frontier bow out — that's diversification.
             </span>
           </label>
+        )}
+
+        {isPair && mode === "historical" && (
+          <p className="pl-mode-note">
+            Historical correlation ({assets[0].name} ↔ {assets[1].name}):{" "}
+            <strong>{realCorrelationMatrix(assets)[0][1].toFixed(2)}</strong> — the
+            real, measured co-movement. Switch to Custom to drag it yourself.
+          </p>
         )}
 
         <div className="pl-add-row">
