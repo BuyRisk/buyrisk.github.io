@@ -20,6 +20,12 @@ export const TOOLS: Tool[] = [
       "See how a starting balance, regular contributions, return, and time compound into long-run growth.",
   },
   {
+    title: "What Happened to Your Dollar?",
+    href: "/tools/inflation",
+    blurb:
+      "Rebase real US prices to any year and watch inflation split apart — college and healthcare soaring while toys and clothing fall.",
+  },
+  {
     title: "Retirement Burn-Rate Calculator",
     href: "/tools/burn-rate",
     blurb:
