@@ -151,6 +151,16 @@ export default function SocialSecurityLab() {
             to today) if you first claim at that age. The tallest is your optimum —
             delaying trades smaller-but-sooner checks for bigger-but-later ones, and
             wins only if you're likely to live to collect them.
+            {(() => {
+              const s = valueScale(result.points);
+              return s.zoomed ? (
+                <>
+                  {" "}The vertical axis is <strong>zoomed in</strong> — it starts at $
+                  {Math.round(s.floor / 1000)}k, not $0 (note the break mark at its base) — so
+                  these close-together values are easier to compare.
+                </>
+              ) : null;
+            })()}
           </p>
         </div>
 
@@ -206,6 +216,40 @@ export default function SocialSecurityLab() {
   );
 }
 
+/** "Nice" axis step (1, 2, 2.5, 5 × 10ⁿ) at or above a rough target. */
+function niceStep(rough: number): number {
+  const pow = Math.pow(10, Math.floor(Math.log10(rough)));
+  const n = rough / pow;
+  const s = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+  return s * pow;
+}
+
+interface ValueScale { zoomed: boolean; floor: number; ceil: number; ticks: number[]; }
+
+/**
+ * Choose the y-axis range for the lifetime-value bars. Survival-weighted NPVs for
+ * adjacent claiming ages are usually within a few percent of each other, so a
+ * zero-based axis squashes them into near-identical bars. When that's the case we
+ * "break" the axis — start it above zero — to make the real differences visible,
+ * and flag that we've done so (a break mark on the axis + a note in the caption).
+ */
+function valueScale(pts: { npv: number }[]): ValueScale {
+  const vals = pts.map((p) => p.npv);
+  const minV = Math.min(...vals);
+  const maxV = Math.max(...vals, 1);
+  const spread = maxV - minV;
+  // Only break the axis when a zero base would genuinely flatten the bars.
+  if (!(minV > 0 && spread / maxV > 0.004)) {
+    return { zoomed: false, floor: 0, ceil: maxV * 1.02, ticks: [0, 0.25, 0.5, 0.75, 1].map((f) => maxV * f) };
+  }
+  const step = niceStep(spread / 3);
+  const floor = Math.max(0, Math.floor((minV - spread * 0.35) / step) * step);
+  const ceil = Math.ceil((maxV + spread * 0.12) / step) * step;
+  const ticks: number[] = [];
+  for (let v = floor; v <= ceil + step * 1e-6; v += step) ticks.push(v);
+  return { zoomed: true, floor, ceil, ticks };
+}
+
 function ValueChart({ result }: { result: OptimizeResult }) {
   const width = 720;
   const height = 300;
@@ -213,19 +257,20 @@ function ValueChart({ result }: { result: OptimizeResult }) {
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
   const pts = result.points;
-  const maxV = Math.max(...pts.map((p) => p.npv), 1);
   const bestAge = Math.round(result.best.ageMonths / 12);
+  const scale = valueScale(pts);
   const bw = plotW / pts.length;
-  const y = (v: number) => pad.top + plotH - (v / maxV) * plotH;
+  const baseY = pad.top + plotH;
+  const y = (v: number) => pad.top + plotH - ((v - scale.floor) / (scale.ceil - scale.floor)) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const fmt = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : `$${Math.round(v / 1e3)}k`);
+  const fmt = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M` : `$${Math.round(v / 1e3)}k`);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Expected lifetime Social Security value by claiming age">
-      {[0, 0.25, 0.5, 0.75, 1].map((f) => (
-        <g key={f}>
-          <line x1={pad.left} x2={width - pad.right} y1={y(maxV * f)} y2={y(maxV * f)} stroke="var(--color-border)" />
-          <text x={pad.left - 8} y={y(maxV * f) + 4} textAnchor="end" style={axisText}>{fmt(maxV * f)}</text>
+      {scale.ticks.map((v, i) => (
+        <g key={i}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" />
+          <text x={pad.left - 8} y={y(v) + 4} textAnchor="end" style={axisText}>{fmt(v)}</text>
         </g>
       ))}
       {pts.map((p, i) => {
@@ -234,11 +279,21 @@ function ValueChart({ result }: { result: OptimizeResult }) {
         const bwFill = bw * 0.7;
         return (
           <g key={p.age}>
-            <rect x={bx} y={y(p.npv)} width={bwFill} height={pad.top + plotH - y(p.npv)} rx={3} fill={isBest ? "var(--color-accent)" : "var(--color-accent-soft)"} stroke={isBest ? "var(--color-accent)" : "var(--color-border)"} />
+            <rect x={bx} y={y(p.npv)} width={bwFill} height={baseY - y(p.npv)} rx={3} fill={isBest ? "var(--color-accent)" : "var(--color-accent-soft)"} stroke={isBest ? "var(--color-accent)" : "var(--color-border)"} />
             <text x={bx + bwFill / 2} y={height - pad.bottom + 16} textAnchor="middle" style={{ ...axisText, fontWeight: isBest ? 700 : 400, fill: isBest ? "var(--color-accent)" : "var(--color-muted)" }}>{p.age}</text>
           </g>
         );
       })}
+
+      {scale.zoomed && (
+        // Broken-axis mark: two short parallel slashes crossing the axis base,
+        // the standard signal that the scale doesn't start at zero.
+        <g stroke="var(--color-text-soft)" strokeWidth={1.5} aria-hidden="true">
+          <line x1={pad.left - 5} y1={baseY + 5} x2={pad.left + 5} y2={baseY - 2} />
+          <line x1={pad.left - 5} y1={baseY + 9} x2={pad.left + 5} y2={baseY + 2} />
+        </g>
+      )}
+
       <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Claiming age →</text>
     </svg>
   );
