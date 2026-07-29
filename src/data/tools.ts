@@ -86,6 +86,12 @@ export const TOOLS: Tool[] = [
       "Beyond CAPM: attribute a portfolio's return to size, value, profitability, and investment tilts.",
   },
   {
+    title: "Can Active Managers Beat the Market?",
+    href: "/tools/active-vs-passive",
+    blurb:
+      "The SPIVA scorecard, made interactive: see the share of professional active funds that fail to beat their benchmark — and how it climbs with the years.",
+  },
+  {
     title: "Can You Beat the Market?",
     href: "/tools/beat-the-market",
     blurb:

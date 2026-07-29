@@ -399,6 +399,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.ici.org/research/stats/fees",
     note: "Aggregate industry averages; only the reduced figures are published here.",
   },
+  spiva: {
+    name: "SPIVA U.S. Scorecard (Year-End 2025)",
+    publisher: "S&P Dow Jones Indices",
+    url: "https://www.spglobal.com/spdji/en/research-insights/spiva/",
+    note: "Copyrighted report; only specific transcribed figures, with attribution, are published here.",
+  },
 };
 
 export interface ToolSources {
@@ -419,6 +425,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   fees: {
     studies: ["sharpe1991", "malkiel1973"],
     datasets: ["ici"],
+  },
+  "active-vs-passive": {
+    studies: ["sharpe1991", "famaFrench2010", "malkiel1973"],
+    datasets: ["spiva"],
   },
   "burn-rate": {
     studies: ["bengen1994", "cooley1998"],

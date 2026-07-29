@@ -429,3 +429,96 @@
 
 /* "Restore defaults" control — shared across all interactive tools. */
 /* .tool-reset now lives in global.css so every tool page styles it identically. */
+
+/* Active-vs-passive (SPIVA) tool */
+.wl-select {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  font-weight: 600;
+  padding: 0.5rem 0.6rem;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  width: 100%;
+}
+.wl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.wl-field-label {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-text-soft);
+  font-weight: 600;
+}
+.wl-simmode--wrap {
+  flex-wrap: wrap;
+}
+.wl-simmode--wrap button {
+  flex: 1 1 auto;
+  min-width: 3rem;
+}
+.spv-rank {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: var(--space-md);
+}
+.spv-row {
+  display: grid;
+  grid-template-columns: 11rem 1fr 3rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+}
+.spv-row:hover {
+  background: var(--color-surface-alt);
+}
+.spv-row--sel {
+  background: var(--color-surface-alt);
+  border-color: var(--color-accent);
+}
+.spv-row-name {
+  font-size: var(--step--1);
+  color: var(--color-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.spv-row--sel .spv-row-name {
+  color: var(--color-text);
+  font-weight: 700;
+}
+.spv-row-track {
+  position: relative;
+  height: 0.85rem;
+  background: var(--color-surface);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.spv-row-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+}
+.spv-row-val {
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+@media (max-width: 520px) {
+  .spv-row {
+    grid-template-columns: 8rem 1fr 2.6rem;
+  }
+}
