@@ -3,11 +3,14 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import {
   optimize,
+  optimizeCouple,
+  fraMonths,
   monthsToLabel,
   type Sex,
   type Smoking,
   type Exercise,
   type OptimizeResult,
+  type CoupleResult,
 } from "../lib/socialSecurity";
 
 /**
@@ -57,12 +60,21 @@ function Segmented<T extends string>({
 }
 
 export default function SocialSecurityLab() {
+  const [mode, setMode] = useState<"single" | "couple">("single");
+  // Person A (also "you" in single mode).
   const [pia, setPia] = useState(2400);
   const [birthYear, setBirthYear] = useState(1965);
   const [currentAge, setCurrentAge] = useState(62);
   const [sex, setSex] = useState<Sex>("male");
   const [smoking, setSmoking] = useState<Smoking>("former");
   const [exercise, setExercise] = useState<Exercise>("moderate");
+  // Person B (spouse).
+  const [piaB, setPiaB] = useState(1200);
+  const [birthYearB, setBirthYearB] = useState(1967);
+  const [currentAgeB, setCurrentAgeB] = useState(60);
+  const [sexB, setSexB] = useState<Sex>("female");
+  const [smokingB, setSmokingB] = useState<Smoking>("never");
+  const [exerciseB, setExerciseB] = useState<Exercise>("moderate");
   const [discountRate, setDiscountRate] = useState(2);
 
   const health = { sex, smoking, exercise };
@@ -76,6 +88,15 @@ export default function SocialSecurityLab() {
     () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" } }),
     [pia, birthYear, currentAge, discountRate, sex]
   );
+  const couple = useMemo(
+    () =>
+      optimizeCouple({
+        a: { pia, birthYear, currentAge, health: { sex, smoking, exercise } },
+        b: { pia: piaB, birthYear: birthYearB, currentAge: currentAgeB, health: { sex: sexB, smoking: smokingB, exercise: exerciseB } },
+        discountRate,
+      }),
+    [pia, birthYear, currentAge, sex, smoking, exercise, piaB, birthYearB, currentAgeB, sexB, smokingB, exerciseB, discountRate]
+  );
 
   const bestAgeLabel = monthsToLabel(result.best.ageMonths);
   const leDelta = result.lifeExpectancy - ref.lifeExpectancy;
@@ -83,49 +104,41 @@ export default function SocialSecurityLab() {
   const at62 = result.points.find((p) => p.age === 62)!;
   const at70 = result.points.find((p) => p.age === 70)!;
 
+  const resetAll = () => {
+    setMode("single");
+    setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male"); setSmoking("former"); setExercise("moderate");
+    setPiaB(1200); setBirthYearB(1967); setCurrentAgeB(60); setSexB("female"); setSmokingB("never"); setExerciseB("moderate");
+    setDiscountRate(2);
+  };
+
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton
-          onReset={() => {
-            setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male");
-            setSmoking("former"); setExercise("moderate"); setDiscountRate(2);
-          }}
-        />
+        <ResetButton onReset={resetAll} />
         <div className="ss-credit">
           Inspired by <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a> by
           Mike Piper — the free, open-source gold standard. Use his for a real
-          filing strategy; ours adds health &amp; debt levers for intuition.
+          filing strategy; ours adds health, debt &amp; survivor levers for intuition.
         </div>
 
-        <label className="wl-slider">
-          <span>
-            Benefit at full retirement
-            <InfoTip text="Your Primary Insurance Amount — the monthly check at full retirement age. Your real figure is on your Social Security statement (ssa.gov)." />{" "}
-            <strong>{currency(pia)}/mo</strong>
-          </span>
-          <input type="range" min={800} max={4000} step={50} value={pia} onChange={(e) => setPia(Number(e.target.value))} />
-        </label>
-        <label className="wl-slider">
-          <span>
-            Birth year
-            <InfoTip text="Sets your full retirement age (66 for 1943–1954, sliding up to 67 for 1960 and later)." />{" "}
-            <strong>{birthYear}</strong> · FRA {monthsToLabel(result.fraMonths)}
-          </span>
-          <input type="range" min={1943} max={1975} step={1} value={birthYear} onChange={(e) => setBirthYear(Number(e.target.value))} />
-        </label>
-        <label className="wl-slider">
-          <span>
-            Your age now
-            <InfoTip text="The age you're deciding at. Survival is conditioned on being alive today." />{" "}
-            <strong>{currentAge}</strong>
-          </span>
-          <input type="range" min={50} max={69} step={1} value={currentAge} onChange={(e) => setCurrentAge(Number(e.target.value))} />
-        </label>
+        <div className="wl-simmode" role="group" aria-label="Who's claiming">
+          <button type="button" className={mode === "single" ? "active" : ""} aria-pressed={mode === "single"} onClick={() => setMode("single")}>Just me</button>
+          <button type="button" className={mode === "couple" ? "active" : ""} aria-pressed={mode === "couple"} onClick={() => setMode("couple")}>Married couple</button>
+        </div>
 
-        <Segmented label="Sex (for life table)" value={sex} onChange={setSex} options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} />
-        <Segmented label="Smoking" info="Current smoking roughly doubles all-cause mortality; quitting recovers most of the gap over time. Illustrative hazard multipliers, not a medical model." value={smoking} onChange={setSmoking} options={[{ value: "never", label: "Never" }, { value: "former", label: "Former" }, { value: "current", label: "Current" }]} />
-        <Segmented label="Exercise" info="Regular activity is associated with ~20–30% lower mortality. Illustrative." value={exercise} onChange={setExercise} options={[{ value: "sedentary", label: "Little" }, { value: "moderate", label: "Some" }, { value: "active", label: "Active" }, { value: "daily", label: "Daily" }]} />
+        {mode === "single" ? (
+          <PersonFields
+            pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
+            sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
+          />
+        ) : (
+          <>
+            <PersonFields title="You" pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
+              sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise} />
+            <PersonFields title="Your spouse" pia={piaB} setPia={setPiaB} birthYear={birthYearB} setBirthYear={setBirthYearB} age={currentAgeB} setAge={setCurrentAgeB}
+              sex={sexB} setSex={setSexB} smoking={smokingB} setSmoking={setSmokingB} exercise={exerciseB} setExercise={setExerciseB} />
+          </>
+        )}
 
         <label className="wl-slider">
           <span>
@@ -136,83 +149,237 @@ export default function SocialSecurityLab() {
           <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
         </label>
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>
-          Single-earner teaching model — no spousal, survivor, tax, or earnings-test
-          rules. Benefits are in today's dollars. Data: SSA period life table, AWI,
-          bend points, COLA.
+          {mode === "single" ? (
+            <>Single-earner teaching model — no spousal, survivor, tax, or earnings-test rules.</>
+          ) : (
+            <>Couple model — retirement + survivor benefits over joint mortality; omits spousal top-ups, taxes, and the earnings test.</>
+          )}{" "}
+          Benefits are in today's dollars. Data: SSA period life table, AWI, bend points, COLA.
         </p>
       </div>
 
-      <div className="wl-stage">
-        <div className="wl-frontier">
-          <h3>Lifetime value by claiming age</h3>
-          <ValueChart result={result} />
-          <p className="wl-fnote">
-            Each bar is the expected lifetime benefit (survival-weighted, discounted
-            to today) if you first claim at that age. The tallest is your optimum —
-            delaying trades smaller-but-sooner checks for bigger-but-later ones, and
-            wins only if you're likely to live to collect them.
-            {(() => {
-              const s = valueScale(result.points);
-              return s.zoomed ? (
-                <>
-                  {" "}The vertical axis is <strong>zoomed in</strong> — it starts at $
-                  {Math.round(s.floor / 1000)}k, not $0 (note the break mark at its base) — so
-                  these close-together values are easier to compare.
-                </>
-              ) : null;
-            })()}
-          </p>
-        </div>
-
-        <div className="wl-lower">
-          <div className="wl-readout">
-            <div className="ss-headline">
-              <span className="ss-headline-label">Your optimal age to claim</span>
-              <span className="ss-headline-value">{bestAgeLabel}</span>
-            </div>
-            <dl className="ss-stats">
-              <div><dt>Monthly check then</dt><dd>{currency(result.best.monthly)}</dd></div>
-              <div><dt>vs. claiming at 62</dt><dd>{currency(at62.monthly)}</dd></div>
-              <div><dt>vs. claiming at 70</dt><dd>{currency(at70.monthly)}</dd></div>
-            </dl>
-            <p className="wl-saved">
-              At a {discountRate}% discount and your longevity, claiming at{" "}
-              <strong>{bestAgeLabel}</strong> maximizes expected lifetime benefits
-              ({currency(result.best.npv)} in today's dollars). Breakeven for
-              delaying to 70 is about age <strong>{result.breakevenAge.toFixed(0)}</strong>.
-            </p>
-          </div>
-
-          <div className="wl-readout ss-health">
-            <h3>The health premium</h3>
-            <p>
-              Your habits imply a life expectancy of{" "}
-              <strong>{result.lifeExpectancy.toFixed(1)}</strong> — {" "}
-              {Math.abs(leDelta) < 0.1 ? (
-                <>right around the population average.</>
-              ) : leDelta > 0 ? (
-                <>
-                  <strong>{leDelta.toFixed(1)} years longer</strong> than an average
-                  profile, worth about{" "}
-                  <strong>{currency(Math.abs(valueDelta))}</strong> more in lifetime
-                  benefits (and it pushes your optimal claim age later).
-                </>
-              ) : (
-                <>
-                  <strong>{Math.abs(leDelta).toFixed(1)} years shorter</strong> than
-                  average, about {currency(Math.abs(valueDelta))} less in lifetime
-                  benefits — and a reason to claim earlier.
-                </>
-              )}
-            </p>
+      {mode === "single" ? (
+        <div className="wl-stage">
+          <div className="wl-frontier">
+            <h3>Lifetime value by claiming age</h3>
+            <ValueChart result={result} />
             <p className="wl-fnote">
-              Fitness and not smoking buy longevity no portfolio can guarantee — an
-              under-priced return that also happens to reshape this very decision.
+              Each bar is the expected lifetime benefit (survival-weighted, discounted
+              to today) if you first claim at that age. The tallest is your optimum —
+              delaying trades smaller-but-sooner checks for bigger-but-later ones, and
+              wins only if you're likely to live to collect them.
+              {(() => {
+                const s = valueScale(result.points);
+                return s.zoomed ? (
+                  <>
+                    {" "}The vertical axis is <strong>zoomed in</strong> — it starts at $
+                    {Math.round(s.floor / 1000)}k, not $0 (note the break mark at its base) — so
+                    these close-together values are easier to compare.
+                  </>
+                ) : null;
+              })()}
             </p>
           </div>
+
+          <div className="wl-lower">
+            <div className="wl-readout">
+              <div className="ss-headline">
+                <span className="ss-headline-label">Your optimal age to claim</span>
+                <span className="ss-headline-value">{bestAgeLabel}</span>
+              </div>
+              <dl className="ss-stats">
+                <div><dt>Monthly check then</dt><dd>{currency(result.best.monthly)}</dd></div>
+                <div><dt>vs. claiming at 62</dt><dd>{currency(at62.monthly)}</dd></div>
+                <div><dt>vs. claiming at 70</dt><dd>{currency(at70.monthly)}</dd></div>
+              </dl>
+              <p className="wl-saved">
+                At a {discountRate}% discount and your longevity, claiming at{" "}
+                <strong>{bestAgeLabel}</strong> maximizes expected lifetime benefits
+                ({currency(result.best.npv)} in today's dollars). Breakeven for
+                delaying to 70 is about age <strong>{result.breakevenAge.toFixed(0)}</strong>.
+              </p>
+            </div>
+
+            <div className="wl-readout ss-health">
+              <h3>The health premium</h3>
+              <p>
+                Your habits imply a life expectancy of{" "}
+                <strong>{result.lifeExpectancy.toFixed(1)}</strong> — {" "}
+                {Math.abs(leDelta) < 0.1 ? (
+                  <>right around the population average.</>
+                ) : leDelta > 0 ? (
+                  <>
+                    <strong>{leDelta.toFixed(1)} years longer</strong> than an average
+                    profile, worth about{" "}
+                    <strong>{currency(Math.abs(valueDelta))}</strong> more in lifetime
+                    benefits (and it pushes your optimal claim age later).
+                  </>
+                ) : (
+                  <>
+                    <strong>{Math.abs(leDelta).toFixed(1)} years shorter</strong> than
+                    average, about {currency(Math.abs(valueDelta))} less in lifetime
+                    benefits — and a reason to claim earlier.
+                  </>
+                )}
+              </p>
+              <p className="wl-fnote">
+                Fitness and not smoking buy longevity no portfolio can guarantee — an
+                under-priced return that also happens to reshape this very decision.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <CoupleOutput couple={couple} piaA={pia} piaB={piaB} />
+      )}
+    </div>
+  );
+}
+
+function PersonFields(props: {
+  title?: string;
+  pia: number; setPia: (n: number) => void;
+  birthYear: number; setBirthYear: (n: number) => void;
+  age: number; setAge: (n: number) => void;
+  sex: Sex; setSex: (v: Sex) => void;
+  smoking: Smoking; setSmoking: (v: Smoking) => void;
+  exercise: Exercise; setExercise: (v: Exercise) => void;
+}) {
+  const fra = fraMonths(props.birthYear);
+  return (
+    <div className="ss-person">
+      {props.title && <p className="br-group">{props.title}</p>}
+      <label className="wl-slider">
+        <span>
+          Benefit at full retirement
+          <InfoTip text="Their Primary Insurance Amount — the monthly check at full retirement age. The real figure is on the Social Security statement (ssa.gov)." />{" "}
+          <strong>{currency(props.pia)}/mo</strong>
+        </span>
+        <input type="range" min={800} max={4000} step={50} value={props.pia} onChange={(e) => props.setPia(Number(e.target.value))} />
+      </label>
+      <label className="wl-slider">
+        <span>
+          Birth year
+          <InfoTip text="Sets full retirement age (66 for 1943–1954, sliding up to 67 for 1960 and later)." />{" "}
+          <strong>{props.birthYear}</strong> · FRA {monthsToLabel(fra)}
+        </span>
+        <input type="range" min={1943} max={1975} step={1} value={props.birthYear} onChange={(e) => props.setBirthYear(Number(e.target.value))} />
+      </label>
+      <label className="wl-slider">
+        <span>
+          Age now
+          <InfoTip text="The age at the decision point. Survival is conditioned on being alive today." />{" "}
+          <strong>{props.age}</strong>
+        </span>
+        <input type="range" min={50} max={69} step={1} value={props.age} onChange={(e) => props.setAge(Number(e.target.value))} />
+      </label>
+      <Segmented label="Sex (for life table)" value={props.sex} onChange={props.setSex} options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} />
+      <Segmented label="Smoking" info="Current smoking roughly doubles all-cause mortality; quitting recovers most of the gap over time. Illustrative hazard multipliers, not a medical model." value={props.smoking} onChange={props.setSmoking} options={[{ value: "never", label: "Never" }, { value: "former", label: "Former" }, { value: "current", label: "Current" }]} />
+      <Segmented label="Exercise" info="Regular activity is associated with ~20–30% lower mortality. Illustrative." value={props.exercise} onChange={props.setExercise} options={[{ value: "sedentary", label: "Little" }, { value: "moderate", label: "Some" }, { value: "active", label: "Active" }, { value: "daily", label: "Daily" }]} />
+    </div>
+  );
+}
+
+function CoupleOutput({ couple, piaA, piaB }: { couple: CoupleResult; piaA: number; piaB: number }) {
+  const aAge = monthsToLabel(couple.best.aMonths);
+  const bAge = monthsToLabel(couple.best.bMonths);
+  const higherIsA = piaA >= piaB;
+  const hi = higherIsA
+    ? { name: "you", couple: couple.best.aMonths, solo: couple.a.soloBestMonths }
+    : { name: "your spouse", couple: couple.best.bMonths, solo: couple.b.soloBestMonths };
+  const coordValue = Math.max(0, couple.best.npv - couple.jointIndependentNpv);
+
+  return (
+    <div className="wl-stage">
+      <div className="wl-frontier">
+        <h3>Household value by claim-age pair</h3>
+        <CoupleHeatmap result={couple} />
+        <p className="wl-fnote">
+          Each square is the household's expected lifetime benefit (survival-weighted,
+          discounted to today) for one combination of claim ages — <strong>you</strong> across
+          the bottom, <strong>your spouse</strong> up the side. The brightest square, outlined,
+          is the pair that together collects the most.
+        </p>
+      </div>
+
+      <div className="wl-lower">
+        <div className="wl-readout">
+          <div className="ss-headline">
+            <span className="ss-headline-label">Claim ages that maximize your household</span>
+            <span className="ss-headline-value">You {aAge} · Spouse {bAge}</span>
+          </div>
+          <dl className="ss-stats">
+            <div><dt>Household lifetime value</dt><dd>{currency(couple.best.npv)}</dd></div>
+            <div><dt>vs. each claiming solo</dt><dd>{currency(couple.jointIndependentNpv)}</dd></div>
+            <div><dt>You: solo → couple</dt><dd>{monthsToLabel(couple.a.soloBestMonths)} → {aAge}</dd></div>
+            <div><dt>Spouse: solo → couple</dt><dd>{monthsToLabel(couple.b.soloBestMonths)} → {bAge}</dd></div>
+          </dl>
+          <p className="wl-saved">
+            The <strong>higher earner</strong> ({hi.name}) should claim at{" "}
+            <strong>{monthsToLabel(hi.couple)}</strong>
+            {hi.couple > hi.solo + 1 ? (
+              <> — later than the {monthsToLabel(hi.solo)} that would be optimal claiming alone</>
+            ) : null}
+            . That larger check becomes the survivor's income for as long as <em>either</em> of you
+            is alive, so delaying it insures the longer of two lifetimes. Coordinating this way is
+            worth about <strong>{currency(coordValue)}</strong> more than each of you optimizing
+            separately.
+          </p>
         </div>
       </div>
     </div>
+  );
+}
+
+function CoupleHeatmap({ result }: { result: CoupleResult }) {
+  const { agesA, agesB, grid } = result;
+  const nA = agesA.length;
+  const nB = agesB.length;
+  const pad = { top: 14, right: 16, bottom: 44, left: 58 };
+  const cell = Math.min(56, Math.floor(560 / Math.max(nA, 1)));
+  const plotW = cell * nA;
+  const plotH = cell * nB;
+  const width = pad.left + plotW + pad.right;
+  const height = pad.top + plotH + pad.bottom;
+
+  const vals = grid.map((g) => g.npv);
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const bestA = Math.round(result.best.aMonths / 12);
+  const bestB = Math.round(result.best.bMonths / 12);
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+
+  // A on x (left→right), B on y (bottom→top).
+  const cx = (ageA: number) => pad.left + agesA.indexOf(ageA) * cell;
+  const cy = (ageB: number) => pad.top + (nB - 1 - agesB.indexOf(ageB)) * cell;
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block", maxWidth: width }} role="img" aria-label="Household lifetime Social Security value for each pair of claim ages">
+      {grid.map((g) => {
+        const isBest = g.ageA === bestA && g.ageB === bestB;
+        const t = max > min ? (g.npv - min) / (max - min) : 1;
+        return (
+          <g key={`${g.ageA}-${g.ageB}`}>
+            <rect x={cx(g.ageA)} y={cy(g.ageB)} width={cell - 2} height={cell - 2} rx={3}
+              fill="var(--color-accent)" opacity={0.12 + 0.88 * t}
+              stroke={isBest ? "var(--color-text)" : "none"} strokeWidth={isBest ? 2.5 : 0}>
+              <title>You {g.ageA}, spouse {g.ageB}: {currency(g.npv)}</title>
+            </rect>
+            {isBest && (
+              <circle cx={cx(g.ageA) + (cell - 2) / 2} cy={cy(g.ageB) + (cell - 2) / 2} r={3.5} fill="var(--color-text)" />
+            )}
+          </g>
+        );
+      })}
+      {agesA.map((a) => (
+        <text key={a} x={cx(a) + (cell - 2) / 2} y={pad.top + plotH + 16} textAnchor="middle" style={{ ...axisText, fontWeight: a === bestA ? 700 : 400, fill: a === bestA ? "var(--color-text)" : "var(--color-muted)" }}>{a}</text>
+      ))}
+      {agesB.map((b) => (
+        <text key={b} x={pad.left - 8} y={cy(b) + (cell - 2) / 2 + 4} textAnchor="end" style={{ ...axisText, fontWeight: b === bestB ? 700 : 400, fill: b === bestB ? "var(--color-text)" : "var(--color-muted)" }}>{b}</text>
+      ))}
+      <text x={pad.left + plotW / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>You claim at →</text>
+      <text transform={`rotate(-90 12 ${pad.top + plotH / 2})`} x={12} y={pad.top + plotH / 2} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Spouse claims at →</text>
+    </svg>
   );
 }
 

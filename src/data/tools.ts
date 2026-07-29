@@ -41,7 +41,7 @@ export const TOOLS: Tool[] = [
     title: "When to Claim Social Security",
     href: "/tools/social-security",
     blurb:
-      "Bigger checks later or more checks sooner? See delayed-retirement credits, the breakeven age, and longevity risk.",
+      "Bigger checks later or more checks sooner? See delayed-retirement credits, the breakeven age, longevity risk — and how a couple's survivor benefit changes it.",
   },
   {
     title: "Rent or Buy?",
