@@ -430,6 +430,48 @@
 /* "Restore defaults" control — shared across all interactive tools. */
 /* .tool-reset now lives in global.css so every tool page styles it identically. */
 
+/* Group heading inside a tool's control column (shared; also used by burn-rate) */
+.br-group {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+  margin: var(--space-xs) 0 0;
+}
+
+/* Rent-vs-buy: a small secondary line under a slider value, and the
+   collapsible "Ownership costs" section. */
+.wl-slider-sub {
+  font-weight: 400;
+  color: var(--color-muted);
+  font-size: var(--step--1);
+}
+.wl-disclose {
+  align-self: start;
+  margin-top: var(--space-xs);
+  padding: 0.3rem 0;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--color-text-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.wl-disclose:hover {
+  color: var(--color-accent);
+}
+.wl-disclose-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--color-border);
+}
+
 /* Active-vs-passive (SPIVA) tool */
 .wl-select {
   font-family: var(--font-sans);

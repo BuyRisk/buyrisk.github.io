@@ -20,7 +20,8 @@
     "data:assets": "node scripts/reduce-asset-stats.mjs",
     "data:inflation": "node scripts/reduce-inflation.mjs",
     "data:fees": "node scripts/reduce-fees.mjs",
-    "data:spiva": "node scripts/reduce-spiva.mjs"
+    "data:spiva": "node scripts/reduce-spiva.mjs",
+    "data:housing": "node scripts/reduce-housing.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

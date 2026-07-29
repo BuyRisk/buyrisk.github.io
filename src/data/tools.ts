@@ -44,6 +44,12 @@ export const TOOLS: Tool[] = [
       "Bigger checks later or more checks sooner? See delayed-retirement credits, the breakeven age, and longevity risk.",
   },
   {
+    title: "Rent or Buy?",
+    href: "/tools/rent-vs-buy",
+    blurb:
+      "Renting isn't throwing money away. Run a buyer and a renter side by side — investing the difference — and find the year buying actually breaks even.",
+  },
+  {
     title: "Diversification: Waveforms",
     href: "/tools/waveforms",
     blurb:
