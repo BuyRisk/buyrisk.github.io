@@ -10,14 +10,23 @@ and redistribute, so unlike jst/ and aqr/ the raw file is committed.
 
 | File | What it is |
 |---|---|
-| `2023 (2026 TR) SSA Period Life Table.xlsx` | Period life table, 2023 data year: by exact age (0–119), for male & female — death probability (qₓ), number of survivors (lₓ), and life expectancy (eₓ). |
+| `2023 (2026 TR) SSA Period Life Table.xlsx` | Period life table, 2023: by exact age (0–119), male & female — death probability (qₓ), survivors (lₓ), life expectancy (eₓ). |
+| `SSA National Average Wage Index.xlsx` | AWI by year (from 1951) — used to index a worker's past earnings to today's wage levels. |
+| `SSA Benefit Formula Bend Points.xlsx` | The two PIA-formula bend points by year (from 1979) — the dollar breakpoints in the 90%/32%/15% benefit formula. |
+| `SSA COLA.xlsx` | Annual cost-of-living adjustments since 1975 — how benefits grow with inflation. |
 
 ## Powers
 
-The **When to Claim Social Security** tool. The survivor column gives the survival
-curve needed to weight the early-vs-delayed claiming breakeven by the actual
-probability of being alive at each age — turning "the breakeven is 80" into "here's
-your chance of living past it."
+The **Social Security** tool(s). Together these support the full picture:
+
+- **Life table** → the survival curve that weights the early-vs-delayed claiming
+  breakeven by the real probability of being alive at each age.
+- **AWI + bend points** → compute an actual **Primary Insurance Amount** from a
+  worker's earnings history (index earnings by AWI, apply the bend-point formula).
+- **COLA** → grow the benefit with realized inflation.
+
+So the tool can move beyond "when to claim" to "here's your *estimated benefit*,
+and here's how claiming age × longevity × COLA change its lifetime value."
 
 ## Format & parsing
 

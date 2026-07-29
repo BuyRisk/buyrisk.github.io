@@ -1,0 +1,6 @@
+# SPIVA reports are copyrighted by S&P Dow Jones Indices. Raw PDF is git-ignored;
+# only the specific extracted figures (with attribution) ship.
+*.pdf
+*.xlsx
+!.gitignore
+!README.md
