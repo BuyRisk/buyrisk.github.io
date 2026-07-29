@@ -1,0 +1,164 @@
+/**
+ * Reduce French factor + industry data → src/data/generated/capm-sml.ts
+ *
+ * Real test assets for the Security Market Line: for each of the 12 Fama-French
+ * industry portfolios, compute its market beta and its average excess return
+ * over the full sample. Plotted against the theoretical SML, these show CAPM's
+ * famous empirical weakness — the real relationship between beta and return is
+ * flatter than the model predicts (low-beta industries earn more than their beta
+ * warrants; high-beta less: the "betting against beta" anomaly).
+ *
+ *   βᵢ = cov(rᵢ − r_f, r_m − r_f) / var(r_m − r_f)
+ *   excessᵢ = mean(rᵢ − r_f), annualized ×12
+ *
+ * Run:  npm run data:capm
+ */
+import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { parseFrench, pickBlock, toColumns } from "./lib/parse-french.mjs";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const FR = join(root, "data", "sources", "french");
+const OUT = join(root, "src", "data", "generated", "capm-sml.ts");
+
+const LABELS = {
+  NoDur: "Consumer staples",
+  Durbl: "Consumer durables",
+  Manuf: "Manufacturing",
+  Enrgy: "Energy",
+  Chems: "Chemicals",
+  BusEq: "Tech / business equip.",
+  Telcm: "Telecom",
+  Utils: "Utilities",
+  Shops: "Retail",
+  Hlth: "Healthcare",
+  Money: "Finance",
+  Other: "Other",
+};
+
+const round = (x, dp) => Math.round(x * 10 ** dp) / 10 ** dp;
+
+function monthlyColumns(file, wantBlock) {
+  const blocks = parseFrench(readFileSync(join(FR, file), "utf8"));
+  const block = wantBlock ? pickBlock(blocks, wantBlock) : pickBlock(blocks, { frequency: "monthly" });
+  if (!block) throw new Error(`no matching block in ${file}`);
+  return toColumns(block); // { period: [...], series: { col: [...] } }
+}
+
+function main() {
+  const fac = monthlyColumns("F-F_Research_Data_Factors.csv", { frequency: "monthly" });
+  const ind = monthlyColumns("12_Industry_Portfolios.csv", { title: "Value Weighted", frequency: "monthly" });
+
+  // Index factors by period for alignment.
+  const facByP = new Map();
+  fac.period.forEach((p, i) => facByP.set(p, { mktRF: fac.series["Mkt-RF"][i], rf: fac.series["RF"][i] }));
+
+  const names = Object.keys(LABELS).filter((k) => ind.series[k]);
+  const market = { mkt: [], rf: [] };
+  const rows = names.map((k) => ({ key: k, m: [], x: [] })); // m = market excess, x = industry excess
+
+  ind.period.forEach((p, i) => {
+    const f = facByP.get(p);
+    if (!f || f.mktRF === null || f.rf === null) return;
+    market.mkt.push(f.mktRF);
+    market.rf.push(f.rf);
+    for (const r of rows) {
+      const v = ind.series[r.key][i];
+      if (v === null) continue;
+      r.m.push(f.mktRF);
+      r.x.push(v - f.rf); // industry excess return
+    }
+  });
+
+  const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+  const beta = (m, x) => {
+    const mm = mean(m), mx = mean(x);
+    let cov = 0, varm = 0;
+    for (let i = 0; i < m.length; i++) {
+      cov += (m[i] - mm) * (x[i] - mx);
+      varm += (m[i] - mm) ** 2;
+    }
+    return cov / varm;
+  };
+
+  const assets = rows.map((r) => ({
+    name: LABELS[r.key],
+    beta: round(beta(r.m, r.x), 3),
+    excess: round((mean(r.x) / 100) * 12, 4), // annualized decimal
+  }));
+
+  const marketExcess = round((mean(market.mkt) / 100) * 12, 4);
+  const rf = round((mean(market.rf) / 100) * 12, 4);
+  const span = [fac.period[0], fac.period[fac.period.length - 1]];
+
+  // Empirical SML: regress excess on beta across the industries (should be flatter
+  // than the theoretical slope = marketExcess through β=0).
+  const bs = assets.map((a) => a.beta);
+  const es = assets.map((a) => a.excess);
+  const mb = mean(bs), me = mean(es);
+  let cov = 0, varb = 0;
+  for (let i = 0; i < bs.length; i++) { cov += (bs[i] - mb) * (es[i] - me); varb += (bs[i] - mb) ** 2; }
+  const empiricalSlope = round(cov / varb, 4);
+  const empiricalIntercept = round(me - (cov / varb) * mb, 4);
+
+  const out = {
+    asOf: +span[1].slice(0, 4),
+    source: "Kenneth R. French Data Library — 12 industry portfolios + market factor.",
+    span: [span[0], span[1]],
+    rf,
+    marketExcess,
+    empiricalSlope,
+    empiricalIntercept,
+    assets,
+  };
+  writeFileSync(OUT, render(out));
+  console.log(
+    `capm-sml: ${assets.length} industries ${span[0]}–${span[1]}\n` +
+      `  market excess ${(marketExcess * 100).toFixed(1)}%/yr, rf ${(rf * 100).toFixed(1)}%\n` +
+      `  theoretical SML slope ${(marketExcess * 100).toFixed(1)}% vs empirical ${(empiricalSlope * 100).toFixed(1)}% (flatter = CAPM anomaly)\n` +
+      `  e.g. Utilities β ${assets.find((a) => a.name === "Utilities")?.beta}, Tech β ${assets.find((a) => a.name.startsWith("Tech"))?.beta}\n  → ${OUT}`
+  );
+}
+
+function render(o) {
+  const assets = o.assets.map((a) => `  { name: ${JSON.stringify(a.name)}, beta: ${a.beta}, excess: ${a.excess} },`).join("\n");
+  return `// AUTO-GENERATED by scripts/reduce-capm.mjs — DO NOT EDIT.
+// Re-run: npm run data:capm
+//
+// Real Fama-French industry portfolios for the Security Market Line: each
+// industry's market beta and annualized average excess return (decimals), plus
+// the theoretical vs empirically-fitted SML slope.
+
+export interface CapmAsset { name: string; beta: number; excess: number; }
+
+export interface CapmSml {
+  asOf: number;
+  source: string;
+  span: [string, string];
+  /** Average annual risk-free rate over the sample (decimal). */
+  rf: number;
+  /** Average annual market excess return = the theoretical SML slope (decimal). */
+  marketExcess: number;
+  /** Slope of the line fitted through the real industry points (flatter). */
+  empiricalSlope: number;
+  empiricalIntercept: number;
+  assets: CapmAsset[];
+}
+
+export const capmSml: CapmSml = {
+  asOf: ${o.asOf},
+  source: ${JSON.stringify(o.source)},
+  span: [${JSON.stringify(o.span[0])}, ${JSON.stringify(o.span[1])}],
+  rf: ${o.rf},
+  marketExcess: ${o.marketExcess},
+  empiricalSlope: ${o.empiricalSlope},
+  empiricalIntercept: ${o.empiricalIntercept},
+  assets: [
+${assets}
+  ],
+};
+`;
+}
+
+main();

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
+import { capmSml } from "../data/generated/capm-sml";
 import InfoTip from "./InfoTip";
 
 /**
@@ -81,6 +82,7 @@ export default function CapmLab() {
   const [blend, setBlend] = useState(1);
   const [seed, setSeed] = useState(1);
   const [mode, setMode] = useState<"static" | "live">("static");
+  const [showReal, setShowReal] = useState(false);
 
   // Live resampling: bump the seed periodically so the estimate wiggles.
   useEffect(() => {
@@ -165,20 +167,39 @@ export default function CapmLab() {
           <span>Cash ⇄ Market blend<InfoTip text="Mix cash (safe) with the market to slide along the line: 0% is all cash, 100% is the market, above 100% means borrowing to invest more." /> <strong>{pct(blend, 0)} market</strong></span>
           <input type="range" min={0} max={1.5} step={0.05} value={blend} onChange={(e) => setBlend(+e.target.value)} />
         </label>
+
+        <p className="cl-group">Does CAPM hold?</p>
+        <div className="wl-simmode" role="group" aria-label="Security market line view">
+          <button type="button" className={!showReal ? "active" : ""} aria-pressed={!showReal} onClick={() => setShowReal(false)}>
+            Model
+          </button>
+          <button type="button" className={showReal ? "active" : ""} aria-pressed={showReal} onClick={() => setShowReal(true)}>
+            Real US industries
+          </button>
+        </div>
+        <p className="wl-note" style={{ marginTop: "0.4rem" }}>
+          Switch to real data to see the {capmSml.assets.length} US industry
+          portfolios ({capmSml.span[0].slice(0, 4)}–{capmSml.span[1].slice(0, 4)})
+          plotted by their actual beta and return — and whether they land on the line.
+        </p>
       </div>
 
       <div className="wl-stage">
         <div className="cl-stage">
           <CharacteristicLine sample={sample} beta={beta} alpha={alpha} est={est} />
-          <SecurityMarketLine
-            rf={rf}
-            premium={premium}
-            beta={beta}
-            alpha={alpha}
-            blend={blend}
-            capmReturn={capmReturn}
-            assetReturn={assetReturn}
-          />
+          {showReal ? (
+            <RealSML />
+          ) : (
+            <SecurityMarketLine
+              rf={rf}
+              premium={premium}
+              beta={beta}
+              alpha={alpha}
+              blend={blend}
+              capmReturn={capmReturn}
+              assetReturn={assetReturn}
+            />
+          )}
         </div>
 
         <div className="cl-readouts">
@@ -285,6 +306,73 @@ function CharacteristicLine({
         <span><span className="cl-key cl-key--fit" /> Fitted (slope = β̂)</span>
         <span><span className="cl-key cl-key--true" /> True line</span>
       </div>
+    </div>
+  );
+}
+
+function RealSML() {
+  const d = capmSml;
+  const width = 440;
+  const height = 320;
+  const pad = { top: 16, right: 20, bottom: 40, left: 52 };
+
+  const betas = d.assets.map((a) => a.beta);
+  const betaMin = -0.05;
+  const betaMax = Math.max(1.6, ...betas) + 0.2;
+  const ret = (a: { beta: number; excess: number }) => d.rf + a.excess;
+  const rMax = (d.rf + Math.max(...d.assets.map((a) => a.excess), d.marketExcess)) * 1.15;
+  const rMin = 0;
+
+  const x = (b: number) => pad.left + ((b - betaMin) / (betaMax - betaMin)) * (width - pad.left - pad.right);
+  const y = (r: number) => height - pad.bottom - ((r - rMin) / (rMax - rMin)) * (height - pad.top - pad.bottom);
+
+  const capmY = (b: number) => d.rf + b * d.marketExcess; // theoretical SML
+  const empY = (b: number) => d.rf + d.empiricalIntercept + b * d.empiricalSlope; // fitted
+
+  const lowest = d.assets.reduce((a, b) => (b.beta < a.beta ? b : a));
+  const highest = d.assets.reduce((a, b) => (b.beta > a.beta ? b : a));
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+
+  return (
+    <div className="cl-panel">
+      <h3>Security market line — real data</h3>
+      <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Real US industry portfolios plotted by beta and average return against the CAPM security market line">
+        <line x1={pad.left} y1={pad.top} x2={pad.left} y2={height - pad.bottom} stroke="var(--color-border)" />
+        <line x1={pad.left} y1={y(d.rf)} x2={width - pad.right} y2={y(d.rf)} stroke="var(--color-border)" strokeDasharray="3 3" />
+        <text x={pad.left + 2} y={y(d.rf) - 4} style={{ ...axisText, fontSize: 10 }}>r_f</text>
+        {[0, 0.5, 1, 1.5].filter((b) => b <= betaMax).map((b) => (
+          <text key={b} x={x(b)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>β={b}</text>
+        ))}
+        {/* theoretical CAPM line (steep) */}
+        <line x1={x(betaMin)} y1={y(capmY(betaMin))} x2={x(betaMax)} y2={y(capmY(betaMax))} stroke="var(--color-text)" strokeWidth={2} />
+        {/* empirical fit (flatter) */}
+        <line x1={x(betaMin)} y1={y(empY(betaMin))} x2={x(betaMax)} y2={y(empY(betaMax))} stroke="var(--color-warn)" strokeWidth={2} strokeDasharray="6 4" />
+        {/* industry dots */}
+        {d.assets.map((a) => (
+          <circle key={a.name} cx={x(a.beta)} cy={y(ret(a))} r={4} fill="var(--color-accent)" stroke="var(--color-surface)" strokeWidth={1.5}>
+            <title>{`${a.name}: β ${a.beta.toFixed(2)}, excess ${(a.excess * 100).toFixed(1)}%/yr`}</title>
+          </circle>
+        ))}
+        {/* market point */}
+        <circle cx={x(1)} cy={y(d.rf + d.marketExcess)} r={5} fill="var(--color-text)" stroke="var(--color-surface)" strokeWidth={1.5} />
+        {/* label the two extremes */}
+        {[lowest, highest].map((a) => (
+          <text key={a.name} x={x(a.beta)} y={y(ret(a)) - 9} textAnchor="middle" style={{ ...axisText, fontSize: 10, fill: "var(--color-accent)", fontWeight: 600 }}>{a.name}</text>
+        ))}
+        <text x={(pad.left + width - pad.right) / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Beta (systematic risk) →</text>
+        <text x={12} y={(pad.top + height - pad.bottom) / 2} textAnchor="middle" transform={`rotate(-90 12 ${(pad.top + height - pad.bottom) / 2})`} style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Average return →</text>
+      </svg>
+      <div className="cl-legend">
+        <span><span className="cl-key cl-key--ref" style={{ borderTopColor: "var(--color-text)" }} /> CAPM predicts</span>
+        <span><span className="cl-key" style={{ borderTopColor: "var(--color-warn)", borderTopWidth: 3, borderTopStyle: "dashed" }} /> Actual (flatter)</span>
+      </div>
+      <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+        CAPM says return should rise <strong>{(d.marketExcess * 100).toFixed(1)}%</strong> per unit
+        of beta. In the real data it rises only <strong>{(d.empiricalSlope * 100).toFixed(1)}%</strong> —
+        the line is too flat. Low-beta industries (like {lowest.name.toLowerCase()}) beat their
+        beta; high-beta ones lag. That gap is the "betting against beta" anomaly, and the reason
+        beta alone isn't the whole story.
+      </p>
     </div>
   );
 }
