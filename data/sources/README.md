@@ -27,7 +27,13 @@ evidence-based teaching site.
 | `damodaran/` | Aswath Damodaran historical returns (NYU Stern) | ✅ ingested |
 | `shiller/` | Robert Shiller long-run US data (Yale) | ✅ ingested |
 | `fred/` | Federal Reserve Economic Data (FRED) | ✅ ingested |
-| `crsp/` | CRSP individual-stock returns (via WRDS) | ⬜ planned |
+| `crsp/` | CRSP individual-stock returns (via WRDS) | 🔒 licensed — pull script ready, raw git-ignored ([details](crsp/README.md)) |
+
+**One licensed exception:** every provider above is free to redistribute *except*
+`crsp/`. CRSP (via WRDS) is a paid subscription whose raw rows may **not** be
+shipped, so — unlike the others — its raw pull is **git-ignored** and only
+aggregate, non-identifiable statistics derived from it enter the repo. See
+[`crsp/README.md`](crsp/README.md).
 
 **File formats:** French files are CSV (parsed by `scripts/lib/parse-french.mjs`).
 Damodaran and Shiller ship legacy binary `.xls` workbooks (parsed by

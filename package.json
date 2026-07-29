@@ -10,7 +10,10 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "data:inspect": "node scripts/inspect-sources.mjs"
+    "data:inspect": "node scripts/inspect-sources.mjs",
+    "data:crsp:superstock": "node scripts/reduce-crsp-superstock.mjs",
+    "data:crsp:diversification": "node scripts/reduce-crsp-diversification.mjs",
+    "data:crsp": "npm run data:crsp:superstock && npm run data:crsp:diversification"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
