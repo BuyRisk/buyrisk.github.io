@@ -98,6 +98,18 @@ export const TOOLS: Tool[] = [
       "Beyond CAPM: attribute a portfolio's return to size, value, profitability, and investment tilts.",
   },
   {
+    title: "All at Once, or Bit by Bit?",
+    href: "/tools/dollar-cost-averaging",
+    blurb:
+      "Got a windfall? Lump sum vs dollar-cost averaging, tested across 150+ years of real returns — why all-at-once usually wins, and what averaging really buys.",
+  },
+  {
+    title: "Time in the Market",
+    href: "/tools/time-in-market",
+    blurb:
+      "Miss the market's best months and decades of growth vanish — because the best months hide right next to the worst. The case against timing, from real data.",
+  },
+  {
     title: "Can Active Managers Beat the Market?",
     href: "/tools/active-vs-passive",
     blurb:

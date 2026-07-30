@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MarketTimingLab from "../../components/MarketTimingLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Time in the Market"
+  description="What does missing the market's best months cost you? Using 150+ years of real US returns, watch a handful of missed months turn a healthy return into almost nothing — because the best months hide right next to the worst."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Time in the market</h1>
+    <p class="lede">
+      When markets get scary, the tempting move is to sell and wait for calm. The
+      problem: the market's very best months tend to arrive right in the middle of
+      the fear — often days after the worst ones. Miss a handful of them and decades
+      of growth can evaporate. Pull the slider and see what sitting out the best
+      months would have done to a real, historical investment.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <MarketTimingLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Why timing is so dangerous</h2>
+      <ul>
+        <li>
+          <strong>The best days hide next to the worst.</strong> Big up-months and
+          big down-months cluster together, because sharp rebounds tend to follow
+          sharp drops. To sell before the fall and buy back before the recovery, you'd
+          have to be right twice, within weeks — and almost no one is.
+        </li>
+        <li>
+          <strong>A few months carry the whole return.</strong> Long-run returns
+          aren't spread evenly across time; a small number of months do most of the
+          work. Being out of the market for even a few of them takes a wrecking ball
+          to the result — which is exactly what the chart shows.
+        </li>
+        <li>
+          <strong>Staying put is the "boring" edge.</strong> The investor who does
+          nothing during a panic captures those rebound months automatically. That's
+          the whole case for staying invested through the scary parts: you can't catch
+          the best months if you're not there for them.
+        </li>
+      </ul>
+      <p>
+        This isn't an argument that markets never fall — they do, sometimes brutally.
+        It's that reacting to the falls by getting out tends to cost more than the
+        falls themselves. Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="time-in-market" />
+
+  <NextTool current="/tools/time-in-market" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .ss-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+  }
+  .ss-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .ss-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .ss-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .ss-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
