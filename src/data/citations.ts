@@ -444,7 +444,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "time-in-market": {
     studies: [],
-    datasets: ["shiller"],
+    datasets: ["french"],
   },
   "burn-rate": {
     studies: ["bengen1994", "cooley1998"],

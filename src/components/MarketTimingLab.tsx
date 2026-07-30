@@ -1,20 +1,26 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
-import { R, N, dateAt, FIRST_YEAR, LAST_YEAR } from "../lib/monthlyReturns";
+import { marketDaily } from "../data/generated/market-daily";
 
 /**
- * "Time in the Market" — the cost of missing the best months. Take a recent window
- * of real US returns and watch what happens to a fully-invested $10,000 as you
- * remove its best months (as a market-timer who sold and sat out would). A handful
- * of missed months can turn a healthy return into nothing — because the best
- * months cluster right next to the worst, so dodging crashes means missing
- * rebounds. Educational only, not advice.
+ * "Time in the Market" — the cost of missing the best days. Take a recent window
+ * of daily US market total returns and watch what happens to a fully-invested
+ * $10,000 as you remove its best days (as a market-timer who sold and sat out
+ * would). A dozen missed days can turn a healthy return into almost nothing —
+ * because the best days sit right next to the worst, so dodging crashes means
+ * missing the rebounds. Nominal returns. Educational only, not advice.
  */
+
+const R = marketDaily.returns;
+const START_YEAR = +marketDaily.startDate.slice(0, 4);
+const END_YEAR = +marketDaily.endDate.slice(0, 4);
+const TD = 252; // trading days per year
+const MAX_SPAN = END_YEAR - START_YEAR;
 
 const START_AMOUNT = 10_000;
 const DEFAULTS = { horizon: 20, missed: 10 };
-const MAX_MISS = 36;
+const MAX_MISS = 50;
 
 const dollars = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -25,17 +31,15 @@ export default function MarketTimingLab() {
   const [missed, setMissed] = useState(DEFAULTS.missed);
 
   const view = useMemo(() => {
-    const months = horizon * 12;
-    const startIdx = Math.max(0, N - months);
+    const startYr = Math.max(START_YEAR, END_YEAR - horizon);
+    const startIdx = marketDaily.yearStart[startYr] ?? 0;
     const W = R.slice(startIdx);
     const m = W.length;
-    const annualize = (mult: number) => Math.pow(mult, 12 / m) - 1;
+    const annualize = (mult: number) => Math.pow(mult, TD / m) - 1;
 
     const full = W.reduce((p, r) => p * (1 + r), 1);
-    // Indices sorted by return, descending.
-    const order = W.map((_, i) => i).sort((a, b) => W[b] - W[a]);
+    const order = W.map((_, i) => i).sort((a, b) => W[b] - W[a]); // best → worst
 
-    // Ending multiple after removing the K best (or worst) months (set to cash, 0%).
     const missBest = (k: number) => {
       let mult = full;
       for (let j = 0; j < k; j++) mult /= 1 + W[order[j]];
@@ -50,15 +54,15 @@ export default function MarketTimingLab() {
     const curve = [];
     for (let k = 0; k <= MAX_MISS; k++) curve.push({ k, best: annualize(missBest(k)), worst: annualize(missWorst(k)) });
 
-    // Do the best and worst months cluster together?
+    // Do the best and worst days cluster together? (within a trading week)
     const best10 = order.slice(0, 10);
     const worst10 = order.slice(m - 10);
-    const nearWorst = best10.filter((bi) => worst10.some((wi) => Math.abs(bi - wi) <= 3)).length;
+    const nearWorst = best10.filter((bi) => worst10.some((wi) => Math.abs(bi - wi) <= 5)).length;
 
     return {
       m,
-      spanStart: dateAt(startIdx).year,
-      spanEnd: dateAt(N - 1).year,
+      spanStart: startYr,
+      spanEnd: END_YEAR,
       fullMult: full,
       fullAnn: annualize(full),
       missMult: missBest(missed),
@@ -68,8 +72,6 @@ export default function MarketTimingLab() {
     };
   }, [horizon, missed]);
 
-  const stayedAhead = view.missMult >= view.fullMult;
-
   return (
     <div className="wl">
       <div className="wl-controls">
@@ -78,16 +80,16 @@ export default function MarketTimingLab() {
         <label className="wl-slider">
           <span>
             Look back over
-            <InfoTip text="The tool uses the most recent window of this length of real (inflation-adjusted) US market returns." />{" "}
+            <InfoTip text="The tool uses the most recent window of this many years of daily US market total returns (dividends included)." />{" "}
             <strong>{horizon} yr</strong>
           </span>
-          <input type="range" min={10} max={50} step={1} value={horizon} onChange={(e) => setHorizon(+e.target.value)} />
+          <input type="range" min={5} max={MAX_SPAN} step={1} value={horizon} onChange={(e) => setHorizon(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
           <span>
-            Best months you missed
-            <InfoTip text="Imagine you were out of the market — in cash — for exactly these best months, as a mistimed sell-and-wait would leave you. Their return becomes zero." />{" "}
+            Best days you missed
+            <InfoTip text="Imagine you were out of the market — in cash — for exactly these best days, as a mistimed sell-and-wait would leave you. Their return becomes zero." />{" "}
             <strong>{missed}</strong>
           </span>
           <input type="range" min={0} max={MAX_MISS} step={1} value={missed} onChange={(e) => setMissed(+e.target.value)} />
@@ -95,7 +97,7 @@ export default function MarketTimingLab() {
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
           <span className="ss-headline-label">
-            {dollars(START_AMOUNT)} over {view.spanStart}–{view.spanEnd}, missing the {missed} best month{missed === 1 ? "" : "s"}
+            {dollars(START_AMOUNT)} over {view.spanStart}–{view.spanEnd}, missing the {missed} best day{missed === 1 ? "" : "s"}
           </span>
           <span className="ss-headline-value">{dollars(START_AMOUNT * view.missMult)}</span>
           <span className="ss-headline-sub">
@@ -105,20 +107,20 @@ export default function MarketTimingLab() {
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          {view.m.toLocaleString()} months of real (inflation-adjusted) US total returns, most recent
-          {" "}{horizon} years. "Missed" months earn 0% (cash). Data: Robert Shiller, monthly S&amp;P
-          total return, {FIRST_YEAR}–{LAST_YEAR}.
+          {view.m.toLocaleString()} trading days of nominal US market total returns, most recent
+          {" "}{view.spanEnd - view.spanStart} years. "Missed" days earn 0% (cash). Data: Fama–French
+          daily market factor (Mkt−RF + RF), {START_YEAR}–{END_YEAR}.
         </p>
       </div>
 
       <div className="wl-stage">
         <div className="wl-frontier">
-          <h3>Your return as you miss the best (or worst) months</h3>
+          <h3>Your return as you miss the best (or worst) days</h3>
           <TimingChart curve={view.curve} missed={missed} fullAnn={view.fullAnn} />
           <p className="wl-fnote">
             The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line is what your
-            yearly return becomes as you sit out the <strong>best</strong> months — it falls off a cliff.
-            The faint line is the mirror image: sitting out the <strong>worst</strong> months would be
+            yearly return becomes as you sit out the <strong>best</strong> days — it falls off a cliff.
+            The faint line is the mirror image: sitting out the <strong>worst</strong> days would be
             just as spectacular. The catch is you can't tell which is which in advance.
           </p>
         </div>
@@ -132,13 +134,13 @@ export default function MarketTimingLab() {
               <div><dt>Ending value, missed</dt><dd>{dollars(START_AMOUNT * view.missMult)}</dd></div>
             </dl>
             <p className="wl-saved">
-              Over roughly {view.m / 12 | 0} years — {view.m.toLocaleString()} months — sitting out just the{" "}
-              <strong>{missed}</strong> best of them {stayedAhead ? "barely dents" : "guts"} the result:{" "}
-              {pct(view.fullAnn * 100)} a year becomes <strong>{pct(view.missAnn * 100)}</strong>. And this
-              isn't a fluke of one stretch: <strong>{view.nearWorst} of the 10 best months landed within
-              three months of one of the 10 worst</strong>. The huge up-months come right after the crashes,
-              so bailing out to dodge the drops is the surest way to miss the recoveries. "Time in the
-              market beats timing the market" isn't a slogan — it's arithmetic. Educational only, not advice.
+              Over {view.spanStart}–{view.spanEnd} — {view.m.toLocaleString()} trading days — sitting out
+              just the <strong>{missed}</strong> best of them turns {pct(view.fullAnn * 100)} a year into{" "}
+              <strong>{pct(view.missAnn * 100)}</strong>. And this isn't a fluke:{" "}
+              <strong>{view.nearWorst} of the 10 best days landed within a week of one of the 10 worst</strong>.
+              The huge up-days come right in the middle of the crashes, so bailing out to dodge the drops is
+              the surest way to miss the recoveries. "Time in the market beats timing the market" isn't a
+              slogan — it's arithmetic. Educational only, not advice.
             </p>
           </div>
         </div>
@@ -166,7 +168,7 @@ function TimingChart({ curve, missed, fullAnn }: { curve: { k: number; best: num
   const yTicks = [minV, minV + (maxV - minV) * 0.5, 0, maxV].filter((v, i, a) => a.findIndex((w) => Math.abs(w - v) < 1e-9) === i);
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Annualized return as the best or worst months are removed">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Annualized return as the best or worst days are removed">
       {yTicks.map((v) => (
         <g key={v}>
           <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" strokeDasharray={Math.abs(v) < 1e-9 ? "4 3" : undefined} />
@@ -187,7 +189,7 @@ function TimingChart({ curve, missed, fullAnn }: { curve: { k: number; best: num
       <circle cx={x(0)} cy={y(fullAnn)} r={4} fill="var(--color-accent)" />
 
       <text x={pad.left + plotW / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Number of best months missed → (annualized real return)
+        Number of best days missed → (annualized return)
       </text>
     </svg>
   );

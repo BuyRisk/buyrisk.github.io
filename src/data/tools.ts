@@ -107,7 +107,7 @@ export const TOOLS: Tool[] = [
     title: "Time in the Market",
     href: "/tools/time-in-market",
     blurb:
-      "Miss the market's best months and decades of growth vanish — because the best months hide right next to the worst. The case against timing, from real data.",
+      "Miss the market's best days and decades of growth vanish — because the best days hide right next to the worst. The case against timing, from real daily data.",
   },
   {
     title: "Can Active Managers Beat the Market?",
