@@ -20,6 +20,12 @@ export const TOOLS: Tool[] = [
       "See how a starting balance, regular contributions, return, and time compound into long-run growth.",
   },
   {
+    title: "The Cost of Debt",
+    href: "/tools/debt",
+    blurb:
+      "Compounding in reverse. At a credit card's rate, paying the minimum stretches a small balance into decades — see the trap, and how a fixed payment breaks it.",
+  },
+  {
     title: "What Happened to Your Dollar?",
     href: "/tools/inflation",
     blurb:

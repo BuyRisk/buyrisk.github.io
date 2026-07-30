@@ -1,0 +1,135 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DebtLab from "../../components/DebtLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="The Cost of Debt"
+  description="Compounding in reverse: at a credit card's APR, paying only the minimum stretches a small balance into decades and doubles it in interest. See the trap — and how a fixed payment breaks it."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>The cost of debt</h1>
+    <p class="lede">
+      Compounding is the most powerful force in investing — and it runs in both
+      directions. On a credit card, it works <em>against</em> you: pay only the
+      minimum and a modest balance can take decades to clear and cost more in
+      interest than you ever borrowed. This is the Compound Growth Explorer's dark
+      twin — and the reason paying off high-rate debt is the surest "return" in all
+      of personal finance.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <DebtLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Why the minimum payment is a trap</h2>
+      <ul>
+        <li>
+          <strong>The minimum shrinks as you pay.</strong> A typical minimum is the
+          month's interest plus about 1% of the balance. As the balance falls, so
+          does the payment — so you keep paying mostly interest, and the principal
+          barely moves. That's what stretches a small balance across decades.
+        </li>
+        <li>
+          <strong>A fixed payment breaks it.</strong> Pay the same dollar amount
+          every month instead, and every month more of it goes to principal as the
+          interest portion shrinks. The balance falls faster and faster — the same
+          compounding that traps you now works for you.
+        </li>
+        <li>
+          <strong>Paying off debt is a guaranteed return.</strong> Clearing a 20%
+          card is a risk-free, tax-free 20% return — better than the stock market's
+          ~10% long-run <em>average</em>, and with none of the uncertainty. Whenever
+          a debt's rate is higher than what you could reasonably earn investing,
+          paying it down is mathematically the best use of the next dollar.
+        </li>
+      </ul>
+      <p>
+        Not all debt is a trap — a low-rate mortgage or student loan can be
+        reasonable to carry while you invest. The rate is what matters: the higher
+        it is, the more certain the case for paying it off first. Educational only,
+        not advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="debt" />
+
+  <NextTool current="/tools/debt" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .ss-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+  }
+  .ss-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .ss-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .ss-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .ss-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
