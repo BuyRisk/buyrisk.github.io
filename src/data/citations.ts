@@ -458,12 +458,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["markowitz1952", "samuelson1965"],
     datasets: ["damodaran"],
   },
-  "how-many-stocks": {
-    studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987"],
-    datasets: ["crsp"],
-  },
-  superstocks: {
-    studies: ["bessembinder2018", "bessembinder2023"],
+  "stock-picking": {
+    studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987", "bessembinder2018", "bessembinder2023"],
     datasets: ["crsp"],
   },
   portfolio: {
@@ -478,19 +474,13 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: [],
     datasets: ["fred"],
   },
-  capm: {
+  factors: {
     studies: [
       "treynor1962",
       "sharpe1964",
       "lintner1965",
       "mossin1966",
       "famaMacBeth1973",
-      "famaFrench1992",
-    ],
-    datasets: ["french"],
-  },
-  factors: {
-    studies: [
       "famaFrench1992",
       "famaFrench1993",
       "famaFrench2015",

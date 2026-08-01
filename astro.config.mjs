@@ -12,6 +12,9 @@ export default defineConfig({
     '/tools/waveforms': '/tools/diversification',
     '/tools/randomness': '/tools/diversification',
     '/tools/inflation': '/tools/fees',
+    '/tools/how-many-stocks': '/tools/stock-picking',
+    '/tools/superstocks': '/tools/stock-picking',
+    '/tools/capm': '/tools/factors',
   },
   markdown: {
     shikiConfig: {
