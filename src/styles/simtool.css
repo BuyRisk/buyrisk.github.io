@@ -542,3 +542,16 @@
     grid-template-columns: 8rem 1fr 2.6rem;
   }
 }
+
+/* Top-level tabs that switch between sub-tools inside a consolidated module. */
+.module-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: var(--border);
+}
+.module-tabs .wl-simmode button {
+  font-weight: 600;
+}

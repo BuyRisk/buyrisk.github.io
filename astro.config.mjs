@@ -6,6 +6,12 @@ import react from '@astrojs/react';
 export default defineConfig({
   site: 'https://buyrisk.example',
   integrations: [react()],
+  // Consolidated modules: retired tool URLs redirect to their new home so
+  // existing links keep working.
+  redirects: {
+    '/tools/waveforms': '/tools/diversification',
+    '/tools/randomness': '/tools/diversification',
+  },
   markdown: {
     shikiConfig: {
       themes: {

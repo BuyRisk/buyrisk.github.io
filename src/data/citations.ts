@@ -458,11 +458,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["shovenSlavov2014"],
     datasets: ["ssa"],
   },
-  waveforms: {
-    studies: ["markowitz1952"],
-    datasets: ["damodaran"],
-  },
-  randomness: {
+  diversification: {
     studies: ["markowitz1952", "samuelson1965"],
     datasets: ["damodaran"],
   },

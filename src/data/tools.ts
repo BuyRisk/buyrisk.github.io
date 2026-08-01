@@ -68,16 +68,10 @@ export const TOOLS: Tool[] = [
       "Renting isn't throwing money away. Run a buyer and a renter side by side — investing the difference — and find the year buying actually breaks even.",
   },
   {
-    title: "Diversification: Waveforms",
-    href: "/tools/waveforms",
+    title: "Diversification",
+    href: "/tools/diversification",
     blurb:
-      "The idea behind diversification, from first principles: how out-of-phase ups and downs cancel out.",
-  },
-  {
-    title: "Diversification: Randomness",
-    href: "/tools/randomness",
-    blurb:
-      "The noisy sequel: with real randomness, variance never fully cancels — and assets sometimes fall together.",
+      "The only free lunch in investing: how mixing assets that don't move together lowers risk. From pure out-of-phase waves to messy, real randomness.",
   },
   {
     title: "How Many Stocks Is Enough?",
