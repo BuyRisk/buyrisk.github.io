@@ -422,37 +422,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["sharpe1991", "malkiel1973"],
     datasets: ["ici", "fred"],
   },
-  "active-vs-passive": {
-    studies: ["sharpe1991", "famaFrench2010", "malkiel1973"],
-    datasets: ["spiva"],
-  },
   "rent-vs-buy": {
     studies: [],
     datasets: ["fred"],
-  },
-  debt: {
-    studies: [],
-    datasets: ["fred"],
-  },
-  "dollar-cost-averaging": {
-    studies: [],
-    datasets: ["shiller"],
-  },
-  "time-in-market": {
-    studies: [],
-    datasets: ["french"],
-  },
-  "savings-rate": {
-    studies: ["bengen1994", "cooley1998"],
-    datasets: [],
-  },
-  "burn-rate": {
-    studies: ["bengen1994", "cooley1998"],
-    datasets: ["damodaran", "shiller"],
-  },
-  "social-security": {
-    studies: ["shovenSlavov2014"],
-    datasets: ["ssa"],
   },
   diversification: {
     studies: ["markowitz1952", "samuelson1965"],
