@@ -32,16 +32,10 @@ export const TOOLS: Tool[] = [
       "Compounding in reverse. At a credit card's rate, paying the minimum stretches a small balance into decades — see the trap, and how a fixed payment breaks it.",
   },
   {
-    title: "What Happened to Your Dollar?",
-    href: "/tools/inflation",
-    blurb:
-      "Rebase real US prices to any year and watch inflation split apart — college and healthcare soaring while toys and clothing fall.",
-  },
-  {
-    title: "The Real Cost of Fees",
+    title: "Fees & Inflation",
     href: "/tools/fees",
     blurb:
-      "A fraction of a percent sounds harmless — but see how fund fees compound into a startling share of your lifetime wealth, and what investors really pay.",
+      "The two silent drains on your money: fund fees (the drag you control) and inflation (the one you don't). See how a tiny fee compounds against you, then how unevenly prices really rise.",
   },
   {
     title: "Roth or Traditional? (+ the Match)",

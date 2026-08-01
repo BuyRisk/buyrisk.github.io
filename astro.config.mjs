@@ -11,6 +11,7 @@ export default defineConfig({
   redirects: {
     '/tools/waveforms': '/tools/diversification',
     '/tools/randomness': '/tools/diversification',
+    '/tools/inflation': '/tools/fees',
   },
   markdown: {
     shikiConfig: {

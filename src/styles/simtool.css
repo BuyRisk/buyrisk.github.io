@@ -555,3 +555,57 @@
 .module-tabs .wl-simmode button {
   font-weight: 600;
 }
+
+/* ── Shared readout styles (previously duplicated per-page as is:global) ──
+   Lifted here so any tool component renders correctly on any page/module. */
+.ss-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius);
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+}
+.ss-headline-label {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-text-soft);
+}
+.ss-headline-value {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--step-3);
+  line-height: 1.1;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+}
+.ss-headline-sub {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-text-soft);
+}
+.ss-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+}
+.ss-stats > div {
+  background: var(--color-surface-alt);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+}
+.ss-stats dt {
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  margin-bottom: 0.2rem;
+}
+.ss-stats dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--step-0);
+  font-variant-numeric: tabular-nums;
+}

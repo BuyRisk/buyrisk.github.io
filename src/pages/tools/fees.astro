@@ -1,59 +1,70 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import FeesLab from "../../components/FeesLab.tsx";
+import FeesInflationModule from "../../components/FeesInflationModule.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
 <BaseLayout
-  title="The Real Cost of Fees"
-  description="A fund fee of a fraction of a percent sounds trivial — but over a lifetime of saving it compounds into a startling share of your wealth. See the drag, and the real history of what investors actually pay."
+  title="Fees & Inflation — the Silent Drains"
+  description="Two forces quietly erode your wealth: fund fees, the drag you control, and inflation, the one you don't. See how a tiny expense ratio compounds against you, then how differently prices have actually risen."
 >
   <section class="container wl-intro">
     <p class="eyebrow">Interactive Tool</p>
-    <h1>The real cost of fees</h1>
+    <h1>The two silent drains</h1>
     <p class="lede">
-      A fund's fee — its <em>expense ratio</em> — is charged as a small percent of
-      your balance every year, whether the fund wins or loses. One percent sounds
-      like nothing. But it's skimmed off your whole balance, year after year, so it
-      compounds right alongside your returns — just in the wrong direction. Move the
-      sliders and watch how much a seemingly tiny fee quietly drains over a lifetime.
+      Two forces work against every dollar you invest, and both are easy to miss
+      because they act slowly. <strong>Fees</strong> are the drag you control — a
+      small yearly percentage that compounds against you. <strong>Inflation</strong>
+      is the drag you don't — the buying power your money loses just sitting there.
+      Understanding both is the whole reason to invest in the first place: to earn a
+      real return, after costs, that outpaces rising prices.
     </p>
   </section>
 
   <section class="container wl-host">
-    <FeesLab client:load />
+    <FeesInflationModule client:load />
   </section>
 
   <section class="container wl-explainer">
     <div class="prose">
-      <h2>Why a small fee is a big deal</h2>
+      <h2>Fees — why a small percent is a big deal</h2>
       <ul>
         <li>
           <strong>Fees compound too.</strong> A 1% fee isn't 1% of your gains — it's
-          1% of your <em>entire balance</em>, taken every single year. Over decades
-          that can quietly consume a quarter or more of the wealth you'd otherwise
-          keep, because every dollar the fee removes is a dollar that stops
-          compounding for you.
+          1% of your <em>entire balance</em>, taken every year, so it compounds
+          right alongside your returns, in the wrong direction. Over decades that
+          can consume a quarter or more of the wealth you'd otherwise keep.
         </li>
         <li>
           <strong>It's guaranteed; the outperformance isn't.</strong> You pay the
-          fee whether or not the fund beats the market. Decades of evidence show
-          most active funds don't beat a simple index over the long run — yet they
-          charge many times more. The fee is the one part of the deal that's certain.
+          fee whether or not the fund beats the market — and most active funds don't
+          over the long run. Cost is the rare thing you actually control: the average
+          active US equity fund charged 1.08% in 1996 and 0.64% in 2025, while index
+          equity funds charge about 0.05%.
+        </li>
+      </ul>
+
+      <h2>Inflation — why one number isn't enough</h2>
+      <ul>
+        <li>
+          <strong>The headline is an average.</strong> CPI blends thousands of
+          prices. Two households can feel very different inflation depending on
+          whether they're paying tuition and medical bills or buying electronics
+          and clothes.
         </li>
         <li>
-          <strong>Cost is the rare thing you control.</strong> You can't control
-          markets, but you can choose a low-cost fund. That's why the real fund-fee
-          history matters: the average active US equity fund charged 1.08% in 1996
-          and 0.64% in 2025, while the average index equity fund charges about 0.05%.
+          <strong>Services rose; many goods fell.</strong> Labor-heavy services —
+          education, healthcare — climb fastest (the <em>Baumol effect</em>), while
+          manufactured goods got cheaper. Your personal inflation is your own
+          basket, which is why outpacing it — not the headline — is what matters.
         </li>
       </ul>
       <p>
-        Fees are compensation for a service, and there's nothing wrong with paying
-        for genuine value. The point is to <em>see</em> the cost clearly and weigh it
-        against what you're getting. Educational only, not advice.
+        Put the two together and you get the point of investing: a low-cost
+        portfolio of productive assets is how you earn a <em>real</em> return that
+        stays ahead of both drains. Educational only, not financial advice.
       </p>
     </div>
   </section>
@@ -75,59 +86,5 @@ import "../../styles/simtool.css";
   }
   .wl-explainer {
     margin-top: var(--space-lg);
-  }
-</style>
-
-<style is:global>
-  .ss-headline {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius);
-    background: var(--color-accent-soft);
-    border: 1px solid var(--color-accent);
-  }
-  .ss-headline-label {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .ss-headline-value {
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: var(--step-3);
-    line-height: 1.1;
-    color: var(--color-accent);
-    font-variant-numeric: tabular-nums;
-  }
-  .ss-headline-sub {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .ss-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-sm);
-    margin: 0 0 var(--space-md);
-  }
-  .ss-stats > div {
-    background: var(--color-surface-alt);
-    border-radius: var(--radius);
-    padding: var(--space-sm);
-  }
-  .ss-stats dt {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    margin-bottom: 0.2rem;
-  }
-  .ss-stats dd {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: var(--step-0);
-    font-variant-numeric: tabular-nums;
   }
 </style>

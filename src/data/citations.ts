@@ -418,13 +418,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: [],
     datasets: ["shiller", "damodaran", "fred"],
   },
-  inflation: {
-    studies: [],
-    datasets: ["fred"],
-  },
   fees: {
     studies: ["sharpe1991", "malkiel1973"],
-    datasets: ["ici"],
+    datasets: ["ici", "fred"],
   },
   "active-vs-passive": {
     studies: ["sharpe1991", "famaFrench2010", "malkiel1973"],
