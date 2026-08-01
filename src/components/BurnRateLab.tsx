@@ -10,9 +10,13 @@ import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib
  *    rate = the nest egg you'd need (25× spending at 4%). Clean, deterministic.
  *  • "Historical stress test" — the honest version. Runs your plan through a
  *    block-bootstrap Monte Carlo over real US market history (1928–), so you see
- *    the SPREAD of outcomes and the sequence-of-returns risk that a single
- *    "average return" hides: same 4% rule, wildly different luck depending on
- *    whether the crashes land early or late.
+ *    the SPREAD of outcomes and the sequence-of-returns risk.
+ *
+ * Guaranteed income (pension, Social Security, annuities) is subtracted from
+ * spending first: only the REMAINING gap has to come from the portfolio. Because
+ * of the 25× multiplier, even a modest pension slashes the nest egg you need and
+ * dramatically raises the odds your money lasts. Guaranteed income is assumed to
+ * keep pace with inflation (Social Security does; many private pensions do NOT).
  */
 
 const currency = (n: number) =>
@@ -59,18 +63,28 @@ export default function BurnRateLab() {
   const [cats, setCats] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
   const [portfolio, setPortfolio] = useState(1_000_000);
+  const [guaranteed, setGuaranteed] = useState(0); // $/month, real (inflation-adjusted)
   const [stockPct, setStockPct] = useState(60);
   const [horizon, setHorizon] = useState(30);
 
   const monthlyTotal = cats.reduce((s, c) => s + c.amount, 0);
   const annualTotal = monthlyTotal * 12;
+  const guaranteedAnnual = guaranteed * 12;
+
+  // What the portfolio actually has to fund: spending net of guaranteed income.
+  const portfolioDrawAnnual = Math.max(0, annualTotal - guaranteedAnnual);
+  const portfolioDrawMonthly = portfolioDrawAnnual / 12;
 
   // --- Simple plan (deterministic 4%-rule) ---------------------------------
-  const nestEgg = withdrawalRate > 0 ? annualTotal / (withdrawalRate / 100) : Infinity;
-  const sustainableAnnual = portfolio * (withdrawalRate / 100);
+  const nestEgg = withdrawalRate > 0 ? portfolioDrawAnnual / (withdrawalRate / 100) : portfolioDrawAnnual > 0 ? Infinity : 0;
+  const nestEggNoIncome = withdrawalRate > 0 ? annualTotal / (withdrawalRate / 100) : Infinity;
+  const nestEggSaved = Math.max(0, nestEggNoIncome - nestEgg);
+
+  const sustainableAnnual = portfolio * (withdrawalRate / 100); // portfolio-funded only
   const sustainableMonthly = sustainableAnnual / 12;
-  const coverage = annualTotal > 0 ? sustainableAnnual / annualTotal : 1;
-  const surplusMonthly = sustainableMonthly - monthlyTotal;
+  const totalMonthlyIncome = sustainableMonthly + guaranteed; // portfolio + guaranteed
+  const coverage = annualTotal > 0 ? (sustainableAnnual + guaranteedAnnual) / annualTotal : 1;
+  const surplusMonthly = totalMonthlyIncome - monthlyTotal;
   const gap = Math.max(0, nestEgg - portfolio);
   const covered = coverage >= 1;
 
@@ -85,10 +99,9 @@ export default function BurnRateLab() {
       paths: PATHS,
       blockLen: BLOCK,
       stockPct: stockPct / 100,
-      real: true, // today's-dollars withdrawals vs real returns
+      real: true,
       seed: SEED,
     });
-    // Each path: withdraw a constant real amount each year, then grow.
     const balances: number[][] = new Array(PATHS);
     const terminal: number[] = new Array(PATHS);
     const depletionYears: number[] = [];
@@ -100,7 +113,7 @@ export default function BurnRateLab() {
       let failed = false;
       for (let y = 0; y < horizon; y++) {
         if (!failed) {
-          bal -= annualTotal;
+          bal -= portfolioDrawAnnual; // only the gap after guaranteed income
           if (bal <= 0) {
             bal = 0;
             failed = true;
@@ -126,7 +139,7 @@ export default function BurnRateLab() {
       medianDepletion: depletionYears.length ? quantile(depletionYears, 0.5) : null,
       bands,
     };
-  }, [mode, horizon, stockPct, portfolio, annualTotal]);
+  }, [mode, horizon, stockPct, portfolio, portfolioDrawAnnual]);
 
   return (
     <div className="wl">
@@ -134,7 +147,7 @@ export default function BurnRateLab() {
         <ResetButton
           onReset={() => {
             setMode("plan"); setCats(DEFAULT_CATEGORIES); setWithdrawalRate(4);
-            setPortfolio(1_000_000); setStockPct(60); setHorizon(30);
+            setPortfolio(1_000_000); setGuaranteed(0); setStockPct(60); setHorizon(30);
           }}
         />
         <div className="wl-simmode" role="group" aria-label="Mode">
@@ -157,11 +170,21 @@ export default function BurnRateLab() {
           </label>
         ))}
 
+        <p className="br-group">Guaranteed income</p>
+        <label className="wl-slider">
+          <span>
+            Pension, Social Security, annuities
+            <InfoTip text="Income that arrives every month no matter what markets do — a pension, Social Security, or an annuity. It covers part of your spending, so your portfolio only has to fund the rest. Assumed here to rise with inflation; Social Security does, but many private pensions are fixed and lose value over time." />{" "}
+            <strong>{currency(guaranteed)}/mo</strong>
+          </span>
+          <input type="range" min={0} max={12000} step={100} value={guaranteed} onChange={(e) => setGuaranteed(Number(e.target.value))} />
+        </label>
+
         <p className="br-group">Your plan</p>
         <label className="wl-slider">
           <span>
             Your nest egg
-            <InfoTip text="The savings you'd retire with." /> <strong>{currency(portfolio)}</strong>
+            <InfoTip text="The invested savings you'd retire with — the liquid portfolio, separate from guaranteed income." /> <strong>{currency(portfolio)}</strong>
           </span>
           <input type="range" min={0} max={5_000_000} step={25_000} value={portfolio} onChange={(e) => setPortfolio(Number(e.target.value))} />
         </label>
@@ -210,8 +233,8 @@ export default function BurnRateLab() {
               <dd>{currency(monthlyTotal)}</dd>
             </div>
             <div>
-              <dt>Per year</dt>
-              <dd>{currency(annualTotal)}</dd>
+              <dt>{guaranteed > 0 ? "Portfolio must fund" : "Per year"}</dt>
+              <dd>{guaranteed > 0 ? `${currency(portfolioDrawMonthly)}/mo` : currency(annualTotal)}</dd>
             </div>
           </div>
           <div className="br-breakdown" role="img" aria-label="Spending breakdown by category">
@@ -227,8 +250,13 @@ export default function BurnRateLab() {
           <PlanView
             withdrawalRate={withdrawalRate}
             nestEgg={nestEgg}
+            nestEggSaved={nestEggSaved}
+            nestEggNoIncome={nestEggNoIncome}
             portfolio={portfolio}
+            guaranteed={guaranteed}
+            portfolioDrawMonthly={portfolioDrawMonthly}
             sustainableMonthly={sustainableMonthly}
+            totalMonthlyIncome={totalMonthlyIncome}
             monthlyTotal={monthlyTotal}
             coverage={coverage}
             covered={covered}
@@ -241,15 +269,17 @@ export default function BurnRateLab() {
               sim={sim}
               horizon={horizon}
               portfolio={portfolio}
-              withdrawalPct={portfolio > 0 ? annualTotal / portfolio : 0}
+              guaranteed={guaranteed}
+              portfolioDrawAnnual={portfolioDrawAnnual}
+              withdrawalPct={portfolio > 0 ? portfolioDrawAnnual / portfolio : 0}
             />
           )
         )}
 
         <p className="wl-note">
           {mode === "plan"
-            ? "A rough planning sketch: costs are steady in today's dollars and the withdrawal rate is a historical rule of thumb, not a guarantee."
-            : "History is one sample of how markets can behave, not a promise. Taxes, fees, changing spending, and longevity are left out. Data: Aswath Damodaran, historical US returns."}
+            ? "A rough planning sketch: costs are steady in today's dollars and the withdrawal rate is a historical rule of thumb, not a guarantee. Guaranteed income is assumed to rise with inflation."
+            : "History is one sample of how markets can behave, not a promise. Taxes, fees, changing spending, and longevity are left out; guaranteed income is treated as inflation-adjusted. Data: Aswath Damodaran, historical US returns."}
         </p>
       </div>
     </div>
@@ -259,15 +289,25 @@ export default function BurnRateLab() {
 function PlanView(props: {
   withdrawalRate: number;
   nestEgg: number;
+  nestEggSaved: number;
+  nestEggNoIncome: number;
   portfolio: number;
+  guaranteed: number;
+  portfolioDrawMonthly: number;
   sustainableMonthly: number;
+  totalMonthlyIncome: number;
   monthlyTotal: number;
   coverage: number;
   covered: boolean;
   surplusMonthly: number;
   gap: number;
 }) {
-  const { withdrawalRate, nestEgg, portfolio, sustainableMonthly, monthlyTotal, coverage, covered, surplusMonthly, gap } = props;
+  const {
+    withdrawalRate, nestEgg, nestEggSaved, nestEggNoIncome, portfolio, guaranteed,
+    portfolioDrawMonthly, sustainableMonthly, totalMonthlyIncome, monthlyTotal, coverage, covered, surplusMonthly, gap,
+  } = props;
+  const hasIncome = guaranteed > 0;
+  const fullyCoveredByIncome = portfolioDrawMonthly <= 0;
   return (
     <>
       <div className="wl-readout">
@@ -275,15 +315,35 @@ function PlanView(props: {
           <span className="br-hero-label">Nest egg you'd need (at {withdrawalRate}%)</span>
           <span className="br-hero-value">{currency(nestEgg)}</span>
           <span className="br-hero-sub">
-            that's {(100 / withdrawalRate).toFixed(0)}× your annual spending — the flip side of the 4% rule
+            {fullyCoveredByIncome ? (
+              <>your guaranteed income alone covers your spending — no nest egg required for these costs</>
+            ) : hasIncome ? (
+              <>
+                only {(100 / withdrawalRate).toFixed(0)}× the {currency(portfolioDrawMonthly * 12)}/yr your portfolio must
+                fund, after {currency(guaranteed)}/mo of guaranteed income
+              </>
+            ) : (
+              <>that's {(100 / withdrawalRate).toFixed(0)}× your annual spending — the flip side of the 4% rule</>
+            )}
           </span>
         </div>
+        {hasIncome && !fullyCoveredByIncome && (
+          <p className="br-verdict-line" style={{ marginTop: "var(--space-sm)" }}>
+            Guaranteed income of {currency(guaranteed)}/mo cuts the nest egg you need by{" "}
+            <strong>{currency(nestEggSaved)}</strong> — down from {currency(nestEggNoIncome)} if you had to fund every dollar
+            from savings.
+          </p>
+        )}
       </div>
       <div className={`wl-readout br-verdict ${covered ? "br-ok" : "br-short"}`}>
-        <h3>Does your nest egg cover it?</h3>
+        <h3>Does your income cover it?</h3>
         <p className="br-verdict-line">
           {currency(portfolio)} at {withdrawalRate}% sustainably provides{" "}
-          <strong>{currency(sustainableMonthly)}/mo</strong> — about <strong>{pctText(coverage)}</strong> of your {currency(monthlyTotal)}/mo burn rate.
+          <strong>{currency(sustainableMonthly)}/mo</strong>
+          {hasIncome && (
+            <>, plus {currency(guaranteed)}/mo guaranteed = <strong>{currency(totalMonthlyIncome)}/mo</strong></>
+          )}{" "}
+          — about <strong>{pctText(coverage)}</strong> of your {currency(monthlyTotal)}/mo burn rate.
         </p>
         {covered ? (
           <p className="br-verdict-tag">✓ Covered, with about {currency(surplusMonthly)}/mo to spare.</p>
@@ -302,35 +362,55 @@ function StressView({
   sim,
   horizon,
   portfolio,
+  guaranteed,
+  portfolioDrawAnnual,
   withdrawalPct,
 }: {
   sim: StressResult;
   horizon: number;
   portfolio: number;
+  guaranteed: number;
+  portfolioDrawAnnual: number;
   withdrawalPct: number;
 }) {
   const good = sim.successRate >= 0.9;
+  const noDraw = portfolioDrawAnnual <= 0;
   return (
     <>
       <div className="wl-readout">
         <div className="sk-headline" style={{ background: good ? "var(--color-accent-soft)" : "var(--color-error-soft, var(--color-accent-soft))", borderColor: good ? "var(--color-accent)" : "var(--color-error)" }}>
           <span className="sk-headline-label">
-            Chance your money lasts {horizon} years (spending {pctText(withdrawalPct)} of it/yr)
+            {noDraw ? `Chance your money lasts ${horizon} years` : `Chance your money lasts ${horizon} years (drawing ${pctText(withdrawalPct)} of it/yr)`}
           </span>
           <span className="sk-headline-value" style={{ color: good ? "var(--color-accent)" : "var(--color-error)" }}>
             {pctText(sim.successRate)}
           </span>
         </div>
         <FanChart bands={sim.bands} horizon={horizon} start={portfolio} />
-        <p className="wl-fnote">
-          Each band is a range of alternate histories. The wedge widens because
-          luck compounds: two retirees with the identical plan can land worlds
-          apart — the top ones caught good years early, the bottom ones hit crashes
-          first (<strong>sequence-of-returns risk</strong>).
-        </p>
+        {noDraw ? (
+          <p className="wl-fnote">
+            Your guaranteed income covers <strong>all</strong> of your spending, so the portfolio is never drawn down — it
+            only compounds. Every history "succeeds"; the question stops being <em>will it last</em> and becomes <em>how
+            much does it grow</em>.
+          </p>
+        ) : (
+          <p className="wl-fnote">
+            Each band is a range of alternate histories. The wedge widens because
+            luck compounds: two retirees with the identical plan can land worlds
+            apart — the top ones caught good years early, the bottom ones hit crashes
+            first (<strong>sequence-of-returns risk</strong>).
+          </p>
+        )}
       </div>
 
       <div className="wl-readout">
+        {guaranteed > 0 && !noDraw && (
+          <p className="br-verdict-line" style={{ marginBottom: "var(--space-sm)" }}>
+            After {currency(guaranteed)}/mo of guaranteed income, the portfolio only has to supply{" "}
+            <strong>{currency(portfolioDrawAnnual)}/yr</strong> — a much gentler draw, which is exactly why the odds above
+            hold up even through bad markets.
+          </p>
+        )}
         <dl className="sk-stats">
           <div>
             <dt>Typical ending (median)</dt>
