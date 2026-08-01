@@ -9,7 +9,9 @@ import ResetButton from "./ResetButton";
  *  • Roth vs Traditional: the whole thing hinges on one comparison — your tax rate
  *    now vs. in retirement. Same pre-tax budget, they're mathematically identical
  *    when the rates match; Roth wins if your rate will be higher later, Traditional
- *    if lower. Everything else is noise.
+ *    if lower. A third bar shows a TAXABLE (non-qualified) account holding the same
+ *    after-tax dollars, so the value of tax-sheltering — and the turnover-driven
+ *    tax drag that hits active funds far harder than index funds — is visible.
  *  • Employer match: the closest thing to free money in all of investing — an
  *    instant, guaranteed return you should capture before anything else.
  *
@@ -18,6 +20,44 @@ import ResetButton from "./ResetButton";
 
 const currency = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+type FundType = "index" | "active" | "high";
+/** Typical profiles. Turnover drives how much gain a fund distributes (and taxes)
+ *  each year; index funds churn little, active funds a lot, with more of it
+ *  short-term (taxed at ordinary rates). Dividend yields are illustrative. */
+const FUNDS: Record<FundType, { label: string; turnover: number; divYield: number; stFrac: number }> = {
+  index: { label: "Index fund", turnover: 0.04, divYield: 0.018, stFrac: 0.05 },
+  active: { label: "Active fund", turnover: 0.6, divYield: 0.015, stFrac: 0.3 },
+  high: { label: "High-turnover active", turnover: 1.2, divYield: 0.012, stFrac: 0.55 },
+};
+
+/**
+ * After-tax ending value of a lump held in a TAXABLE (non-qualified) account.
+ * Each year dividends are taxed, and turnover forces the fund to realize and
+ * distribute a share of its gains (taxable now) instead of deferring them; the
+ * rest compounds untaxed until sale, when the remaining gain is taxed at LTCG.
+ * Basis is tracked so nothing is double-taxed. A transparent approximation.
+ */
+function taxableEnding(
+  afterTax: number, r: number, n: number,
+  fund: { turnover: number; divYield: number; stFrac: number },
+  cgTax: number, ordRate: number,
+) {
+  let V = afterTax; // market value
+  let B = afterTax; // cost basis
+  for (let y = 0; y < n; y++) {
+    const div = V * fund.divYield; // dividend cash (taxed at qualified/LTCG rate)
+    const priceApp = V * (r - fund.divYield); // price appreciation (unrealized)
+    const unreal = Math.max(0, V - B + priceApp);
+    const cgDist = fund.turnover * unreal; // gains realized & distributed via turnover
+    const divTaxPaid = div * cgTax;
+    const cgTaxPaid = cgDist * fund.stFrac * ordRate + cgDist * (1 - fund.stFrac) * cgTax;
+    V = V * (1 + r) - divTaxPaid - cgTaxPaid; // reinvest all; taxes leak out of the account
+    B = Math.min(V, B + (div - divTaxPaid) + cgDist); // net dividends + distributed gains lift basis
+  }
+  const finalGain = Math.max(0, V - B);
+  return V - finalGain * cgTax; // pay LTCG on the remaining unrealized gain at sale
+}
 
 export default function RothLab() {
   const [mode, setMode] = useState<"account" | "match">("account");
@@ -28,6 +68,8 @@ export default function RothLab() {
   const [taxLater, setTaxLater] = useState(22);
   const [years, setYears] = useState(30);
   const [ret, setRet] = useState(5);
+  const [taxableFund, setTaxableFund] = useState<FundType>("index");
+  const [cgRate, setCgRate] = useState(15); // long-term cap-gains / qualified-dividend rate
 
   // Employer match
   const [salary, setSalary] = useState(90_000);
@@ -36,13 +78,23 @@ export default function RothLab() {
   const [matchLimit, setMatchLimit] = useState(6);
 
   const acct = useMemo(() => {
-    const g = Math.pow(1 + ret / 100, years);
+    const rd = ret / 100;
+    const g = Math.pow(1 + rd, years);
+    const afterTax = contrib * (1 - taxNow / 100); // after-tax dollars (same base as Roth & Taxable)
     const traditional = contrib * g * (1 - taxLater / 100); // full pre-tax in, taxed at withdrawal
-    const roth = contrib * (1 - taxNow / 100) * g; // taxed going in, tax-free out
+    const roth = afterTax * g; // taxed going in, tax-free out
     const diff = roth - traditional;
     const winner = Math.abs(diff) < 1 ? "tie" : diff > 0 ? "roth" : "traditional";
-    return { traditional, roth, diff: Math.abs(diff), winner, grossTraditional: contrib * g };
-  }, [contrib, taxNow, taxLater, years, ret]);
+
+    // Same after-tax dollars, but in a taxable account with turnover-driven drag.
+    const fund = FUNDS[taxableFund];
+    const taxable = taxableEnding(afterTax, rd, years, fund, cgRate / 100, taxNow / 100);
+    const taxDrag = roth - taxable; // gap vs. the tax-free shelter = cost of the drag
+    const taxableCagr = afterTax > 0 ? Math.pow(taxable / afterTax, 1 / years) - 1 : 0;
+    const dragPct = rd - taxableCagr; // annualized drag, incl. the final sale tax
+
+    return { traditional, roth, diff: Math.abs(diff), winner, grossTraditional: contrib * g, taxable, taxDrag, dragPct };
+  }, [contrib, taxNow, taxLater, years, ret, taxableFund, cgRate]);
 
   const match = useMemo(() => {
     const yourContrib = (salary * contribPct) / 100;
@@ -62,6 +114,7 @@ export default function RothLab() {
         <ResetButton
           onReset={() => {
             setMode("account"); setContrib(7_000); setTaxNow(24); setTaxLater(22); setYears(30); setRet(5);
+            setTaxableFund("index"); setCgRate(15);
             setSalary(90_000); setContribPct(6); setMatchRate(50); setMatchLimit(6);
           }}
         />
@@ -114,6 +167,32 @@ export default function RothLab() {
                 <InfoTip text="Expected return above inflation." /> <strong>{ret}%</strong>
               </span>
               <input type="range" min={1} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
+            </label>
+
+            <div className="wl-field">
+              <span className="wl-field-label">
+                Taxable-account fund
+                <InfoTip text="Only affects the taxable (non-qualified) account. A fund's turnover — how much it buys and sells each year — forces it to distribute taxable gains. Index funds barely turn over; active funds churn, and more of their gains are short-term (taxed at your ordinary rate)." />
+              </span>
+              <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Taxable fund type">
+                {(Object.keys(FUNDS) as FundType[]).map((k) => (
+                  <button key={k} type="button" className={taxableFund === k ? "active" : ""} aria-pressed={taxableFund === k} onClick={() => setTaxableFund(k)}>
+                    {FUNDS[k].label}
+                  </button>
+                ))}
+              </div>
+              <p className="wl-note" style={{ marginTop: "0.3rem" }}>
+                {(FUNDS[taxableFund].turnover * 100).toFixed(0)}% turnover · {(FUNDS[taxableFund].divYield * 100).toFixed(1)}% dividend yield
+              </p>
+            </div>
+
+            <label className="wl-slider">
+              <span>
+                Capital-gains tax rate
+                <InfoTip text="Your long-term capital-gains and qualified-dividend rate (often 15%). Applied only in the taxable account. Short-term gains from active-fund turnover are taxed at your ordinary rate above instead." />{" "}
+                <strong>{cgRate}%</strong>
+              </span>
+              <input type="range" min={0} max={30} step={1} value={cgRate} onChange={(e) => setCgRate(+e.target.value)} />
             </label>
 
             <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
@@ -190,10 +269,12 @@ export default function RothLab() {
           <>
             <div className="wl-frontier">
               <h3>After-tax money in your pocket at retirement</h3>
-              <AccountBars traditional={acct.traditional} roth={acct.roth} />
+              <AccountBars traditional={acct.traditional} roth={acct.roth} taxable={acct.taxable} />
               <p className="wl-fnote">
-                Both bars start from the same pre-tax budget. The <em>only</em> thing that separates them is when the tax
-                is paid — and at what rate. Move the two tax sliders to equal values and the bars snap to the same height.
+                Roth and Traditional (the tax-advantaged accounts) start from the same pre-tax budget and differ only in
+                <em> when</em> the tax is paid. The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>taxable</span>{" "}
+                account invests the same after-tax dollars as Roth — but loses ground every year to taxes on dividends and
+                on the gains a fund is forced to distribute as it trades.
               </p>
             </div>
             <div className="wl-lower">
@@ -201,16 +282,18 @@ export default function RothLab() {
                 <dl className="ss-stats">
                   <div><dt>Traditional, after tax</dt><dd>{currency(acct.traditional)}</dd></div>
                   <div><dt>Roth, after tax</dt><dd>{currency(acct.roth)}</dd></div>
-                  <div><dt>Traditional, before tax</dt><dd>{currency(acct.grossTraditional)}</dd></div>
-                  <div><dt>The gap</dt><dd>{acct.winner === "tie" ? "—" : currency(acct.diff)}</dd></div>
+                  <div><dt>Taxable ({FUNDS[taxableFund].label.toLowerCase()})</dt><dd>{currency(acct.taxable)}</dd></div>
+                  <div><dt>Lost to tax drag</dt><dd>{currency(acct.taxDrag)}</dd></div>
                 </dl>
                 <p className="wl-saved">
-                  The big Traditional balance is partly the government's — you still owe tax on every dollar you pull out.
-                  Roth's smaller-looking contribution is already yours, free and clear. So the contest isn't about the
-                  headline balance; it's <strong>only</strong> about your tax rate now versus later. Common tie-breakers:
-                  Roth if you're early-career with room to grow into higher brackets, or want tax-free flexibility;
-                  Traditional if you're in your peak-earning years and expect a lower rate in retirement. Educational only,
-                  not advice.
+                  Roth vs. Traditional is <strong>only</strong> about your tax rate now versus later — Roth if you'll be in
+                  a higher bracket later, Traditional if lower. But notice the third bar: the <strong>taxable account</strong>
+                  starts with the exact same after-tax dollars as Roth, yet ends <strong>{currency(acct.taxDrag)}</strong> behind
+                  — a drag of about <strong>{(acct.dragPct * 100).toFixed(1)}%/yr</strong> — purely from taxes it can't defer.
+                  And that gap swings hard on the fund: a low-turnover <strong>index fund</strong> barely distributes gains,
+                  while a churning <strong>active fund</strong> hands you a taxable bill every year, much of it at your higher
+                  ordinary rate. That's the case for sheltering first, and for holding tax-inefficient, high-turnover funds
+                  <em> inside</em> tax-advantaged accounts. Educational only, not advice.
                 </p>
               </div>
             </div>
@@ -254,7 +337,7 @@ export default function RothLab() {
   );
 }
 
-function AccountBars({ traditional, roth }: { traditional: number; roth: number }) {
+function AccountBars({ traditional, roth, taxable }: { traditional: number; roth: number; taxable: number }) {
   const width = 760;
   const height = 360;
   const pad = { top: 26, right: 18, bottom: 44, left: 66 };
@@ -263,6 +346,7 @@ function AccountBars({ traditional, roth }: { traditional: number; roth: number 
   const bars = [
     { label: "Traditional", sub: "taxed at withdrawal", value: traditional, color: "var(--pl-c1)" },
     { label: "Roth", sub: "tax-free withdrawal", value: roth, color: "var(--color-accent)" },
+    { label: "Taxable", sub: "taxed along the way", value: taxable, color: "var(--pl-c3)" },
   ];
   const maxV = Math.max(...bars.map((b) => b.value)) * 1.16;
   const y = (v: number) => pad.top + plotH - (v / maxV) * plotH;
@@ -271,7 +355,7 @@ function AccountBars({ traditional, roth }: { traditional: number; roth: number 
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
   const money = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M` : `$${Math.round(v / 1000)}k`);
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="After-tax retirement wealth: Traditional vs Roth">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="After-tax retirement wealth: Traditional, Roth, and Taxable">
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
         <g key={f}>
           <line x1={pad.left} x2={width - pad.right} y1={y(maxV * f)} y2={y(maxV * f)} stroke="var(--color-border)" />
