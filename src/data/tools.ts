@@ -98,6 +98,18 @@ export const TOOLS: Tool[] = [
       "Mix assets and watch correlations, the efficient frontier, and the range of outcomes come to life.",
   },
   {
+    title: "How Much in Stocks?",
+    href: "/tools/asset-allocation",
+    blurb:
+      "The biggest decision you'll make: the stock/bond mix. See the trade-off between long-run growth and the worst drop you'd have to survive — plus the volatility drag that rewards a smoother ride.",
+  },
+  {
+    title: "Bonds & Interest-Rate Risk",
+    href: "/tools/bonds",
+    blurb:
+      "The 'safe' sleeve has a catch: when rates rise, bond prices fall — and longer bonds fall harder. Meet duration, and read today's Treasury yield curve.",
+  },
+  {
     title: "CAPM & the Security Market Line",
     href: "/tools/capm",
     blurb:

@@ -1,0 +1,140 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import AssetAllocationLab from "../../components/AssetAllocationLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="How Much in Stocks?"
+  description="The single biggest investing decision is your stock/bond mix. Slide the dial and see the historical trade-off — more stocks means higher long-run growth but deeper, scarier drops — plus the volatility drag that rewards a smoother ride."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>How much should be in stocks?</h1>
+    <p class="lede">
+      Which funds you pick matters far less than one dial: how much of your money
+      rides in stocks versus bonds. Turn it and watch the trade-off that governs
+      every portfolio — more stocks lifts your long-run return, but you have to
+      survive a deeper drop to collect it. The right answer isn't the highest
+      return; it's the most risk you can actually hold onto through the worst of it.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <AssetAllocationLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Three questions set your mix</h2>
+      <p>
+        There's no universally "right" allocation — there's the right one for you,
+        and it comes down to three dimensions of risk:
+      </p>
+      <ul>
+        <li>
+          <strong>Ability</strong> — how long is your horizon? A 30-year-old has
+          decades to recover from a crash; someone spending the money next year does
+          not. Longer horizons can hold more stocks.
+        </li>
+        <li>
+          <strong>Willingness</strong> — can you actually sit through the worst
+          drop on the chart without selling? A perfect plan you abandon at the
+          bottom is worse than a modest plan you keep. Be honest.
+        </li>
+        <li>
+          <strong>Need</strong> — do your goals even require the extra risk? If a
+          60/40 mix comfortably funds your life, reaching for 100% stocks may be
+          taking risk you're not being paid to take.
+        </li>
+      </ul>
+
+      <h2>Why a smoother ride compounds to more</h2>
+      <p>
+        The tool shows a quiet but crucial gap: a portfolio's <em>average</em>
+        yearly return is always higher than what it actually <strong>compounds</strong>
+        to. That difference — <strong>volatility drag</strong> — grows with roughly
+        half the variance, because losses hurt more than equal gains help: a −50%
+        year needs a +100% year just to break even. Cutting needless volatility
+        lifts the return you keep at the same average. It's the mathematical heart
+        of "diversify, and don't bear risk you aren't paid for." Educational only,
+        not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="asset-allocation" />
+
+  <NextTool current="/tools/asset-allocation" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .ss-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+  }
+  .ss-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .ss-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .ss-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .ss-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

@@ -478,6 +478,14 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["markowitz1952", "tobin1958", "sharpe1966"],
     datasets: ["damodaran"],
   },
+  "asset-allocation": {
+    studies: ["markowitz1952", "tobin1958"],
+    datasets: ["damodaran"],
+  },
+  bonds: {
+    studies: [],
+    datasets: ["fred"],
+  },
   capm: {
     studies: [
       "treynor1962",
