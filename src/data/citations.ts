@@ -415,7 +415,7 @@ export interface ToolSources {
 /** Keyed by the tool's slug (the last segment of its /tools/<slug> href). */
 export const TOOL_SOURCES: Record<string, ToolSources> = {
   "compound-growth": {
-    studies: [],
+    studies: ["bengen1994", "cooley1998"],
     datasets: ["shiller", "damodaran", "fred"],
   },
   fees: {
@@ -464,15 +464,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   portfolio: {
     studies: ["markowitz1952", "tobin1958", "sharpe1966"],
-    datasets: ["damodaran"],
-  },
-  "asset-allocation": {
-    studies: ["markowitz1952", "tobin1958"],
-    datasets: ["damodaran"],
-  },
-  bonds: {
-    studies: [],
-    datasets: ["fred"],
+    datasets: ["damodaran", "fred"],
   },
   factors: {
     studies: [
@@ -501,6 +493,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "sharpe1991",
       "famaFrench2010",
     ],
-    datasets: [],
+    datasets: ["french", "shiller", "spiva"],
+  },
+  retirement: {
+    studies: ["bengen1994", "cooley1998", "shovenSlavov2014"],
+    datasets: ["damodaran", "shiller", "ssa"],
   },
 };

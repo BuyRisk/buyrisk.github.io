@@ -1,36 +1,55 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import CompoundGrowthExplorer from "../../components/CompoundGrowthExplorer.tsx";
+import GrowthModule from "../../components/GrowthModule.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
 ---
 
 <BaseLayout
-  title="Compound Growth Explorer"
-  description="An interactive tool: adjust your starting amount, contributions, return, and time horizon to see how an investment compounds."
+  title="Growth, Savings & Debt"
+  description="Compounding in every direction: how contributions, return, and time build wealth; how your savings rate (not your income) sets your timeline to financial independence; and how the same math runs in reverse as debt."
 >
-  <section class="container tool-intro">
+  <section class="container wl-intro">
     <p class="eyebrow">Interactive Tool</p>
-    <h1>Compound Growth Explorer</h1>
+    <h1>The engine: compounding</h1>
     <p class="lede">
-      Adjust your starting amount, monthly contribution, expected return, and
-      time horizon to see how an investment could grow — and watch how much of
-      the final balance comes from your contributions versus compounding itself.
+      One force runs through all of personal finance — compounding — and it works
+      in every direction. Watch a balance grow from contributions, return, and time;
+      see how the <strong>rate</strong> you save (not the size of your paycheck) sets
+      your timeline to financial independence; then watch the same math turn against
+      you as debt. Three views of one equation.
     </p>
   </section>
 
-  <section class="container tool-host">
-    <div class="tool-frame">
-      <CompoundGrowthExplorer client:load />
+  <section class="container wl-host">
+    <GrowthModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Three views of one idea</h2>
+      <ul>
+        <li>
+          <strong>Compound growth.</strong> Money earns a return, and next year that
+          return earns a return too. Over decades, most of a portfolio's final value
+          comes from growth on growth — not the contributions themselves.
+        </li>
+        <li>
+          <strong>Savings rate.</strong> How fast you reach the point where your
+          investments could cover your life depends on the fraction of income you
+          save, almost regardless of how much you earn — because spending and the
+          nest egg you need scale together.
+        </li>
+        <li>
+          <strong>Debt.</strong> The exact same compounding, pointed the wrong way.
+          At a credit card's rate, paying only the minimum stretches a small balance
+          into decades — which is why high-interest debt comes before investing on
+          every sensible priority list.
+        </li>
+      </ul>
+      <p>Educational only, not financial advice.</p>
     </div>
-  </section>
-
-  <section class="container tool-more">
-    <p>
-      Curious what to explore next? Head to the
-      <a href="/tools/portfolio">Portfolio Diversification Lab</a>
-      to see how risk and return interact.
-    </p>
   </section>
 
   <Sources tool="compound-growth" />
@@ -39,444 +58,7 @@ import Sources from "../../components/Sources.astro";
 </BaseLayout>
 
 <style>
-  .tool-intro {
-    padding-block: var(--space-lg) var(--space-md);
-    max-width: var(--measure);
-  }
-  .lede {
-    font-size: var(--step-1);
-    color: var(--color-text-soft);
-    line-height: 1.5;
-  }
-  .tool-frame {
-    background: var(--color-surface);
-    border: var(--border);
-    border-radius: var(--radius);
-    padding: var(--space-md);
-    box-shadow: var(--shadow);
-  }
-  .tool-more {
-    margin-top: var(--space-lg);
-    max-width: var(--measure);
-    color: var(--color-text-soft);
-  }
-</style>
-
-<style is:global>
-  /* Styles for the CompoundGrowthExplorer React island. Global so they reach
-     the client-rendered component markup. */
-  .cge {
-    display: grid;
-    gap: var(--space-md);
-  }
-  @media (min-width: 820px) {
-    .cge {
-      grid-template-columns: 300px 1fr;
-      align-items: start;
-    }
-    .cge-note,
-    .cge-lifecycle-wrap {
-      grid-column: 1 / -1;
-    }
-  }
-  .cge-lifecycle-wrap {
-    display: grid;
-    gap: var(--space-sm);
-  }
-  .cge-life-toggle {
-    justify-self: start;
-    font-family: var(--font-sans);
-    font-size: var(--step-0);
-    font-weight: 600;
-    padding: 0.5rem 0.9rem;
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius);
-    background: transparent;
-    color: var(--color-text-soft);
-    cursor: pointer;
-  }
-  .cge-life-toggle:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-  .cge-lifecycle {
-    background: var(--color-surface);
-    border: var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: var(--space-md);
-    display: grid;
-    gap: var(--space-md);
-  }
-  .cge-life-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--space-md);
-  }
-  .cge-life-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.1rem;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-life-legend span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .cge-life-key {
-    width: 0.9rem;
-    height: 0.9rem;
-    border-radius: 3px;
-    flex: none;
-  }
-  .cge-life-insight {
-    margin: 0;
-    max-width: var(--measure);
-    color: var(--color-text-soft);
-  }
-  .cge-controls {
-    display: grid;
-    gap: var(--space-md);
-    align-content: start;
-  }
-  .cge-field {
-    display: grid;
-    gap: 0.5rem;
-  }
-  .cge-mode {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-    background: var(--color-surface-alt);
-    border-radius: var(--radius);
-    padding: 4px;
-  }
-  .cge-mode button {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    font-weight: 600;
-    padding: 0.45rem 0.5rem;
-    border: none;
-    border-radius: 7px;
-    background: transparent;
-    color: var(--color-text-soft);
-    cursor: pointer;
-  }
-  .cge-mode button.active {
-    background: var(--color-surface);
-    color: var(--color-accent);
-    box-shadow: var(--shadow);
-  }
-  .cge-goal-note {
-    grid-column: 1 / -1;
-    margin: var(--space-sm) 0 0;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-warn);
-  }
-  .cge-phase {
-    display: grid;
-    gap: var(--space-sm);
-    padding: var(--space-sm);
-    border: 1px solid var(--color-border);
-    border-left: 3px solid var(--color-accent);
-    border-radius: var(--radius);
-    background: var(--color-bg);
-  }
-  .cge-phase-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-accent);
-  }
-  .cge-phase-remove {
-    border: none;
-    background: transparent;
-    color: var(--color-muted);
-    font-size: 1.1rem;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0 0.2rem;
-  }
-  .cge-phase-remove:hover {
-    color: var(--color-error);
-  }
-  .cge-phase-add {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    font-weight: 600;
-    padding: 0.5rem;
-    border: 1px dashed var(--color-border);
-    border-radius: var(--radius);
-    background: transparent;
-    color: var(--color-text-soft);
-    cursor: pointer;
-  }
-  .cge-phase-add:hover {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-  }
-  .cge-label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-value-box {
-    display: inline-flex;
-    align-items: baseline;
-    white-space: pre;
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    padding: 0.15rem 0.45rem;
-    background: var(--color-surface);
-    color: var(--color-text);
-    transition: border-color var(--transition);
-  }
-  .cge-value-box:focus-within {
-    border-color: var(--color-accent);
-  }
-  .cge-value-box[data-invalid] {
-    border-color: var(--color-error);
-  }
-  .cge-adorn {
-    font-weight: 650;
-    font-variant-numeric: tabular-nums;
-  }
-  .cge-value-input {
-    width: 6.5em;
-    border: none;
-    padding: 0;
-    background: transparent;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: 650;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-  }
-  .cge-value-input:focus {
-    outline: none;
-  }
-  .cge-error {
-    justify-self: end;
-    color: var(--color-error);
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-  }
-  .cge-field input[type="range"] {
-    width: 100%;
-    accent-color: var(--color-accent);
-    cursor: pointer;
-  }
-  .cge-chart {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .cge-gridline {
-    stroke: var(--color-border);
-    stroke-width: 1;
-  }
-  .cge-axis-label {
-    fill: var(--color-muted);
-    font-family: var(--font-sans);
-    font-size: 11px;
-  }
-  .cge-area {
-    fill: var(--color-accent-soft);
-    opacity: 0.7;
-  }
-  .cge-line {
-    fill: none;
-    stroke-width: 2.5;
-    stroke-linejoin: round;
-    stroke-linecap: round;
-  }
-  .cge-line--balance {
-    stroke: var(--color-accent);
-  }
-  .cge-line--contributed {
-    stroke: var(--color-muted);
-    stroke-dasharray: 5 5;
-    stroke-width: 2;
-  }
-  .cge-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-    margin-top: var(--space-sm);
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .cge-swatch {
-    width: 1rem;
-    height: 0.35rem;
-    border-radius: 2px;
-  }
-  .cge-swatch--balance {
-    background: var(--color-accent);
-  }
-  .cge-swatch--contributed {
-    background: var(--color-muted);
-  }
-  .cge-stats {
-    display: grid;
-    gap: var(--space-sm);
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    margin: var(--space-md) 0 0;
-  }
-  .cge-stat {
-    background: var(--color-surface-alt);
-    border-radius: var(--radius);
-    padding: var(--space-sm);
-  }
-  .cge-stat dt {
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    margin-bottom: 0.25rem;
-  }
-  .cge-stat dd {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-weight: 650;
-    font-size: var(--step-1);
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
-  .cge-stat--big {
-    font-size: var(--step-2) !important;
-  }
-  .cge-stat--accent {
-    color: var(--color-accent) !important;
-  }
-  .cge-note {
-    font-size: var(--step--1);
-    color: var(--color-muted);
-    font-style: italic;
-    margin: 0;
-  }
-  .cge-realfee {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.5rem;
-    margin-top: var(--space-sm);
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-realfee-item {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.4rem;
-  }
-  .cge-realfee-item strong {
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
-  .cge-realfee-cost {
-    color: var(--color-error) !important;
-  }
-  .cge-retire-real {
-    margin: 0 0 0.3rem;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-    font-variant-numeric: tabular-nums;
-  }
-  .cge-retire {
-    margin-top: var(--space-md);
-    padding: var(--space-md);
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius);
-    background: var(--color-accent-soft);
-  }
-  .cge-retire-top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-  .cge-retire-title {
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: var(--step-0);
-    color: var(--color-text);
-  }
-  .cge-retire-rate {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
-  .cge-retire-rate input[type="range"] {
-    width: 6rem;
-    accent-color: var(--color-accent);
-    cursor: pointer;
-  }
-  .cge-retire-ratebox {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.1rem;
-    color: var(--color-text);
-    font-weight: 700;
-  }
-  .cge-retire-rateinput {
-    width: 3.2rem;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    font-weight: 700;
-    text-align: right;
-    padding: 0.15rem 0.3rem;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    background: var(--color-surface);
-    color: var(--color-text);
-    font-variant-numeric: tabular-nums;
-  }
-  .cge-retire-rateinput:focus {
-    outline: none;
-    border-color: var(--color-accent);
-  }
-  .cge-retire-figure {
-    margin: 0.4rem 0 0.3rem;
-    font-family: var(--font-sans);
-    font-size: var(--step-1);
-    color: var(--color-text);
-  }
-  .cge-retire-figure strong {
-    color: var(--color-accent);
-    font-size: var(--step-2);
-  }
-  .cge-retire-year {
-    color: var(--color-text-soft);
-    font-size: var(--step-0);
-  }
-  .cge-retire-note {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: var(--step--1);
-    color: var(--color-text-soft);
-  }
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
 </style>

@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RetirementModule from "../../components/RetirementModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Retirement & Roth"
+  description="Everything about funding and drawing down retirement: what it will cost and whether your money lasts, when to claim Social Security, and how to choose between Roth and Traditional accounts (and grab the employer match)."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Funding — and spending — retirement</h1>
+    <p class="lede">
+      Retirement is two problems: building the pile, and living off it. See what your
+      spending implies for the nest egg you need and whether it survives real market
+      history; decide when to claim Social Security's guaranteed, inflation-adjusted
+      income; and choose the account — Roth or Traditional — that keeps the most after
+      tax, starting with the employer match you should never leave behind.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <RetirementModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The three levers</h2>
+      <ul>
+        <li>
+          <strong>What it costs.</strong> Flip the 4% rule around: your spending sets
+          the nest egg you need (about 25× at 4%), and guaranteed income shrinks it.
+          A Monte Carlo over real history shows whether the plan survives bad luck.
+        </li>
+        <li>
+          <strong>Social Security.</strong> Claiming later means bigger checks for
+          life — inflation-adjusted longevity insurance. The breakeven age, and a
+          spouse's survivor benefit, decide whether waiting pays.
+        </li>
+        <li>
+          <strong>Roth or Traditional.</strong> It comes down to your tax rate now vs.
+          in retirement. And whatever you choose, capture the full employer match
+          first — an instant, guaranteed return nothing else matches.
+        </li>
+      </ul>
+      <p>Educational only, not financial advice.</p>
+    </div>
+  </section>
+
+  <Sources tool="retirement" />
+
+  <NextTool current="/tools/retirement" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>
