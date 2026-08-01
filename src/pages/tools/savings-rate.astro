@@ -1,0 +1,135 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SavingsRateLab from "../../components/SavingsRateLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Savings Rate & Financial Independence"
+  description="How long until your investments could cover your life? It depends almost entirely on your savings rate — not your income. See the math that sets your timeline to financial independence."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>What's your savings rate really buying?</h1>
+    <p class="lede">
+      Think of your net worth as a tank. What flows in minus what flows out — your
+      <strong>savings rate</strong> — is what fills it, and once it's full enough,
+      the returns it throws off can cover your spending forever. The surprise: how
+      many years that takes is set almost entirely by the <em>rate</em> you save,
+      not the size of your paycheck. Slide your income and watch the finish line
+      barely move.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <SavingsRateLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Why income barely matters</h2>
+      <p>
+        A raise cuts both ways. Earn more and you can save more — but if your
+        spending rises to match, your target nest egg (25× spending at 4%) rises
+        right along with it. The two scale together, so what's left over — the
+        <strong>fraction</strong> you keep — is what actually moves your timeline.
+        Two engineers, one earning $60,000 and one earning $250,000, both saving
+        20%, reach financial independence in the <em>same</em> number of years.
+      </p>
+      <ul>
+        <li>
+          <strong>Saving does double duty.</strong> Every extra dollar saved is a
+          dollar that both grows in your favor and is a dollar you've shown you can
+          live without — shrinking the pile you need. That's why the curve falls so
+          steeply: a 10% → 20% jump saves far more time than 60% → 70%.
+        </li>
+        <li>
+          <strong>It's a conservation law.</strong> Accumulation = what comes in −
+          what goes out, plus what your investments generate. Spending is the leak;
+          the savings rate is the valve. Nothing about compounding lets you escape
+          the arithmetic — but the arithmetic is friendlier than most people think.
+        </li>
+      </ul>
+      <p>
+        This is a clean model, not a promise: real incomes, spending, and returns
+        are lumpy, and a bad decade of markets can stretch the timeline. Treat the
+        number as a target to steer by. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="savings-rate" />
+
+  <NextTool current="/tools/savings-rate" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>
+
+<style is:global>
+  .ss-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+  }
+  .ss-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .ss-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .ss-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .ss-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

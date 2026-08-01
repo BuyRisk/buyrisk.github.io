@@ -20,6 +20,12 @@ export const TOOLS: Tool[] = [
       "See how a starting balance, regular contributions, return, and time compound into long-run growth.",
   },
   {
+    title: "Savings Rate & Financial Independence",
+    href: "/tools/savings-rate",
+    blurb:
+      "How long until your investments could cover your life? It's set by your savings rate — not your income. See the math, and why a raise barely moves the finish line.",
+  },
+  {
     title: "The Cost of Debt",
     href: "/tools/debt",
     blurb:
@@ -36,6 +42,12 @@ export const TOOLS: Tool[] = [
     href: "/tools/fees",
     blurb:
       "A fraction of a percent sounds harmless — but see how fund fees compound into a startling share of your lifetime wealth, and what investors really pay.",
+  },
+  {
+    title: "Roth or Traditional? (+ the Match)",
+    href: "/tools/roth-vs-traditional",
+    blurb:
+      "The Roth-vs-Traditional choice comes down to one thing: your tax rate now vs. in retirement. Plus why the employer match is free money you should never leave behind.",
   },
   {
     title: "Retirement Burn-Rate Calculator",

@@ -446,6 +446,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: [],
     datasets: ["french"],
   },
+  "savings-rate": {
+    studies: ["bengen1994", "cooley1998"],
+    datasets: [],
+  },
   "burn-rate": {
     studies: ["bengen1994", "cooley1998"],
     datasets: ["damodaran", "shiller"],

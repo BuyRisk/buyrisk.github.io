@@ -1,0 +1,201 @@
+import { useMemo, useState } from "react";
+import InfoTip from "./InfoTip";
+import ResetButton from "./ResetButton";
+
+/**
+ * "Savings Rate & Financial Independence" — the punchline of the control-volume
+ * view of net worth: what fills the tank is INPUT − OUTPUT (your savings rate),
+ * and what the tank generates (investment returns) eventually covers your OUTPUT
+ * forever. The startling result: how long that takes depends on your savings
+ * RATE and return — almost not at all on your income. Two people saving 20% reach
+ * independence in the same number of years whether they earn $50k or $500k.
+ * Educational only, not advice.
+ */
+
+const currency = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+
+const MAX_YEARS = 60;
+
+/**
+ * Years to financial independence, starting from zero, saving a constant fraction
+ * `s` of take-home pay, earning real return `r`, targeting a nest egg of
+ * spending / `wr` (the flip side of the 4% rule). Income cancels out entirely.
+ */
+function yearsToFI(s: number, r: number, wr: number): number {
+  if (s <= 0) return Infinity;
+  if (s >= 1) return 0; // saving everything → zero spending → nothing to fund
+  if (r <= 0) return (1 - s) / (s * wr);
+  const ratio = ((1 - s) * r) / (s * wr); // (1+r)^n = 1 + ratio
+  return Math.log1p(ratio) / Math.log1p(r);
+}
+
+const fmtYears = (y: number) => (!Number.isFinite(y) ? "never" : y >= MAX_YEARS ? `${MAX_YEARS}+` : `${y.toFixed(0)}`);
+
+export default function SavingsRateLab() {
+  const [savings, setSavings] = useState(20); // % of take-home
+  const [ret, setRet] = useState(5); // real return %
+  const [wr, setWr] = useState(4); // withdrawal rate %
+  const [income, setIncome] = useState(60_000); // take-home $/yr
+  const [age, setAge] = useState(30);
+
+  const view = useMemo(() => {
+    const s = savings / 100;
+    const r = ret / 100;
+    const w = wr / 100;
+    const years = yearsToFI(s, r, w);
+    const spending = income * (1 - s);
+    const annualSaved = income * s;
+    const target = w > 0 ? spending / w : Infinity;
+    const fiAge = Number.isFinite(years) ? age + years : Infinity;
+
+    // The iconic curve: years to FI across every savings rate, at these r & wr.
+    const curve: { s: number; years: number }[] = [];
+    for (let p = 1; p <= 90; p++) curve.push({ s: p, years: Math.min(MAX_YEARS + 5, yearsToFI(p / 100, r, w)) });
+
+    return { years, spending, annualSaved, target, fiAge, curve, multiple: w > 0 ? 1 / w : Infinity };
+  }, [savings, ret, wr, income, age]);
+
+  return (
+    <div className="wl">
+      <div className="wl-controls">
+        <ResetButton onReset={() => { setSavings(20); setRet(5); setWr(4); setIncome(60_000); setAge(30); }} />
+
+        <label className="wl-slider">
+          <span>
+            Savings rate
+            <InfoTip text="The share of your take-home pay you save and invest, instead of spending. This one number drives almost everything." />{" "}
+            <strong>{savings}%</strong>
+          </span>
+          <input type="range" min={1} max={90} step={1} value={savings} onChange={(e) => setSavings(+e.target.value)} />
+        </label>
+
+        <label className="wl-slider">
+          <span>
+            Take-home pay
+            <InfoTip text="Your spendable income after taxes. Slide it and watch the YEARS barely move — income sets how big your numbers are, not how long financial independence takes." />{" "}
+            <strong>{currency(income)}/yr</strong>
+          </span>
+          <input type="range" min={20_000} max={400_000} step={5_000} value={income} onChange={(e) => setIncome(+e.target.value)} />
+        </label>
+
+        <label className="wl-slider">
+          <span>
+            Real return
+            <InfoTip text="Expected investment return above inflation. A globally diversified stock/bond mix has historically returned roughly 4–6% real over long periods — nothing is guaranteed." />{" "}
+            <strong>{ret}%</strong>
+          </span>
+          <input type="range" min={0} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
+        </label>
+
+        <label className="wl-slider">
+          <span>
+            Withdrawal rate
+            <InfoTip text="The share of the nest egg you'll live on each year in retirement. 4% is the classic rule of thumb; lower is safer and needs a bigger pile." />{" "}
+            <strong>{wr}%</strong>
+          </span>
+          <input type="range" min={2.5} max={6} step={0.25} value={wr} onChange={(e) => setWr(+e.target.value)} />
+        </label>
+
+        <label className="wl-slider">
+          <span>
+            Your age today
+            <InfoTip text="Just to translate 'years to FI' into an age. It doesn't affect the math." />{" "}
+            <strong>{age}</strong>
+          </span>
+          <input type="range" min={18} max={60} step={1} value={age} onChange={(e) => setAge(+e.target.value)} />
+        </label>
+
+        <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
+          <span className="ss-headline-label">Saving {savings}% of your pay, you reach financial independence in</span>
+          <span className="ss-headline-value">{fmtYears(view.years)} {Number.isFinite(view.years) && view.years < MAX_YEARS ? "years" : ""}</span>
+          <span className="ss-headline-sub">
+            {Number.isFinite(view.fiAge) && view.fiAge < age + MAX_YEARS
+              ? <>around age <strong>{view.fiAge.toFixed(0)}</strong> — a {currency(view.target)} nest egg ({view.multiple.toFixed(0)}× spending)</>
+              : <>at this savings rate the finish line is more than {MAX_YEARS} years out</>}
+          </span>
+        </div>
+
+        <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+          Starting from zero, saving a constant share of pay, earning {ret}% real. Years to FI depend on your savings
+          rate and return — <strong>not</strong> your income. Educational only, not advice.
+        </p>
+      </div>
+
+      <div className="wl-stage">
+        <div className="wl-frontier">
+          <h3>Years to financial independence vs. your savings rate</h3>
+          <SavingsCurve curve={view.curve} savings={savings} years={view.years} />
+          <p className="wl-fnote">
+            The curve is brutal at the left and merciful at the right: going from a 10% to a 20% savings rate cuts far
+            more time than going from 60% to 70%. Every extra point of savings does double duty — it grows the pile
+            faster <em>and</em> shrinks the pile you need.
+          </p>
+        </div>
+
+        <div className="wl-lower">
+          <div className="wl-readout">
+            <dl className="ss-stats">
+              <div><dt>Years to FI</dt><dd>{fmtYears(view.years)}</dd></div>
+              <div><dt>FI age</dt><dd>{Number.isFinite(view.fiAge) && view.fiAge < age + MAX_YEARS ? view.fiAge.toFixed(0) : "—"}</dd></div>
+              <div><dt>Nest egg needed</dt><dd>{Number.isFinite(view.target) ? currency(view.target) : "—"}</dd></div>
+              <div><dt>Saved per year</dt><dd>{currency(view.annualSaved)}</dd></div>
+            </dl>
+            <p className="wl-saved">
+              Here's the part that surprises people: drag <strong>take-home pay</strong> from {currency(20_000)} to{" "}
+              {currency(400_000)} and the <strong>years barely change</strong>. A bigger paycheck makes every number
+              bigger — the savings, the spending, the target — but they scale together, so the <em>rate</em> is what
+              sets your timeline. It's the closest thing personal finance has to a law of conservation: what you don't
+              spend is what funds your freedom, and how fast you get there is set by the fraction, not the size, of the
+              flow. Educational only, not advice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SavingsCurve({ curve, savings, years }: { curve: { s: number; years: number }[]; savings: number; years: number }) {
+  const width = 760;
+  const height = 380;
+  const pad = { top: 18, right: 18, bottom: 44, left: 52 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+
+  const yMax = MAX_YEARS;
+  const x = (s: number) => pad.left + (s / 100) * plotW;
+  const y = (v: number) => pad.top + plotH - (Math.min(v, yMax) / yMax) * plotH;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+
+  const line = curve.map((c, i) => `${i === 0 ? "M" : "L"}${x(c.s)},${y(c.years)}`).join(" ");
+  const curY = Math.min(years, yMax);
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Years to financial independence as a function of savings rate">
+      {[0, 15, 30, 45, 60].map((v) => (
+        <g key={v}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" />
+          <text x={pad.left - 6} y={y(v) + 4} textAnchor="end" style={axisText}>{v === 60 ? "60+" : v}</text>
+        </g>
+      ))}
+      {[10, 25, 50, 75, 90].map((s) => (
+        <text key={s} x={x(s)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{s}%</text>
+      ))}
+
+      <path d={line} fill="none" stroke="var(--color-accent)" strokeWidth={2.8} />
+
+      {Number.isFinite(years) && (
+        <>
+          <line x1={x(savings)} x2={x(savings)} y1={pad.top} y2={pad.top + plotH} stroke="var(--color-muted)" strokeDasharray="3 3" />
+          <line x1={pad.left} x2={x(savings)} y1={y(curY)} y2={y(curY)} stroke="var(--pl-c3)" strokeDasharray="3 3" />
+          <circle cx={x(savings)} cy={y(curY)} r={5} fill="var(--pl-c3)" />
+        </>
+      )}
+
+      <text x={pad.left + plotW / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        Savings rate (% of take-home pay) → years to financial independence
+      </text>
+    </svg>
+  );
+}
