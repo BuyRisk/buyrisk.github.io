@@ -18,16 +18,22 @@ const currency = (n: number) =>
 const MAX_YEARS = 60;
 
 /**
- * Years to financial independence, starting from zero, saving a constant fraction
- * `s` of take-home pay, earning real return `r`, targeting a nest egg of
- * spending / `wr` (the flip side of the 4% rule). Income cancels out entirely.
+ * Years to financial independence, saving a constant fraction `s` of take-home
+ * pay, earning real return `r`, targeting a nest egg of spending / `wr` (the flip
+ * side of the 4% rule). `n0` is any starting net worth expressed in *years of
+ * income* (net worth / income); at n0 = 0 income cancels out entirely and the
+ * result depends only on `s` and `r`. Once n0 > 0, the head start's size
+ * relative to income matters, so income starts to move the timeline.
  */
-function yearsToFI(s: number, r: number, wr: number): number {
-  if (s <= 0) return Infinity;
-  if (s >= 1) return 0; // saving everything → zero spending → nothing to fund
-  if (r <= 0) return (1 - s) / (s * wr);
-  const ratio = ((1 - s) * r) / (s * wr); // (1+r)^n = 1 + ratio
-  return Math.log1p(ratio) / Math.log1p(r);
+function yearsToFI(s: number, r: number, wr: number, n0 = 0): number {
+  const target = (1 - s) / wr; // nest egg needed, in years of income
+  if (n0 >= target) return 0; // the head start alone already covers it
+  if (r <= 0) return s > 0 ? (target - n0) / s : Infinity; // linear fill, or never
+  // With a real return, solve (1+r)^t = (target + s/r) / (n0 + s/r).
+  const denom = n0 + s / r;
+  if (denom <= 0) return Infinity; // no savings and no starting balance
+  const g = (target + s / r) / denom;
+  return g > 1 ? Math.log(g) / Math.log1p(r) : 0;
 }
 
 const fmtYears = (y: number) => (!Number.isFinite(y) ? "never" : y >= MAX_YEARS ? `${MAX_YEARS}+` : `${y.toFixed(0)}`);
@@ -37,13 +43,16 @@ export default function SavingsRateLab() {
   const [ret, setRet] = useState(5); // real return %
   const [wr, setWr] = useState(4); // withdrawal rate %
   const [income, setIncome] = useState(60_000); // take-home $/yr
+  const [netWorth, setNetWorth] = useState(0); // current invested savings, $
   const [age, setAge] = useState(30);
 
   const view = useMemo(() => {
     const s = savings / 100;
     const r = ret / 100;
     const w = wr / 100;
-    const years = yearsToFI(s, r, w);
+    const n0 = income > 0 ? netWorth / income : 0; // head start, in years of income
+    const years = yearsToFI(s, r, w, n0);
+    const yearsFromZero = yearsToFI(s, r, w, 0); // same plan with no head start
     const spending = income * (1 - s);
     const annualSaved = income * s;
     const target = w > 0 ? spending / w : Infinity;
@@ -51,15 +60,21 @@ export default function SavingsRateLab() {
 
     // The iconic curve: years to FI across every savings rate, at these r & wr.
     const curve: { s: number; years: number }[] = [];
-    for (let p = 1; p <= 90; p++) curve.push({ s: p, years: Math.min(MAX_YEARS + 5, yearsToFI(p / 100, r, w)) });
+    for (let p = 1; p <= 90; p++) curve.push({ s: p, years: Math.min(MAX_YEARS + 5, yearsToFI(p / 100, r, w, n0)) });
 
-    return { years, spending, annualSaved, target, fiAge, curve, multiple: w > 0 ? 1 / w : Infinity };
-  }, [savings, ret, wr, income, age]);
+    // How many years the head start shaves off, when both timelines are finite.
+    const yearsSaved =
+      netWorth > 0 && Number.isFinite(years) && Number.isFinite(yearsFromZero)
+        ? Math.max(0, yearsFromZero - years)
+        : 0;
+
+    return { years, spending, annualSaved, target, fiAge, curve, yearsSaved, multiple: w > 0 ? 1 / w : Infinity };
+  }, [savings, ret, wr, income, netWorth, age]);
 
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton onReset={() => { setSavings(20); setRet(5); setWr(4); setIncome(60_000); setAge(30); }} />
+        <ResetButton onReset={() => { setSavings(20); setRet(5); setWr(4); setIncome(60_000); setNetWorth(0); setAge(30); }} />
 
         <label className="wl-slider">
           <span>
@@ -73,10 +88,19 @@ export default function SavingsRateLab() {
         <label className="wl-slider">
           <span>
             Take-home pay
-            <InfoTip text="Your spendable income after taxes. Slide it and watch the YEARS barely move. Income sets how big your numbers are, not how long financial independence takes." />{" "}
+            <InfoTip text="Your spendable income after taxes. With no starting net worth, slide it and the YEARS barely move: income sets how big your numbers are, not how long FI takes. Add a head start below and income starts to matter." />{" "}
             <strong>{currency(income)}/yr</strong>
           </span>
           <input type="range" min={20_000} max={400_000} step={5_000} value={income} onChange={(e) => setIncome(+e.target.value)} />
+        </label>
+
+        <label className="wl-slider">
+          <span>
+            Current net worth
+            <InfoTip text="Money you've already invested. Leave it at $0 for the classic result where income doesn't matter. Add a balance and it gives you a head start that pulls the finish line closer, and the bigger it is relative to your pay, the more it helps." />{" "}
+            <strong>{currency(netWorth)}</strong>
+          </span>
+          <input type="range" min={0} max={2_000_000} step={10_000} value={netWorth} onChange={(e) => setNetWorth(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
@@ -117,8 +141,23 @@ export default function SavingsRateLab() {
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          Starting from zero, saving a constant share of pay, earning {ret}% real. Years to FI depend on your savings
-          rate and return, <strong>not</strong> your income. Educational only, not advice.
+          {netWorth > 0 ? (
+            <>
+              Saving a constant share of pay, earning {ret}% real, on top of your{" "}
+              <strong>{currency(netWorth)}</strong> head start.{" "}
+              {view.yearsSaved >= 0.5 ? (
+                <>That pulls FI in by about <strong>{view.yearsSaved.toFixed(0)} year{view.yearsSaved >= 1.5 ? "s" : ""}</strong>, and because the head start is a fixed sum, your income now nudges the timeline too.</>
+              ) : (
+                <>Because the head start is a fixed sum, your income now nudges the timeline too.</>
+              )}{" "}
+              Educational only, not advice.
+            </>
+          ) : (
+            <>
+              Starting from zero, saving a constant share of pay, earning {ret}% real. Years to FI depend on your savings
+              rate and return, <strong>not</strong> your income. Educational only, not advice.
+            </>
+          )}
         </p>
       </div>
 
@@ -142,12 +181,24 @@ export default function SavingsRateLab() {
               <div><dt>Saved per year</dt><dd>{currency(view.annualSaved)}</dd></div>
             </dl>
             <p className="wl-saved">
-              Here's the part that surprises people: drag <strong>take-home pay</strong> from {currency(20_000)} to{" "}
-              {currency(400_000)} and the <strong>years barely change</strong>. A bigger paycheck makes every number
-              bigger (the savings, the spending, the target), but they scale together, so the <em>rate</em> is what
-              sets your timeline. It's the closest thing personal finance has to a law of conservation: what you don't
-              spend is what funds your freedom, and how fast you get there is set by the fraction, not the size, of the
-              flow. Educational only, not advice.
+              {netWorth > 0 ? (
+                <>
+                  With a head start, that clean result bends a little. Because your{" "}
+                  <strong>{currency(netWorth)}</strong> is a fixed sum, a smaller paycheck makes it a{" "}
+                  <em>bigger</em> fraction of what you need and pulls FI closer, while a bigger paycheck shrinks
+                  its relative weight. Set net worth back to $0 to see the pure version, where only your savings{" "}
+                  <em>rate</em> and return set the clock. Educational only, not advice.
+                </>
+              ) : (
+                <>
+                  Here's the part that surprises people: drag <strong>take-home pay</strong> from {currency(20_000)} to{" "}
+                  {currency(400_000)} and the <strong>years barely change</strong>. A bigger paycheck makes every number
+                  bigger (the savings, the spending, the target), but they scale together, so the <em>rate</em> is what
+                  sets your timeline. It's the closest thing personal finance has to a law of conservation: what you don't
+                  spend is what funds your freedom, and how fast you get there is set by the fraction, not the size, of the
+                  flow. Educational only, not advice.
+                </>
+              )}
             </p>
           </div>
 
