@@ -116,9 +116,6 @@ function requiredMonthly(
 // a high, equity-like discount rate would impose.
 const HC_DISCOUNT = 3; // % real
 
-// The lifecycle chart runs a full lifespan, drawing the nest egg down to age 100.
-const LIFE_END = 100;
-
 /**
  * Human capital at a given age: the present value of remaining labor income up
  * to retirement, in real (today's-dollar) terms. Real income grows at
@@ -361,11 +358,7 @@ function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: num
   const path = (key: "fin" | "hc" | "total") =>
     data.map((d, i) => `${i === 0 ? "M" : "L"}${x(d.age).toFixed(1)},${y(d[key]).toFixed(1)}`).join(" ");
 
-  // Nearest data point to a target age, for anchoring inline labels to a line.
-  const at = (age: number) => data.reduce((a, b) => (Math.abs(b.age - age) < Math.abs(a.age - age) ? b : a));
-
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const labelText = { fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 700 } as const;
   const showRetire = retireAge > ageMin && retireAge < ageMax;
 
   // Age ticks at tidy 5- or 10-year marks across the span.
@@ -374,13 +367,6 @@ function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: num
   const firstTick = Math.ceil(ageMin / tickStep) * tickStep;
   const ageTicks: number[] = [];
   for (let a = firstTick; a <= ageMax; a += tickStep) ageTicks.push(a);
-
-  // Inline-label anchors, positioned along each line like Bernstein's figure.
-  const accSpan = Math.max(retireAge - ageMin, 1);
-  const hcAnchor = at(ageMin + accSpan * 0.16);
-  const totAnchor = at(ageMin + accSpan * 0.34);
-  const invAnchor = at(ageMin + accSpan * 0.62);
-  const nestAnchor = at(retireAge + (ageMax - retireAge) * 0.35);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Human capital, investment capital, and total capital over your lifetime, in today's dollars">
@@ -401,13 +387,6 @@ function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: num
       <path d={path("hc")} fill="none" stroke="var(--pl-c3)" strokeWidth={2} />
       <path d={path("fin")} fill="none" stroke="var(--color-accent)" strokeWidth={2} />
       <path d={path("total")} fill="none" stroke="var(--color-text)" strokeWidth={2.5} />
-
-      <text x={x(hcAnchor.age)} y={y(hcAnchor.hc) - 8} textAnchor="middle" style={{ ...labelText, fill: "var(--pl-c3)" }}>Human capital</text>
-      <text x={x(totAnchor.age)} y={y(totAnchor.total) - 8} textAnchor="middle" style={{ ...labelText, fill: "var(--color-text)" }}>Total capital</text>
-      <text x={x(invAnchor.age)} y={y(invAnchor.fin) + 16} textAnchor="middle" style={{ ...labelText, fill: "var(--color-accent)" }}>Investment capital</text>
-      {showRetire && (
-        <text x={x(nestAnchor.age)} y={y(nestAnchor.fin) - 8} textAnchor="middle" style={{ ...labelText, fill: "var(--color-accent)", fontSize: 11 }}>Retirement nest egg</text>
-      )}
 
       {ageTicks.map((a) => (
         <text key={a} x={x(a)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{a}</text>
@@ -832,18 +811,18 @@ export default function CompoundGrowthExplorer() {
     const nestEgg = out[out.length - 1]?.fin ?? 0;
     const withdrawal = (withdrawalRate / 100) * nestEgg; // constant in real terms
     let bal = nestEgg;
-    // Draw the nest egg down across a full lifespan, out to age 100.
-    for (let age = retireAge + 1; age <= LIFE_END; age++) {
+    // Draw the nest egg down across the retirement the user planned for.
+    for (let s = 1; s <= retYears; s++) {
       bal = Math.max(0, bal * (1 + retRealReturn) - withdrawal);
-      out.push({ age, fin: bal, hc: 0, total: bal });
+      out.push({ age: retireAge + s, fin: bal, hc: 0, total: bal });
     }
     return out;
-  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retRealReturn]);
+  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retYears, retRealReturn]);
 
   const hcNow = lifecycle[0]?.hc ?? 0;
   const nestEggReal = lifecycle[years]?.fin ?? 0;
   const endBalance = lifecycle[lifecycle.length - 1]?.fin ?? 0;
-  const endAge = lifecycle[lifecycle.length - 1]?.age ?? LIFE_END;
+  const endAge = lifecycle[lifecycle.length - 1]?.age ?? retireAge + retYears;
   // Age at which the nest egg is exhausted, if it happens within the horizon.
   const depletedAge = (() => {
     for (let i = years + 1; i < lifecycle.length; i++) {
@@ -1283,7 +1262,7 @@ export default function CompoundGrowthExplorer() {
               <p className="cge-life-caption">
                 Everything here is in <strong>today's dollars</strong>, built from your inputs above: invest for {years} years,
                 retire at <strong>{retireAge}</strong>, then draw <strong>{withdrawalRate}%</strong> a year from a{" "}
-                {retStock}%-stock nest egg through age {LIFE_END}.
+                {retStock}%-stock nest egg for {retYears} years, through age {retireAge + retYears}.
               </p>
               <LifecycleChart data={lifecycle} retireAge={retireAge} />
               <div className="cge-life-legend">
