@@ -20,6 +20,14 @@ import "../../styles/simtool.css";
       your timeline to financial independence; then watch the same math turn against
       you as debt. Three views of one equation.
     </p>
+    <div class="intro-formula" role="img" aria-label="A equals P times, open paren, 1 plus r, close paren, to the power of n">
+      <span class="intro-formula-eq">A = P (1 + r)<sup>n</sup></span>
+      <span class="intro-formula-key">
+        <b>A</b> final amount &middot; <b>P</b> what you start with &middot;
+        <b>r</b> yearly return &middot; <b>n</b> years. Add regular contributions and
+        each one compounds the same way, from the day you invest it.
+      </span>
+    </div>
   </section>
 
   <section class="container wl-host">
@@ -60,7 +68,29 @@ import "../../styles/simtool.css";
 </BaseLayout>
 
 <style>
-  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure); }
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
   .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .intro-formula {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
+  }
+  .intro-formula-eq {
+    font-family: var(--font-mono);
+    font-size: var(--step-2);
+    font-weight: 600;
+    color: var(--color-accent);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .intro-formula-eq sup { font-size: 0.6em; }
+  .intro-formula-key {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    max-width: 40rem;
+  }
+  .intro-formula-key b { color: var(--color-text-soft); font-family: var(--font-mono); }
   .wl-explainer { margin-top: var(--space-lg); }
 </style>
