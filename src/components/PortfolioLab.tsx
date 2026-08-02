@@ -408,7 +408,7 @@ export default function PortfolioLab() {
   const [mode, setMode] = useState<"historical" | "custom">("historical");
   const [years, setYears] = useState(20);
   const [seed, setSeed] = useState(1);
-  const [showFan, setShowFan] = useState(false);
+  const [showFan, setShowFan] = useState(true);
   const [addValue, setAddValue] = useState("");
   const [riskFree, setRiskFree] = useState(0.03);
   const [pairCorr, setPairCorr] = useState(-0.2);
@@ -772,7 +772,7 @@ export default function PortfolioLab() {
           onReset={() => {
             setAssets(histAssets(DEFAULT_ASSET_IDS));
             setRawWeights(DEFAULT_ASSET_IDS.map(() => 50));
-            setMode("historical"); setYears(20); setSeed(1); setShowFan(false);
+            setMode("historical"); setYears(20); setSeed(1); setShowFan(true);
             setAddValue(""); setRiskFree(0.03); setPairCorr(-0.2);
             setScenarioNote(null); setSimMode("single");
           }}
@@ -795,8 +795,8 @@ export default function PortfolioLab() {
         </div>
         <p className="pl-mode-note">
           {locked
-            ? `Real historical estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
-            : "Edit each asset's expected return, volatility, and market correlation."}
+            ? `Method: the efficient frontier and capital market line are computed analytically (mean–variance) from these inputs — real historical return, volatility, and correlation estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
+            : "Edit each asset's expected return, volatility, and market correlation — the frontier is recomputed analytically (mean–variance) from your inputs."}
         </p>
 
         <div className="pl-assets">

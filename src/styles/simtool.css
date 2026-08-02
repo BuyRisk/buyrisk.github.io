@@ -1119,7 +1119,13 @@
     background: var(--color-accent);
   }
   .cge-swatch--contributed {
-    background: var(--color-muted);
+    /* Dashes, to match the dashed "money you put in" line on the chart. */
+    background: repeating-linear-gradient(
+      to right,
+      var(--color-muted) 0 5px,
+      transparent 5px 9px
+    );
+    border-radius: 0;
   }
   .cge-stats {
     display: grid;

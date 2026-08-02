@@ -145,7 +145,7 @@ const APPR_PRESETS = [
 
 export default function RentVsBuyLab() {
   const [inp, setInp] = useState<Inputs>(DEFAULTS);
-  const [showCosts, setShowCosts] = useState(false);
+  const [showCosts, setShowCosts] = useState(true);
   const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) => setInp((s) => ({ ...s, [k]: v }));
 
   const r = useMemo(() => simulate(inp), [inp]);
@@ -154,7 +154,7 @@ export default function RentVsBuyLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton onReset={() => { setInp(DEFAULTS); setShowCosts(false); }} />
+        <ResetButton onReset={() => { setInp(DEFAULTS); setShowCosts(true); }} />
 
         <p className="br-group">The home</p>
         <Slider label="Home price" tip="The purchase price of the home you're considering." value={inp.price} min={100_000} max={1_500_000} step={10_000} fmt={dollars} onChange={(v) => set("price", v)} />

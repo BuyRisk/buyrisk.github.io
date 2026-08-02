@@ -11,7 +11,14 @@ import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib
  * growth curve as an inline SVG. Pure client-side math — no dependencies.
  */
 
-type Phase = { id: number; startYear: number; monthly: number };
+type Phase = {
+  id: number;
+  startYear: number;
+  monthly: number;
+  /** Optional per-phase overrides (percent). Undefined = use the base value. */
+  rate?: number;
+  fee?: number;
+};
 
 type Projection = {
   points: { year: number; balance: number; contributed: number }[];
@@ -24,11 +31,11 @@ type Projection = {
 function project(
   principal: number,
   monthly: number,
-  annualRatePct: number,
+  baseRatePct: number,
+  baseFeePct: number,
   years: number,
   phases: Phase[] = []
 ): Projection {
-  const monthlyRate = annualRatePct / 100 / 12;
   const sorted = [...phases].sort((a, b) => a.startYear - b.startYear);
   // Contribution in effect during a given (fractional) year. Later phases with
   // startYear <= the current year override earlier ones; negative = withdrawal.
@@ -36,6 +43,17 @@ function project(
     let m = monthly;
     for (const p of sorted) if (year >= p.startYear) m = p.monthly;
     return m;
+  };
+  // Net monthly return in effect during a given year — each phase may override the
+  // expected return and/or the fee (e.g. a new asset allocation or a new advisor).
+  const monthlyRateFor = (year: number) => {
+    let gross = baseRatePct;
+    let fee = baseFeePct;
+    for (const p of sorted) if (year >= p.startYear) {
+      if (p.rate != null) gross = p.rate;
+      if (p.fee != null) fee = p.fee;
+    }
+    return (gross - fee) / 100 / 12;
   };
 
   const points: Projection["points"] = [
@@ -46,7 +64,7 @@ function project(
   let depletedYear: number | null = null;
 
   for (let month = 1; month <= years * 12; month++) {
-    const grown = balance * (1 + monthlyRate);
+    const grown = balance * (1 + monthlyRateFor((month - 1) / 12));
     const wanted = monthlyFor((month - 1) / 12);
     let applied = wanted;
     balance = grown + wanted;
@@ -386,7 +404,6 @@ function HistoricalGrowthPanel({
   isGoal: boolean;
 }) {
   const stats = useMemo(() => {
-    const annual = monthly * 12;
     const paths = bootstrapReturns({
       years,
       paths: HIST_PATHS,
@@ -395,6 +412,26 @@ function HistoricalGrowthPanel({
       real: true,
       seed: HIST_SEED,
     });
+
+    // Goal mode: solve the constant monthly saving needed to hit the target in
+    // EACH history, so we can report a realistic range instead of one number.
+    if (isGoal && target > 0) {
+      const req = new Array<number>(HIST_PATHS);
+      for (let p = 0; p < HIST_PATHS; p++) {
+        let gp = 1; // growth factor on the starting amount
+        let ga = 0; // ending value of $1 saved each year (annuity factor)
+        for (let y = 0; y < years; y++) {
+          const r = paths[p][y];
+          gp *= 1 + r;
+          ga = ga * (1 + r) + 1;
+        }
+        req[p] = ga > 0 ? Math.max(0, (target - gp * principal) / ga) / 12 : 0;
+      }
+      // Lower required saving = luckier markets, so p10 is the "kind" case.
+      return { goal: true as const, reqMedian: quantile(req, 0.5), reqLucky: quantile(req, 0.1), reqUnlucky: quantile(req, 0.9) };
+    }
+
+    const annual = monthly * 12;
     const balances: number[][] = new Array(HIST_PATHS);
     for (let p = 0; p < HIST_PATHS; p++) {
       const row = new Array<number>(years + 1);
@@ -408,14 +445,49 @@ function HistoricalGrowthPanel({
     }
     const finals = balances.map((b) => b[years]);
     return {
+      goal: false as const,
       bands: bandsOverTime(balances, [0.1, 0.25, 0.5, 0.75, 0.9]),
       median: quantile(finals, 0.5),
       mean: mean(finals),
       p10: quantile(finals, 0.1),
       p90: quantile(finals, 0.9),
-      hitTarget: target > 0 ? finals.filter((f) => f >= target).length / finals.length : null,
     };
-  }, [principal, monthly, years, stockPct, target]);
+  }, [principal, monthly, years, stockPct, target, isGoal]);
+
+  if (stats.goal) {
+    return (
+      <div className="cge-output">
+        <div className="sk-headline">
+          <span className="sk-headline-label">To reach {compactCurrency(target)} in {years} years, save about</span>
+          <span className="sk-headline-value">{currency(stats.reqMedian)}/mo</span>
+        </div>
+        <dl className="cge-stats" style={{ marginTop: "var(--space-md)" }}>
+          <div className="cge-stat">
+            <dt>Typical (median)</dt>
+            <dd className="cge-stat--big">{currency(stats.reqMedian)}/mo</dd>
+          </div>
+          <div className="cge-stat">
+            <dt>If markets are kind</dt>
+            <dd>{currency(stats.reqLucky)}/mo</dd>
+          </div>
+          <div className="cge-stat">
+            <dt>If markets are unkind</dt>
+            <dd>{currency(stats.reqUnlucky)}/mo</dd>
+          </div>
+        </dl>
+        <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
+          There's no single right answer — how much you need depends on returns nobody can predict. Across the
+          histories, the monthly saving to hit your goal ranges from about <strong>{currency(stats.reqLucky)}</strong>{" "}
+          in kind markets to <strong>{currency(stats.reqUnlucky)}</strong> in unkind ones. A sturdy plan aims near the
+          higher end and treats good luck as a bonus.
+        </p>
+        <p className="cge-note">
+          {HIST_PATHS.toLocaleString()} alternate timelines, block-bootstrapped from real US returns
+          ({HISTORY.span[0]}–{HISTORY.span[1]}). Data: Aswath Damodaran.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="cge-output">
@@ -441,13 +513,7 @@ function HistoricalGrowthPanel({
       <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
         The <strong>average is well above the typical</strong> result — a handful of
         lucky return-sequences drag the mean up while most outcomes land lower. Real
-        growth isn't a smooth line; it's a wide, right-skewed fan.{" "}
-        {isGoal && stats.hitTarget !== null && (
-          <>
-            About <strong>{Math.round(stats.hitTarget * 100)}%</strong> of histories
-            reached your target.
-          </>
-        )}
+        growth isn't a smooth line; it's a wide, right-skewed fan.
       </p>
       <p className="cge-note">
         {HIST_PATHS.toLocaleString()} alternate timelines, block-bootstrapped from
@@ -504,7 +570,7 @@ export default function CompoundGrowthExplorer() {
   const [withdrawalRate, setWithdrawalRate] = useState(4);
   const [phases, setPhases] = useState<Phase[]>([]);
   const phaseCounter = useRef(0);
-  const [showLifecycle, setShowLifecycle] = useState(false);
+  const [showLifecycle, setShowLifecycle] = useState(true);
   const [currentAge, setCurrentAge] = useState(30);
   const [income, setIncome] = useState(70_000);
   const [incomeGrowth, setIncomeGrowth] = useState(2);
@@ -530,14 +596,15 @@ export default function CompoundGrowthExplorer() {
   const effectiveMonthly = Math.max(0, rawRequired);
   const alreadyThere = mode === "goal" && rawRequired <= 0;
 
-  const phasesKey = activePhases.map((p) => `${p.startYear}:${p.monthly}`).join("|");
+  const phasesKey = activePhases.map((p) => `${p.startYear}:${p.monthly}:${p.rate ?? ""}:${p.fee ?? ""}`).join("|");
   const result = useMemo(
-    () => project(principal, effectiveMonthly, effectiveRate, years, activePhases),
-    [principal, effectiveMonthly, effectiveRate, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
+    () => project(principal, effectiveMonthly, rate, fee, years, activePhases),
+    [principal, effectiveMonthly, rate, fee, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
-  // Same projection without the fee, to show what the fee cost over the horizon.
+  // Same projection with every fee zeroed (base and per-phase), to show what fees
+  // cost over the horizon.
   const resultNoFee = useMemo(
-    () => project(principal, effectiveMonthly, rate, years, activePhases),
+    () => project(principal, effectiveMonthly, rate, 0, years, activePhases.map((p) => ({ ...p, fee: 0 }))),
     [principal, effectiveMonthly, rate, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
   // Inflation doesn't touch the dollar balance — it erodes what those dollars
@@ -548,12 +615,12 @@ export default function CompoundGrowthExplorer() {
 
   const addPhase = () => {
     setPhases((prev) => {
-      if (prev.length >= 2) return prev;
+      if (prev.length >= 4) return prev; // up to 3 life phases + 1 retirement drawdown
       phaseCounter.current += 1;
       const lastStart = prev.length ? prev[prev.length - 1].startYear : 0;
       const startYear = Math.min(years, Math.max(lastStart + 5, Math.round(years / 2)));
-      // First extra phase: a changed contribution. Second: a retirement drawdown.
-      const monthlyDefault = prev.length === 0 ? monthly * 2 : -2000;
+      // The first three additions are life phases; the fourth is retirement.
+      const monthlyDefault = prev.length >= 3 ? -2000 : monthly;
       return [...prev, { id: phaseCounter.current, startYear, monthly: monthlyDefault }];
     });
   };
@@ -586,7 +653,7 @@ export default function CompoundGrowthExplorer() {
           onReset={() => {
             setMode("project"); setPrincipal(10_000); setMonthly(300); setRate(10);
             setInflation(3); setFee(0.5); setYears(30); setTarget(1_000_000);
-            setWithdrawalRate(4); setPhases([]); setShowLifecycle(false); setCurrentAge(30);
+            setWithdrawalRate(4); setPhases([]); setShowLifecycle(true); setCurrentAge(30);
             setIncome(70_000); setIncomeGrowth(2); setRetireAge(65); setStockPct(90);
             setSimMode("simple"); setHistStock(90);
           }}
@@ -723,7 +790,7 @@ export default function CompoundGrowthExplorer() {
             {activePhases.map((ph) => (
               <div className="cge-phase" key={ph.id}>
                 <div className="cge-phase-head">
-                  <span>{ph.monthly < 0 ? "Retirement drawdown" : "Life change"}</span>
+                  <span>{ph.monthly < 0 ? "Retirement drawdown" : "Life phase"}</span>
                   <button
                     type="button"
                     className="cge-phase-remove"
@@ -757,11 +824,33 @@ export default function CompoundGrowthExplorer() {
                   integer
                   onCommit={(v) => updatePhase(ph.id, { monthly: v })}
                 />
+                <NumberField
+                  key={`rate-${ph.id}`}
+                  label="Return from here"
+                  info="Expected annual return from this phase onward — e.g. if you shift to a more conservative allocation in retirement. Leave it at the base return to keep it unchanged."
+                  value={ph.rate ?? rate}
+                  min={0}
+                  max={15}
+                  step={0.5}
+                  suffix="%"
+                  onCommit={(v) => updatePhase(ph.id, { rate: v })}
+                />
+                <NumberField
+                  key={`fee-${ph.id}`}
+                  label="Fee from here"
+                  info="Annual fee from this phase onward — e.g. if you switch to an advisor or a different fund. Leave it at the base fee to keep it unchanged."
+                  value={ph.fee ?? fee}
+                  min={0}
+                  max={3}
+                  step={0.05}
+                  suffix="%"
+                  onCommit={(v) => updatePhase(ph.id, { fee: v })}
+                />
               </div>
             ))}
-            {activePhases.length < 2 && (
+            {activePhases.length < 4 && (
               <button type="button" className="cge-phase-add" onClick={addPhase}>
-                + {activePhases.length === 0 ? "Add a life change" : "Add a retirement drawdown"}
+                + {activePhases.length < 3 ? "Add a different life phase" : "Add retirement"}
               </button>
             )}
           </>
