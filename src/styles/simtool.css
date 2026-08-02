@@ -332,6 +332,43 @@
   margin: 0;
 }
 
+/* Mr. Money Mustache reference table beside the savings-rate readout. */
+.mmm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+.mmm-table th {
+  text-align: left;
+  font-size: var(--step--2);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 600;
+  padding: 0.3rem 0.5rem;
+  border-bottom: var(--border);
+}
+.mmm-table td {
+  padding: 0.25rem 0.5rem;
+  color: var(--color-text-soft);
+}
+.mmm-table th:last-child,
+.mmm-table td:last-child {
+  text-align: right;
+}
+.mmm-table tbody tr:nth-child(odd) {
+  background: var(--color-surface-alt);
+}
+.mmm-table .mmm-row--active {
+  background: var(--color-accent-soft);
+  font-weight: 700;
+}
+.mmm-table .mmm-row--active td {
+  color: var(--color-accent);
+}
+
 /* Real-data anchor — CRSP-derived aggregates shown beside the live simulation. */
 .rd-callout {
   background: var(--color-surface);

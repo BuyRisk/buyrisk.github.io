@@ -133,8 +133,8 @@ export default function SavingsRateLab() {
           </p>
         </div>
 
-        <div className="wl-lower">
-          <div className="wl-readout">
+        <div className="wl-lower" style={{ display: "flex", gap: "var(--space-md)", alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div className="wl-readout" style={{ flex: "1 1 320px" }}>
             <dl className="ss-stats">
               <div><dt>Years to FI</dt><dd>{fmtYears(view.years)}</dd></div>
               <div><dt>FI age</dt><dd>{Number.isFinite(view.fiAge) && view.fiAge < age + MAX_YEARS ? view.fiAge.toFixed(0) : "—"}</dd></div>
@@ -150,9 +150,52 @@ export default function SavingsRateLab() {
               flow. Educational only, not advice.
             </p>
           </div>
+
+          <div className="wl-readout" style={{ flex: "0 1 260px" }}>
+            <h3 style={{ marginTop: 0 }}>The shockingly simple table</h3>
+            <MmmTable savings={savings} />
+            <p className="wl-fnote" style={{ marginTop: "var(--space-sm)" }}>
+              Recreated from Mr. Money Mustache,{" "}
+              <a href="https://www.mrmoneymustache.com/2012/01/13/the-shockingly-simple-math-behind-early-retirement/" target="_blank" rel="noopener noreferrer">
+                "The Shockingly Simple Math Behind Early Retirement"
+              </a>{" "}
+              (2012). It assumes a 5% real return and a 4% withdrawal rate — the same defaults as this tool, which is why
+              the rows line up. Set those sliders differently and your curve above will diverge from his table.
+            </p>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+/** Mr. Money Mustache's canonical savings-rate → years-to-retirement table. */
+const MMM_TABLE: { rate: number; years: string }[] = [
+  { rate: 5, years: "66" }, { rate: 10, years: "51" }, { rate: 15, years: "43" },
+  { rate: 20, years: "37" }, { rate: 25, years: "32" }, { rate: 30, years: "28" },
+  { rate: 35, years: "25" }, { rate: 40, years: "22" }, { rate: 45, years: "19" },
+  { rate: 50, years: "17" }, { rate: 55, years: "14.5" }, { rate: 60, years: "12.5" },
+  { rate: 65, years: "10.5" }, { rate: 70, years: "8.5" }, { rate: 75, years: "7" },
+  { rate: 80, years: "5.5" }, { rate: 85, years: "4" }, { rate: 90, years: "Under 3" },
+  { rate: 95, years: "Under 2" }, { rate: 100, years: "Zero" },
+];
+
+function MmmTable({ savings }: { savings: number }) {
+  const nearest = MMM_TABLE.reduce((a, b) => (Math.abs(b.rate - savings) < Math.abs(a.rate - savings) ? b : a));
+  return (
+    <table className="mmm-table">
+      <thead>
+        <tr><th>Savings rate</th><th>Years to retirement</th></tr>
+      </thead>
+      <tbody>
+        {MMM_TABLE.map((r) => (
+          <tr key={r.rate} className={r.rate === nearest.rate ? "mmm-row--active" : undefined}>
+            <td>{r.rate}%</td>
+            <td>{r.years}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
