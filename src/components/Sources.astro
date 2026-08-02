@@ -51,7 +51,7 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
 {
   hasContent && (
     <section class="container sources">
-      <h2>{heading}</h2>
+      <h2 id={grouped ? "research" : undefined}>{heading}</h2>
       {intro && <p class="src-intro">{intro}</p>}
 
       {studyList.length > 0 &&
@@ -93,7 +93,7 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
         ))}
 
       {dataList.length > 0 && (
-        <div class="src-block">
+        <div class="src-block" id={grouped ? "data" : undefined}>
           <h3>Data</h3>
           <ul class="src-list">
             {dataList.map((d) => (
