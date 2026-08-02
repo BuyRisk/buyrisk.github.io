@@ -4,12 +4,12 @@ import ResetButton from "./ResetButton";
 import { housing } from "../data/generated/housing";
 
 /**
- * "Rent or Buy?" — a fair, opportunity-cost-aware comparison. Instead of pitting
+ * "Rent or Buy?": a fair, opportunity-cost-aware comparison. Instead of pitting
  * a mortgage payment against rent, it runs two parallel lives: a buyer and a
  * renter who spend the SAME amount each month, with the cheaper one investing the
  * difference and the renter keeping the down payment invested. It then tracks each
  * one's net worth over time and finds the break-even year. Real mortgage and
- * Case-Shiller data set the defaults — and show that the appreciation assumption
+ * Case-Shiller data set the defaults, and show that the appreciation assumption
  * the answer hinges on most is also the most uncertain. Educational only.
  */
 
@@ -73,7 +73,7 @@ function simulate(inp: Inputs): SimResult {
   let totalOwnerCost = 0;
 
   // At t=0 both have committed `upfront` cash: the buyer's is home equity (just the
-  // down payment — closing costs are sunk), the renter's is invested. So the buyer
+  // down payment, since closing costs are sunk), the renter's is invested. So the buyer
   // starts behind by the closing costs, which is exactly right.
   const path: SimPoint[] = [{ year: 0, buyer: inp.price * (inp.downPct / 100), renter: upfront }];
 
@@ -158,7 +158,7 @@ export default function RentVsBuyLab() {
 
         <p className="br-group">The home</p>
         <Slider label="Home price" tip="The purchase price of the home you're considering." value={inp.price} min={100_000} max={1_500_000} step={10_000} fmt={dollars} onChange={(v) => set("price", v)} />
-        <Slider label="Down payment" tip="The cash you put down up front. The rest is borrowed. A renter would instead keep this money invested — its lost growth is the hidden cost of buying." value={inp.downPct} min={0} max={100} step={1} fmt={(v) => pct(v, 0)} onChange={(v) => set("downPct", v)} sub={dollars(inp.price * inp.downPct / 100)} />
+        <Slider label="Down payment" tip="The cash you put down up front. The rest is borrowed. A renter would instead keep this money invested. Its lost growth is the hidden cost of buying." value={inp.downPct} min={0} max={100} step={1} fmt={(v) => pct(v, 0)} onChange={(v) => set("downPct", v)} sub={dollars(inp.price * inp.downPct / 100)} />
         <Slider label="Mortgage rate" tip={`The 30-year fixed rate. Today's average is about ${pct(housing.mortgage.latest, 2)} (Freddie Mac via FRED).`} value={inp.rate} min={2} max={12} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("rate", v)} />
         <div className="wl-field">
           <span className="wl-field-label">Loan term</span>
@@ -170,11 +170,11 @@ export default function RentVsBuyLab() {
         </div>
 
         <p className="br-group">Renting instead</p>
-        <Slider label="Monthly rent" tip="What it would cost to rent a comparable place today. This is the number to vary — the tool shows whether buying beats renting at this rent." value={inp.rent} min={500} max={8_000} step={50} fmt={dollars} onChange={(v) => set("rent", v)} />
+        <Slider label="Monthly rent" tip="What it would cost to rent a comparable place today. This is the number to vary. The tool shows whether buying beats renting at this rent." value={inp.rent} min={500} max={8_000} step={50} fmt={dollars} onChange={(v) => set("rent", v)} />
 
         <p className="br-group">Your assumptions</p>
         <Slider label="Years you'll stay" tip="How long before you'd sell and move. Buying has big upfront and selling costs, so the longer you stay, the more likely buying wins." value={inp.years} min={1} max={30} step={1} fmt={(v) => `${v} yr`} onChange={(v) => set("years", v)} />
-        <Slider label="Home appreciation / yr" tip={`How fast the home's value grows. Nationally, prices rose ${pct(HIST_APPRECIATION)}/yr since ${housing.homePrices.startYear} — but this is the single most uncertain input.`} value={inp.appreciation} min={-2} max={10} step={0.1} fmt={pct} onChange={(v) => set("appreciation", v)} />
+        <Slider label="Home appreciation / yr" tip={`How fast the home's value grows. Nationally, prices rose ${pct(HIST_APPRECIATION)}/yr since ${housing.homePrices.startYear}, but this is the single most uncertain input.`} value={inp.appreciation} min={-2} max={10} step={0.1} fmt={pct} onChange={(v) => set("appreciation", v)} />
         <div className="wl-presets">
           <span className="wl-presets-label">Set appreciation to:</span>
           {APPR_PRESETS.map((p) => (
@@ -189,11 +189,11 @@ export default function RentVsBuyLab() {
         </button>
         {showCosts && (
           <div className="wl-disclose-body">
-            <Slider label="Property tax / yr" tip="Annual property tax as a percent of the home's value. Varies a lot by state — the U.S. average is around 1.1%." value={inp.propTax} min={0} max={3} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("propTax", v)} />
+            <Slider label="Property tax / yr" tip="Annual property tax as a percent of the home's value. Varies a lot by state. The U.S. average is around 1.1%." value={inp.propTax} min={0} max={3} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("propTax", v)} />
             <Slider label="Maintenance / yr" tip="Upkeep and repairs, as a percent of home value per year. A common rule of thumb is about 1%." value={inp.maintenance} min={0} max={3} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("maintenance", v)} />
-            <Slider label="Home insurance / yr" tip="Homeowner's insurance as a percent of home value per year — roughly 0.5%." value={inp.insurance} min={0} max={2} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("insurance", v)} />
-            <Slider label="Buying closing costs" tip="One-time costs to purchase (loan fees, title, inspection), as a percent of price — usually 2–4%." value={inp.buyClosing} min={0} max={6} step={0.5} fmt={(v) => pct(v, 1)} onChange={(v) => set("buyClosing", v)} />
-            <Slider label="Selling costs" tip="Agent commissions and fees when you sell, as a percent of the sale price — commonly around 6%." value={inp.sellClosing} min={0} max={10} step={0.5} fmt={(v) => pct(v, 1)} onChange={(v) => set("sellClosing", v)} />
+            <Slider label="Home insurance / yr" tip="Homeowner's insurance as a percent of home value per year, roughly 0.5%." value={inp.insurance} min={0} max={2} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("insurance", v)} />
+            <Slider label="Buying closing costs" tip="One-time costs to purchase (loan fees, title, inspection), as a percent of price, usually 2–4%." value={inp.buyClosing} min={0} max={6} step={0.5} fmt={(v) => pct(v, 1)} onChange={(v) => set("buyClosing", v)} />
+            <Slider label="Selling costs" tip="Agent commissions and fees when you sell, as a percent of the sale price, commonly around 6%." value={inp.sellClosing} min={0} max={10} step={0.5} fmt={(v) => pct(v, 1)} onChange={(v) => set("sellClosing", v)} />
             <Slider label="HOA / month" tip="Homeowners-association dues, if any (common for condos). Enter 0 if none." value={inp.hoa} min={0} max={1500} step={25} fmt={dollars} onChange={(v) => set("hoa", v)} />
           </div>
         )}
@@ -215,7 +215,7 @@ export default function RentVsBuyLab() {
           <p className="wl-fnote">
             Both people spend the same each month; whoever's housing is cheaper invests the
             difference, and the renter keeps the down payment invested. The lines cross at the{" "}
-            <strong>break-even</strong> — before it, renting is ahead; after it, buying is.
+            <strong>break-even</strong>: before it, renting is ahead; after it, buying is.
             {r.breakevenYear != null ? <> Here that's about <strong>{r.breakevenYear} years</strong>.</> : <> Here buying never catches up within your {inp.years}-year stay.</>}
           </p>
         </div>
@@ -231,13 +231,13 @@ export default function RentVsBuyLab() {
             <p className="wl-saved">
               The <strong>price-to-rent ratio</strong> ({r.priceToRent.toFixed(1)}) is a quick gut check:
               below about 15, buying tends to win; above ~21, renting usually does. But the answer
-              swings most on one guess — <strong>home appreciation</strong>. Nationally prices rose{" "}
+              swings most on one guess: <strong>home appreciation</strong>. Nationally prices rose{" "}
               {pct(HIST_APPRECIATION)}/yr since {housing.homePrices.startYear}, yet they fell{" "}
               <strong>{pct(Math.abs(housing.homePrices.worstDrawdown.pct * 100), 0)}</strong> from{" "}
               {housing.homePrices.worstDrawdown.peakYear}–{housing.homePrices.worstDrawdown.troughYear},
               and even over rolling 10-year spans they ranged from{" "}
               {pct(housing.homePrices.rolling10yr.min * 100)} to {pct(housing.homePrices.rolling10yr.max * 100)} a
-              year. A home is a leveraged, undiversified bet — try the "Flat" and downturn cases above
+              year. A home is a leveraged, undiversified bet. Try the "Flat" and downturn cases above
               and watch the break-even move. Educational only, not advice.
             </p>
           </div>

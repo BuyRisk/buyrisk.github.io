@@ -5,16 +5,16 @@ import { mulberry32 } from "./portfolio";
  * Block-bootstrap Monte Carlo over real US market history (1928–present, from
  * Damodaran). Instead of a single smooth "average return", each simulated path
  * is stitched together from randomly-placed blocks of *consecutive* historical
- * years — so it keeps the real lumpiness: crashes, multi-year droughts, and the
+ * years, so it keeps the real lumpiness: crashes, multi-year droughts, and the
  * sequence-of-returns pattern that a bell-curve model erases.
  *
  * Why blocks (not one year at a time): drawing years independently destroys the
- * runs — the back-to-back bad years that actually sink retirements. A circular
+ * runs, the back-to-back bad years that actually sink retirements. A circular
  * block bootstrap preserves that short-run structure while still reshuffling
  * history into many plausible alternate timelines.
  *
  * Everything is expressed in REAL (inflation-adjusted) terms by default, so a
- * path is in today's purchasing power — the honest way to read a decades-long
+ * path is in today's purchasing power, the honest way to read a decades-long
  * projection.
  */
 
@@ -81,7 +81,7 @@ export const mean = (v: number[]) => v.reduce((s, x) => s + x, 0) / v.length;
 
 /**
  * Percentile bands across time for a `paths × (years+1)` matrix of balances.
- * Returns, for each requested probability, the value at every time step — ready
+ * Returns, for each requested probability, the value at every time step, ready
  * to draw as a fan chart.
  */
 export function bandsOverTime(

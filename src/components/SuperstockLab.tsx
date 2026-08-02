@@ -8,14 +8,14 @@ import ResetButton from "./ResetButton";
  * Bessembinder's skewness, made interactive. Individual stock lifetime returns
  * are wildly right-skewed: most stocks lose to T-bills, and a tiny sliver of
  * "superstocks" create essentially all the market's wealth. So a small hand-
- * picked portfolio is statistically likely to UNDERPERFORM the market — you
+ * picked portfolio is statistically likely to UNDERPERFORM the market: you
  * probably miss the winners.
  *
  * The simulated universe is drawn straight from the real CRSP lifetime-return
  * histogram we ship (src/data/generated/crsp-superstock.ts, every US common
  * stock 1925–2026): each stock is an inverse-CDF sample of that empirical
- * distribution. So the shape the reader plays with — ~51% losing money, a median
- * near break-even, and a mean of ~650× dragged up by a handful of monsters — is
+ * distribution. So the shape the reader plays with (~51% losing money, a median
+ * near break-even, and a mean of ~650× dragged up by a handful of monsters) is
  * the *real* one, not the milder lognormal this tool used to fake. Educational
  * only; not financial advice.
  *
@@ -30,7 +30,7 @@ const K = 2000; // portfolios per Monte Carlo
 const PORT_SEED = 909090;
 
 // The extreme right tail (stocks above the histogram's 200× top bin) is modelled
-// as a bounded Pareto capped at TAIL_MAX — a representative best-case lifetime
+// as a bounded Pareto capped at TAIL_MAX, a representative best-case lifetime
 // multiple for a stock compounded across the ~century-long sample. The cap keeps
 // one lucky draw from making the displayed "market average" swing between
 // reseeds; TAIL_ALPHA (below) is then solved so the reconstructed mean equals the
@@ -71,7 +71,7 @@ function invCDF(u: number, alpha: number): number {
   while (b < CUM.length - 1 && u >= CUM[b + 1]) b++;
   const local = (u - CUM[b]) / (CUM[b + 1] - CUM[b]);
   if (b === 0) {
-    // underflow — log-uniform across the near-total-loss floor up to HIST.min
+    // underflow: log-uniform across the near-total-loss floor up to HIST.min
     const lo = Math.log10(UNDER_FLOOR);
     return Math.pow(10, lo + local * (LOG_LO - lo));
   }
@@ -101,7 +101,7 @@ const TAIL_ALPHA = (() => {
 })();
 
 // A single fixed reference multiple standing in for "what T-bills did over a
-// typical stock's life." Derived — not guessed — so the share of the universe
+// typical stock's life." Derived, not guessed, so the share of the universe
 // that clears it matches CRSP's pctBeatTbills. (The old hard-coded 1.8× predated
 // the real data; the calibrated value is ~1.3×.) Read off the (1 - pctBeatTbills)
 // quantile of the reconstructed distribution.
@@ -125,7 +125,7 @@ const pctText = (x: number) => `${Math.round(x * 100)}%`;
  * A fresh simulated universe: an inverse-CDF sample of the real CRSP lifetime-
  * return distribution. The dense body of the distribution is jittered within each
  * quantile stratum so every reseed differs, while the ~2.7% "superstock" tail is
- * drawn at fixed quantiles — that pins the mean and concentration to the real
+ * drawn at fixed quantiles. That pins the mean and concentration to the real
  * anchors instead of letting one lucky monster dominate the average. The array is
  * then shuffled so the winners land in random slots for the portfolio draws.
  */
@@ -205,9 +205,9 @@ export default function SuperstockLab() {
         </button>
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
           {M.toLocaleString()} simulated stocks, held equal-weight. <strong>Method:</strong> each is an
-          inverse-CDF draw from the <em>actual</em> empirical distribution of individual-stock lifetime returns — so
+          inverse-CDF draw from the <em>actual</em> empirical distribution of individual-stock lifetime returns, so
           the sample reproduces the real skew, not a bell curve. Data: CRSP, every US common stock, 1925–2026
-          (Bessembinder). Educational only — not financial advice.
+          (Bessembinder). Educational only, not financial advice.
         </p>
       </div>
 
@@ -232,7 +232,7 @@ export default function SuperstockLab() {
             <PortfolioHistogram dist={dist} market={uStats.mean} />
             <p className="wl-fnote">
               Each run picks {n} stock{n === 1 ? "" : "s"} at random. The bulk of the
-              distribution sits <em>left</em> of the market line — most attempts miss
+              distribution sits <em>left</em> of the market line. Most attempts miss
               the superstocks.
             </p>
           </div>
@@ -251,7 +251,7 @@ export default function SuperstockLab() {
               With just {n} stock{n === 1 ? "" : "s"}, your typical outcome{" "}
               <strong>{pStats.median < uStats.mean ? "trails" : "matches"}</strong> the
               market: you rarely hold the handful of superstocks that carry it. Own
-              more and more of the universe and your odds climb — the limit is owning
+              more and more of the universe and your odds climb. The limit is owning
               everything, which is the case for indexing.
             </p>
           </div>
@@ -266,7 +266,7 @@ export default function SuperstockLab() {
 /**
  * The real record: aggregate figures computed from every US common stock in CRSP
  * (1925–2026), shown beside the simulation the reader is playing with. These are
- * the actual numbers the model above is drawn from — see
+ * the actual numbers the model above is drawn from. See
  * src/data/generated/crsp-superstock.ts.
  */
 function RealRecord() {
@@ -278,7 +278,7 @@ function RealRecord() {
     <div className="rd-callout">
       <div className="rd-head">
         <span className="rd-badge">Real data</span>
-        <h3>The actual record — every US stock, {startYear}–{endYear}</h3>
+        <h3>The actual record: every US stock, {startYear}–{endYear}</h3>
       </div>
       <div className="rd-grid">
         <div>
@@ -302,7 +302,7 @@ function RealRecord() {
       </div>
       <p className="rd-credit">
         {d.nStocks.toLocaleString()} US common stocks, delisting-adjusted. The
-        simulation above samples this exact distribution — these are the figures it's
+        simulation above samples this exact distribution. These are the figures it's
         drawn from. {d.source}
       </p>
     </div>
@@ -319,8 +319,8 @@ function UniverseHistogram({
   const width = 720;
   const height = 220;
   const pad = { top: 14, right: 14, bottom: 34, left: 14 };
-  const LOG_MIN = Math.log10(0.02); // ≈ -1.7 — show the near-total-loss mass
-  const LOG_MAX = Math.log10(3000); // ≈ 3.48 — room for the ~650× mean + the tail
+  const LOG_MIN = Math.log10(0.02); // ≈ -1.7: show the near-total-loss mass
+  const LOG_MAX = Math.log10(3000); // ≈ 3.48: room for the ~650× mean + the tail
   const BINS = 44;
   const plotW = width - pad.left - pad.right;
 
@@ -371,7 +371,7 @@ function UniverseHistogram({
         <text key={m} x={x(m)} y={baseY + 16} textAnchor="middle" style={axisText}>{mult(m)}</text>
       ))}
       <text x={width / 2} y={height - 2} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Lifetime return (log scale) — red = lost money
+        Lifetime return (log scale): red = lost money
       </text>
     </svg>
   );
@@ -383,8 +383,8 @@ function PortfolioHistogram({ dist, market }: { dist: number[]; market: number }
   const pad = { top: 14, right: 14, bottom: 30, left: 14 };
   const plotW = width - pad.left - pad.right;
   // Log axis, matching the universe chart above. Span from below the T-bill line
-  // up past whichever is larger — the market mean or the portfolio's own 98th
-  // percentile — so the market line stays on-scale as n (and the spread) grows.
+  // up past whichever is larger, the market mean or the portfolio's own 98th
+  // percentile, so the market line stays on-scale as n (and the spread) grows.
   const LOG_MIN = Math.log10(0.3);
   const LOG_MAX = Math.log10(Math.max(market, percentile(dist, 0.98)) * 1.3);
   const BINS = 30;

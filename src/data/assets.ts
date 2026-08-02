@@ -4,7 +4,7 @@ import type { Asset } from "../lib/portfolio";
  * Preset asset classes with *illustrative* long-run annual figures.
  *
  * These are round-number, education-grade approximations of historical
- * nominal returns and volatilities — NOT values scraped from a specific
+ * nominal returns and volatilities, NOT values scraped from a specific
  * dataset. `marketCorr` is each class's correlation with a common "market"
  * factor; pairwise correlations follow as rho_i * rho_j. Note bonds/cash/gold
  * carry low or negative market correlation, which is what makes them diversify
@@ -68,7 +68,7 @@ export const PRESET_ASSETS: PresetAsset[] = [
     sigma: 0.07,
     marketCorr: -0.2,
     color: "var(--pl-c6)",
-    blurb: "Government bonds — often zig when stocks zag",
+    blurb: "Government bonds: often zig when stocks zag",
   },
   {
     id: "tbills",

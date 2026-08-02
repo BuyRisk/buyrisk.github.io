@@ -4,7 +4,7 @@ import { sharpe, type PortfolioPoint } from "../lib/portfolio";
 /**
  * Shared efficient-frontier scatter/curve. Self-contained (all styling via
  * inline CSS variables) so it can drop into any tool page without extra CSS.
- * The Capital Market Line is optional — pass `riskFree` + `tangency` to show it.
+ * The Capital Market Line is optional. Pass `riskFree` + `tangency` to show it.
  */
 
 type XY = { vol: number; mu: number };
@@ -166,7 +166,7 @@ export default function FrontierChart({
       <circle cx={x(current.vol)} cy={y(current.mu)} r={13} fill="none" stroke="var(--color-accent)" strokeWidth={1.5} opacity={0.5} />
 
       <text x={width / 2} y={height - 6} textAnchor="middle" style={titleText}>
-        Risk — volatility →
+        Risk: volatility →
       </text>
       <text x={-height / 2} y={15} textAnchor="middle" transform="rotate(-90)" style={titleText}>
         Expected return →

@@ -8,7 +8,7 @@ import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib
  *
  * A React island (hydrated client-side) that projects the future value of an
  * initial investment plus recurring monthly contributions, and draws the
- * growth curve as an inline SVG. Pure client-side math — no dependencies.
+ * growth curve as an inline SVG. Pure client-side math, no dependencies.
  */
 
 type Phase = {
@@ -44,7 +44,7 @@ function project(
     for (const p of sorted) if (year >= p.startYear) m = p.monthly;
     return m;
   };
-  // Net monthly return in effect during a given year — each phase may override the
+  // Net monthly return in effect during a given year; each phase may override the
   // expected return and/or the fee (e.g. a new asset allocation or a new advisor).
   const monthlyRateFor = (year: number) => {
     let gross = baseRatePct;
@@ -92,7 +92,7 @@ function project(
 /**
  * Inverse of `project`: the monthly contribution needed to reach `target` by
  * the end of the horizon, holding everything else constant. Closed-form annuity
- * solution — no iteration. Can be negative if the starting amount alone already
+ * solution, no iteration. Can be negative if the starting amount alone already
  * overshoots the target (the caller clamps at zero and explains).
  */
 function requiredMonthly(
@@ -134,8 +134,8 @@ function humanCapital(
 }
 
 // Format a dollar amount, staying readable across a huge dynamic range.
-// Realistic figures show in full ($447,156); once numbers get absurd — as they
-// do over centuries of compounding — we switch to compact (…B, …T) and then
+// Realistic figures show in full ($447,156); once numbers get absurd, as they
+// do over centuries of compounding, we switch to compact (…B, …T) and then
 // scientific notation so labels and stat cards never overflow.
 function formatCurrency(n: number, { alwaysCompact = false } = {}): string {
   const abs = Math.abs(n);
@@ -389,9 +389,9 @@ const RET_SEED = 24681;
 
 /**
  * Share of block-bootstrapped histories in which a portfolio outlasts a
- * retirement of `years`. Each year we take an inflation-adjusted withdrawal —
+ * retirement of `years`. Each year we take an inflation-adjusted withdrawal,
  * constant in REAL terms, so against real returns it's a fixed fraction `w` of
- * the *starting* balance (normalized to 1) — then let the survivors grow by
+ * the *starting* balance (normalized to 1), then let the survivors grow by
  * that year's real return. If the pot can't cover a year's spending, that
  * timeline has failed. This is Bengen's / the Trinity study's experiment, run
  * over bootstrapped history instead of a single rolling window.
@@ -457,7 +457,7 @@ function SurvivalCurve({
 /**
  * The honest counterpart to the smooth-curve projection: run the same starting
  * amount + monthly contributions through {@link HIST_PATHS} alternate histories
- * stitched from real US returns, and show the *range* of where you might land —
+ * stitched from real US returns, and show the *range* of where you might land,
  * plus the skew that a single "average return" hides. Everything is in today's
  * dollars (real returns), so no separate inflation step is needed.
  */
@@ -549,7 +549,7 @@ function HistoricalGrowthPanel({
           </div>
         </dl>
         <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
-          There's no single right answer — how much you need depends on returns nobody can predict. Across the
+          There's no single right answer; how much you need depends on returns nobody can predict. Across the
           histories, the monthly saving to hit your goal ranges from about <strong>{currency(stats.reqLucky)}</strong>{" "}
           in kind markets to <strong>{currency(stats.reqUnlucky)}</strong> in unkind ones. A sturdy plan aims near the
           higher end and treats good luck as a bonus.
@@ -584,7 +584,7 @@ function HistoricalGrowthPanel({
         </div>
       </dl>
       <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
-        The <strong>average is well above the typical</strong> result — a handful of
+        The <strong>average is well above the typical</strong> result: a handful of
         lucky return-sequences drag the mean up while most outcomes land lower. Real
         growth isn't a smooth line; it's a wide, right-skewed fan.
       </p>
@@ -657,7 +657,7 @@ export default function CompoundGrowthExplorer() {
   // Life phases only apply in project mode (goal mode solves for one monthly).
   const activePhases = mode === "project" ? phases : [];
 
-  // Fees come straight out of your return, in every period — a 0.5% fee on a
+  // Fees come straight out of your return, in every period: a 0.5% fee on a
   // 10% return leaves 9.5% to compound. Everything downstream uses this
   // after-fee rate, so the drag flows through all contribution phases too.
   const effectiveRate = rate - fee;
@@ -682,7 +682,7 @@ export default function CompoundGrowthExplorer() {
     () => project(principal, effectiveMonthly, rate, 0, years, activePhases.map((p) => ({ ...p, fee: 0 }))),
     [principal, effectiveMonthly, rate, years, phasesKey] // eslint-disable-line react-hooks/exhaustive-deps
   );
-  // Inflation doesn't touch the dollar balance — it erodes what those dollars
+  // Inflation doesn't touch the dollar balance; it erodes what those dollars
   // buy. Deflate by cumulative inflation to express the result in today's money.
   const inflationFactor = Math.pow(1 + inflation / 100, years);
   const realFinal = result.finalBalance / inflationFactor;
@@ -708,8 +708,8 @@ export default function CompoundGrowthExplorer() {
   const monthlyIncome = annualIncome / 12;
   const monthlyIncomeReal = monthlyIncome / inflationFactor;
 
-  // Retirement-survival simulation. It doesn't depend on the size of the pile —
-  // only on the withdrawal rate, horizon, and stock/bond mix — so one
+  // Retirement-survival simulation. It doesn't depend on the size of the pile,
+  // only on the withdrawal rate, horizon, and stock/bond mix, so one
   // bootstrapped return matrix is reused for both the live rate and the whole
   // success-vs-rate curve. Regenerating the matrix (the costly part) only when
   // the horizon or allocation changes keeps dragging the slider instant.
@@ -741,7 +741,7 @@ export default function CompoundGrowthExplorer() {
       : survival >= 0.85
         ? { tone: "good", label: "Likely to last", text: "survived most histories, though a bad first decade could still bite." }
         : survival >= 0.7
-          ? { tone: "warn", label: "Getting risky", text: "ran dry in a meaningful share of histories — this is sequence-of-returns risk, not just bad luck." }
+          ? { tone: "warn", label: "Getting risky", text: "ran dry in a meaningful share of histories. This is sequence-of-returns risk, not just bad luck." }
           : survival >= 0.5
             ? { tone: "bad", label: "A coin flip", text: "ran out of money in roughly half of all histories." }
             : { tone: "bad", label: "Very likely to fail", text: "ran out of money in most histories. A rate this high has rarely survived a full retirement." };
@@ -780,7 +780,7 @@ export default function CompoundGrowthExplorer() {
             className={simMode === "historical" ? "active" : ""}
             aria-pressed={simMode === "historical"}
             onClick={() => setSimMode("historical")}
-            title={`Block-bootstrap Monte Carlo — ${HIST_PATHS.toLocaleString()} alternate timelines stitched together from real ${HIST_BLOCK}-year blocks of US return history (${HISTORY.span[0]}–${HISTORY.span[1]}, inflation-adjusted). Data: Aswath Damodaran.`}
+            title={`Block-bootstrap Monte Carlo: ${HIST_PATHS.toLocaleString()} alternate timelines stitched together from real ${HIST_BLOCK}-year blocks of US return history (${HISTORY.span[0]}–${HISTORY.span[1]}, inflation-adjusted). Data: Aswath Damodaran.`}
           >
             Historical
           </button>
@@ -844,7 +844,7 @@ export default function CompoundGrowthExplorer() {
         )}
         <NumberField
           label="Annual return"
-          info="Your assumed average yearly return before inflation and fees (a nominal return), compounded monthly. US stocks have averaged roughly 10% nominal — about 7% after inflation — over the long run, but real returns are bumpy."
+          info="Your assumed average yearly return before inflation and fees (a nominal return), compounded monthly. US stocks have averaged roughly 10% nominal (about 7% after inflation) over the long run, but real returns are bumpy."
           value={rate}
           min={0}
           max={15}
@@ -854,7 +854,7 @@ export default function CompoundGrowthExplorer() {
         />
         <NumberField
           label="Inflation"
-          info="How fast prices rise each year. It doesn't shrink your dollar balance, but it erodes what those dollars buy — so we also show your result in today's purchasing power. The US long-run average is around 3%."
+          info="How fast prices rise each year. It doesn't shrink your dollar balance, but it erodes what those dollars buy, so we also show your result in today's purchasing power. The US long-run average is around 3%."
           value={inflation}
           min={0}
           max={10}
@@ -864,7 +864,7 @@ export default function CompoundGrowthExplorer() {
         />
         <NumberField
           label="Annual fees"
-          info="Yearly investing costs — fund expense ratios plus any advisory fee — as a share of your balance. Fees come straight out of your return every year, so even 1% compounds into a surprisingly large drag over decades. Broad index funds run under 0.1%."
+          info="Yearly investing costs (fund expense ratios plus any advisory fee) as a share of your balance. Fees come straight out of your return every year, so even 1% compounds into a surprisingly large drag over decades. Broad index funds run under 0.1%."
           value={fee}
           min={0}
           max={3}
@@ -874,7 +874,7 @@ export default function CompoundGrowthExplorer() {
         />
         <NumberField
           label="Time horizon"
-          info="How many years you stay invested. Time is compounding's biggest lever — the curve bends sharply upward in the later years."
+          info="How many years you stay invested. Time is compounding's biggest lever; the curve bends sharply upward in the later years."
           value={years}
           min={1}
           max={100}
@@ -887,7 +887,7 @@ export default function CompoundGrowthExplorer() {
         {simMode === "historical" && (
           <NumberField
             label="Stocks in portfolio"
-            info="Stock share of your portfolio; the rest is 10-year Treasuries. More stocks lifts the median outcome but widens the fan — the range of where you might land."
+            info="Stock share of your portfolio; the rest is 10-year Treasuries. More stocks lifts the median outcome but widens the fan, the range of where you might land."
             value={histStock}
             min={0}
             max={100}
@@ -916,7 +916,7 @@ export default function CompoundGrowthExplorer() {
                 <NumberField
                   key={`start-${ph.id}`}
                   label="Starting in year"
-                  info="The year this new contribution level kicks in — for example, when the kids leave home, or when you retire."
+                  info="The year this new contribution level kicks in (for example, when the kids leave home, or when you retire)."
                   value={ph.startYear}
                   min={1}
                   max={years}
@@ -940,7 +940,7 @@ export default function CompoundGrowthExplorer() {
                 <NumberField
                   key={`rate-${ph.id}`}
                   label="Return from here"
-                  info="Expected annual return from this phase onward — e.g. if you shift to a more conservative allocation in retirement. Leave it at the base return to keep it unchanged."
+                  info="Expected annual return from this phase onward (e.g. if you shift to a more conservative allocation in retirement). Leave it at the base return to keep it unchanged."
                   value={ph.rate ?? rate}
                   min={0}
                   max={15}
@@ -951,7 +951,7 @@ export default function CompoundGrowthExplorer() {
                 <NumberField
                   key={`fee-${ph.id}`}
                   label="Fee from here"
-                  info="Annual fee from this phase onward — e.g. if you switch to an advisor or a different fund. Leave it at the base fee to keep it unchanged."
+                  info="Annual fee from this phase onward (e.g. if you switch to an advisor or a different fund). Leave it at the base fee to keep it unchanged."
                   value={ph.fee ?? fee}
                   min={0}
                   max={3}
@@ -1045,15 +1045,15 @@ export default function CompoundGrowthExplorer() {
 
         {alreadyThere && (
           <p className="cge-goal-note">
-            Your starting amount alone already grows past this target — no monthly
-            saving required.
+            Your starting amount alone already grows past this target, so no
+            monthly saving is required.
           </p>
         )}
 
         {result.depletedYear !== null && (
           <p className="cge-goal-note">
-            Heads up: your withdrawals outpace the balance — the money runs out in
-            year {Math.round(result.depletedYear)}.
+            Heads up: your withdrawals outpace the balance, so the money runs out
+            in year {Math.round(result.depletedYear)}.
           </p>
         )}
 
@@ -1136,8 +1136,8 @@ export default function CompoundGrowthExplorer() {
             <div className="cge-survival-head">
               <span className="cge-survival-pct">{survivalPct}%</span>
               <span className="cge-survival-copy">
-                chance the money lasts {retYears} years
-                <strong className="cge-survival-verdict"> — {verdict.label}</strong>
+                chance the money lasts {retYears} years.{" "}
+                <strong className="cge-survival-verdict">{verdict.label}</strong>
               </span>
             </div>
             <SurvivalCurve curve={survivalCurve} rate={withdrawalRate} />
@@ -1149,7 +1149,7 @@ export default function CompoundGrowthExplorer() {
 
           <p className="cge-retire-note">
             The <strong>“4% rule”</strong> is a widely cited <em>approximation</em> of a safe
-            withdrawal rate — draw 4% of your balance the first year, then raise that dollar
+            withdrawal rate: draw 4% of your balance the first year, then raise that dollar
             amount with inflation. William Bengen, whose research first found that roughly 4–5%
             survived every historical 30-year retirement, never claimed a single number is
             guaranteed; the odds above show why higher rates get dangerous fast.{" "}
@@ -1162,16 +1162,16 @@ export default function CompoundGrowthExplorer() {
       {simMode === "simple" && mode === "project" && (
         <div className="cge-lifecycle-wrap">
           <button type="button" className="cge-life-toggle" onClick={() => setShowLifecycle((v) => !v)}>
-            {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view — human &amp; financial capital
+            {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view: human &amp; financial capital
           </button>
           {showLifecycle && (
             <div className="cge-lifecycle">
               <div className="cge-life-controls">
-                <NumberField label="Current age" info="Your age today — the left edge of the lifecycle chart." value={currentAge} min={18} max={80} step={1} integer onCommit={setCurrentAge} />
+                <NumberField label="Current age" info="Your age today, the left edge of the lifecycle chart." value={currentAge} min={18} max={80} step={1} integer onCommit={setCurrentAge} />
                 <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks." value={income} min={0} max={1_000_000} step={5_000} prefix="$" integer onCommit={setIncome} />
                 <NumberField label="Income growth" info="How fast your pay rises each year." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
-                <NumberField label="Retirement age" info="When labor income stops — where human capital reaches zero." value={retireAge} min={40} max={90} step={1} integer onCommit={setRetireAge} />
-                <NumberField label="Stocks in portfolio" info="The share of your invested savings held in stocks — used to gauge your true, total-wealth stock exposure." value={stockPct} min={0} max={100} step={5} suffix="%" integer onCommit={setStockPct} />
+                <NumberField label="Retirement age" info="When labor income stops, the point where human capital reaches zero." value={retireAge} min={40} max={90} step={1} integer onCommit={setRetireAge} />
+                <NumberField label="Stocks in portfolio" info="The share of your invested savings held in stocks, used to gauge your true, total-wealth stock exposure." value={stockPct} min={0} max={100} step={5} suffix="%" integer onCommit={setStockPct} />
               </div>
               <LifecycleChart data={lifecycle} retireAge={retireAge} />
               <div className="cge-life-legend">
@@ -1183,7 +1183,7 @@ export default function CompoundGrowthExplorer() {
                 about {compactCurrency(hcNow)} of future earnings versus {compactCurrency(principal)} saved.
                 So even a {stockPct}%-stock portfolio is only{" "}
                 <strong>{Math.round(trueEquity * 100)}%</strong> of your <em>total</em> capital
-                in stocks — the classic case that the young can afford more equity risk, and
+                in stocks, the classic case that the young can afford more equity risk, and
                 why target-date funds start aggressive and glide safer as human capital runs out.
               </p>
             </div>
@@ -1195,7 +1195,7 @@ export default function CompoundGrowthExplorer() {
         <p className="cge-note">
           A simplified model: it assumes a steady average return, compounded
           monthly, with fees and inflation applied evenly and taxes left out. Real
-          markets are far bumpier — switch to <strong>Historical</strong> to see
+          markets are far bumpier; switch to <strong>Historical</strong> to see
           the real, block-bootstrapped range instead of a single line.
         </p>
       )}

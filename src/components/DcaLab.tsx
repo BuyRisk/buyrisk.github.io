@@ -4,10 +4,10 @@ import ResetButton from "./ResetButton";
 import { C, N, dateAt, FIRST_YEAR, LAST_YEAR } from "../lib/monthlyReturns";
 
 /**
- * "All at Once, or Bit by Bit?" — lump-sum vs dollar-cost averaging, tested across
+ * "All at Once, or Bit by Bit?": lump-sum vs dollar-cost averaging, tested across
  * every start month in 150+ years of real US stock returns. Because markets rise
  * more often than they fall, investing a windfall all at once usually beats
- * spreading it out — but the tool also shows the skew: DCA gives up a little
+ * spreading it out, but the tool also shows the skew: DCA gives up a little
  * expected return to narrow the range of outcomes. Educational only, not advice.
  */
 
@@ -85,7 +85,7 @@ export default function DcaLab() {
         <label className="wl-slider">
           <span>
             Windfall to invest
-            <InfoTip text="A lump of cash to put to work — an inheritance, bonus, or sale. Do you invest it all today, or spread it out?" />{" "}
+            <InfoTip text="A lump of cash to put to work: an inheritance, bonus, or sale. Do you invest it all today, or spread it out?" />{" "}
             <strong>{dollars(amount)}</strong>
           </span>
           <input type="range" min={5_000} max={250_000} step={5_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
@@ -106,7 +106,7 @@ export default function DcaLab() {
         <label className="wl-slider">
           <span>
             Then hold for
-            <InfoTip text="How long you stay invested afterward. Once all the money is in, both strategies hold the same portfolio — so the horizon scales the dollars but not who wins." />{" "}
+            <InfoTip text="How long you stay invested afterward. Once all the money is in, both strategies hold the same portfolio, so the horizon scales the dollars but not who wins." />{" "}
             <strong>{horizon} yr</strong>
           </span>
           <input type="range" min={3} max={30} step={1} value={horizon} onChange={(e) => setHorizon(+e.target.value)} />
@@ -116,7 +116,7 @@ export default function DcaLab() {
           <span className="ss-headline-label">Investing it all at once won</span>
           <span className="ss-headline-value">{Math.round(view.winRate * 100)}% of the time</span>
           <span className="ss-headline-sub">
-            across every start month, {view.firstStart}–{view.lastStart} — beating {spread}-month
+            across every start month, {view.firstStart}–{view.lastStart}, beating {spread}-month
             averaging by a median of {pct(view.medianOutperf * 100)}
           </span>
         </div>
@@ -135,7 +135,7 @@ export default function DcaLab() {
             Each bar counts start months. To the{" "}
             <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>right of zero</span>, lump
             sum ended ahead; to the <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>left</span>,
-            averaging won — the times you happened to drip money in as prices fell. Most of the mass
+            averaging won: the times you happened to drip money in as prices fell. Most of the mass
             sits on the right, because markets rise more often than they fall.
           </p>
         </div>
@@ -152,7 +152,7 @@ export default function DcaLab() {
               Investing all at once won <strong>{Math.round(view.winRate * 100)}%</strong> of the time
               and ended higher on average ({dollars(amount * view.meanLs)} vs {dollars(amount * view.meanDca)}),
               because money in the market sooner spends more time compounding. Dollar-cost averaging isn't
-              about beating that — it's about a <strong>narrower range of outcomes</strong> and less regret
+              about beating that. It's about a <strong>narrower range of outcomes</strong> and less regret
               if you happen to invest right before a fall. If the cash is already yours and you can stomach
               the swings, the math favors lump sum; if buying in all at once would keep you up at night,
               averaging is a reasonable price for peace of mind. Educational only, not advice.

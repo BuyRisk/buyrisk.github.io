@@ -97,7 +97,7 @@ export function portfolioVol(weights: number[], cov: number[][]): number {
   return Math.sqrt(portfolioVariance(weights, cov));
 }
 
-/** Weighted average of individual vols — the "no diversification" benchmark. */
+/** Weighted average of individual vols: the "no diversification" benchmark. */
 export function weightedAverageVol(weights: number[], sigmas: number[]): number {
   return weights.reduce((s, w, i) => s + w * sigmas[i], 0);
 }
@@ -114,7 +114,7 @@ export function normalizeWeights(raw: number[]): number[] {
 }
 
 // ---------------------------------------------------------------------------
-// Randomness — a small seeded PRNG so runs are reproducible.
+// Randomness: a small seeded PRNG so runs are reproducible.
 // ---------------------------------------------------------------------------
 
 export function mulberry32(seed: number): () => number {
@@ -152,7 +152,7 @@ export function makeNormal(rng: () => number): () => number {
 }
 
 // ---------------------------------------------------------------------------
-// Efficient frontier — a cloud of random long-only portfolios.
+// Efficient frontier: a cloud of random long-only portfolios.
 // ---------------------------------------------------------------------------
 
 export type PortfolioPoint = { weights: number[]; mu: number; vol: number };
@@ -280,7 +280,7 @@ export function rebalancedPortfolioPath(
   return out;
 }
 
-/** A few full portfolio paths — the visible "fan" of alternate outcomes. */
+/** A few full portfolio paths: the visible "fan" of alternate outcomes. */
 export function simulatePortfolioFan(
   mus: number[],
   sigmas: number[],
@@ -301,7 +301,7 @@ export function simulatePortfolioFan(
 }
 
 /**
- * Correlated mean-reverting (Ornstein–Uhlenbeck) series, centered at zero — the
+ * Correlated mean-reverting (Ornstein–Uhlenbeck) series, centered at zero: the
  * noisy analog of a wave. Each series has stationary std ≈ sigma_i and the
  * cross-correlations of the correlation matrix behind L. Used to show that with
  * real randomness, diversification never cancels variance perfectly.
@@ -346,7 +346,7 @@ export type OutcomeStats = {
 };
 
 /**
- * Many portfolio runs, summarized to terminal values and max drawdowns —
+ * Many portfolio runs, summarized to terminal values and max drawdowns,
  * without keeping every full path in memory.
  */
 export function simulateOutcomeStats(

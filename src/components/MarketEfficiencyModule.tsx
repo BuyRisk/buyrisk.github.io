@@ -5,11 +5,11 @@ import DcaLab from "./DcaLab";
 import SpivaLab from "./SpivaLab";
 
 /**
- * "Can You Outsmart the Market?" module: four angles on the same answer — no.
- *  • Predict it — the efficient-markets coin-flip game.
- *  • Time it — the cost of missing the best days / the worst market timer.
- *  • When to deploy — lump sum vs. dollar-cost averaging a windfall.
- *  • Beat it — the SPIVA evidence on active managers.
+ * "Can You Outsmart the Market?" module: four angles on the same answer: no.
+ *  • Predict it: the efficient-markets coin-flip game.
+ *  • Time it: the cost of missing the best days / the worst market timer.
+ *  • When to deploy: lump sum vs. dollar-cost averaging a windfall.
+ *  • Beat it: the SPIVA evidence on active managers.
  */
 export default function MarketEfficiencyModule() {
   return (

@@ -6,9 +6,9 @@ import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib
 /**
  * Retirement burn-rate calculator, two ways:
  *
- *  • "Simple plan" — the flip side of Bengen's rule: annual spend / withdrawal
+ *  • "Simple plan", the flip side of Bengen's rule: annual spend / withdrawal
  *    rate = the nest egg you'd need (25× spending at 4%). Clean, deterministic.
- *  • "Historical stress test" — the honest version. Runs your plan through a
+ *  • "Historical stress test": the honest version. Runs your plan through a
  *    block-bootstrap Monte Carlo over real US market history (1928–), so you see
  *    the SPREAD of outcomes and the sequence-of-returns risk.
  *
@@ -159,7 +159,7 @@ export default function BurnRateLab() {
             className={mode === "stress" ? "active" : ""}
             aria-pressed={mode === "stress"}
             onClick={() => setMode("stress")}
-            title={`Block-bootstrap Monte Carlo — ${PATHS.toLocaleString()} alternate retirements stitched from real ${BLOCK}-year blocks of US return history (${HISTORY.span[0]}–${HISTORY.span[1]}, inflation-adjusted). Data: Aswath Damodaran.`}
+            title={`Block-bootstrap Monte Carlo: ${PATHS.toLocaleString()} alternate retirements stitched from real ${BLOCK}-year blocks of US return history (${HISTORY.span[0]}–${HISTORY.span[1]}, inflation-adjusted). Data: Aswath Damodaran.`}
           >
             Historical stress test
           </button>
@@ -180,7 +180,7 @@ export default function BurnRateLab() {
         <label className="wl-slider">
           <span>
             Pension, Social Security, annuities
-            <InfoTip text="Income that arrives every month no matter what markets do — a pension, Social Security, or an annuity. It covers part of your spending, so your portfolio only has to fund the rest. Assumed here to rise with inflation; Social Security does, but many private pensions are fixed and lose value over time." />{" "}
+            <InfoTip text="Income that arrives every month no matter what markets do: a pension, Social Security, or an annuity. It covers part of your spending, so your portfolio only has to fund the rest. Assumed here to rise with inflation; Social Security does, but many private pensions are fixed and lose value over time." />{" "}
             <strong>{currency(guaranteed)}/mo</strong>
           </span>
           <input type="range" min={0} max={12000} step={100} value={guaranteed} onChange={(e) => setGuaranteed(Number(e.target.value))} />
@@ -190,7 +190,7 @@ export default function BurnRateLab() {
         <label className="wl-slider">
           <span>
             Your nest egg
-            <InfoTip text="The invested savings you'd retire with — the liquid portfolio, separate from guaranteed income." /> <strong>{currency(portfolio)}</strong>
+            <InfoTip text="The invested savings you'd retire with: the liquid portfolio, separate from guaranteed income." /> <strong>{currency(portfolio)}</strong>
           </span>
           <input type="range" min={0} max={5_000_000} step={25_000} value={portfolio} onChange={(e) => setPortfolio(Number(e.target.value))} />
         </label>
@@ -322,21 +322,21 @@ function PlanView(props: {
           <span className="br-hero-value">{currency(nestEgg)}</span>
           <span className="br-hero-sub">
             {fullyCoveredByIncome ? (
-              <>your guaranteed income alone covers your spending — no nest egg required for these costs</>
+              <>your guaranteed income alone covers your spending; no nest egg required for these costs</>
             ) : hasIncome ? (
               <>
                 only {(100 / withdrawalRate).toFixed(0)}× the {currency(portfolioDrawMonthly * 12)}/yr your portfolio must
                 fund, after {currency(guaranteed)}/mo of guaranteed income
               </>
             ) : (
-              <>that's {(100 / withdrawalRate).toFixed(0)}× your annual spending — the flip side of the 4% rule</>
+              <>that's {(100 / withdrawalRate).toFixed(0)}× your annual spending, the flip side of the 4% rule</>
             )}
           </span>
         </div>
         {hasIncome && !fullyCoveredByIncome && (
           <p className="br-verdict-line" style={{ marginTop: "var(--space-sm)" }}>
             Guaranteed income of {currency(guaranteed)}/mo cuts the nest egg you need by{" "}
-            <strong>{currency(nestEggSaved)}</strong> — down from {currency(nestEggNoIncome)} if you had to fund every dollar
+            <strong>{currency(nestEggSaved)}</strong>, down from {currency(nestEggNoIncome)} if you had to fund every dollar
             from savings.
           </p>
         )}
@@ -348,8 +348,8 @@ function PlanView(props: {
           <strong>{currency(sustainableMonthly)}/mo</strong>
           {hasIncome && (
             <>, plus {currency(guaranteed)}/mo guaranteed = <strong>{currency(totalMonthlyIncome)}/mo</strong></>
-          )}{" "}
-          — about <strong>{pctText(coverage)}</strong> of your {currency(monthlyTotal)}/mo burn rate.
+          )},{" "}
+          about <strong>{pctText(coverage)}</strong> of your {currency(monthlyTotal)}/mo burn rate.
         </p>
         {covered ? (
           <p className="br-verdict-tag">✓ Covered, with about {currency(surplusMonthly)}/mo to spare.</p>
@@ -395,7 +395,7 @@ function StressView({
         <FanChart bands={sim.bands} horizon={horizon} start={portfolio} />
         {noDraw ? (
           <p className="wl-fnote">
-            Your guaranteed income covers <strong>all</strong> of your spending, so the portfolio is never drawn down — it
+            Your guaranteed income covers <strong>all</strong> of your spending, so the portfolio is never drawn down. It
             only compounds. Every history "succeeds"; the question stops being <em>will it last</em> and becomes <em>how
             much does it grow</em>.
           </p>
@@ -403,7 +403,7 @@ function StressView({
           <p className="wl-fnote">
             Each band is a range of alternate histories. The wedge widens because
             luck compounds: two retirees with the identical plan can land worlds
-            apart — the top ones caught good years early, the bottom ones hit crashes
+            apart. The top ones caught good years early, the bottom ones hit crashes
             first (<strong>sequence-of-returns risk</strong>).
           </p>
         )}
@@ -413,7 +413,7 @@ function StressView({
         {guaranteed > 0 && !noDraw && (
           <p className="br-verdict-line" style={{ marginBottom: "var(--space-sm)" }}>
             After {currency(guaranteed)}/mo of guaranteed income, the portfolio only has to supply{" "}
-            <strong>{currency(portfolioDrawAnnual)}/yr</strong> — a much gentler draw, which is exactly why the odds above
+            <strong>{currency(portfolioDrawAnnual)}/yr</strong>, a much gentler draw, which is exactly why the odds above
             hold up even through bad markets.
           </p>
         )}
@@ -436,7 +436,7 @@ function StressView({
           </div>
         </dl>
         <p className="wl-saved">
-          Notice the <strong>average is pulled far above the typical</strong> outcome —
+          Notice the <strong>average is pulled far above the typical</strong> outcome:
           a few lucky timelines drag the mean up while most people land lower. That
           skew is why a single "average return" projection quietly oversells the
           plan.{" "}

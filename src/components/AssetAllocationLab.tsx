@@ -4,14 +4,14 @@ import ResetButton from "./ResetButton";
 import { historicalReturns } from "../data/generated/historical-returns";
 
 /**
- * "How Much in Stocks?" — the asset-allocation dial. Slide the stock/bond mix and
+ * "How Much in Stocks?" The asset-allocation dial. Slide the stock/bond mix and
  * see the historical trade-off: more stocks lifts the long-run compound return but
  * deepens the worst drawdown you'd have had to sit through. Framed by Swedroe's
- * three dimensions of risk — ability, willingness, and need to take it.
+ * three dimensions of risk: ability, willingness, and need to take it.
  *
  * It also surfaces VOLATILITY DRAG: the compound (geometric) return is always
  * below the average (arithmetic) return by roughly ½·variance, so a smoother ride
- * compounds to more even at the same average — the quantitative case for not
+ * compounds to more even at the same average: the quantitative case for not
  * bearing risk you aren't paid for.
  *
  * Real (inflation-adjusted) annual US returns, 1928–. Educational only, not advice.
@@ -75,12 +75,12 @@ export default function AssetAllocationLab() {
           <span className="ss-headline-label">A {stockPct}/{100 - stockPct} stock/bond mix historically returned</span>
           <span className="ss-headline-value">{pct(c.geo)}/yr</span>
           <span className="ss-headline-sub">
-            real (after inflation) — but you'd have had to sit through a worst drop of <strong>{pct(c.mdd)}</strong>
+            real (after inflation), but you'd have had to sit through a worst drop of <strong>{pct(c.mdd)}</strong>
           </span>
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          Every figure is computed <strong>directly</strong> from the actual year-by-year record — no simulation or
+          Every figure is computed <strong>directly</strong> from the actual year-by-year record: no simulation or
           bootstrap. Data: real (inflation-adjusted) US annual returns, {SPAN[0]}–{SPAN[1]} (stocks = S&P 500, bonds =
           10-year Treasuries; Aswath Damodaran). History is one sample, not a promise. Educational only, not advice.
         </p>
@@ -93,7 +93,7 @@ export default function AssetAllocationLab() {
           <p className="wl-fnote">
             The <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>upper line</span> is the long-run
             compound return; the <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>lower line</span> is the worst
-            peak-to-trough drop you'd have endured. Adding stocks lifts both — the reward <em>and</em> the white-knuckle
+            peak-to-trough drop you'd have endured. Adding stocks lifts both: the reward <em>and</em> the white-knuckle
             risk. The right mix is the one whose lower line you could actually live through without selling.
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function AssetAllocationLab() {
             </dl>
             <p className="wl-saved">
               Notice the <strong>volatility drag</strong>: this mix <em>averaged</em> {pct(c.arith)} a year, but only
-              <strong> compounded</strong> at {pct(c.geo)} — a gap of {pct(c.drag)} lost purely to the bumps, because a
+              <strong> compounded</strong> at {pct(c.geo)}: a gap of {pct(c.drag)} lost purely to the bumps, because a
               −50% year needs a +100% year to recover. Cutting volatility raises what you actually keep, even at the same
               average. That's the deep reason not to bear risk you aren't paid for. How much stock is right for you comes
               down to three questions: your <strong>ability</strong> to take risk (how long is your horizon?), your{" "}

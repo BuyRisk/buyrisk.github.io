@@ -1,5 +1,5 @@
 /**
- * Citation registry — the single source of truth for the studies and datasets
+ * Citation registry: the single source of truth for the studies and datasets
  * credited across the site. Each tool page renders its relevant subset via the
  * <Sources> component (keyed by TOOL_SOURCES), and the About page renders the
  * full catalogue. Add a source once here and it stays consistent everywhere.

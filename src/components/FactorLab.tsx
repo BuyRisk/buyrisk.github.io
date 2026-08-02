@@ -117,7 +117,7 @@ export default function FactorLab() {
             </dl>
             <p className="wl-saved">
               To CAPM, that <strong>{signed1(factorAlpha)}</strong> looks like
-              unexplained <em>alpha</em> — mysterious out-performance. Fama–French
+              unexplained <em>alpha</em>: mysterious out-performance. Fama–French
               says it isn't skill at all: it's <strong>factor exposure</strong> you
               could have targeted on purpose. Switch the model above from CAPM to
               5-factor and watch the mystery turn into math.

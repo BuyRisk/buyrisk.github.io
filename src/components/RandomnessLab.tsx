@@ -20,7 +20,7 @@ import {
 /**
  * The noisy sequel to the waveforms tool. Each asset is a correlated
  * mean-reverting random series (amplitude ≈ volatility) rather than a clean
- * sine wave. The weighted portfolio still swings less than its parts — but with
+ * sine wave. The weighted portfolio still swings less than its parts, but with
  * real randomness the cancellation is never perfect, it varies run to run, and
  * sometimes every asset falls at once.
  */
@@ -366,7 +366,7 @@ export default function RandomnessLab() {
               <label className="wl-slider">
                 <span>
                   Swing
-                  <InfoTip text="The asset's volatility — the typical size of its random ups and downs each period." />{" "}
+                  <InfoTip text="The asset's volatility: the typical size of its random ups and downs each period." />{" "}
                   <strong>{pct(a.sigma, 0)}</strong>
                 </span>
                 <input
@@ -404,7 +404,7 @@ export default function RandomnessLab() {
           <label className="wl-corr">
             <span className="wl-corr-label">
               Correlation ({assets[0].name} ↔ {assets[1].name})
-              <InfoTip text="How the two assets move together (−1 to +1). Even near −1, real randomness leaves a residual wobble — perfect cancellation never happens." />{" "}
+              <InfoTip text="How the two assets move together (−1 to +1). Even near −1, real randomness leaves a residual wobble. Perfect cancellation never happens." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input
@@ -416,7 +416,7 @@ export default function RandomnessLab() {
               onChange={(e) => setPairCorr(Number(e.target.value))}
             />
             <span className="wl-corr-hint">
-              Even near −1, real randomness leaves a residual wobble — it never
+              Even near −1, real randomness leaves a residual wobble. It never
               fully cancels.
             </span>
           </label>
@@ -459,7 +459,7 @@ export default function RandomnessLab() {
               <span className="wl-bar-value">{pct(avgVol)}</span>
             </div>
             <div className="wl-bar">
-              <span className="wl-bar-label">Portfolio swing — in theory</span>
+              <span className="wl-bar-label">Portfolio swing (in theory)</span>
               <div className="wl-bar-track">
                 <div
                   className="wl-bar-fill wl-bar-fill--port"
@@ -480,7 +480,7 @@ export default function RandomnessLab() {
             </div>
             <p className="wl-saved">
               Diversification should cancel <strong>{pct(cancelled, 0)}</strong> of the
-              swing — but this run came out to {pct(realizedVol)}, not the theoretical{" "}
+              swing, but this run came out to {pct(realizedVol)}, not the theoretical{" "}
               {pct(portVol)}. Randomness means it's never exact, and every asset fell
               together <strong>{pct(allDownFrac, 0)}</strong> of the time.
             </p>
@@ -510,7 +510,7 @@ export default function RandomnessLab() {
         </div>
 
         <p className="wl-note">
-          A simple Monte Carlo of correlated, mean-reverting returns — no fat tails
+          A simple Monte Carlo of correlated, mean-reverting returns: no fat tails
           or real history yet. Hit “New draw” a few times: the cancellation, and
           how often assets sink together, shifts every run.
         </p>

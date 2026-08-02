@@ -6,17 +6,17 @@ import { shillerMonthly } from "../data/generated/shiller-monthly";
 import { historicalReturns } from "../data/generated/historical-returns";
 
 /**
- * "Time in the Market" — two lessons about timing, one tool.
+ * "Time in the Market": two lessons about timing, one tool.
  *
  * Mode 1 ("Missing the best days"): take a recent window of daily US market total
- * returns and watch a fully-invested $10,000 collapse as its best days are removed
- * — because the best days sit right next to the worst.
+ * returns and watch a fully-invested $10,000 collapse as its best days are removed,
+ * because the best days sit right next to the worst.
  *
  * Mode 2 ("Timing your buys", the Ben Carlson "worst market timer" story): four
  * savers contribute the same amount every month over decades. One deploys cash
  * only at the peak before every crash (worst), one only at the bottoms (best), one
  * invests immediately (steady), one never invests (cash). The worst timer still
- * buries the cash saver — because they stayed invested and rode every recovery.
+ * buries the cash saver, because they stayed invested and rode every recovery.
  * Monthly returns are REAL (inflation-adjusted). Educational only, not advice.
  */
 
@@ -150,7 +150,7 @@ export default function MarketTimingLab() {
               className={mode === "best-days" ? "active" : ""}
               aria-pressed={mode === "best-days"}
               onClick={() => setMode("best-days")}
-              title={`Direct calculation on actual daily returns — no simulation. We compound the real day-by-day US market return and remove the single best days. Data: Fama–French daily market factor (Mkt−RF + RF), ${START_YEAR}–${END_YEAR}.`}
+              title={`Direct calculation on actual daily returns: no simulation. We compound the real day-by-day US market return and remove the single best days. Data: Fama–French daily market factor (Mkt−RF + RF), ${START_YEAR}–${END_YEAR}.`}
             >
               Missing the best days
             </button>
@@ -159,7 +159,7 @@ export default function MarketTimingLab() {
               className={mode === "timing" ? "active" : ""}
               aria-pressed={mode === "timing"}
               onClick={() => setMode("timing")}
-              title="Direct historical simulation — no bootstrap. Each saver's monthly contributions are deployed on the actual month-by-month path. Data: Shiller monthly real S&P total return (1871–); cash earns the real 3-month T-bill (Damodaran)."
+              title="Direct historical simulation: no bootstrap. Each saver's monthly contributions are deployed on the actual month-by-month path. Data: Shiller monthly real S&P total return (1871–); cash earns the real 3-month T-bill (Damodaran)."
             >
               Timing your buys
             </button>
@@ -180,7 +180,7 @@ export default function MarketTimingLab() {
             <label className="wl-slider">
               <span>
                 Best days you missed
-                <InfoTip text="Imagine you were out of the market — in cash — for exactly these best days, as a mistimed sell-and-wait would leave you. Their return becomes zero." />{" "}
+                <InfoTip text="Imagine you were out of the market (in cash) for exactly these best days, as a mistimed sell-and-wait would leave you. Their return becomes zero." />{" "}
                 <strong>{missed}</strong>
               </span>
               <input type="range" min={0} max={MAX_MISS} step={1} value={missed} onChange={(e) => setMissed(+e.target.value)} />
@@ -192,7 +192,7 @@ export default function MarketTimingLab() {
               </span>
               <span className="ss-headline-value">{dollars(START_AMOUNT * bestDays.missMult)}</span>
               <span className="ss-headline-sub">
-                vs <strong>{dollars(START_AMOUNT * bestDays.fullMult)}</strong> staying fully invested —{" "}
+                vs <strong>{dollars(START_AMOUNT * bestDays.fullMult)}</strong> staying fully invested:{" "}
                 {pct(bestDays.missAnn * 100)}/yr vs {pct(bestDays.fullAnn * 100)}/yr
               </span>
             </div>
@@ -216,7 +216,7 @@ export default function MarketTimingLab() {
 
             <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
               <span className="ss-headline-label">
-                The world's worst market timer — bought only at the {timing.crashes} peaks before every crash — ended with
+                The world's worst market timer (bought only at the {timing.crashes} peaks before every crash) ended with
               </span>
               <span className="ss-headline-value">{dollars(timing.worst)}</span>
               <span className="ss-headline-sub">
@@ -241,7 +241,7 @@ export default function MarketTimingLab() {
               <BestDaysChart curve={bestDays.curve} missed={missed} fullAnn={bestDays.fullAnn} />
               <p className="wl-fnote">
                 The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line is what your
-                yearly return becomes as you sit out the <strong>best</strong> days — it falls off a cliff.
+                yearly return becomes as you sit out the <strong>best</strong> days. It falls off a cliff.
                 The faint line is the mirror image: sitting out the <strong>worst</strong> days would be
                 just as spectacular. The catch is you can't tell which is which in advance.
               </p>
@@ -256,13 +256,13 @@ export default function MarketTimingLab() {
                   <div><dt>Ending value, missed</dt><dd>{dollars(START_AMOUNT * bestDays.missMult)}</dd></div>
                 </dl>
                 <p className="wl-saved">
-                  Over {bestDays.spanStart}–{bestDays.spanEnd} — {bestDays.m.toLocaleString()} trading days — sitting out
+                  Over {bestDays.spanStart}–{bestDays.spanEnd} ({bestDays.m.toLocaleString()} trading days) sitting out
                   just the <strong>{missed}</strong> best of them turns {pct(bestDays.fullAnn * 100)} a year into{" "}
                   <strong>{pct(bestDays.missAnn * 100)}</strong>. And this isn't a fluke:{" "}
                   <strong>{bestDays.nearWorst} of the 10 best days landed within a week of one of the 10 worst</strong>.
                   The huge up-days come right in the middle of the crashes, so bailing out to dodge the drops is
                   the surest way to miss the recoveries. "Time in the market beats timing the market" isn't a
-                  slogan — it's arithmetic. Educational only, not advice.
+                  slogan. It's arithmetic. Educational only, not advice.
                 </p>
               </div>
             </div>
@@ -274,7 +274,7 @@ export default function MarketTimingLab() {
               <TimingBars timing={timing} />
               <p className="wl-fnote">
                 Every saver set aside the same {dollars(CONTRIB)} a month. The only difference is <em>when</em> they
-                moved it into the market — and whether they moved it at all. Bought-at-the-worst still lands a world
+                moved it into the market, and whether they moved it at all. Bought-at-the-worst still lands a world
                 apart from never-invested.
               </p>
             </div>
@@ -288,10 +288,10 @@ export default function MarketTimingLab() {
                   <div><dt>Never invested (cash)</dt><dd>{dollars(timing.cash)}</dd></div>
                 </dl>
                 <p className="wl-saved">
-                  Over {timing.spanStart}–{timing.spanEnd}, the <strong>worst</strong> possible market timer — who only ever
-                  bought at the {timing.crashes} peaks right before each crash — still turned {dollars(timing.contributed)} of
+                  Over {timing.spanStart}–{timing.spanEnd}, the <strong>worst</strong> possible market timer, who only ever
+                  bought at the {timing.crashes} peaks right before each crash, still turned {dollars(timing.contributed)} of
                   savings into <strong>{dollars(timing.worst)}</strong>, because he never sold and rode every recovery to the
-                  end. The saver who stayed in cash ended with just {dollars(timing.cash)} — barely more than he put in, once
+                  end. The saver who stayed in cash ended with just {dollars(timing.cash)}, barely more than he put in, once
                   inflation is counted. And notice the <strong>perfect</strong> dip-buyer only about tied the saver who
                   invested every month on autopilot: waiting in cash for the perfect moment quietly costs you the growth you
                   miss while waiting. Being <em>in</em> the market swamps timing it. Educational only, not advice.

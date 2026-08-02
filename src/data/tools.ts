@@ -2,7 +2,7 @@
  * The canonical list of interactive tool modules, in learning-progression order.
  * Both the Portfolio Playground dropdown in the header and the /tools overview
  * page read from this, and each tool page shows a "next tool" link derived from
- * this order — so adding a module here slots it into all three automatically.
+ * this order, so adding a module here slots it into all three automatically.
  *
  * Each entry is a consolidated MODULE; several earlier single tools now live
  * inside one module as tabs. Retired URLs redirect (see astro.config.mjs).
@@ -20,7 +20,7 @@ export const TOOLS: Tool[] = [
     title: "Growth, Savings & Debt",
     href: "/tools/compound-growth",
     blurb:
-      "The engine of personal finance — compounding — in every direction: how wealth builds, how your savings rate sets your timeline to independence, and how the same math runs in reverse as debt.",
+      "The engine of personal finance (compounding) in every direction: how wealth builds, how your savings rate sets your timeline to independence, and how the same math runs in reverse as debt.",
   },
   {
     title: "Fees & Inflation",
@@ -50,13 +50,13 @@ export const TOOLS: Tool[] = [
     title: "Risk & Return: CAPM & Factors",
     href: "/tools/factors",
     blurb:
-      "How markets price risk: start with CAPM — one risk, the market's, measured by beta — then extend to the Fama–French factors that explain what CAPM called 'alpha.'",
+      "How markets price risk: start with CAPM (one risk, the market's, measured by beta), then extend to the Fama–French factors that explain what CAPM called 'alpha.'",
   },
   {
     title: "Can You Outsmart the Market?",
     href: "/tools/beat-the-market",
     blurb:
-      "Four bets against the market — predicting it, timing it, deploying into it, and hiring active managers — and the one answer that keeps appearing. The whole case for indexing.",
+      "Four bets against the market (predicting it, timing it, deploying into it, and hiring active managers), and the one answer that keeps appearing. The whole case for indexing.",
   },
   {
     title: "Retirement & Roth",
@@ -68,6 +68,6 @@ export const TOOLS: Tool[] = [
     title: "Rent or Buy?",
     href: "/tools/rent-vs-buy",
     blurb:
-      "Renting isn't throwing money away. Run a buyer and a renter side by side — investing the difference — and find the year buying actually breaks even.",
+      "Renting isn't throwing money away. Run a buyer and a renter side by side (investing the difference) and find the year buying actually breaks even.",
   },
 ];

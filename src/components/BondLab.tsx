@@ -4,14 +4,14 @@ import ResetButton from "./ResetButton";
 import { bondYields } from "../data/generated/bond-yields";
 
 /**
- * "Bonds & Interest-Rate Risk" — the one risk that surprises new bond investors:
+ * "Bonds & Interest-Rate Risk", the one risk that surprises new bond investors:
  * when rates rise, bond PRICES fall, and the longer the bond, the harder it falls.
  *
- *  • "Rate risk" — a par bond's price change for a given move in rates, across
+ *  • "Rate risk": a par bond's price change for a given move in rates, across
  *    maturities. Pure bond math (present value of coupons + face). Shows why a
- *    30-year bond is a wild ride and a 2-year barely flinches — that sensitivity
+ *    30-year bond is a wild ride and a 2-year barely flinches. That sensitivity
  *    is duration.
- *  • "Today's rates" — the current Treasury yield curve from FRED, plus the
+ *  • "Today's rates": the current Treasury yield curve from FRED, plus the
  *    10-year decomposed into a real (TIPS) yield and expected inflation.
  *
  * Educational only, not advice.
@@ -101,12 +101,12 @@ export default function BondLab() {
               </span>
               <span className="ss-headline-value">{pctText(risk.focused.change)}</span>
               <span className="ss-headline-sub">
-                its duration is about <strong>{risk.focused.dur.toFixed(1)}</strong> — roughly {risk.focused.dur.toFixed(1)}% per 1% rate move
+                its duration is about <strong>{risk.focused.dur.toFixed(1)}</strong>: roughly {risk.focused.dur.toFixed(1)}% per 1% rate move
               </span>
             </div>
 
             <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-<strong>Method:</strong> pure present-value bond math — no historical data and no default risk assumed. (The
+<strong>Method:</strong> pure present-value bond math: no historical data and no default risk assumed. (The
               "Today's rates" tab instead plots the current Treasury curve directly from FRED.) Par bonds, annual
               coupons; longer maturity = bigger swing = more interest-rate risk. Educational only, not advice.
             </p>
@@ -122,7 +122,7 @@ export default function BondLab() {
             </div>
             <p className="wl-note" style={{ marginTop: "0.5rem" }}>
               The current US Treasury yield curve, {new Date(bondYields.asOf).toLocaleDateString("en-US", { year: "numeric", month: "long" })}. The
-              curve is {inverted ? "inverted (short rates above long — often a recession signal)" : "upward-sloping (longer bonds pay more — the normal shape)"}.
+              curve is {inverted ? "inverted (short rates above long, often a recession signal)" : "upward-sloping (longer bonds pay more, the normal shape)"}.
               A nominal yield splits into a real return plus the inflation investors expect. Data: {bondYields.source}
             </p>
           </>
@@ -136,7 +136,7 @@ export default function BondLab() {
               <h3>Same rate move, very different pain</h3>
               <RateRiskChart bars={risk.bars} focus={focus} rateMove={rateMove} />
               <p className="wl-fnote">
-                Every bar is the same {pctText(rateMove)} rate move — but the longer the bond, the more of its value sits
+                Every bar is the same {pctText(rateMove)} rate move, but the longer the bond, the more of its value sits
                 in far-off payments that get repriced, so the bigger the swing. That sensitivity has a name: <strong>duration</strong>.
               </p>
             </div>
@@ -149,7 +149,7 @@ export default function BondLab() {
                 </dl>
                 <p className="wl-saved">
                   This is why "bonds are safe" needs an asterisk. They carry little <em>default</em> risk (Treasuries none),
-                  but real <strong>interest-rate risk</strong>: in 2022, rates jumped and long Treasuries fell over 30% —
+                  but real <strong>interest-rate risk</strong>: in 2022, rates jumped and long Treasuries fell over 30%,
                   a stock-like loss from the "safe" sleeve. The fix isn't to avoid bonds; it's to match their duration to
                   when you need the money. Short bonds for near-term needs, longer for distant ones. Educational only, not advice.
                 </p>
@@ -176,7 +176,7 @@ export default function BondLab() {
                 <p className="wl-saved">
                   A bond's nominal yield is really two things stacked: the <strong>real</strong> return you keep after
                   inflation, plus the <strong>inflation investors expect</strong>. Today the 10-year's {bondYields.tenYear.nominal}%
-                  splits into a {bondYields.tenYear.real}% real yield and {bondYields.tenYear.breakeven}% expected inflation —
+                  splits into a {bondYields.tenYear.real}% real yield and {bondYields.tenYear.breakeven}% expected inflation,
                   which is exactly what TIPS (inflation-protected Treasuries) let you lock in directly. Data: {bondYields.source}
                   Educational only, not advice.
                 </p>

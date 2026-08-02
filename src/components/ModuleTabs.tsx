@@ -3,7 +3,7 @@ import { useState, type ReactNode } from "react";
 export interface ModuleTab {
   id: string;
   label: string;
-  /** Rendered lazily — only the active tab's component mounts, so inactive
+  /** Rendered lazily: only the active tab's component mounts, so inactive
    *  sub-tools don't run animations or hold state in the background. */
   render: () => ReactNode;
 }

@@ -5,9 +5,9 @@ import DebtLab from "./DebtLab";
 
 /**
  * Growth, Savings & Debt module: compounding in every direction.
- *  • Compound growth — how contributions, return, and time build wealth.
- *  • Savings rate — the rate (not the income) that sets your timeline to freedom.
- *  • Debt — compounding in reverse, working against you.
+ *  • Compound growth: how contributions, return, and time build wealth.
+ *  • Savings rate: the rate (not the income) that sets your timeline to freedom.
+ *  • Debt: compounding in reverse, working against you.
  */
 export default function GrowthModule() {
   return (

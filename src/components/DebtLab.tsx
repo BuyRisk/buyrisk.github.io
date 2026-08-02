@@ -4,11 +4,11 @@ import ResetButton from "./ResetButton";
 import { debt } from "../data/generated/debt";
 
 /**
- * "The Cost of Debt" — the mirror image of the Compound Growth Explorer. Here
+ * "The Cost of Debt": the mirror image of the Compound Growth Explorer. Here
  * compounding works against you: at a credit card's APR, paying only the minimum
  * stretches a modest balance into decades and doubles it in interest. The tool
  * contrasts the minimum-payment trap with a fixed payment you choose, and frames
- * the payoff as what it is — a guaranteed, tax-free return equal to the APR, one
+ * the payoff as what it is: a guaranteed, tax-free return equal to the APR, one
  * no risky investment can promise. Educational only, not advice.
  */
 
@@ -50,7 +50,7 @@ function amortize(balance: number, aprPct: number, paymentFn: (bal: number, inte
     const interest = bal * mr;
     let pay = paymentFn(bal, interest);
     if (pay <= interest + 1e-9) {
-      // Payment doesn't even cover interest — the balance never falls.
+      // Payment doesn't even cover interest. The balance never falls.
       return { path, months: Infinity, totalInterest: Infinity, totalPaid: Infinity, neverPaysOff: true };
     }
     pay = Math.min(pay, bal + interest);
@@ -103,7 +103,7 @@ export default function DebtLab() {
         <label className="wl-slider">
           <span>
             Interest rate (APR)
-            <InfoTip text={`The annual interest rate. The average US credit card charges about ${pct(CC)} (Federal Reserve, via FRED) — far above what markets reliably return.`} />{" "}
+            <InfoTip text={`The annual interest rate. The average US credit card charges about ${pct(CC)} (Federal Reserve, via FRED), far above what markets reliably return.`} />{" "}
             <strong>{pct(apr)}</strong>
           </span>
           <input type="range" min={0} max={30} step={0.1} value={apr} onChange={(e) => setApr(+e.target.value)} />
@@ -118,7 +118,7 @@ export default function DebtLab() {
         <label className="wl-slider">
           <span>
             Your monthly payment
-            <InfoTip text="A fixed amount you pay every month. Compare it to the shrinking minimum payment — paying a steady, higher amount is what breaks the trap." />{" "}
+            <InfoTip text="A fixed amount you pay every month. Compare it to the shrinking minimum payment. Paying a steady, higher amount is what breaks the trap." />{" "}
             <strong>{dollars(payment)}/mo</strong>
           </span>
           <input type="range" min={25} max={2_000} step={25} value={payment} onChange={(e) => setPayment(+e.target.value)} />
@@ -129,14 +129,14 @@ export default function DebtLab() {
             <>
               <span className="ss-headline-label">At {dollars(payment)}/mo</span>
               <span className="ss-headline-value">Never paid off</span>
-              <span className="ss-headline-sub">that barely covers the {dollars(firstMin)} minimum — the balance won't fall. Pay more.</span>
+              <span className="ss-headline-sub">that barely covers the {dollars(firstMin)} minimum. The balance won't fall. Pay more.</span>
             </>
           ) : (
             <>
               <span className="ss-headline-label">Paying {dollars(payment)}/mo clears it in</span>
               <span className="ss-headline-value">{yearsLabel(you.months)}</span>
               <span className="ss-headline-sub">
-                vs <strong>{yearsLabel(min.months)}</strong> on the minimum — saving{" "}
+                vs <strong>{yearsLabel(min.months)}</strong> on the minimum, saving{" "}
                 <strong>{dollars(interestSaved)}</strong> in interest
               </span>
             </>
@@ -144,7 +144,7 @@ export default function DebtLab() {
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          Minimum payment modeled as interest plus 1% of the balance (a $25 floor) — the
+          Minimum payment modeled as interest plus 1% of the balance (a $25 floor): the
           industry-standard formula that keeps you in debt for decades. Data: Federal
           Reserve consumer rates via FRED.
         </p>
@@ -156,7 +156,7 @@ export default function DebtLab() {
           <BalanceChart min={min} you={you} paysOff={paysOff} />
           <p className="wl-fnote">
             The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line pays only
-            the minimum — it barely descends, because the payment shrinks as fast as the balance
+            the minimum. It barely descends, because the payment shrinks as fast as the balance
             does. The <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>green</span> line
             is your fixed payment, which actually gets you out.
           </p>
@@ -172,11 +172,11 @@ export default function DebtLab() {
             </dl>
             <p className="wl-saved">
               On the minimum, this {dollars(balance)} balance costs{" "}
-              <strong>{dollars(min.totalInterest)}</strong> in interest — {(min.totalInterest / balance).toFixed(1)}×
-              the amount you borrowed — and takes <strong>{yearsLabel(min.months)}</strong> to clear.
+              <strong>{dollars(min.totalInterest)}</strong> in interest ({(min.totalInterest / balance).toFixed(1)}×
+              the amount you borrowed) and takes <strong>{yearsLabel(min.months)}</strong> to clear.
               That's the trap: the minimum falls as the balance does, so you mostly pay interest.
               Flip it around and paying down a <strong>{pct(apr)}</strong> balance is a{" "}
-              <strong>guaranteed {pct(apr)} return</strong>, tax-free — higher than the stock
+              <strong>guaranteed {pct(apr)} return</strong>, tax-free, higher than the stock
               market's ~10% long-run average, and with none of the risk. When your debt's rate beats
               what you could earn investing, paying it off is the best "investment" available.
               Educational only, not advice.

@@ -7,7 +7,7 @@ tags: ["fundamentals", "risk"]
 ---
 
 There's an old line among investors: you don't get paid for the return you
-*want* — you get paid for the risk you're willing to *hold*. That idea is the
+*want*. You get paid for the risk you're willing to *hold*. That idea is the
 whole reason this site is called **Buy Risk**.
 
 ## Return is the price of discomfort
@@ -16,7 +16,7 @@ Imagine two ways to store $10,000 for a year.
 
 - Leave it in an insured savings account. You know almost exactly what you'll
   have in twelve months.
-- Buy a diversified basket of stocks. You have no idea what you'll have — it
+- Buy a diversified basket of stocks. You have no idea what you'll have. It
   could be $8,500 or $12,500.
 
 The second option, on average and over long stretches, has paid more. Not
@@ -29,13 +29,13 @@ reward*. That extra expected reward is called the **risk premium**.
 
 ## "Buying risk" is a deliberate act
 
-When you invest, you are choosing to take on a specific bundle of risks —
-market swings, inflation, the fortunes of particular companies — in exchange
+When you invest, you are choosing to take on a specific bundle of risks
+(market swings, inflation, the fortunes of particular companies) in exchange
 for an expected premium. Done thoughtfully, that's not gambling. It's a
 priced, repeatable trade.
 
 The skill of investing is mostly about **which** risks to buy, **how much**,
-and for **how long** — not about avoiding risk altogether. A portfolio with no
+and for **how long**, not about avoiding risk altogether. A portfolio with no
 risk also has no risk premium, and inflation quietly erodes it.
 
 ## What this site will help you do
@@ -47,5 +47,5 @@ intuition to answer questions like:
 2. Why does diversification give you a "free lunch"?
 3. How do fees and inflation eat into returns you never see?
 
-Start by playing with the [compound growth explorer](/tools/compound-growth/) — then come back
+Start by playing with the [compound growth explorer](/tools/compound-growth/). Then come back
 and read on. Seeing the numbers move is worth a thousand words.

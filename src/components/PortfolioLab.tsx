@@ -108,7 +108,7 @@ const SCENARIOS: Scenario[] = [
   {
     id: "perfect-pos",
     label: "ρ = +1",
-    note: "Perfectly correlated assets move in lockstep. The frontier collapses to a straight line — mixing them buys you no risk reduction at all. This is the 'no free lunch' case.",
+    note: "Perfectly correlated assets move in lockstep. The frontier collapses to a straight line. Mixing them buys you no risk reduction at all. This is the 'no free lunch' case.",
     assetIds: ["us-stocks", "intl-stocks"],
     weights: [50, 50],
     pairCorr: 0.99,
@@ -124,7 +124,7 @@ const SCENARIOS: Scenario[] = [
   {
     id: "sixty-forty",
     label: "Classic 60/40",
-    note: "The classic balanced portfolio: 60% stocks, 40% bonds. Because their correlation is low, the mix sits well inside the two single-asset points — less risk than stocks alone, most of the return.",
+    note: "The classic balanced portfolio: 60% stocks, 40% bonds. Because their correlation is low, the mix sits well inside the two single-asset points: less risk than stocks alone, most of the return.",
     assetIds: ["us-stocks", "treasuries"],
     weights: [60, 40],
     pairCorr: -0.1,
@@ -132,7 +132,7 @@ const SCENARIOS: Scenario[] = [
   {
     id: "diversifier",
     label: "Add a diversifier",
-    note: "Gold has a weak link to the stock market, so adding a slice pushes the whole efficient frontier up-and-to-the-left — better return for the same risk — even though gold alone is mediocre.",
+    note: "Gold has a weak link to the stock market, so adding a slice pushes the whole efficient frontier up-and-to-the-left (better return for the same risk) even though gold alone is mediocre.",
     assetIds: ["us-stocks", "treasuries", "gold"],
     weights: [50, 35, 15],
   },
@@ -274,7 +274,7 @@ function FrontierChart({
       <circle cx={x(current.vol)} cy={y(current.mu)} r={13} className="pl-marker-ring" />
 
       <text x={width / 2} y={height - 6} className="pl-axis-title" textAnchor="middle">
-        Risk — annual volatility →
+        Risk: annual volatility →
       </text>
       <text
         x={-height / 2}
@@ -389,7 +389,7 @@ function OutcomeDistribution({
       </dl>
       <p className="pl-caption">
         The single path above is just one draw. Across {runs.toLocaleString()} runs,
-        outcomes fan out enormously — and even good portfolios suffer deep
+        outcomes fan out enormously, and even good portfolios suffer deep
         temporary drops along the way. That spread is the risk you're paid for.
       </p>
     </div>
@@ -440,7 +440,7 @@ export default function PortfolioLab() {
   const cov = useMemo(() => covarianceMatrix(corr, sigmas), [corr, sigmas]);
   const chol = useMemo(() => cholesky(corr), [corr]);
 
-  // Asset price paths — independent of weights, so weight tweaks don't reset
+  // Asset price paths, independent of weights, so weight tweaks don't reset
   // the animation.
   const assetSim = useMemo(
     () => simulateAssetPaths(mus, sigmas, chol, years, STEPS_PER_YEAR, seed),
@@ -795,8 +795,8 @@ export default function PortfolioLab() {
         </div>
         <p className="pl-mode-note">
           {locked
-            ? `Method: the efficient frontier and capital market line are computed analytically (mean–variance) from these inputs — real historical return, volatility, and correlation estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
-            : "Edit each asset's expected return, volatility, and market correlation — the frontier is recomputed analytically (mean–variance) from your inputs."}
+            ? `Method: the efficient frontier and capital market line are computed analytically (mean–variance) from these inputs: real historical return, volatility, and correlation estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
+            : "Edit each asset's expected return, volatility, and market correlation. The frontier is recomputed analytically (mean–variance) from your inputs."}
         </p>
 
         <div className="pl-assets">
@@ -840,7 +840,7 @@ export default function PortfolioLab() {
 
               <div className="pl-params">
                 <label>
-                  <span>Return<InfoTip text="The asset's expected annual return — its reward. In Historical mode this is the real annualized average from Damodaran's data (1928–present)." /></span>
+                  <span>Return<InfoTip text="The asset's expected annual return: its reward. In Historical mode this is the real annualized average from Damodaran's data (1928–present)." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"
@@ -853,7 +853,7 @@ export default function PortfolioLab() {
                   </span>
                 </label>
                 <label>
-                  <span>Risk<InfoTip text="The asset's volatility (standard deviation) — how much its return swings year to year." /></span>
+                  <span>Risk<InfoTip text="The asset's volatility (standard deviation): how much its return swings year to year." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"
@@ -892,7 +892,7 @@ export default function PortfolioLab() {
           <label className="pl-corr">
             <span className="pl-corr-label">
               Correlation ({assets[0].name} ↔ {assets[1].name})
-              <InfoTip text="How the two assets move together, from −1 to +1. Drag toward −1 and the efficient frontier bows out — the essence of diversification." />{" "}
+              <InfoTip text="How the two assets move together, from −1 to +1. Drag toward −1 and the efficient frontier bows out: the essence of diversification." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input
@@ -904,7 +904,7 @@ export default function PortfolioLab() {
               onChange={(e) => setPairCorr(Number(e.target.value))}
             />
             <span className="pl-corr-hint">
-              Drag toward −1 and watch the frontier bow out — that's diversification.
+              Drag toward −1 and watch the frontier bow out. That's diversification.
             </span>
           </label>
         )}
@@ -912,7 +912,7 @@ export default function PortfolioLab() {
         {isPair && mode === "historical" && (
           <p className="pl-mode-note">
             Historical correlation ({assets[0].name} ↔ {assets[1].name}):{" "}
-            <strong>{realCorrelationMatrix(assets)[0][1].toFixed(2)}</strong> — the
+            <strong>{realCorrelationMatrix(assets)[0][1].toFixed(2)}</strong>, the
             real, measured co-movement. Switch to Custom to drag it yourself.
           </p>
         )}
@@ -1041,7 +1041,7 @@ export default function PortfolioLab() {
           <p className="pl-caption">
             A simulated path over {years} years: each thin line is an asset's
             price, the bold line is your rebalanced portfolio. Notice how the
-            portfolio rides steadier than its riskiest holdings — that steadiness
+            portfolio rides steadier than its riskiest holdings. That steadiness
             is diversification. <strong>Single</strong> plays one draw and holds;
             <strong> Live</strong> cycles fresh scenarios continuously.
           </p>
@@ -1070,7 +1070,7 @@ export default function PortfolioLab() {
               <span className="pl-legend-item"><span className="pl-dot pl-dot--asset" /> Single asset</span>
             </div>
             <p className="pl-caption">
-              Each dot is a possible mix. The curve is the efficient frontier —
+              Each dot is a possible mix. The curve is the efficient frontier:
               the best return for each level of risk. Add cash at the risk-free
               rate and the straight <strong>capital market line</strong> beats
               the curve: every investor should hold the tangency portfolio and
@@ -1106,7 +1106,7 @@ export default function PortfolioLab() {
               </div>
               <p className="pl-saved">
                 Diversification removed <strong>{pct(diversificationSaved)}</strong> of
-                risk — for free, without lowering expected return.
+                risk, for free, without lowering expected return.
               </p>
             </div>
           </div>
@@ -1117,7 +1117,7 @@ export default function PortfolioLab() {
 
       <p className="pl-disclaimer">
         A simplified model for learning, not a forecast or advice. It assumes
-        returns are normally distributed and inputs are stable and known — real
+        returns are normally distributed and inputs are stable and known. Real
         markets have fatter tails, and these estimates are uncertain. See the
         notes below on what mean-variance theory leaves out.
       </p>

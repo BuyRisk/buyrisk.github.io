@@ -5,9 +5,9 @@ import BondLab from "./BondLab";
 
 /**
  * Portfolio, Allocation & Bonds module: building the actual portfolio.
- *  • Build a portfolio — mix assets, watch correlations and the efficient frontier.
- *  • How much in stocks? — the stock/bond dial and its risk/return trade-off.
- *  • Bonds & rates — why the "safe" sleeve moves when interest rates do.
+ *  • Build a portfolio: mix assets, watch correlations and the efficient frontier.
+ *  • How much in stocks? The stock/bond dial and its risk/return trade-off.
+ *  • Bonds & rates: why the "safe" sleeve moves when interest rates do.
  */
 export default function PortfolioModule() {
   return (

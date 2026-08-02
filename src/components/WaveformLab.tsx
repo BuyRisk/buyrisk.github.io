@@ -360,7 +360,7 @@ export default function WaveformLab() {
               <label className="wl-slider">
                 <span>
                   Swing
-                  <InfoTip text="The asset's volatility — how big its ups and downs are. Here it sets the height (amplitude) of the wave." />{" "}
+                  <InfoTip text="The asset's volatility: how big its ups and downs are. Here it sets the height (amplitude) of the wave." />{" "}
                   <strong>{pct(a.amp, 0)}</strong>
                 </span>
                 <input
@@ -398,7 +398,7 @@ export default function WaveformLab() {
           <label className="wl-corr">
             <span className="wl-corr-label">
               Correlation ({assets[0].name} ↔ {assets[1].name})
-              <InfoTip text="How the two assets move together, from −1 (opposite) to +1 (in lockstep). Lower correlation means the waves cancel more — more diversification." />{" "}
+              <InfoTip text="How the two assets move together, from −1 (opposite) to +1 (in lockstep). Lower correlation means the waves cancel more: more diversification." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input
@@ -463,7 +463,7 @@ export default function WaveformLab() {
             </div>
             <p className="wl-saved">
               Out-of-phase waves cancel <strong>{pct(cancelled, 0)}</strong> of the
-              swing. That shrinkage is diversification — exactly the portfolio's
+              swing. That shrinkage is diversification: exactly the portfolio's
               volatility falling below the average of its parts.
             </p>
           </div>
@@ -484,7 +484,7 @@ export default function WaveformLab() {
               <span><span className="wl-fdot wl-fdot--as" /> Single asset</span>
             </div>
             <p className="wl-fnote">
-              Your portfolio's swing above is its <em>risk</em> here — its spot on
+              Your portfolio's swing above is its <em>risk</em> here: its spot on
               the horizontal axis. As you lower correlation, the frontier bows out
               and your mix slides left. (Return uses each asset's typical figure.)
             </p>
@@ -493,7 +493,7 @@ export default function WaveformLab() {
 
         <p className="wl-note">
           An idealized model: perfectly smooth, repeating waves. Real returns are
-          noisy and never cancel this cleanly — that's
+          noisy and never cancel this cleanly. That's
           <a href="/tools/randomness"> Part 2</a>. Correlation sets each wave's
           phase; amplitude is its volatility.
         </p>

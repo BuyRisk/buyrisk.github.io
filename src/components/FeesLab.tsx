@@ -4,10 +4,10 @@ import ResetButton from "./ResetButton";
 import { fees } from "../data/generated/fees";
 
 /**
- * "The Real Cost of Fees" — a small annual expense ratio feels trivial, but over
+ * "The Real Cost of Fees": a small annual expense ratio feels trivial, but over
  * decades it compounds into a startling share of the wealth you'd otherwise keep.
  * The calculator pits your fund's fee against a low-cost index fund and shows the
- * dollar gap; the trends view shows the real ICI history — fees fell for 30 years,
+ * dollar gap; the trends view shows the real ICI history: fees fell for 30 years,
  * and index funds cost a fraction of active ones. Educational only, not advice.
  */
 
@@ -126,7 +126,7 @@ export default function FeesLab() {
             <label className="wl-slider">
               <span>
                 Your fund's fee
-                <InfoTip text="The expense ratio — the percent of your balance the fund charges every year, whether it beats the market or not. The average active US equity fund charged 0.64% in 2025." />{" "}
+                <InfoTip text="The expense ratio: the percent of your balance the fund charges every year, whether it beats the market or not. The average active US equity fund charged 0.64% in 2025." />{" "}
                 <strong>{pct(yourFee)}</strong>
               </span>
               <input type="range" min={0} max={2} step={0.01} value={yourFee} onChange={(e) => setYourFee(+e.target.value)} />
@@ -135,7 +135,7 @@ export default function FeesLab() {
             <label className="wl-slider">
               <span>
                 Low-cost index fee
-                <InfoTip text="What a broad index fund charges. The average US index equity fund charged just 0.05% in 2025 — about one-thirteenth of the average active fund." />{" "}
+                <InfoTip text="What a broad index fund charges. The average US index equity fund charged just 0.05% in 2025, about one-thirteenth of the average active fund." />{" "}
                 <strong>{pct(indexFee)}</strong>
               </span>
               <input type="range" min={0} max={1} step={0.01} value={indexFee} onChange={(e) => setIndexFee(+e.target.value)} />
@@ -154,7 +154,7 @@ export default function FeesLab() {
               <span className="ss-headline-label">Choosing the index fund would leave you with</span>
               <span className="ss-headline-value">{dollars(view.gap)} more</span>
               <span className="ss-headline-sub">
-                after {years} years — money the {pct(yourFee)} fee would otherwise quietly drain
+                after {years} years, money the {pct(yourFee)} fee would otherwise quietly drain
               </span>
             </div>
           </>
@@ -211,8 +211,8 @@ function CostView({
         <p className="wl-fnote">
           The <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>green</span> line is the
           low-cost index fund; the <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line
-          is your fund. The shaded gap between them is wealth the higher fee compounds away —
-          it widens every year because the fee is charged on a balance that would otherwise
+          is your fund. The shaded gap between them is wealth the higher fee compounds away.
+          It widens every year because the fee is charged on a balance that would otherwise
           be growing.
         </p>
       </div>
@@ -227,9 +227,9 @@ function CostView({
           </dl>
           <p className="wl-saved">
             Over {years} years, your fund's <strong>{pct(yourFee)}</strong> fee quietly costs{" "}
-            <strong>{dollars(view.dragYours)}</strong> — about <strong>{Math.round(view.dragShare * 100)}%</strong> of
+            <strong>{dollars(view.dragYours)}</strong>, about <strong>{Math.round(view.dragShare * 100)}%</strong> of
             the wealth you'd have kept with no fee at all. The fee looks tiny each year, but
-            it's charged on your whole balance, so it compounds right alongside your returns —
+            it's charged on your whole balance, so it compounds right alongside your returns,
             just in the wrong direction. This is why costs are one of the very few things in
             investing you can actually control.
           </p>
@@ -312,10 +312,10 @@ function TrendsView() {
         <h3>What US fund investors actually paid, {fees.start}–{fees.end}</h3>
         <TrendChart series={shown} />
         <p className="wl-fnote">
-          Asset-weighted average expense ratios — what the typical invested dollar really
+          Asset-weighted average expense ratios: what the typical invested dollar really
           paid. The average active equity fund's fee fell from{" "}
           <strong>{pct(firstA.ratio)}</strong> in {firstA.year} to <strong>{pct(lastA.ratio)}</strong>{" "}
-          in {lastA.year}, while index equity funds charge just <strong>{pct(lastI.ratio)}</strong> —
+          in {lastA.year}, while index equity funds charge just <strong>{pct(lastI.ratio)}</strong>,
           a fraction of the active average.
         </p>
       </div>
@@ -331,7 +331,7 @@ function TrendsView() {
           <p className="wl-saved">
             Two forces drove fees down: investors moved trillions into low-cost index funds,
             and competition pushed even active funds to trim their charges. But a real gap
-            remains — the average active equity fund still costs about{" "}
+            remains: the average active equity fund still costs about{" "}
             <strong>{(lastA.ratio / lastI.ratio).toFixed(0)}×</strong> what the average index
             fund does. That difference is small as a yearly percentage and enormous once it
             compounds, which is exactly what the calculator shows.

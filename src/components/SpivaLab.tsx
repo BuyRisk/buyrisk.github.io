@@ -4,13 +4,13 @@ import ResetButton from "./ResetButton";
 import { spiva } from "../data/generated/spiva";
 
 /**
- * "Can Active Managers Beat the Market?" — the SPIVA scorecard made interactive.
+ * "Can Active Managers Beat the Market?": the SPIVA scorecard made interactive.
  * Pick a fund category and a time horizon and see the share of professional,
  * actively managed funds that FAILED to beat their benchmark. The signature
  * result: the longer the horizon, the higher the failure rate.
  *
  * SPIVA only reports out to 20 years. Beyond that we EXTRAPOLATE (30–70y) by
- * fitting the decay of the out-performing share and projecting it — always
+ * fitting the decay of the out-performing share and projecting it, always
  * clearly flagged as a model, never presented as reported data. Educational
  * only, not advice.
  */
@@ -110,7 +110,7 @@ export default function SpivaLab() {
         <div className="wl-field">
           <span className="wl-field-label">
             Time horizon
-            <InfoTip text="How long the funds are measured over. SPIVA reports through 20 years; 30–70 are extrapolated (dashed) — a projection of the trend, not measured data." />
+            <InfoTip text="How long the funds are measured over. SPIVA reports through 20 years; 30–70 are extrapolated (dashed), a projection of the trend, not measured data." />
           </span>
           <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Time horizon">
             {spiva.horizons.map((h) => (
@@ -125,7 +125,7 @@ export default function SpivaLab() {
                 className={horizon === h ? "active" : ""}
                 aria-pressed={horizon === h}
                 onClick={() => setHorizon(h)}
-                title="Extrapolated — not reported by SPIVA"
+                title="Extrapolated, not reported by SPIVA"
                 style={{ borderStyle: "dashed" }}
               >
                 {h}y*
@@ -149,14 +149,14 @@ export default function SpivaLab() {
           <p className="wl-note" style={{ marginTop: "0.5rem", borderLeft: "3px solid var(--pl-c3)", paddingLeft: "0.6rem" }}>
             <strong>Extrapolation.</strong> SPIVA stops at 20 years. This figure projects the observed
             decay of the out-performing share out to {horizon} years. It assumes the trend simply
-            continues and ignores real-world wrinkles (funds close, the surviving pool shrinks) — so
+            continues and ignores real-world wrinkles (funds close, the surviving pool shrinks), so
             treat it as "how the odds are trending," not a measured result. The direction is the point:
             over a lifetime, beating the index becomes vanishingly unlikely.
           </p>
         ) : (
           <p className="wl-note" style={{ marginTop: "0.5rem" }}>
             These are professional, full-time managers. The longer the clock runs, the more of
-            them fall behind a simple index — the core reason low-cost index funds are so hard
+            them fall behind a simple index: the core reason low-cost index funds are so hard
             to beat. <strong>Method:</strong> the reported failure rates, transcribed directly (1–20-year
             horizons); 30-year and beyond are extrapolated, and always labelled as such. Data: S&P Dow Jones
             Indices SPIVA U.S. Scorecard, {spiva.asOf}.
@@ -183,7 +183,7 @@ export default function SpivaLab() {
             <RankedList ranked={view.ranked} selectedId={catId} onPick={setCatId} />
             <p className="wl-saved">
               It isn't one corner of the market. Across US and international stocks and bonds,
-              most active funds underperform their benchmark over {horizon} years — and the gap
+              most active funds underperform their benchmark over {horizon} years, and the gap
               widens the longer you look.{" "}
               {extrap
                 ? "Extended to a lifetime horizon, the projection points the same way for essentially every category: the index wins almost every time."

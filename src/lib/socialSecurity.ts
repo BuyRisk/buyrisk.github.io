@@ -9,7 +9,7 @@ import { socialSecurity } from "../data/generated/social-security";
  *
  * Two personalization levers beyond the textbook version:
  *  • Health → a mortality hazard multiplier (smoking, exercise) reshapes the
- *    survival curve — quantifying how much longevity (and thus the value of
+ *    survival curve, quantifying how much longevity (and thus the value of
  *    delaying) fitness buys.
  *  • Debt → the discount rate. Using early benefits to retire a 6% mortgage *is*
  *    a 6% return, so debt raises your effective discount rate and favors claiming
@@ -17,8 +17,8 @@ import { socialSecurity } from "../data/generated/social-security";
  *
  * For couples, `optimizeCouple` adds the single most important effect the
  * single-earner model misses: the survivor benefit. When the first spouse dies,
- * the survivor's check steps up to the larger of the two — and it keeps the
- * deceased's delayed-retirement credits — so the higher earner's benefit really
+ * the survivor's check steps up to the larger of the two, and it keeps the
+ * deceased's delayed-retirement credits, so the higher earner's benefit really
  * insures the longer of two lives. That reliably pushes the higher earner's
  * optimal claim age toward 70.
  *

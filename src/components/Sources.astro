@@ -9,7 +9,7 @@ import {
 } from "../data/citations";
 
 interface Props {
-  /** Tool slug — pulls its study/dataset ids from TOOL_SOURCES. */
+  /** Tool slug: pulls its study/dataset ids from TOOL_SOURCES. */
   tool?: string;
   /** Explicit study ids (overrides `tool`). */
   studies?: string[];
@@ -100,8 +100,8 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
               <li>
                 <a href={d.url} target="_blank" rel="noopener noreferrer">
                   {d.name}
-                </a>{" "}
-                — {d.publisher}.
+                </a>,{" "}
+                {d.publisher}.
                 {d.note && (
                   <Fragment>
                     {" "}
@@ -115,7 +115,7 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
       )}
 
       <p class="src-foot">
-        Educational use only — not financial advice. Figures are calculated from
+        Educational use only, not financial advice. Figures are calculated from
         the sources above; each tool's own notes describe its method.
       </p>
     </section>

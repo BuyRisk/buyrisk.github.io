@@ -5,11 +5,11 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
 /**
- * "How many stocks is enough?" — diversification WITHIN one asset class.
+ * "How many stocks is enough?": diversification WITHIN one asset class.
  *
  * N equally-weighted stocks, each volatility sigma, all sharing an average
  * pairwise correlation rho. Portfolio volatility = sigma*sqrt(rho + (1-rho)/N),
- * which falls from sigma toward an irreducible floor of sigma*sqrt(rho) — the
+ * which falls from sigma toward an irreducible floor of sigma*sqrt(rho): the
  * systematic (market) risk that CAPM's beta prices. Shown two ways: a live
  * cloud of noisy stock paths collapsing into a steadier portfolio, and the
  * classic risk-vs-number-of-stocks curve.
@@ -251,7 +251,7 @@ export default function StockCountLab() {
         <label className="wl-slider">
           <span>
             Volatility per stock
-            <InfoTip text="How jumpy a single stock is on its own. Individual stocks are far more volatile than the market — often 30%+ a year." />{" "}
+            <InfoTip text="How jumpy a single stock is on its own. Individual stocks are far more volatile than the market, often 30%+ a year." />{" "}
             <strong>{pct(sigma, 0)}</strong>
           </span>
           <input type="range" min={0.1} max={0.6} step={0.01} value={sigma} onChange={(e) => setSigma(+e.target.value)} />
@@ -266,7 +266,7 @@ export default function StockCountLab() {
         </label>
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>
           Real stocks are positively correlated (typically 0.1–0.4), so they can't
-          diversify to zero — only down to the market floor.
+          diversify to zero, only down to the market floor.
         </p>
       </div>
 
@@ -299,7 +299,7 @@ export default function StockCountLab() {
             <p className="wl-saved">
               With {n} stocks you've removed <strong>{pct(removedVar, 0)}</strong> of the
               diversifiable risk (in variance terms). But you can never beat the{" "}
-              {pct(floor, 1)} floor — that leftover is systematic risk, the same thing{" "}
+              {pct(floor, 1)} floor. That leftover is systematic risk, the same thing{" "}
               <a href="/tools/capm">CAPM's beta</a> prices.
             </p>
           </div>
@@ -308,7 +308,7 @@ export default function StockCountLab() {
             <h3>Risk vs. number of stocks</h3>
             <RiskCurve sigma={sigma} rho={rho} n={n} />
             <p className="wl-fnote">
-              Most of the benefit comes early — about 20–30 stocks captures the bulk
+              Most of the benefit comes early: about 20–30 stocks captures the bulk
               of it. Beyond that the curve flattens against the floor. The dots are
               the <strong>actual</strong> curve for US stocks; hit “Real US stocks”
               to snap the model onto them. {crspDiversification.source}
@@ -318,7 +318,7 @@ export default function StockCountLab() {
 
         <p className="wl-note">
           Each thin line is one stock's noisy ups and downs; the bold line is your
-          equal-weight portfolio. Add stocks and watch it steady — but never go
+          equal-weight portfolio. Add stocks and watch it steady, but never go
           flat. <strong>Method:</strong> the dotted reference curve is the real
           risk-vs-count relationship measured directly from individual US stocks
           (CRSP); the animated lines are a live illustrative draw around it.
@@ -367,7 +367,7 @@ function RiskCurve({ sigma, rho, n }: { sigma: number; rho: number; n: number })
       </text>
       {/* curve */}
       <path d={path} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinejoin="round" />
-      {/* empirical (real CRSP) curve — a fixed reference the model can be fit to */}
+      {/* empirical (real CRSP) curve: a fixed reference the model can be fit to */}
       <polyline
         points={empirical.map((p) => `${x(p.n)},${y(p.volAnnual)}`).join(" ")}
         fill="none"

@@ -1,6 +1,6 @@
 ---
 title: "The Quiet Magic of Compounding"
-description: "Compounding feels boring for years, then suddenly it isn't. Here's the intuition — and the math — behind why patience pays."
+description: "Compounding feels boring for years, then suddenly it isn't. Here's the intuition (and the math) behind why patience pays."
 pubDate: 2026-06-18
 author: "The Buy Risk Team"
 tags: ["fundamentals", "compounding"]
@@ -23,7 +23,7 @@ Future value = Principal × (1 + r) ^ years
 ```
 
 where `r` is the annual growth rate. That little exponent is where the magic
-hides — growth stacks on growth.
+hides. Growth stacks on growth.
 
 ## Why it feels slow, then fast
 
@@ -38,7 +38,7 @@ Suppose you invest $10,000 at 7% per year.
 | 30   | $76,123   |
 
 The *first* decade adds under $10,000. The *third* decade adds more than
-$37,000 — on the same original deposit and the same rate. Nothing changed
+$37,000, on the same original deposit and the same rate. Nothing changed
 except that the base got bigger. That acceleration is the whole point.
 
 ## The rule of 72
@@ -49,7 +49,7 @@ annual return:
 - At 6%, money doubles in about **12 years** (72 ÷ 6).
 - At 9%, about **8 years** (72 ÷ 9).
 
-It's not exact, but it's close enough to do in your head — and it makes the cost
+It's not exact, but it's close enough to do in your head, and it makes the cost
 of a lower return vivid.
 
 ## Try it yourself

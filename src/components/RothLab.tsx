@@ -3,16 +3,16 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
 /**
- * "Roth or Traditional? (+ the employer match)" — two of the most consequential,
+ * "Roth or Traditional? (+ the employer match)": two of the most consequential,
  * least-understood decisions in a workplace retirement plan.
  *
- *  • Roth vs Traditional: the whole thing hinges on one comparison — your tax rate
+ *  • Roth vs Traditional: the whole thing hinges on one comparison, your tax rate
  *    now vs. in retirement. Same pre-tax budget, they're mathematically identical
  *    when the rates match; Roth wins if your rate will be higher later, Traditional
  *    if lower. A third bar shows a TAXABLE (non-qualified) account holding the same
- *    after-tax dollars, so the value of tax-sheltering — and the turnover-driven
- *    tax drag that hits active funds far harder than index funds — is visible.
- *  • Employer match: the closest thing to free money in all of investing — an
+ *    after-tax dollars, so the value of tax-sheltering (and the turnover-driven
+ *    tax drag that hits active funds far harder than index funds) is visible.
+ *  • Employer match: the closest thing to free money in all of investing, an
  *    instant, guaranteed return you should capture before anything else.
  *
  * Educational only, not advice.
@@ -140,7 +140,7 @@ export default function RothLab() {
             <label className="wl-slider">
               <span>
                 Tax rate now
-                <InfoTip text="Your marginal tax rate today — the rate on your last dollar of income. Contributing to Traditional saves you this rate now." />{" "}
+                <InfoTip text="Your marginal tax rate today: the rate on your last dollar of income. Contributing to Traditional saves you this rate now." />{" "}
                 <strong>{taxNow}%</strong>
               </span>
               <input type="range" min={0} max={45} step={1} value={taxNow} onChange={(e) => setTaxNow(+e.target.value)} />
@@ -156,7 +156,7 @@ export default function RothLab() {
             <label className="wl-slider">
               <span>
                 Years to grow
-                <InfoTip text="How long until you withdraw. Longer just scales both accounts equally — it doesn't change which wins." />{" "}
+                <InfoTip text="How long until you withdraw. Longer just scales both accounts equally. It doesn't change which wins." />{" "}
                 <strong>{years}</strong>
               </span>
               <input type="range" min={5} max={45} step={1} value={years} onChange={(e) => setYears(+e.target.value)} />
@@ -172,7 +172,7 @@ export default function RothLab() {
             <div className="wl-field">
               <span className="wl-field-label">
                 Taxable-account fund
-                <InfoTip text="Only affects the taxable (non-qualified) account. A fund's turnover — how much it buys and sells each year — forces it to distribute taxable gains. Index funds barely turn over; active funds churn, and more of their gains are short-term (taxed at your ordinary rate)." />
+                <InfoTip text="Only affects the taxable (non-qualified) account. A fund's turnover (how much it buys and sells each year) forces it to distribute taxable gains. Index funds barely turn over; active funds churn, and more of their gains are short-term (taxed at your ordinary rate)." />
               </span>
               <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Taxable fund type">
                 {(Object.keys(FUNDS) as FundType[]).map((k) => (
@@ -202,7 +202,7 @@ export default function RothLab() {
               <span className="ss-headline-value">{acct.winner === "tie" ? "dead heat" : currency(acct.diff)}</span>
               <span className="ss-headline-sub">
                 {acct.winner === "tie"
-                  ? <>same after-tax result either way — {currency(acct.roth)}</>
+                  ? <>same after-tax result either way: {currency(acct.roth)}</>
                   : acct.winner === "roth"
                     ? <>because your tax rate is <strong>higher later</strong> ({taxLater}%) than today ({taxNow}%)</>
                     : <>because your tax rate is <strong>lower later</strong> ({taxLater}%) than today ({taxNow}%)</>}
@@ -218,7 +218,7 @@ export default function RothLab() {
           <>
             <label className="wl-slider">
               <span>
-                Salary <InfoTip text="Your gross annual salary — the base the match percentages apply to." /> <strong>{currency(salary)}</strong>
+                Salary <InfoTip text="Your gross annual salary: the base the match percentages apply to." /> <strong>{currency(salary)}</strong>
               </span>
               <input type="range" min={30_000} max={300_000} step={5_000} value={salary} onChange={(e) => setSalary(+e.target.value)} />
             </label>
@@ -233,7 +233,7 @@ export default function RothLab() {
             <label className="wl-slider">
               <span>
                 Employer matches
-                <InfoTip text="How many cents the employer adds per dollar you contribute. A 50% match adds 50¢ per $1 — an instant 50% return." />{" "}
+                <InfoTip text="How many cents the employer adds per dollar you contribute. A 50% match adds 50¢ per $1: an instant 50% return." />{" "}
                 <strong>{matchRate}%</strong>
               </span>
               <input type="range" min={0} max={100} step={5} value={matchRate} onChange={(e) => setMatchRate(+e.target.value)} />
@@ -257,8 +257,8 @@ export default function RothLab() {
 
             <p className="wl-note" style={{ marginTop: "0.5rem" }}>
               {match.leavingBehind > 0
-                ? `You're leaving ${currency(match.leavingBehind)}/yr on the table — bump your contribution to ${matchLimit}% to capture the full match.`
-                : "You're capturing the full match. This is the one guaranteed, unbeatable return in investing — take it before anything else."}
+                ? `You're leaving ${currency(match.leavingBehind)}/yr on the table. Bump your contribution to ${matchLimit}% to capture the full match.`
+                : "You're capturing the full match. This is the one guaranteed, unbeatable return in investing. Take it before anything else."}
             </p>
           </>
         )}
@@ -273,7 +273,7 @@ export default function RothLab() {
               <p className="wl-fnote">
                 Roth and Traditional (the tax-advantaged accounts) start from the same pre-tax budget and differ only in
                 <em> when</em> the tax is paid. The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>taxable</span>{" "}
-                account invests the same after-tax dollars as Roth — but loses ground every year to taxes on dividends and
+                account invests the same after-tax dollars as Roth, but loses ground every year to taxes on dividends and
                 on the gains a fund is forced to distribute as it trades.
               </p>
             </div>
@@ -286,10 +286,10 @@ export default function RothLab() {
                   <div><dt>Lost to tax drag</dt><dd>{currency(acct.taxDrag)}</dd></div>
                 </dl>
                 <p className="wl-saved">
-                  Roth vs. Traditional is <strong>only</strong> about your tax rate now versus later — Roth if you'll be in
+                  Roth vs. Traditional is <strong>only</strong> about your tax rate now versus later: Roth if you'll be in
                   a higher bracket later, Traditional if lower. But notice the third bar: the <strong>taxable account</strong>
                   starts with the exact same after-tax dollars as Roth, yet ends <strong>{currency(acct.taxDrag)}</strong> behind
-                  — a drag of about <strong>{(acct.dragPct * 100).toFixed(1)}%/yr</strong> — purely from taxes it can't defer.
+                  (a drag of about <strong>{(acct.dragPct * 100).toFixed(1)}%/yr</strong>) purely from taxes it can't defer.
                   And that gap swings hard on the fund: a low-turnover <strong>index fund</strong> barely distributes gains,
                   while a churning <strong>active fund</strong> hands you a taxable bill every year, much of it at your higher
                   ordinary rate. That's the case for sheltering first, and for holding tax-inefficient, high-turnover funds
@@ -305,7 +305,7 @@ export default function RothLab() {
               <MatchBars yourContrib={match.yourContrib} employerAdds={match.employerAdds} />
               <p className="wl-fnote">
                 The blue slice is yours; the gold slice is your employer's, added the moment you contribute. No market
-                return, no waiting, no risk — you cannot buy that anywhere.
+                return, no waiting, no risk. You cannot buy that anywhere.
               </p>
             </div>
             <div className="wl-lower">
@@ -317,7 +317,7 @@ export default function RothLab() {
                   <div><dt>Match grows to ({years} yr)</dt><dd>{currency(match.matchFV)}</dd></div>
                 </dl>
                 <p className="wl-saved">
-                  A {matchRate}% match is an instant, guaranteed {matchRate}% return — before the market does anything.
+                  A {matchRate}% match is an instant, guaranteed {matchRate}% return, before the market does anything.
                   Nothing else in investing comes close, which is why "get the full match" sits at the very top of every
                   sensible priority list, ahead of paying down low-rate debt or investing anywhere else. Over {years} years,
                   that free money alone compounds into <strong>{currency(match.matchFV)}</strong>. Educational only, not advice.

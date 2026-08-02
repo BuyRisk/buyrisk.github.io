@@ -5,12 +5,12 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
 /**
- * CAPM teaching tool — two linked panels:
+ * CAPM teaching tool with two linked panels:
  *  A) the characteristic line (regress an asset's excess returns on the
  *     market's; slope = beta, intercept = alpha, R² = systematic share), with
  *     resampling so the estimated beta visibly wiggles around the true beta.
  *  B) the Security Market Line (expected return vs beta); the asset sits off
- *     the line by exactly its alpha — above = underpriced, below = overpriced.
+ *     the line by exactly its alpha: above = underpriced, below = overpriced.
  */
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
@@ -110,10 +110,10 @@ export default function CapmLab() {
   const assetReturn = capmReturn + alpha;
   const verdict =
     alpha > 0.003
-      ? { text: "Underpriced — it offers more return than its beta demands.", cls: "cl-up" }
+      ? { text: "Underpriced: it offers more return than its beta demands.", cls: "cl-up" }
       : alpha < -0.003
-        ? { text: "Overpriced — it offers less return than its beta demands.", cls: "cl-down" }
-        : { text: "Fairly priced — it sits right on the Security Market Line.", cls: "cl-fair" };
+        ? { text: "Overpriced: it offers less return than its beta demands.", cls: "cl-down" }
+        : { text: "Fairly priced: it sits right on the Security Market Line.", cls: "cl-fair" };
 
   return (
     <div className="wl">
@@ -126,11 +126,11 @@ export default function CapmLab() {
         />
         <p className="cl-group">The market</p>
         <label className="wl-slider">
-          <span>Risk-free rate<InfoTip text="The return on a safe asset like Treasury bills — the reward for taking no risk. It's where the Security Market Line starts." /> <strong>{pct(rf)}</strong></span>
+          <span>Risk-free rate<InfoTip text="The return on a safe asset like Treasury bills: the reward for taking no risk. It's where the Security Market Line starts." /> <strong>{pct(rf)}</strong></span>
           <input type="range" min={0} max={0.08} step={0.0025} value={rf} onChange={(e) => setRf(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Market risk premium<InfoTip text="How much extra return the overall market is expected to earn above the risk-free rate — the payoff for bearing market risk." /> <strong>{pct(premium)}</strong></span>
+          <span>Market risk premium<InfoTip text="How much extra return the overall market is expected to earn above the risk-free rate: the payoff for bearing market risk." /> <strong>{pct(premium)}</strong></span>
           <input type="range" min={0.01} max={0.1} step={0.0025} value={premium} onChange={(e) => setPremium(+e.target.value)} />
         </label>
         <label className="wl-slider">
@@ -144,11 +144,11 @@ export default function CapmLab() {
           <input type="range" min={-0.5} max={2.5} step={0.05} value={beta} onChange={(e) => setBeta(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Alpha (α)<InfoTip text="Return the market doesn't explain — skill or mispricing. Positive alpha sits above the Security Market Line (a bargain); negative below." /> <strong>{signedPct(alpha)}</strong></span>
+          <span>Alpha (α)<InfoTip text="Return the market doesn't explain: skill or mispricing. Positive alpha sits above the Security Market Line (a bargain); negative below." /> <strong>{signedPct(alpha)}</strong></span>
           <input type="range" min={-0.05} max={0.05} step={0.0025} value={alpha} onChange={(e) => setAlpha(+e.target.value)} />
         </label>
         <label className="wl-slider">
-          <span>Idiosyncratic noise<InfoTip text="Company-specific wobble unrelated to the market. More noise scatters the dots and lowers R² — this is the risk diversification removes." /> <strong>{pct(idio, 0)}</strong></span>
+          <span>Idiosyncratic noise<InfoTip text="Company-specific wobble unrelated to the market. More noise scatters the dots and lowers R². This is the risk diversification removes." /> <strong>{pct(idio, 0)}</strong></span>
           <input type="range" min={0} max={0.25} step={0.005} value={idio} onChange={(e) => setIdio(+e.target.value)} />
         </label>
 
@@ -182,7 +182,7 @@ export default function CapmLab() {
             className={!showReal ? "active" : ""}
             aria-pressed={!showReal}
             onClick={() => setShowReal(false)}
-            title="Illustrative — the scatter is synthetic, generated from the beta, volatility, and noise you set with the sliders. Not real data; it's here to show how beta and R² work."
+            title="Illustrative: the scatter is synthetic, generated from the beta, volatility, and noise you set with the sliders. Not real data; it's here to show how beta and R² work."
           >
             Model
           </button>
@@ -191,7 +191,7 @@ export default function CapmLab() {
             className={showReal ? "active" : ""}
             aria-pressed={showReal}
             onClick={() => setShowReal(true)}
-            title={`Direct — real US industry portfolios plotted by their actual average return vs. beta (beta measured by regression). Data: Fama–French, ${capmSml.span[0].slice(0, 4)}–${capmSml.span[1].slice(0, 4)}.`}
+            title={`Direct: real US industry portfolios plotted by their actual average return vs. beta (beta measured by regression). Data: Fama–French, ${capmSml.span[0].slice(0, 4)}–${capmSml.span[1].slice(0, 4)}.`}
           >
             Real US industries
           </button>
@@ -199,7 +199,7 @@ export default function CapmLab() {
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>
           Switch to real data to see the {capmSml.assets.length} US industry
           portfolios ({capmSml.span[0].slice(0, 4)}–{capmSml.span[1].slice(0, 4)})
-          plotted by their actual beta and return — and whether they land on the line.
+          plotted by their actual beta and return, and whether they land on the line.
         </p>
       </div>
 
@@ -238,8 +238,8 @@ export default function CapmLab() {
               <span className="wl-bar-value">{pct(sysShare, 0)}</span>
             </div>
             <p className="wl-saved">
-              Only the <strong>{pct(sysShare, 0)}</strong> systematic slice is rewarded —
-              the rest is idiosyncratic and diversifies away. With more data, β̂ closes
+              Only the <strong>{pct(sysShare, 0)}</strong> systematic slice is rewarded.
+              The rest is idiosyncratic and diversifies away. With more data, β̂ closes
               in on the true β; with a small sample it wanders.
             </p>
           </div>
@@ -253,7 +253,7 @@ export default function CapmLab() {
             </dl>
             <p className={`cl-verdict ${verdict.cls}`}>{verdict.text}</p>
             <p className="wl-note">
-              Portfolio beta is just a weighted average of the parts — unlike volatility,
+              Portfolio beta is just a weighted average of the parts. Unlike volatility,
               it adds up linearly. The market portfolio (β = 1) is the tangency portfolio
               from the <a href="/tools/portfolio">Portfolio Lab</a>.
             </p>
@@ -354,7 +354,7 @@ function RealSML() {
 
   return (
     <div className="cl-panel">
-      <h3>Security market line — real data</h3>
+      <h3>Security market line: real data</h3>
       <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Real US industry portfolios plotted by beta and average return against the CAPM security market line">
         <line x1={pad.left} y1={pad.top} x2={pad.left} y2={height - pad.bottom} stroke="var(--color-border)" />
         <line x1={pad.left} y1={y(d.rf)} x2={width - pad.right} y2={y(d.rf)} stroke="var(--color-border)" strokeDasharray="3 3" />
@@ -387,8 +387,8 @@ function RealSML() {
       </div>
       <p className="wl-note" style={{ marginTop: "0.5rem" }}>
         CAPM says return should rise <strong>{(d.marketExcess * 100).toFixed(1)}%</strong> per unit
-        of beta. In the real data it rises only <strong>{(d.empiricalSlope * 100).toFixed(1)}%</strong> —
-        the line is too flat. Low-beta industries (like {lowest.name.toLowerCase()}) beat their
+        of beta. In the real data it rises only <strong>{(d.empiricalSlope * 100).toFixed(1)}%</strong>.
+        The line is too flat. Low-beta industries (like {lowest.name.toLowerCase()}) beat their
         beta; high-beta ones lag. That gap is the "betting against beta" anomaly, and the reason
         beta alone isn't the whole story.
       </p>

@@ -14,7 +14,7 @@ import {
 } from "../lib/socialSecurity";
 
 /**
- * A survival-weighted Social Security claiming optimizer — our take on Mike
+ * A survival-weighted Social Security claiming optimizer, our take on Mike
  * Piper's Open Social Security, with two extra levers: a health-based mortality
  * adjustment (the longevity "premium" of not smoking / staying active) and a
  * discount rate you can tie to paying down debt. Educational, single-earner; for
@@ -117,7 +117,7 @@ export default function SocialSecurityLab() {
         <ResetButton onReset={resetAll} />
         <div className="ss-credit">
           Inspired by <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a> by
-          Mike Piper — the free, open-source gold standard. Use his for a real
+          Mike Piper, the free, open-source gold standard. Use his for a real
           filing strategy; ours adds health, debt &amp; survivor levers for intuition.
         </div>
 
@@ -143,16 +143,16 @@ export default function SocialSecurityLab() {
         <label className="wl-slider">
           <span>
             Discount rate (real)
-            <InfoTip text="How much you value a dollar today vs. later. If you'd use early benefits to pay off debt, set this near that debt's rate — retiring a 6% mortgage IS a 6% return, and it favors claiming earlier." />{" "}
+            <InfoTip text="How much you value a dollar today vs. later. If you'd use early benefits to pay off debt, set this near that debt's rate. Retiring a 6% mortgage IS a 6% return, and it favors claiming earlier." />{" "}
             <strong>{discountRate}%</strong>
           </span>
           <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
         </label>
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>
           {mode === "single" ? (
-            <>Single-earner teaching model — no spousal, survivor, tax, or earnings-test rules.</>
+            <>Single-earner teaching model: no spousal, survivor, tax, or earnings-test rules.</>
           ) : (
-            <>Couple model — retirement + survivor benefits over joint mortality; omits spousal top-ups, taxes, and the earnings test.</>
+            <>Couple model: retirement + survivor benefits over joint mortality; omits spousal top-ups, taxes, and the earnings test.</>
           )}{" "}
           Benefits are in today's dollars. Data: SSA period life table, AWI, bend points, COLA.
         </p>
@@ -165,15 +165,15 @@ export default function SocialSecurityLab() {
             <ValueChart result={result} />
             <p className="wl-fnote">
               Each bar is the expected lifetime benefit (survival-weighted, discounted
-              to today) if you first claim at that age. The tallest is your optimum —
-              delaying trades smaller-but-sooner checks for bigger-but-later ones, and
+              to today) if you first claim at that age. The tallest is your optimum.
+              Delaying trades smaller-but-sooner checks for bigger-but-later ones, and
               wins only if you're likely to live to collect them.
               {(() => {
                 const s = valueScale(result.points);
                 return s.zoomed ? (
                   <>
-                    {" "}The vertical axis is <strong>zoomed in</strong> — it starts at $
-                    {Math.round(s.floor / 1000)}k, not $0 (note the break mark at its base) — so
+                    {" "}The vertical axis is <strong>zoomed in</strong>: it starts at $
+                    {Math.round(s.floor / 1000)}k, not $0 (note the break mark at its base), so
                     these close-together values are easier to compare.
                   </>
                 ) : null;
@@ -204,7 +204,7 @@ export default function SocialSecurityLab() {
               <h3>The health premium</h3>
               <p>
                 Your habits imply a life expectancy of{" "}
-                <strong>{result.lifeExpectancy.toFixed(1)}</strong> — {" "}
+                <strong>{result.lifeExpectancy.toFixed(1)}</strong>: {" "}
                 {Math.abs(leDelta) < 0.1 ? (
                   <>right around the population average.</>
                 ) : leDelta > 0 ? (
@@ -218,12 +218,12 @@ export default function SocialSecurityLab() {
                   <>
                     <strong>{Math.abs(leDelta).toFixed(1)} years shorter</strong> than
                     average, about {currency(Math.abs(valueDelta))} less in lifetime
-                    benefits — and a reason to claim earlier.
+                    benefits, and a reason to claim earlier.
                   </>
                 )}
               </p>
               <p className="wl-fnote">
-                Fitness and not smoking buy longevity no portfolio can guarantee — an
+                Fitness and not smoking buy longevity no portfolio can guarantee, an
                 under-priced return that also happens to reshape this very decision.
               </p>
             </div>
@@ -252,7 +252,7 @@ function PersonFields(props: {
       <label className="wl-slider">
         <span>
           Benefit at full retirement
-          <InfoTip text="Their Primary Insurance Amount — the monthly check at full retirement age. The real figure is on the Social Security statement (ssa.gov)." />{" "}
+          <InfoTip text="Their Primary Insurance Amount, the monthly check at full retirement age. The real figure is on the Social Security statement (ssa.gov)." />{" "}
           <strong>{currency(props.pia)}/mo</strong>
         </span>
         <input type="range" min={800} max={4000} step={50} value={props.pia} onChange={(e) => props.setPia(Number(e.target.value))} />
@@ -296,7 +296,7 @@ function CoupleOutput({ couple, piaA, piaB }: { couple: CoupleResult; piaA: numb
         <CoupleHeatmap result={couple} />
         <p className="wl-fnote">
           Each square is the household's expected lifetime benefit (survival-weighted,
-          discounted to today) for one combination of claim ages — <strong>you</strong> across
+          discounted to today) for one combination of claim ages: <strong>you</strong> across
           the bottom, <strong>your spouse</strong> up the side. The brightest square, outlined,
           is the pair that together collects the most.
         </p>
@@ -318,7 +318,7 @@ function CoupleOutput({ couple, piaA, piaB }: { couple: CoupleResult; piaA: numb
             The <strong>higher earner</strong> ({hi.name}) should claim at{" "}
             <strong>{monthsToLabel(hi.couple)}</strong>
             {hi.couple > hi.solo + 1 ? (
-              <> — later than the {monthsToLabel(hi.solo)} that would be optimal claiming alone</>
+              <>, later than the {monthsToLabel(hi.solo)} that would be optimal claiming alone</>
             ) : null}
             . That larger check becomes the survivor's income for as long as <em>either</em> of you
             is alive, so delaying it insures the longer of two lifetimes. Coordinating this way is
@@ -397,7 +397,7 @@ interface ValueScale { zoomed: boolean; floor: number; ceil: number; ticks: numb
  * Choose the y-axis range for the lifetime-value bars. Survival-weighted NPVs for
  * adjacent claiming ages are usually within a few percent of each other, so a
  * zero-based axis squashes them into near-identical bars. When that's the case we
- * "break" the axis — start it above zero — to make the real differences visible,
+ * "break" the axis (start it above zero) to make the real differences visible,
  * and flag that we've done so (a break mark on the axis + a note in the caption).
  */
 function valueScale(pts: { npv: number }[]): ValueScale {

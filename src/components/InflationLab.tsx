@@ -4,7 +4,7 @@ import ResetButton from "./ResetButton";
 import { inflation } from "../data/generated/inflation";
 
 /**
- * "What happened to your dollar?" — rebase real US CPI category price levels to a
+ * "What happened to your dollar?": rebase real US CPI category price levels to a
  * year of your choosing and watch how differently everyday prices moved: college
  * and healthcare soaring far past the overall average, while toys and clothing
  * stayed flat or got cheaper. Plus the plain purchasing-power erosion of a dollar.
@@ -65,7 +65,7 @@ export default function InflationLab() {
         <label className="wl-slider">
           <span>
             An amount, then
-            <InfoTip text="A dollar figure in your start year — we'll show what the same basket of goods costs today." />{" "}
+            <InfoTip text="A dollar figure in your start year. We'll show what the same basket of goods costs today." />{" "}
             <strong>{dollars(amount)}</strong>
           </span>
           <input type="range" min={10} max={1000} step={10} value={amount} onChange={(e) => setAmount(+e.target.value)} />
@@ -81,7 +81,7 @@ export default function InflationLab() {
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
           Overall prices rose about <strong>{(view.annualized * 100).toFixed(1)}%</strong> a
-          year since {startYear} — but the average hides enormous spread. <strong>Method:</strong> the official
+          year since {startYear}, but the average hides enormous spread. <strong>Method:</strong> the official
           category price indexes, plotted directly and rebased to your chosen year (no modelling). Data: US
           BLS consumer price indexes via FRED.
         </p>
@@ -116,7 +116,7 @@ export default function InflationLab() {
               ) : (
                 <>rose only {view.slowest.mult.toFixed(1)}×</>
               )}
-              . "Inflation" is really many different stories at once — which is why the
+              . "Inflation" is really many different stories at once, which is why the
               category you spend most on matters more than the headline number.
             </p>
           </div>

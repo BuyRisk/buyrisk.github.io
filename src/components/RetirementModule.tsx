@@ -5,9 +5,9 @@ import RothLab from "./RothLab";
 
 /**
  * Retirement & Roth module: funding and drawing down the nest egg.
- *  • Burn rate — what retirement costs, the nest egg it implies, and whether it lasts.
- *  • Social Security — when to claim the guaranteed inflation-adjusted income.
- *  • Roth vs Traditional — which account, and the employer match to grab first.
+ *  • Burn rate: what retirement costs, the nest egg it implies, and whether it lasts.
+ *  • Social Security: when to claim the guaranteed inflation-adjusted income.
+ *  • Roth vs Traditional: which account, and the employer match to grab first.
  */
 export default function RetirementModule() {
   return (

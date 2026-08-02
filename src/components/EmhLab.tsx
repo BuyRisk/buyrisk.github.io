@@ -3,10 +3,10 @@ import ResetButton from "./ResetButton";
 import { mulberry32, makeNormal } from "../lib/portfolio";
 
 /**
- * "Can you beat the market?" — an efficient-markets game. A simulated stock
+ * "Can you beat the market?": an efficient-markets game. A simulated stock
  * unfolds one step at a time; the player predicts each next move (up/down). Two
  * lessons emerge: prediction accuracy hovers at ~50% (the past doesn't forecast
- * the future — weak-form EMH), and jumping in and out ("timing") tends to trail
+ * the future, weak-form EMH), and jumping in and out ("timing") tends to trail
  * just holding, because you sit out unpredictable jumps.
  */
 
@@ -104,19 +104,19 @@ export default function EmhLab() {
         {over ? (
           <div className="emh-verdict">
             <p className="emh-verdict-head">
-              You called {correctCount} of {N} right — {accuracy > 0.6 ? "a hot streak" : accuracy < 0.4 ? "a cold streak" : "about a coin flip"}.
+              You called {correctCount} of {N} right, {accuracy > 0.6 ? "a hot streak" : accuracy < 0.4 ? "a cold streak" : "about a coin flip"}.
             </p>
             <p>
               {timingReturn < buyHold ? (
-                <>By jumping in and out you turned the market's <strong>{signed(buyHold)}</strong> into <strong>{signed(timingReturn)}</strong> — timing <em>cost</em> you, because you sat out moves you couldn't predict.</>
+                <>By jumping in and out you turned the market's <strong>{signed(buyHold)}</strong> into <strong>{signed(timingReturn)}</strong>. Timing <em>cost</em> you, because you sat out moves you couldn't predict.</>
               ) : (
-                <>You beat buy-and-hold this round (<strong>{signed(timingReturn)}</strong> vs <strong>{signed(buyHold)}</strong>) — but that's luck. Keep playing and watch your accuracy drift toward 50%.</>
+                <>You beat buy-and-hold this round (<strong>{signed(timingReturn)}</strong> vs <strong>{signed(buyHold)}</strong>), but that's luck. Keep playing and watch your accuracy drift toward 50%.</>
               )}
             </p>
           </div>
         ) : (
           <p className="emh-hint">
-            The chart is a simulated stock. Study the trend all you like — then
+            The chart is a simulated stock. Study the trend all you like, then
             predict. The past is already in the price.
           </p>
         )}
@@ -129,7 +129,7 @@ export default function EmhLab() {
           </div>
           <span className="emh-cum-val">
             {cum.total > 0 ? `${Math.round(cumAcc * 100)}% over ${cum.total} predictions` : "make some predictions…"}
-            {cum.total >= 10 && <> — the 50% line is where a coin flip lands.</>}
+            {cum.total >= 10 && <>. The 50% line is where a coin flip lands.</>}
           </span>
         </div>
 

@@ -3,11 +3,11 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
 /**
- * "Savings Rate & Financial Independence" — the punchline of the control-volume
+ * "Savings Rate & Financial Independence": the punchline of the control-volume
  * view of net worth: what fills the tank is INPUT − OUTPUT (your savings rate),
  * and what the tank generates (investment returns) eventually covers your OUTPUT
  * forever. The startling result: how long that takes depends on your savings
- * RATE and return — almost not at all on your income. Two people saving 20% reach
+ * RATE and return, almost not at all on your income. Two people saving 20% reach
  * independence in the same number of years whether they earn $50k or $500k.
  * Educational only, not advice.
  */
@@ -73,7 +73,7 @@ export default function SavingsRateLab() {
         <label className="wl-slider">
           <span>
             Take-home pay
-            <InfoTip text="Your spendable income after taxes. Slide it and watch the YEARS barely move — income sets how big your numbers are, not how long financial independence takes." />{" "}
+            <InfoTip text="Your spendable income after taxes. Slide it and watch the YEARS barely move. Income sets how big your numbers are, not how long financial independence takes." />{" "}
             <strong>{currency(income)}/yr</strong>
           </span>
           <input type="range" min={20_000} max={400_000} step={5_000} value={income} onChange={(e) => setIncome(+e.target.value)} />
@@ -82,7 +82,7 @@ export default function SavingsRateLab() {
         <label className="wl-slider">
           <span>
             Real return
-            <InfoTip text="Expected investment return above inflation. A globally diversified stock/bond mix has historically returned roughly 4–6% real over long periods — nothing is guaranteed." />{" "}
+            <InfoTip text="Expected investment return above inflation. A globally diversified stock/bond mix has historically returned roughly 4–6% real over long periods. Nothing is guaranteed." />{" "}
             <strong>{ret}%</strong>
           </span>
           <input type="range" min={0} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
@@ -111,14 +111,14 @@ export default function SavingsRateLab() {
           <span className="ss-headline-value">{fmtYears(view.years)} {Number.isFinite(view.years) && view.years < MAX_YEARS ? "years" : ""}</span>
           <span className="ss-headline-sub">
             {Number.isFinite(view.fiAge) && view.fiAge < age + MAX_YEARS
-              ? <>around age <strong>{view.fiAge.toFixed(0)}</strong> — a {currency(view.target)} nest egg ({view.multiple.toFixed(0)}× spending)</>
+              ? <>around age <strong>{view.fiAge.toFixed(0)}</strong>, a {currency(view.target)} nest egg ({view.multiple.toFixed(0)}× spending)</>
               : <>at this savings rate the finish line is more than {MAX_YEARS} years out</>}
           </span>
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
           Starting from zero, saving a constant share of pay, earning {ret}% real. Years to FI depend on your savings
-          rate and return — <strong>not</strong> your income. Educational only, not advice.
+          rate and return, <strong>not</strong> your income. Educational only, not advice.
         </p>
       </div>
 
@@ -128,7 +128,7 @@ export default function SavingsRateLab() {
           <SavingsCurve curve={view.curve} savings={savings} years={view.years} />
           <p className="wl-fnote">
             The curve is brutal at the left and merciful at the right: going from a 10% to a 20% savings rate cuts far
-            more time than going from 60% to 70%. Every extra point of savings does double duty — it grows the pile
+            more time than going from 60% to 70%. Every extra point of savings does double duty: it grows the pile
             faster <em>and</em> shrinks the pile you need.
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function SavingsRateLab() {
             <p className="wl-saved">
               Here's the part that surprises people: drag <strong>take-home pay</strong> from {currency(20_000)} to{" "}
               {currency(400_000)} and the <strong>years barely change</strong>. A bigger paycheck makes every number
-              bigger — the savings, the spending, the target — but they scale together, so the <em>rate</em> is what
+              bigger (the savings, the spending, the target), but they scale together, so the <em>rate</em> is what
               sets your timeline. It's the closest thing personal finance has to a law of conservation: what you don't
               spend is what funds your freedom, and how fast you get there is set by the fraction, not the size, of the
               flow. Educational only, not advice.
@@ -159,7 +159,7 @@ export default function SavingsRateLab() {
               <a href="https://www.mrmoneymustache.com/2012/01/13/the-shockingly-simple-math-behind-early-retirement/" target="_blank" rel="noopener noreferrer">
                 "The Shockingly Simple Math Behind Early Retirement"
               </a>{" "}
-              (2012). It assumes a 5% real return and a 4% withdrawal rate — the same defaults as this tool, which is why
+              (2012). It assumes a 5% real return and a 4% withdrawal rate, the same defaults as this tool, which is why
               the rows line up. Set those sliders differently and your curve above will diverge from his table.
             </p>
           </div>

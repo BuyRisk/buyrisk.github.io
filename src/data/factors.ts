@@ -1,6 +1,6 @@
 /**
  * Fama–French factor data. Premia and volatilities are long-run annualized US
- * averages (≈1963–present) from the Kenneth French Data Library — real
+ * averages (≈1963–present) from the Kenneth French Data Library: real
  * empirical figures, though every one is period-dependent (value in particular
  * has had long droughts). They ground the factor tool's return attribution.
  *
@@ -27,7 +27,7 @@ export const FACTORS: Factor[] = [
     premium: 0.066,
     vol: 0.154,
     color: "var(--pl-c1)",
-    blurb: "The whole stock market's return above Treasury bills — the reward for bearing market risk.",
+    blurb: "The whole stock market's return above Treasury bills: the reward for bearing market risk.",
   },
   {
     key: "smb",
@@ -81,7 +81,7 @@ export type FactorPreset = { name: string; blurb: string; loadings: Loadings };
 export const FACTOR_PRESETS: FactorPreset[] = [
   {
     name: "Total US market",
-    blurb: "The whole market — market risk only, no tilts.",
+    blurb: "The whole market: market risk only, no tilts.",
     loadings: { mkt: 1, smb: 0, hml: 0, rmw: 0, cma: 0 },
   },
   {
@@ -96,7 +96,7 @@ export const FACTOR_PRESETS: FactorPreset[] = [
   },
   {
     name: "Small-cap growth",
-    blurb: "Small, expensive, unprofitable — historically the weakest corner.",
+    blurb: "Small, expensive, unprofitable: historically the weakest corner.",
     loadings: { mkt: 1.12, smb: 0.72, hml: -0.42, rmw: -0.35, cma: -0.45 },
   },
   {
