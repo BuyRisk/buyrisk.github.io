@@ -522,7 +522,18 @@ function HistoricalGrowthPanel({
         req[p] = ga > 0 ? Math.max(0, (target - gp * principal) / ga) / 12 : 0;
       }
       // Lower required saving = luckier markets, so p10 is the "kind" case.
-      return { goal: true as const, reqMedian: quantile(req, 0.5), reqLucky: quantile(req, 0.1), reqUnlucky: quantile(req, 0.9) };
+      const reqMedian = quantile(req, 0.5);
+      // At that typical pace, how much of the goal is your own money vs growth.
+      const totalContributed = principal + reqMedian * 12 * years;
+      const growthShare = Math.max(0, target - totalContributed);
+      return {
+        goal: true as const,
+        reqMedian,
+        reqLucky: quantile(req, 0.1),
+        reqUnlucky: quantile(req, 0.9),
+        totalContributed,
+        growthShare,
+      };
     }
 
     const annual = monthly * 12;
@@ -569,11 +580,21 @@ function HistoricalGrowthPanel({
             <dd>{currency(stats.reqUnlucky)}/mo</dd>
           </div>
         </dl>
+        <div className="cge-legend" style={{ marginTop: "var(--space-sm)" }}>
+          <span className="cge-legend-item">
+            <span className="cge-swatch cge-swatch--balance" /> Goal (projected balance) {compactCurrency(target)}
+          </span>
+          <span className="cge-legend-item">
+            <span className="cge-swatch cge-swatch--contributed" /> Money you put in {compactCurrency(stats.totalContributed)}
+          </span>
+        </div>
         <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
           There's no single right answer; how much you need depends on returns nobody can predict. Across the
           histories, the monthly saving to hit your goal ranges from about <strong>{currency(stats.reqLucky)}</strong>{" "}
           in kind markets to <strong>{currency(stats.reqUnlucky)}</strong> in unkind ones. A sturdy plan aims near the
-          higher end and treats good luck as a bonus.
+          higher end and treats good luck as a bonus. At the typical pace you'd contribute about{" "}
+          <strong>{currency(stats.totalContributed)}</strong> of your own money, and the other{" "}
+          <strong>{currency(stats.growthShare)}</strong> of your {compactCurrency(target)} goal comes from compounding.
         </p>
         <p className="cge-note">
           {HIST_PATHS.toLocaleString()} alternate timelines, block-bootstrapped from real US returns
@@ -1247,7 +1268,7 @@ export default function CompoundGrowthExplorer() {
       </div>
       )}
 
-      {simMode === "simple" && mode === "project" && (
+      {simMode === "simple" && (
         <div className="cge-lifecycle-wrap">
           <button type="button" className="cge-life-toggle" onClick={() => setShowLifecycle((v) => !v)}>
             {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view: human capital, savings &amp; the drawdown
