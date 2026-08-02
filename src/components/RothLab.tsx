@@ -290,7 +290,7 @@ export default function RothLab() {
                   a higher bracket later, Traditional if lower. But notice the third bar: the <strong>taxable account</strong>
                   starts with the exact same after-tax dollars as Roth, yet ends <strong>{currency(acct.taxDrag)}</strong> behind
                   (a drag of about <strong>{(acct.dragPct * 100).toFixed(1)}%/yr</strong>) purely from taxes it can't defer.
-                  And that gap swings hard on the fund: a low-turnover <strong>index fund</strong> barely distributes gains,
+                  And that gap varies sharply with the fund: a low-turnover <strong>index fund</strong> barely distributes gains,
                   while a churning <strong>active fund</strong> hands you a taxable bill every year, much of it at your higher
                   ordinary rate. That's the case for sheltering first, and for holding tax-inefficient, high-turnover funds
                   <em> inside</em> tax-advantaged accounts. Educational only, not advice.

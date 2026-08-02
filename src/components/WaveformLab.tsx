@@ -17,7 +17,7 @@ import {
  * Each asset is a clean sine wave: amplitude = its volatility, and its phase
  * comes from correlation (in-phase = +1, quarter-turn = 0, opposite = -1). The
  * weighted portfolio is the sum of those waves, drawn below. When the waves are
- * out of phase they partly cancel, so the portfolio swings less than its parts.
+ * out of phase they partly cancel, so the portfolio is less volatile than its parts.
  *
  * This is exact, not hand-wavy: the portfolio wave's amplitude equals the
  * portfolio volatility sqrt(wᵀΣw) under corr(i,j) = cos(phase_i − phase_j).
@@ -91,7 +91,7 @@ export default function WaveformLab() {
 
   // Efficient frontier, using the same correlation model that drives the waves:
   // corr(i, j) = cos(phase_i - phase_j). The y-axis uses each asset's expected
-  // return; the current mix's volatility is exactly the portfolio wave's swing.
+  // return; the current mix's volatility is exactly the portfolio wave's amplitude.
   const mus = useMemo(() => assets.map((a) => a.ret), [assets]);
   const cov = useMemo(() => {
     const n = assets.length;
@@ -174,7 +174,7 @@ export default function WaveformLab() {
       ctx!.font = SANS;
       ctx!.textAlign = "left";
       ctx!.textBaseline = "top";
-      ctx!.fillText("Each asset's swing", padL, 2);
+      ctx!.fillText("Each asset's volatility", padL, 2);
       ctx!.fillText("Your portfolio", padL, bandH + gap + 2);
       ctx!.textAlign = "right";
       ctx!.fillText("time →", W - padR, 2);
@@ -215,7 +215,7 @@ export default function WaveformLab() {
       }
       ctx!.stroke();
 
-      // faint guide showing the max possible swing (weighted-average amplitude)
+      // faint guide showing the max possible volatility (weighted-average amplitude)
       ctx!.strokeStyle = color("--color-muted");
       ctx!.globalAlpha = 0.4;
       ctx!.setLineDash([4, 4]);
@@ -359,8 +359,8 @@ export default function WaveformLab() {
 
               <label className="wl-slider">
                 <span>
-                  Swing
-                  <InfoTip text="The asset's volatility: how big its ups and downs are. Here it sets the height (amplitude) of the wave." />{" "}
+                  Volatility
+                  <InfoTip text="The asset's volatility (standard deviation of its return): how big its ups and downs are. Here it sets the height (amplitude) of the wave." />{" "}
                   <strong>{pct(a.amp, 0)}</strong>
                 </span>
                 <input
@@ -445,14 +445,14 @@ export default function WaveformLab() {
         <div className="wl-lower">
           <div className="wl-readout">
             <div className="wl-bar">
-              <span className="wl-bar-label">If the swings simply added up</span>
+              <span className="wl-bar-label">If the volatilities simply added up</span>
               <div className="wl-bar-track">
                 <div className="wl-bar-fill wl-bar-fill--avg" style={{ width: "100%" }} />
               </div>
               <span className="wl-bar-value">{pct(avgAmp)}</span>
             </div>
             <div className="wl-bar">
-              <span className="wl-bar-label">Actual portfolio swing</span>
+              <span className="wl-bar-label">Actual portfolio volatility</span>
               <div className="wl-bar-track">
                 <div
                   className="wl-bar-fill wl-bar-fill--port"
@@ -463,7 +463,7 @@ export default function WaveformLab() {
             </div>
             <p className="wl-saved">
               Out-of-phase waves cancel <strong>{pct(cancelled, 0)}</strong> of the
-              swing. That shrinkage is diversification: exactly the portfolio's
+              volatility. That shrinkage is diversification: exactly the portfolio's
               volatility falling below the average of its parts.
             </p>
           </div>
@@ -484,7 +484,7 @@ export default function WaveformLab() {
               <span><span className="wl-fdot wl-fdot--as" /> Single asset</span>
             </div>
             <p className="wl-fnote">
-              Your portfolio's swing above is its <em>risk</em> here: its spot on
+              Your portfolio's volatility above is its <em>risk</em> here: its spot on
               the horizontal axis. As you lower correlation, the frontier bows out
               and your mix slides left. (Return uses each asset's typical figure.)
             </p>

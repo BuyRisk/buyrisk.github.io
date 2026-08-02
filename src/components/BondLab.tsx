@@ -108,7 +108,7 @@ export default function BondLab() {
             <p className="wl-note" style={{ marginTop: "0.5rem" }}>
 <strong>Method:</strong> pure present-value bond math: no historical data and no default risk assumed. (The
               "Today's rates" tab instead plots the current Treasury curve directly from FRED.) Par bonds, annual
-              coupons; longer maturity = bigger swing = more interest-rate risk. Educational only, not advice.
+              coupons; longer maturity = bigger price move = more interest-rate risk. Educational only, not advice.
             </p>
           </>
         ) : (
@@ -137,7 +137,7 @@ export default function BondLab() {
               <RateRiskChart bars={risk.bars} focus={focus} rateMove={rateMove} />
               <p className="wl-fnote">
                 Every bar is the same {pctText(rateMove)} rate move, but the longer the bond, the more of its value sits
-                in far-off payments that get repriced, so the bigger the swing. That sensitivity has a name: <strong>duration</strong>.
+                in far-off payments that get repriced, so the bigger the price move. That sensitivity has a name: <strong>duration</strong>.
               </p>
             </div>
             <div className="wl-lower">
@@ -227,7 +227,7 @@ function RateRiskChart({ bars, focus, rateMove }: { bars: { m: number; change: n
         );
       })}
       <text x={pad.left + plotW / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Price change for a {rateMove >= 0 ? "+" : "−"}{Math.abs(rateMove)}% rate move · longer maturity → bigger swing
+        Price change for a {rateMove >= 0 ? "+" : "−"}{Math.abs(rateMove)}% rate move · longer maturity → bigger price move
       </text>
     </svg>
   );

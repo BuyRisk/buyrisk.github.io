@@ -32,7 +32,7 @@ const PORT_SEED = 909090;
 // The extreme right tail (stocks above the histogram's 200× top bin) is modelled
 // as a bounded Pareto capped at TAIL_MAX, a representative best-case lifetime
 // multiple for a stock compounded across the ~century-long sample. The cap keeps
-// one lucky draw from making the displayed "market average" swing between
+// one lucky draw from making the displayed "market average" vary between
 // reseeds; TAIL_ALPHA (below) is then solved so the reconstructed mean equals the
 // real mean multiple. Everything below 200× is sampled log-uniformly *inside* the
 // shipped histogram bins, so all but this last bucket reproduces CRSP exactly.

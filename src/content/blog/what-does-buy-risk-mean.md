@@ -30,7 +30,7 @@ reward*. That extra expected reward is called the **risk premium**.
 ## "Buying risk" is a deliberate act
 
 When you invest, you are choosing to take on a specific bundle of risks
-(market swings, inflation, the fortunes of particular companies) in exchange
+(market volatility, inflation, the fortunes of particular companies) in exchange
 for an expected premium. Done thoughtfully, that's not gambling. It's a
 priced, repeatable trade.
 

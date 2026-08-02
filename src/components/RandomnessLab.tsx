@@ -20,7 +20,7 @@ import {
 /**
  * The noisy sequel to the waveforms tool. Each asset is a correlated
  * mean-reverting random series (amplitude ≈ volatility) rather than a clean
- * sine wave. The weighted portfolio still swings less than its parts, but with
+ * sine wave. The weighted portfolio is still less volatile than its parts, but with
  * real randomness the cancellation is never perfect, it varies run to run, and
  * sometimes every asset falls at once.
  */
@@ -365,8 +365,8 @@ export default function RandomnessLab() {
 
               <label className="wl-slider">
                 <span>
-                  Swing
-                  <InfoTip text="The asset's volatility: the typical size of its random ups and downs each period." />{" "}
+                  Volatility
+                  <InfoTip text="The asset's volatility (standard deviation of its return): the typical size of its random ups and downs each period." />{" "}
                   <strong>{pct(a.sigma, 0)}</strong>
                 </span>
                 <input
@@ -452,14 +452,14 @@ export default function RandomnessLab() {
         <div className="wl-lower">
           <div className="wl-readout">
             <div className="wl-bar">
-              <span className="wl-bar-label">If the swings simply added up</span>
+              <span className="wl-bar-label">If the volatilities simply added up</span>
               <div className="wl-bar-track">
                 <div className="wl-bar-fill wl-bar-fill--avg" style={{ width: "100%" }} />
               </div>
               <span className="wl-bar-value">{pct(avgVol)}</span>
             </div>
             <div className="wl-bar">
-              <span className="wl-bar-label">Portfolio swing (in theory)</span>
+              <span className="wl-bar-label">Portfolio volatility (in theory)</span>
               <div className="wl-bar-track">
                 <div
                   className="wl-bar-fill wl-bar-fill--port"
@@ -480,7 +480,7 @@ export default function RandomnessLab() {
             </div>
             <p className="wl-saved">
               Diversification should cancel <strong>{pct(cancelled, 0)}</strong> of the
-              swing, but this run came out to {pct(realizedVol)}, not the theoretical{" "}
+              volatility, but this run came out to {pct(realizedVol)}, not the theoretical{" "}
               {pct(portVol)}. Randomness means it's never exact, and every asset fell
               together <strong>{pct(allDownFrac, 0)}</strong> of the time.
             </p>

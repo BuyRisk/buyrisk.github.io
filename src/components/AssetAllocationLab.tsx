@@ -25,6 +25,11 @@ const REAL = S.map((y) => ({
 }));
 const SPAN = historicalReturns.span;
 
+// Real risk-free rate: the average real 3-month T-bill return over the same
+// record. Used as the baseline for the Sharpe ratio so it's derived from the
+// same data, not an assumed number.
+const RF_REAL = S.reduce((s, y) => s + ((1 + y.tbills) / (1 + y.inflation) - 1), 0) / S.length;
+
 const pct = (x: number, dp = 1) => `${x >= 0 ? "" : "−"}${Math.abs(x * 100).toFixed(dp)}%`;
 
 function stats(w: number) {
@@ -53,6 +58,8 @@ export default function AssetAllocationLab() {
   }, [stockPct]);
 
   const c = view.cur;
+  // Sharpe ratio: real reward per unit of volatility, above the real risk-free rate.
+  const sharpe = c.vol > 0 ? (c.arith - RF_REAL) / c.vol : 0;
 
   return (
     <div className="wl">
@@ -102,8 +109,12 @@ export default function AssetAllocationLab() {
           <div className="wl-readout">
             <dl className="ss-stats">
               <div><dt>Compound return (real)</dt><dd>{pct(c.geo)}/yr</dd></div>
-              <div><dt>Worst drawdown</dt><dd>{pct(c.mdd)}</dd></div>
               <div><dt>Volatility</dt><dd>{pct(c.vol)}</dd></div>
+              <div>
+                <dt>Sharpe ratio<InfoTip text={`Reward per unit of risk: the average real return above the real risk-free rate (the ${pct(RF_REAL)} average real T-bill return here), divided by volatility. Higher means you were paid more for each unit of risk borne.`} /></dt>
+                <dd>{sharpe.toFixed(2)}</dd>
+              </div>
+              <div><dt>Worst drawdown</dt><dd>{pct(c.mdd)}</dd></div>
               <div><dt>Worst single year</dt><dd>{pct(c.worst)}</dd></div>
             </dl>
             <p className="wl-saved">

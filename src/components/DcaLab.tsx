@@ -154,7 +154,7 @@ export default function DcaLab() {
               because money in the market sooner spends more time compounding. Dollar-cost averaging isn't
               about beating that. It's about a <strong>narrower range of outcomes</strong> and less regret
               if you happen to invest right before a fall. If the cash is already yours and you can stomach
-              the swings, the math favors lump sum; if buying in all at once would keep you up at night,
+              the volatility, the math favors lump sum; if buying in all at once would keep you up at night,
               averaging is a reasonable price for peace of mind. Educational only, not advice.
             </p>
           </div>

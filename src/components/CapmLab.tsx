@@ -140,7 +140,7 @@ export default function CapmLab() {
 
         <p className="cl-group">Your asset</p>
         <label className="wl-slider">
-          <span>Beta (β)<InfoTip text="How much the asset amplifies the market. β=1 moves with it, β=2 swings twice as hard, β=0.5 half. It's the slope of the scatter." /> <strong>{beta.toFixed(2)}</strong></span>
+          <span>Beta (β)<InfoTip text="How much the asset amplifies the market. β=1 moves with it, β=2 moves twice as much, β=0.5 half. It's the slope of the scatter." /> <strong>{beta.toFixed(2)}</strong></span>
           <input type="range" min={-0.5} max={2.5} step={0.05} value={beta} onChange={(e) => setBeta(+e.target.value)} />
         </label>
         <label className="wl-slider">

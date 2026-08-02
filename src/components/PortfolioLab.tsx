@@ -853,7 +853,7 @@ export default function PortfolioLab() {
                   </span>
                 </label>
                 <label>
-                  <span>Risk<InfoTip text="The asset's volatility (standard deviation): how much its return swings year to year." /></span>
+                  <span>Risk<InfoTip text="The asset's volatility (standard deviation): how much its return varies year to year." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"

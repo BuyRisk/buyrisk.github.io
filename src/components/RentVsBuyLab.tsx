@@ -231,7 +231,7 @@ export default function RentVsBuyLab() {
             <p className="wl-saved">
               The <strong>price-to-rent ratio</strong> ({r.priceToRent.toFixed(1)}) is a quick gut check:
               below about 15, buying tends to win; above ~21, renting usually does. But the answer
-              swings most on one guess: <strong>home appreciation</strong>. Nationally prices rose{" "}
+              depends most on one guess: <strong>home appreciation</strong>. Nationally prices rose{" "}
               {pct(HIST_APPRECIATION)}/yr since {housing.homePrices.startYear}, yet they fell{" "}
               <strong>{pct(Math.abs(housing.homePrices.worstDrawdown.pct * 100), 0)}</strong> from{" "}
               {housing.homePrices.worstDrawdown.peakYear}–{housing.homePrices.worstDrawdown.troughYear},
