@@ -217,6 +217,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Market efficiency & active management",
     note: "Introduces the reward-to-variability (Sharpe) ratio.",
   },
+  barberOdean2000: {
+    authors: "Barber, B. M., & Odean, T.",
+    year: 2000,
+    title: "Trading Is Hazardous to Your Wealth: The Common Stock Investment Performance of Individual Investors",
+    venue: "The Journal of Finance 55(2): 773–806",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "The more households traded, the worse they did: the most active fifth trailed the market by about 6.5 points a year, mostly from trading costs.",
+  },
   sharpe1991: {
     authors: "Sharpe, W. F.",
     year: 1991,
@@ -464,6 +473,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "jensen1968",
       "sharpe1991",
       "famaFrench2010",
+      "barberOdean2000",
     ],
     datasets: ["french", "shiller", "spiva"],
   },

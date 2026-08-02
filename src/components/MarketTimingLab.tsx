@@ -263,7 +263,9 @@ export default function MarketTimingLab() {
                   <strong>{bestDays.nearWorst} of the 10 best days landed within a week of one of the 10 worst</strong>.
                   The huge up-days come right in the middle of the crashes, so bailing out to dodge the drops is
                   the surest way to miss the recoveries. "Time in the market beats timing the market" isn't a
-                  slogan. It's arithmetic. Educational only, not advice.
+                  slogan. It's arithmetic. And missing rebounds isn't the only cost: in Barber and Odean's landmark
+                  study, <em>Trading Is Hazardous to Your Wealth</em>, the households that traded the most trailed the
+                  market by roughly 6.5 points a year. Educational only, not advice.
                 </p>
               </div>
             </div>
