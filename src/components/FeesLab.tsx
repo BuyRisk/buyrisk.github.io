@@ -161,7 +161,9 @@ export default function FeesLab() {
         ) : (
           <p className="wl-note">
             The chart on the right is the real history of what fund investors actually paid,
-            drawn from the Investment Company Institute's annual expense-ratio study. Two
+            plotted <strong>directly</strong> from the Investment Company Institute's annual
+            expense-ratio study (the calculator simply compounds a fixed fee against your
+            balance each year). Two
             things stand out: fees fell dramatically over 30 years, and index funds cost a
             small fraction of what active funds charge. Switch back to the calculator to see
             what a gap like that does to a lifetime of saving.

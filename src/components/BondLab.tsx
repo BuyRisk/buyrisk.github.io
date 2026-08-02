@@ -106,8 +106,9 @@ export default function BondLab() {
             </div>
 
             <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-              Par bonds, annual coupons. Price change is present-value math — no default risk assumed. Longer maturity =
-              bigger swing = more interest-rate risk. Educational only, not advice.
+<strong>Method:</strong> pure present-value bond math — no historical data and no default risk assumed. (The
+              "Today's rates" tab instead plots the current Treasury curve directly from FRED.) Par bonds, annual
+              coupons; longer maturity = bigger swing = more interest-rate risk. Educational only, not advice.
             </p>
           </>
         ) : (

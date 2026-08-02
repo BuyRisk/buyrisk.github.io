@@ -177,10 +177,22 @@ export default function CapmLab() {
 
         <p className="cl-group">Does CAPM hold?</p>
         <div className="wl-simmode" role="group" aria-label="Security market line view">
-          <button type="button" className={!showReal ? "active" : ""} aria-pressed={!showReal} onClick={() => setShowReal(false)}>
+          <button
+            type="button"
+            className={!showReal ? "active" : ""}
+            aria-pressed={!showReal}
+            onClick={() => setShowReal(false)}
+            title="Illustrative — the scatter is synthetic, generated from the beta, volatility, and noise you set with the sliders. Not real data; it's here to show how beta and R² work."
+          >
             Model
           </button>
-          <button type="button" className={showReal ? "active" : ""} aria-pressed={showReal} onClick={() => setShowReal(true)}>
+          <button
+            type="button"
+            className={showReal ? "active" : ""}
+            aria-pressed={showReal}
+            onClick={() => setShowReal(true)}
+            title={`Direct — real US industry portfolios plotted by their actual average return vs. beta (beta measured by regression). Data: Fama–French, ${capmSml.span[0].slice(0, 4)}–${capmSml.span[1].slice(0, 4)}.`}
+          >
             Real US industries
           </button>
         </div>
