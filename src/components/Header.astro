@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import CurrencySelect from "./CurrencySelect.astro";
 import { TOOLS } from "../data/tools";
 
 type NavItem = { href: string; label: string; children?: typeof TOOLS };
@@ -77,6 +78,7 @@ const isActive = (href: string) =>
       }
     </nav>
 
+    <CurrencySelect />
     <ThemeToggle />
   </div>
 </header>

@@ -12,6 +12,7 @@ import {
   type OptimizeResult,
   type CoupleResult,
 } from "../lib/socialSecurity";
+import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
 
 /**
  * A survival-weighted Social Security claiming optimizer, our take on Mike
@@ -21,13 +22,7 @@ import {
  * a real filing strategy we point to Open Social Security.
  */
 
-const currency = (n: number) =>
-  n.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: Math.abs(n) >= 1e6 ? "compact" : "standard",
-    maximumFractionDigits: Math.abs(n) >= 1e6 ? 2 : 0,
-  });
+const currency = (n: number) => formatMoney(n);
 
 function Segmented<T extends string>({
   label,
@@ -60,6 +55,7 @@ function Segmented<T extends string>({
 }
 
 export default function SocialSecurityLab() {
+  const symbol = currencySymbol(useCurrencyCode()); // re-render + dynamic symbol
   const [mode, setMode] = useState<"single" | "couple">("single");
   // Person A (also "you" in single mode).
   const [pia, setPia] = useState(2400);
@@ -172,8 +168,8 @@ export default function SocialSecurityLab() {
                 const s = valueScale(result.points);
                 return s.zoomed ? (
                   <>
-                    {" "}The vertical axis is <strong>zoomed in</strong>: it starts at $
-                    {Math.round(s.floor / 1000)}k, not $0 (note the break mark at its base), so
+                    {" "}The vertical axis is <strong>zoomed in</strong>: it starts at {symbol}
+                    {Math.round(s.floor / 1000)}k, not {symbol}0 (note the break mark at its base), so
                     these close-together values are easier to compare.
                   </>
                 ) : null;
@@ -430,7 +426,7 @@ function ValueChart({ result }: { result: OptimizeResult }) {
   const baseY = pad.top + plotH;
   const y = (v: number) => pad.top + plotH - ((v - scale.floor) / (scale.ceil - scale.floor)) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const fmt = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(2)}M` : `$${Math.round(v / 1e3)}k`);
+  const fmt = (v: number) => formatMoney(v, { compact: true });
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Expected lifetime Social Security value by claiming age">

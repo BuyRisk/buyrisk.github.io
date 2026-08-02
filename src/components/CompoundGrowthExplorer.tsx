@@ -2,6 +2,7 @@ import { useId, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
+import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
 
 /**
  * Interactive compound-growth explorer.
@@ -140,24 +141,11 @@ function humanCapital(
   return hc;
 }
 
-// Format a dollar amount, staying readable across a huge dynamic range.
-// Realistic figures show in full ($447,156); once numbers get absurd, as they
-// do over centuries of compounding, we switch to compact (…B, …T) and then
-// scientific notation so labels and stat cards never overflow.
-function formatCurrency(n: number, { alwaysCompact = false } = {}): string {
-  const abs = Math.abs(n);
-  const notation =
-    abs >= 1e15 ? "scientific" : alwaysCompact || abs >= 1e9 ? "compact" : "standard";
-  return n.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation,
-    maximumFractionDigits: notation === "standard" ? 0 : 1,
-  });
-}
-
-const currency = (n: number) => formatCurrency(n);
-const compactCurrency = (n: number) => formatCurrency(n, { alwaysCompact: true });
+// Money formatting lives in the shared currency module so the whole site tracks
+// the header's currency picker. Full figures for realistic amounts, compact
+// (…B/…T) once numbers get absurd, so labels and cards never overflow.
+const currency = (n: number) => formatMoney(n);
+const compactCurrency = (n: number) => formatMoney(n, { compact: true });
 
 function Chart({ points }: { points: Projection["points"] }) {
   const width = 640;
@@ -718,6 +706,9 @@ function GrowthFan({ bands, years }: { bands: { p: number; series: number[] }[];
 }
 
 export default function CompoundGrowthExplorer() {
+  // Subscribe to the header's currency picker; `symbol` feeds the input prefixes,
+  // and reading the code re-renders the whole tool (and its children) on a change.
+  const symbol = currencySymbol(useCurrencyCode());
   const [mode, setMode] = useState<"project" | "goal">("project");
   const [principal, setPrincipal] = useState(10_000);
   const [monthly, setMonthly] = useState(300);
@@ -948,7 +939,7 @@ export default function CompoundGrowthExplorer() {
           min={0}
           max={5_000_000}
           step={5_000}
-          prefix="$"
+          prefix={symbol}
           integer
           onCommit={setPrincipal}
         />
@@ -961,7 +952,7 @@ export default function CompoundGrowthExplorer() {
             min={0}
             max={20_000}
             step={100}
-            prefix="$"
+            prefix={symbol}
             integer
             onCommit={setMonthly}
           />
@@ -974,7 +965,7 @@ export default function CompoundGrowthExplorer() {
             min={0}
             max={10_000_000}
             step={10_000}
-            prefix="$"
+            prefix={symbol}
             integer
             onCommit={setTarget}
           />
@@ -1070,7 +1061,7 @@ export default function CompoundGrowthExplorer() {
                   min={-20_000}
                   max={20_000}
                   step={100}
-                  prefix="$"
+                  prefix={symbol}
                   integer
                   onCommit={(v) => updatePhase(ph.id, { monthly: v })}
                 />
@@ -1322,7 +1313,7 @@ export default function CompoundGrowthExplorer() {
             <div className="cge-lifecycle">
               <div className="cge-life-controls">
                 <NumberField label="Current age" info="Your age today, the left edge of the chart. You invest for the horizon set above, so you retire at this age plus that many years." value={currentAge} min={16} max={70} step={1} integer onCommit={setCurrentAge} />
-                <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks, in today's dollars." value={income} min={0} max={1_000_000} step={5_000} prefix="$" integer onCommit={setIncome} />
+                <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks, in today's dollars." value={income} min={0} max={1_000_000} step={5_000} prefix={symbol} integer onCommit={setIncome} />
                 <NumberField label="Income growth" info="How fast your real pay rises each year, above inflation." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
               </div>
               <p className="cge-life-caption">

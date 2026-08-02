@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { housing } from "../data/generated/housing";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "Rent or Buy?": a fair, opportunity-cost-aware comparison. Instead of pitting
@@ -35,9 +36,7 @@ const DEFAULTS = {
 
 type Inputs = typeof DEFAULTS;
 
-const dollars = (n: number) =>
-  (n < 0 ? "-" : "") +
-  Math.abs(n).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const dollars = (n: number) => formatMoney(n);
 const pct = (n: number, dp = 1) => `${n.toFixed(dp)}%`;
 
 interface SimPoint { year: number; buyer: number; renter: number; }
@@ -144,6 +143,7 @@ const APPR_PRESETS = [
 ];
 
 export default function RentVsBuyLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [inp, setInp] = useState<Inputs>(DEFAULTS);
   const [showCosts, setShowCosts] = useState(true);
   const set = <K extends keyof Inputs>(k: K, v: Inputs[K]) => setInp((s) => ({ ...s, [k]: v }));
@@ -276,7 +276,7 @@ function NetWorthChart({ path, breakevenYear, years }: { path: SimPoint[]; break
   const x = (yr: number) => pad.left + (yr / (years || 1)) * plotW;
   const y = (v: number) => pad.top + plotH - ((v - minV) / (maxV - minV || 1)) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const money = (v: number) => (Math.abs(v) >= 1000 ? `$${Math.round(v / 1000)}k` : `$${Math.round(v)}`);
+  const money = (v: number) => formatMoney(v, { compact: true });
 
   const line = (key: "buyer" | "renter") => path.map((p, i) => `${i === 0 ? "M" : "L"}${x(p.year)},${y(p[key])}`).join(" ");
   const ticks = [minV, minV + (maxV - minV) * 0.5, maxV].filter((v, i, a) => a.indexOf(v) === i);

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { inflation } from "../data/generated/inflation";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "What happened to your dollar?": rebase real US CPI category price levels to a
@@ -14,8 +15,7 @@ import { inflation } from "../data/generated/inflation";
 const DEFAULT_START = 1990;
 const END = inflation.commonEnd;
 
-const dollars = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n < 100 ? 2 : 0 });
+const dollars = (n: number) => formatMoney(n);
 
 const palette = (i: number) => `var(--pl-c${(i % 8) + 1})`;
 
@@ -24,6 +24,7 @@ function indexAt(cat: (typeof inflation.categories)[number], year: number): numb
 }
 
 export default function InflationLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [startYear, setStartYear] = useState(DEFAULT_START);
   const [amount, setAmount] = useState(100);
 

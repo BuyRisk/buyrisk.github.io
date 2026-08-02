@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "Savings Rate & Financial Independence": the punchline of the control-volume
@@ -12,8 +13,7 @@ import ResetButton from "./ResetButton";
  * Educational only, not advice.
  */
 
-const currency = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const currency = (n: number) => formatMoney(n);
 
 const MAX_YEARS = 60;
 
@@ -39,6 +39,7 @@ function yearsToFI(s: number, r: number, wr: number, n0 = 0): number {
 const fmtYears = (y: number) => (!Number.isFinite(y) ? "never" : y >= MAX_YEARS ? `${MAX_YEARS}+` : `${y.toFixed(0)}`);
 
 export default function SavingsRateLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [savings, setSavings] = useState(20); // % of take-home
   const [ret, setRet] = useState(5); // real return %
   const [wr, setWr] = useState(4); // withdrawal rate %

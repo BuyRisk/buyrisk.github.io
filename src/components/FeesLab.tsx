@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { fees } from "../data/generated/fees";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "The Real Cost of Fees": a small annual expense ratio feels trivial, but over
@@ -20,8 +21,7 @@ const DEFAULTS = {
   indexFee: fees.latest.indexEquity, // typical index equity fund today
 };
 
-const dollars = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const dollars = (n: number) => formatMoney(n);
 
 const pct = (n: number, dp = 2) => `${n.toFixed(dp)}%`;
 
@@ -46,6 +46,7 @@ const PRESETS = [
 ];
 
 export default function FeesLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [mode, setMode] = useState<"cost" | "trends">("cost");
   const [amount, setAmount] = useState(DEFAULTS.amount);
   const [contribution, setContribution] = useState(DEFAULTS.contribution);
@@ -273,7 +274,7 @@ function GrowthChart({
 
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map((f) => maxV * f);
   const xTicks = [0, Math.round(years / 2), years];
-  const money = (v: number) => (v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${Math.round(v)}`);
+  const money = (v: number) => formatMoney(v, { compact: true });
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Savings growth with a low-cost index fund versus a higher-fee fund">

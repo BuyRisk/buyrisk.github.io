@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { debt } from "../data/generated/debt";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "The Cost of Debt": the mirror image of the Compound Growth Explorer. Here
@@ -17,8 +18,7 @@ const AUTO = debt.autoLoan.latest; // ~7.5%
 
 const DEFAULTS = { balance: 6_000, apr: CC, payment: 250 };
 
-const dollars = (n: number) =>
-  (n < 0 ? "-" : "") + Math.abs(n).toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const dollars = (n: number) => formatMoney(n);
 const pct = (n: number, dp = 1) => `${n.toFixed(dp)}%`;
 const yearsLabel = (months: number) => {
   if (!Number.isFinite(months)) return "never";
@@ -72,6 +72,7 @@ const APR_PRESETS = [
 ];
 
 export default function DebtLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [balance, setBalance] = useState(DEFAULTS.balance);
   const [apr, setApr] = useState(DEFAULTS.apr);
   const [payment, setPayment] = useState(DEFAULTS.payment);
@@ -204,7 +205,7 @@ function BalanceChart({ min, you, paysOff }: { min: Plan; you: Plan; paysOff: bo
   const x = (m: number) => pad.left + (m / maxMonths) * plotW;
   const y = (b: number) => pad.top + plotH - (b / maxBal) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const money = (v: number) => (v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${Math.round(v)}`);
+  const money = (v: number) => formatMoney(v, { compact: true });
 
   const line = (p: Plan) => p.path.filter((pt) => pt.month <= maxMonths).map((pt, i) => `${i === 0 ? "M" : "L"}${x(pt.month)},${y(pt.balance)}`).join(" ");
 

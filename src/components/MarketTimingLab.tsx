@@ -4,6 +4,7 @@ import ResetButton from "./ResetButton";
 import { marketDaily } from "../data/generated/market-daily";
 import { shillerMonthly } from "../data/generated/shiller-monthly";
 import { historicalReturns } from "../data/generated/historical-returns";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "Time in the Market": two lessons about timing, one tool.
@@ -106,12 +107,12 @@ function simulateTiming(years: number) {
   };
 }
 
-const dollars = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const dollars = (n: number) => formatMoney(n);
 const pct = (n: number, dp = 1) => `${n >= 0 ? "" : "−"}${Math.abs(n).toFixed(dp)}%`;
 const mult = (n: number, base: number) => `${(n / base).toFixed(1)}×`;
 
 export default function MarketTimingLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [mode, setMode] = useState<"best-days" | "timing">("best-days");
   const [horizon, setHorizon] = useState(DEFAULTS.horizon);
   const [missed, setMissed] = useState(DEFAULTS.missed);
@@ -364,7 +365,7 @@ function TimingBars({ timing }: { timing: ReturnType<typeof simulateTiming> }) {
   const bandW = plotW / n;
   const barW = Math.min(96, bandW * 0.62);
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const money = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : `$${Math.round(v / 1000)}k`);
+  const money = (v: number) => formatMoney(v, { compact: true });
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Ending wealth for four market-timing strategies">

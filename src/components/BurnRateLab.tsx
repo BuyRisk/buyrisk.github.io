@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * Retirement burn-rate calculator, two ways:
@@ -19,15 +20,7 @@ import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib
  * keep pace with inflation (Social Security does; many private pensions do NOT).
  */
 
-const currency = (n: number) =>
-  !Number.isFinite(n)
-    ? "∞"
-    : n.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-        notation: Math.abs(n) >= 1e7 ? "compact" : "standard",
-        maximumFractionDigits: Math.abs(n) >= 1e7 ? 1 : 0,
-      });
+const currency = (n: number) => (!Number.isFinite(n) ? "∞" : formatMoney(n));
 const paletteColor = (i: number) => `var(--pl-c${(i % 8) + 1})`;
 const pctText = (x: number) => `${Math.round(x * 100)}%`;
 
@@ -59,6 +52,7 @@ interface StressResult {
 }
 
 export default function BurnRateLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [mode, setMode] = useState<"plan" | "stress">("plan");
   const [cats, setCats] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
@@ -472,7 +466,7 @@ function FanChart({ bands, horizon, start }: { bands: { p: number; series: numbe
 
   const median = "M" + b50.map((v, t) => `${x(t)},${y(v)}`).join(" L");
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const fmt = (v: number) => (v >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `$${Math.round(v / 1e3)}k` : `$${Math.round(v)}`);
+  const fmt = (v: number) => formatMoney(v, { compact: true });
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Range of retirement balances over time across simulated histories">

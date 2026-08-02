@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { C, N, dateAt, FIRST_YEAR, LAST_YEAR } from "../lib/monthlyReturns";
+import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
  * "All at Once, or Bit by Bit?": lump-sum vs dollar-cost averaging, tested across
@@ -21,8 +22,7 @@ const P: number[] = (() => {
 
 const DEFAULTS = { amount: 60_000, spread: 12, horizon: 10 };
 
-const dollars = (n: number) =>
-  n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+const dollars = (n: number) => formatMoney(n);
 const pct = (n: number, dp = 1) => `${n >= 0 ? "" : "−"}${Math.abs(n).toFixed(dp)}%`;
 
 function quantile(sorted: number[], q: number): number {
@@ -33,6 +33,7 @@ function quantile(sorted: number[], q: number): number {
 }
 
 export default function DcaLab() {
+  useCurrencyCode(); // re-render when the header currency picker changes
   const [amount, setAmount] = useState(DEFAULTS.amount);
   const [spread, setSpread] = useState(DEFAULTS.spread);
   const [horizon, setHorizon] = useState(DEFAULTS.horizon);
