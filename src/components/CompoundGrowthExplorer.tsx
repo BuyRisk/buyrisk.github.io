@@ -381,6 +381,79 @@ const HIST_PATHS = 1200;
 const HIST_BLOCK = 5;
 const HIST_SEED = 135790;
 
+// Retirement-survival Monte Carlo uses its own, larger path count: a success
+// probability is a binomial estimate and wants more paths than a fan chart to
+// stay smooth as the user drags the withdrawal slider.
+const RET_PATHS = 2000;
+const RET_SEED = 24681;
+
+/**
+ * Share of block-bootstrapped histories in which a portfolio outlasts a
+ * retirement of `years`. Each year we take an inflation-adjusted withdrawal —
+ * constant in REAL terms, so against real returns it's a fixed fraction `w` of
+ * the *starting* balance (normalized to 1) — then let the survivors grow by
+ * that year's real return. If the pot can't cover a year's spending, that
+ * timeline has failed. This is Bengen's / the Trinity study's experiment, run
+ * over bootstrapped history instead of a single rolling window.
+ */
+function survivalFrom(returns: number[][], withdrawalPct: number, years: number): number {
+  const w = withdrawalPct / 100;
+  let survived = 0;
+  for (let p = 0; p < returns.length; p++) {
+    let bal = 1;
+    let ok = true;
+    for (let t = 0; t < years; t++) {
+      bal -= w; // spend first (inflation-adjusted, i.e. constant real)
+      if (bal <= 0) {
+        ok = false;
+        break;
+      }
+      bal *= 1 + returns[p][t]; // survivors ride the market
+    }
+    if (ok) survived++;
+  }
+  return survived / returns.length;
+}
+
+/** Success-rate-vs-withdrawal-rate sparkline, with a marker at the live rate. */
+function SurvivalCurve({
+  curve,
+  rate,
+}: {
+  curve: { rate: number; ok: number }[];
+  rate: number;
+}) {
+  const w = 320;
+  const h = 76;
+  const pad = { l: 6, r: 6, t: 8, b: 15 };
+  const RMIN = curve[0]?.rate ?? 2;
+  const RMAX = curve[curve.length - 1]?.rate ?? 10;
+  const x = (r: number) => pad.l + ((r - RMIN) / (RMAX - RMIN)) * (w - pad.l - pad.r);
+  const y = (ok: number) => pad.t + (1 - ok) * (h - pad.t - pad.b);
+  const line = curve.map((p, i) => `${i === 0 ? "M" : "L"}${x(p.rate).toFixed(1)},${y(p.ok).toFixed(1)}`).join(" ");
+  const area = `${line} L${x(RMAX).toFixed(1)},${y(0).toFixed(1)} L${x(RMIN).toFixed(1)},${y(0).toFixed(1)} Z`;
+  const cur = curve.reduce((a, b) => (Math.abs(b.rate - rate) < Math.abs(a.rate - rate) ? b : a));
+  return (
+    <svg
+      className="cge-survcurve"
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label={`Chance of lasting versus withdrawal rate: ${Math.round(cur.ok * 100)}% at ${rate}%.`}
+    >
+      <path d={area} className="cge-survcurve-area" />
+      <path d={line} className="cge-survcurve-line" />
+      <line x1={x(rate)} x2={x(rate)} y1={pad.t} y2={h - pad.b} className="cge-survcurve-cursor" />
+      <circle cx={x(cur.rate)} cy={y(cur.ok)} r={4} className="cge-survcurve-dot" />
+      {[2, 4, 6, 8, 10].map((t) => (
+        <text key={t} x={x(t)} y={h - 3} className="cge-survcurve-tick" textAnchor="middle">
+          {t}%
+        </text>
+      ))}
+    </svg>
+  );
+}
+
 /**
  * The honest counterpart to the smooth-curve projection: run the same starting
  * amount + monthly contributions through {@link HIST_PATHS} alternate histories
@@ -568,6 +641,8 @@ export default function CompoundGrowthExplorer() {
   const [years, setYears] = useState(30);
   const [target, setTarget] = useState(1_000_000);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
+  const [retYears, setRetYears] = useState(30);
+  const [retStock, setRetStock] = useState(60);
   const [phases, setPhases] = useState<Phase[]>([]);
   const phaseCounter = useRef(0);
   const [showLifecycle, setShowLifecycle] = useState(true);
@@ -628,10 +703,48 @@ export default function CompoundGrowthExplorer() {
   const updatePhase = (id: number, patch: Partial<Phase>) =>
     setPhases((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
 
-  // Bengen 4%-rule sustainable retirement income from the ending balance.
+  // First-year retirement income from the ending balance (4%-rule style).
   const annualIncome = (result.finalBalance * withdrawalRate) / 100;
   const monthlyIncome = annualIncome / 12;
   const monthlyIncomeReal = monthlyIncome / inflationFactor;
+
+  // Retirement-survival simulation. It doesn't depend on the size of the pile —
+  // only on the withdrawal rate, horizon, and stock/bond mix — so one
+  // bootstrapped return matrix is reused for both the live rate and the whole
+  // success-vs-rate curve. Regenerating the matrix (the costly part) only when
+  // the horizon or allocation changes keeps dragging the slider instant.
+  const retReturns = useMemo(
+    () =>
+      bootstrapReturns({
+        years: retYears,
+        paths: RET_PATHS,
+        blockLen: HIST_BLOCK,
+        stockPct: retStock / 100,
+        seed: RET_SEED,
+        real: true,
+      }),
+    [retYears, retStock]
+  );
+  const survival = useMemo(
+    () => survivalFrom(retReturns, withdrawalRate, retYears),
+    [retReturns, withdrawalRate, retYears]
+  );
+  const survivalCurve = useMemo(() => {
+    const pts: { rate: number; ok: number }[] = [];
+    for (let r = 2; r <= 10.0001; r += 0.25) pts.push({ rate: r, ok: survivalFrom(retReturns, r, retYears) });
+    return pts;
+  }, [retReturns, retYears]);
+  const survivalPct = Math.round(survival * 100);
+  const verdict =
+    survival >= 0.95
+      ? { tone: "good", label: "Very safe", text: "outlasted the horizon in almost every history." }
+      : survival >= 0.85
+        ? { tone: "good", label: "Likely to last", text: "survived most histories, though a bad first decade could still bite." }
+        : survival >= 0.7
+          ? { tone: "warn", label: "Getting risky", text: "ran dry in a meaningful share of histories — this is sequence-of-returns risk, not just bad luck." }
+          : survival >= 0.5
+            ? { tone: "bad", label: "A coin flip", text: "ran out of money in roughly half of all histories." }
+            : { tone: "bad", label: "Very likely to fail", text: "ran out of money in most histories. A rate this high has rarely survived a full retirement." };
 
   // Lifecycle: financial capital (the balance) vs human capital (PV of income).
   const lifecycle = useMemo(
@@ -653,7 +766,7 @@ export default function CompoundGrowthExplorer() {
           onReset={() => {
             setMode("project"); setPrincipal(10_000); setMonthly(300); setRate(10);
             setInflation(3); setFee(0.5); setYears(30); setTarget(1_000_000);
-            setWithdrawalRate(4); setPhases([]); setShowLifecycle(true); setCurrentAge(30);
+            setWithdrawalRate(4); setRetYears(30); setRetStock(60); setPhases([]); setShowLifecycle(true); setCurrentAge(30);
             setIncome(70_000); setIncomeGrowth(2); setRetireAge(65); setStockPct(90);
             setSimMode("simple"); setHistStock(90);
           }}
@@ -985,10 +1098,62 @@ export default function CompoundGrowthExplorer() {
           <p className="cge-retire-real">
             ≈ {currency(monthlyIncomeReal)} / month in today's dollars
           </p>
+
+          <div className="cge-retire-strategy">
+            <label>
+              Years in retirement
+              <input
+                type="number"
+                min={10}
+                max={50}
+                step={1}
+                value={retYears}
+                aria-label="Years in retirement"
+                onChange={(e) => {
+                  const v = Math.round(Number(e.target.value));
+                  if (Number.isFinite(v)) setRetYears(Math.min(50, Math.max(10, v)));
+                }}
+              />
+            </label>
+            <label className="cge-retire-alloc">
+              Stocks in retirement
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={retStock}
+                aria-label="Stock share in retirement"
+                onChange={(e) => setRetStock(Number(e.target.value))}
+              />
+              <span className="cge-retire-allocval">
+                {retStock}% stocks / {100 - retStock}% bonds
+              </span>
+            </label>
+          </div>
+
+          <div className={`cge-survival cge-survival--${verdict.tone}`}>
+            <div className="cge-survival-head">
+              <span className="cge-survival-pct">{survivalPct}%</span>
+              <span className="cge-survival-copy">
+                chance the money lasts {retYears} years
+                <strong className="cge-survival-verdict"> — {verdict.label}</strong>
+              </span>
+            </div>
+            <SurvivalCurve curve={survivalCurve} rate={withdrawalRate} />
+            <p className="cge-survival-text">
+              Across {RET_PATHS.toLocaleString()} block-bootstrapped US histories, drawing{" "}
+              <strong>{withdrawalRate}%</strong> a year (raised with inflation) {verdict.text}
+            </p>
+          </div>
+
           <p className="cge-retire-note">
-            Bengen's {withdrawalRate}% rule: a first-year withdrawal you raise with
-            inflation each year, which historically lasted ~30 years.{" "}
-            <a href="/tools/burn-rate">Will it cover your costs? →</a>
+            The <strong>“4% rule”</strong> is a widely cited <em>approximation</em> of a safe
+            withdrawal rate — draw 4% of your balance the first year, then raise that dollar
+            amount with inflation. William Bengen, whose research first found that roughly 4–5%
+            survived every historical 30-year retirement, never claimed a single number is
+            guaranteed; the odds above show why higher rates get dangerous fast.{" "}
+            <a href="/tools/burn-rate">Stress-test it against your real costs →</a>
           </p>
         </div>
       </div>

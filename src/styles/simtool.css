@@ -1306,6 +1306,139 @@
     font-size: var(--step--1);
     color: var(--color-text-soft);
   }
+  .cge-retire-note strong {
+    color: var(--color-text);
+  }
+
+  /* Retirement withdrawal strategy inputs (horizon + allocation). */
+  .cge-retire-strategy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    margin: 0.6rem 0 0.7rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+  .cge-retire-strategy label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-retire-strategy input[type="number"] {
+    width: 3.4rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-align: right;
+    padding: 0.15rem 0.3rem;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .cge-retire-strategy input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+  .cge-retire-strategy input[type="range"] {
+    width: 6rem;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+  .cge-retire-allocval {
+    color: var(--color-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Survival gauge: probability the money lasts, with a success-vs-rate curve. */
+  .cge-survival {
+    --tone: var(--color-accent);
+    margin: 0.7rem 0;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid color-mix(in srgb, var(--tone) 45%, transparent);
+    border-left: 4px solid var(--tone);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--tone) 9%, var(--color-surface));
+  }
+  .cge-survival--good {
+    --tone: var(--color-accent);
+  }
+  .cge-survival--warn {
+    --tone: var(--color-warn);
+  }
+  .cge-survival--bad {
+    --tone: var(--color-error);
+  }
+  .cge-survival-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .cge-survival-pct {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: var(--step-2);
+    line-height: 1;
+    color: var(--tone);
+    font-variant-numeric: tabular-nums;
+  }
+  .cge-survival-copy {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-survival-verdict {
+    color: var(--tone);
+  }
+  .cge-survcurve {
+    display: block;
+    width: 100%;
+    height: 76px;
+    margin: 0.5rem 0 0.1rem;
+    overflow: visible;
+  }
+  .cge-survcurve-area {
+    fill: color-mix(in srgb, var(--tone) 14%, transparent);
+    stroke: none;
+  }
+  .cge-survcurve-line {
+    fill: none;
+    stroke: var(--tone);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+  .cge-survcurve-cursor {
+    stroke: var(--color-text);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    opacity: 0.5;
+    vector-effect: non-scaling-stroke;
+  }
+  .cge-survcurve-dot {
+    fill: var(--tone);
+    stroke: var(--color-surface);
+    stroke-width: 1.5;
+  }
+  .cge-survcurve-tick {
+    fill: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: 9px;
+  }
+  .cge-survival-text {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .cge-survival-text strong {
+    color: var(--color-text);
+  }
 
 /* from superstocks.astro */
   .sk-quicks {
