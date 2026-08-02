@@ -1268,7 +1268,8 @@ export default function CompoundGrowthExplorer() {
       </div>
       )}
 
-      {simMode === "simple" && (
+      {/* Lifecycle view is a deterministic companion; show it in every mode. */}
+      {(
         <div className="cge-lifecycle-wrap">
           <button type="button" className="cge-life-toggle" onClick={() => setShowLifecycle((v) => !v)}>
             {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view: human capital, savings &amp; the drawdown
