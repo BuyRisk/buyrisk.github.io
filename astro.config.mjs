@@ -4,7 +4,10 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://buyrisk.example',
+  // Public URL of the deployed site (used for canonical URLs, sitemaps, etc.).
+  // For a GitHub user/org page repo named `buyrisk.github.io`, this is the root.
+  // Change it here if you later move to a custom domain.
+  site: 'https://buyrisk.github.io',
   integrations: [react()],
   // Consolidated modules: retired tool URLs redirect to their new home so
   // existing links keep working.
