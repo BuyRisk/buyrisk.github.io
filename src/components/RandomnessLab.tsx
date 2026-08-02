@@ -144,7 +144,7 @@ export default function RandomnessLab() {
       const rect = canvas!.getBoundingClientRect();
       const W = rect.width;
       const H = rect.height;
-      const padL = 12;
+      const padL = 40;
       const padR = 12;
       const plotW = W - padL - padR;
       ctx!.clearRect(0, 0, W, H);
@@ -174,6 +174,37 @@ export default function RandomnessLab() {
       ctx!.fillText("Your portfolio", padL, bandH + gap + 2);
       ctx!.textAlign = "right";
       ctx!.fillText("time →", W - padR, 2);
+      ctx!.textAlign = "left";
+
+      // Return (%) scale on each band, so the size of the moves reads as a number.
+      const maxPlotVal = maxAmp * 2.8;
+      const tick = maxPlotVal >= 0.5 ? 0.2 : 0.1;
+      ctx!.font = '500 10px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif';
+      ctx!.textBaseline = "middle";
+      ctx!.textAlign = "right";
+      for (const cy of [topCenter, botCenter]) {
+        ctx!.fillStyle = color("--color-muted");
+        ctx!.fillText("0%", padL - 6, cy);
+        for (let k = 1; k * tick <= maxPlotVal + 1e-9; k++) {
+          const gOff = k * tick * ampScale;
+          for (const s of [-1, 1]) {
+            const gy = cy - s * gOff;
+            ctx!.strokeStyle = color("--color-border");
+            ctx!.globalAlpha = 0.45;
+            ctx!.setLineDash([2, 3]);
+            ctx!.beginPath();
+            ctx!.moveTo(padL, gy);
+            ctx!.lineTo(W - padR, gy);
+            ctx!.stroke();
+            ctx!.setLineDash([]);
+            ctx!.globalAlpha = 1;
+            ctx!.fillStyle = color("--color-muted");
+            ctx!.fillText(`${s > 0 ? "+" : "−"}${Math.round(k * tick * 100)}%`, padL - 6, gy);
+          }
+        }
+      }
+      ctx!.font = SANS;
+      ctx!.textBaseline = "top";
       ctx!.textAlign = "left";
 
       const clampY = (yy: number, center: number) =>

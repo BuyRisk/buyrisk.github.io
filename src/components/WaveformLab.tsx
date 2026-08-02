@@ -148,7 +148,7 @@ export default function WaveformLab() {
       const rect = canvas!.getBoundingClientRect();
       const W = rect.width;
       const H = rect.height;
-      const padL = 12;
+      const padL = 40;
       const padR = 12;
       const plotW = W - padL - padR;
       ctx!.clearRect(0, 0, W, H);
@@ -178,6 +178,38 @@ export default function WaveformLab() {
       ctx!.fillText("Your portfolio", padL, bandH + gap + 2);
       ctx!.textAlign = "right";
       ctx!.fillText("time →", W - padR, 2);
+      ctx!.textAlign = "left";
+
+      // Return (%) scale on each band, so the wave amplitude reads as a number.
+      // A wave's peak height IS that asset's volatility, e.g. a peak at 16%.
+      const maxPlotVal = maxAmp * 1.05;
+      const tick = maxPlotVal >= 0.22 ? 0.1 : 0.05;
+      ctx!.font = '500 10px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif';
+      ctx!.textBaseline = "middle";
+      ctx!.textAlign = "right";
+      for (const cy of [topCenter, botCenter]) {
+        ctx!.fillStyle = color("--color-muted");
+        ctx!.fillText("0%", padL - 6, cy);
+        for (let k = 1; k * tick <= maxPlotVal + 1e-9; k++) {
+          const off = k * tick * ampScale;
+          for (const s of [-1, 1]) {
+            const gy = cy - s * off;
+            ctx!.strokeStyle = color("--color-border");
+            ctx!.globalAlpha = 0.45;
+            ctx!.setLineDash([2, 3]);
+            ctx!.beginPath();
+            ctx!.moveTo(padL, gy);
+            ctx!.lineTo(W - padR, gy);
+            ctx!.stroke();
+            ctx!.setLineDash([]);
+            ctx!.globalAlpha = 1;
+            ctx!.fillStyle = color("--color-muted");
+            ctx!.fillText(`${s > 0 ? "+" : "−"}${Math.round(k * tick * 100)}%`, padL - 6, gy);
+          }
+        }
+      }
+      ctx!.font = SANS;
+      ctx!.textBaseline = "top";
       ctx!.textAlign = "left";
 
       const theta = (x: number) => (x / plotW) * THETA_SPAN + phase0;
