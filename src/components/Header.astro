@@ -32,6 +32,7 @@ const isActive = (href: string) =>
                 class:list={["nav-link", { active: isActive(item.href) }]}
                 aria-current={isActive(item.href) ? "page" : undefined}
                 aria-haspopup="true"
+                aria-expanded="false"
               >
                 {item.label}
                 <svg
@@ -146,19 +147,8 @@ const isActive = (href: string) =>
     transition: transform var(--transition);
     opacity: 0.7;
   }
-  .nav-dropdown:hover .nav-caret,
-  .nav-dropdown:focus-within .nav-caret {
+  .nav-dropdown.open .nav-caret {
     transform: rotate(180deg);
-  }
-  /* Invisible bridge so the menu doesn't close when crossing the gap. */
-  .nav-dropdown:hover::after,
-  .nav-dropdown:focus-within::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    height: 0.6rem;
   }
   .nav-menu {
     position: absolute;
@@ -181,11 +171,35 @@ const isActive = (href: string) =>
     transform: translateY(-4px);
     transition: opacity var(--transition), transform var(--transition);
   }
-  .nav-dropdown:hover .nav-menu,
-  .nav-dropdown:focus-within .nav-menu {
+  .nav-dropdown.open .nav-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+  }
+
+  /* Devices with a real pointer (desktop) get hover-to-open; touch devices use
+     a tap toggle wired up in the script below (the `.open` class). */
+  @media (hover: hover) {
+    .nav-dropdown:hover .nav-caret,
+    .nav-dropdown:focus-within .nav-caret {
+      transform: rotate(180deg);
+    }
+    /* Invisible bridge so the menu doesn't close when crossing the gap. */
+    .nav-dropdown:hover::after,
+    .nav-dropdown:focus-within::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 0.6rem;
+    }
+    .nav-dropdown:hover .nav-menu,
+    .nav-dropdown:focus-within .nav-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
   }
   .nav-menu-link {
     display: block;
@@ -216,3 +230,32 @@ const isActive = (href: string) =>
     }
   }
 </style>
+
+<script>
+  // Touch devices have no hover, so the CSS-only dropdown can't open on a tap.
+  // Wire up a tap toggle on the trigger for pointers that don't hover.
+  const noHover = () => window.matchMedia("(hover: none)").matches;
+  document.querySelectorAll<HTMLElement>(".nav-dropdown").forEach((drop) => {
+    const trigger = drop.querySelector<HTMLElement>(".nav-link");
+    if (!trigger) return;
+
+    const setOpen = (open: boolean) => {
+      drop.classList.toggle("open", open);
+      trigger.setAttribute("aria-expanded", String(open));
+    };
+
+    trigger.addEventListener("click", (e) => {
+      if (!noHover()) return; // desktop: let hover + the link's own navigation work
+      e.preventDefault();
+      setOpen(!drop.classList.contains("open"));
+    });
+
+    // Close when tapping outside the menu, or on Escape.
+    document.addEventListener("click", (e) => {
+      if (!drop.contains(e.target as Node)) setOpen(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+  });
+</script>
