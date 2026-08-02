@@ -145,10 +145,22 @@ export default function MarketTimingLab() {
         <div className="wl-field">
           <span className="wl-field-label">What to explore</span>
           <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Choose a scenario">
-            <button type="button" className={mode === "best-days" ? "active" : ""} aria-pressed={mode === "best-days"} onClick={() => setMode("best-days")}>
+            <button
+              type="button"
+              className={mode === "best-days" ? "active" : ""}
+              aria-pressed={mode === "best-days"}
+              onClick={() => setMode("best-days")}
+              title={`Direct calculation on actual daily returns — no simulation. We compound the real day-by-day US market return and remove the single best days. Data: Fama–French daily market factor (Mkt−RF + RF), ${START_YEAR}–${END_YEAR}.`}
+            >
               Missing the best days
             </button>
-            <button type="button" className={mode === "timing" ? "active" : ""} aria-pressed={mode === "timing"} onClick={() => setMode("timing")}>
+            <button
+              type="button"
+              className={mode === "timing" ? "active" : ""}
+              aria-pressed={mode === "timing"}
+              onClick={() => setMode("timing")}
+              title="Direct historical simulation — no bootstrap. Each saver's monthly contributions are deployed on the actual month-by-month path. Data: Shiller monthly real S&P total return (1871–); cash earns the real 3-month T-bill (Damodaran)."
+            >
               Timing your buys
             </button>
           </div>

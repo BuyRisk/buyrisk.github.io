@@ -80,8 +80,9 @@ export default function AssetAllocationLab() {
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          Real (inflation-adjusted) US annual returns, {SPAN[0]}–{SPAN[1]}. Stocks = S&P 500; bonds = 10-year
-          Treasuries. History is one sample, not a promise. Educational only, not advice.
+          Every figure is computed <strong>directly</strong> from the actual year-by-year record — no simulation or
+          bootstrap. Data: real (inflation-adjusted) US annual returns, {SPAN[0]}–{SPAN[1]} (stocks = S&P 500, bonds =
+          10-year Treasuries; Aswath Damodaran). History is one sample, not a promise. Educational only, not advice.
         </p>
       </div>
 

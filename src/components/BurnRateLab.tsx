@@ -154,7 +154,13 @@ export default function BurnRateLab() {
           <button type="button" className={mode === "plan" ? "active" : ""} aria-pressed={mode === "plan"} onClick={() => setMode("plan")}>
             Simple plan
           </button>
-          <button type="button" className={mode === "stress" ? "active" : ""} aria-pressed={mode === "stress"} onClick={() => setMode("stress")}>
+          <button
+            type="button"
+            className={mode === "stress" ? "active" : ""}
+            aria-pressed={mode === "stress"}
+            onClick={() => setMode("stress")}
+            title={`Block-bootstrap Monte Carlo — ${PATHS.toLocaleString()} alternate retirements stitched from real ${BLOCK}-year blocks of US return history (${HISTORY.span[0]}–${HISTORY.span[1]}, inflation-adjusted). Data: Aswath Damodaran.`}
+          >
             Historical stress test
           </button>
         </div>

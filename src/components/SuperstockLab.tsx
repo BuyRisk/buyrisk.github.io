@@ -204,9 +204,10 @@ export default function SuperstockLab() {
           New universe of stocks
         </button>
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
-          {M.toLocaleString()} simulated stocks, held equal-weight, drawn from the
-          real CRSP lifetime-return distribution (1925–2026). Educational only —
-          not financial advice.
+          {M.toLocaleString()} simulated stocks, held equal-weight. <strong>Method:</strong> each is an
+          inverse-CDF draw from the <em>actual</em> empirical distribution of individual-stock lifetime returns — so
+          the sample reproduces the real skew, not a bell curve. Data: CRSP, every US common stock, 1925–2026
+          (Bessembinder). Educational only — not financial advice.
         </p>
       </div>
 

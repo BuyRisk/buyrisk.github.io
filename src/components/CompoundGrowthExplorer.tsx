@@ -595,7 +595,13 @@ export default function CompoundGrowthExplorer() {
           <button type="button" className={simMode === "simple" ? "active" : ""} aria-pressed={simMode === "simple"} onClick={() => setSimMode("simple")}>
             Simplified
           </button>
-          <button type="button" className={simMode === "historical" ? "active" : ""} aria-pressed={simMode === "historical"} onClick={() => setSimMode("historical")}>
+          <button
+            type="button"
+            className={simMode === "historical" ? "active" : ""}
+            aria-pressed={simMode === "historical"}
+            onClick={() => setSimMode("historical")}
+            title={`Block-bootstrap Monte Carlo — ${HIST_PATHS.toLocaleString()} alternate timelines stitched together from real ${HIST_BLOCK}-year blocks of US return history (${HISTORY.span[0]}–${HISTORY.span[1]}, inflation-adjusted). Data: Aswath Damodaran.`}
+          >
             Historical
           </button>
         </div>

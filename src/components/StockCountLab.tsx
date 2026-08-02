@@ -319,7 +319,9 @@ export default function StockCountLab() {
         <p className="wl-note">
           Each thin line is one stock's noisy ups and downs; the bold line is your
           equal-weight portfolio. Add stocks and watch it steady — but never go
-          flat.
+          flat. <strong>Method:</strong> the dotted reference curve is the real
+          risk-vs-count relationship measured directly from individual US stocks
+          (CRSP); the animated lines are a live illustrative draw around it.
         </p>
       </div>
     </div>
