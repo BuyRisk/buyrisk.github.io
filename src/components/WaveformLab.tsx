@@ -262,8 +262,20 @@ export default function WaveformLab() {
   }, [drawKey]);
 
   // --- Handlers ----------------------------------------------------------
-  const setWeight = (i: number, v: number) =>
-    setRawWeights((prev) => prev.map((w, idx) => (idx === i ? v : w)));
+  // Dragging one weight sets it to that share and rescales the others to keep the
+  // total at 100%, so every slider (not just the number) moves in response.
+  const setWeight = (i: number, target: number) =>
+    setRawWeights((prev) => {
+      const w = normalize(prev); // current shares, sum 1
+      const t = Math.min(1, Math.max(0, target / 100));
+      const otherSum = w.reduce((s, x, idx) => (idx === i ? s : s + x), 0);
+      const next = w.map((x, idx) => {
+        if (idx === i) return t;
+        if (otherSum <= 1e-9) return (1 - t) / (w.length - 1); // others were all zero
+        return x * ((1 - t) / otherSum);
+      });
+      return next.map((x) => x * 100); // store 0–100 summing to 100
+    });
   const updateAsset = (i: number, patch: Partial<WaveAsset>) =>
     setAssets((prev) => prev.map((a, idx) => (idx === i ? { ...a, ...patch } : a)));
   const removeAsset = (i: number) => {
@@ -352,7 +364,7 @@ export default function WaveformLab() {
                   min={0}
                   max={100}
                   step={1}
-                  value={rawWeights[i]}
+                  value={Math.round(weights[i] * 100)}
                   onChange={(e) => setWeight(i, Number(e.target.value))}
                 />
               </label>

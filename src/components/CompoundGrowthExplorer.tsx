@@ -549,6 +549,30 @@ function HistoricalGrowthPanel({
       balances[p] = row;
     }
     const finals = balances.map((b) => b[years]);
+
+    // Downturn profile: how rough each simulated timeline was, measured on the
+    // pure market path (growth of $1, contributions removed) so contributions
+    // don't mask the drops. Per path: deepest fall from a prior high, number of
+    // 20%+ bear markets, and years spent below a prior high. We report medians,
+    // to show downturns aren't the exception — every timeline has them.
+    const ddArr = new Array<number>(HIST_PATHS);
+    const bearArr = new Array<number>(HIST_PATHS);
+    const uwArr = new Array<number>(HIST_PATHS);
+    for (let p = 0; p < HIST_PATHS; p++) {
+      let g = 1, peak = 1, maxDD = 0, underwater = 0, bears = 0, inBear = false;
+      for (let y = 0; y < years; y++) {
+        g *= 1 + paths[p][y];
+        if (g >= peak) { peak = g; inBear = false; }
+        const dd = g / peak - 1;
+        if (dd < maxDD) maxDD = dd;
+        if (dd < -1e-9) underwater++;
+        if (dd <= -0.2 && !inBear) { inBear = true; bears++; }
+      }
+      ddArr[p] = maxDD;
+      bearArr[p] = bears;
+      uwArr[p] = underwater;
+    }
+
     return {
       goal: false as const,
       bands: bandsOverTime(balances, [0.1, 0.25, 0.5, 0.75, 0.9]),
@@ -556,6 +580,11 @@ function HistoricalGrowthPanel({
       mean: mean(finals),
       p10: quantile(finals, 0.1),
       p90: quantile(finals, 0.9),
+      downturn: {
+        maxDD: quantile(ddArr, 0.5),
+        bears: Math.round(quantile(bearArr, 0.5)),
+        underwater: Math.round(quantile(uwArr, 0.5)),
+      },
     };
   }, [principal, monthly, years, stockPct, target, isGoal]);
 
@@ -625,10 +654,25 @@ function HistoricalGrowthPanel({
           <dd>{currency(stats.p10)}</dd>
         </div>
       </dl>
+
+      <div className="cge-downturn">
+        <p className="cge-downturn-lead">
+          <strong>Downturns are normal.</strong> Every one of these {HIST_PATHS.toLocaleString()} timelines lived through them.
+        </p>
+        <dl className="cge-stats">
+          <div className="cge-stat"><dt>Bear markets (20%+ drops)</dt><dd>{stats.downturn.bears} in a typical run</dd></div>
+          <div className="cge-stat"><dt>Worst drop from a high</dt><dd>−{Math.round(-stats.downturn.maxDD * 100)}%</dd></div>
+          <div className="cge-stat"><dt>Years below a prior high</dt><dd>~{stats.downturn.underwater}</dd></div>
+        </dl>
+      </div>
+
       <p className="cge-note" style={{ marginTop: "var(--space-sm)" }}>
-        The <strong>average is well above the typical</strong> result: a handful of
-        lucky return-sequences drag the mean up while most outcomes land lower. Real
-        growth isn't a smooth line; it's a wide, right-skewed fan.
+        The <strong>average sits well above the typical</strong> result: a few lucky return-sequences pull the mean up
+        while most land lower. But the outcome that matters isn't really the average, it's whether you hold on. The
+        typical timeline fell about <strong>−{Math.round(-stats.downturn.maxDD * 100)}%</strong> from a high at some
+        point, and the gap between ending near {compactCurrency(stats.p10)} and far less is mostly whether you keep
+        investing through drops like that instead of selling near the bottom. Crashes aren't a failure of the plan;
+        they're baked into the same returns that produce the growth.
       </p>
       <p className="cge-note">
         {HIST_PATHS.toLocaleString()} alternate timelines, block-bootstrapped from
