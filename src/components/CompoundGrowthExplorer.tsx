@@ -116,6 +116,9 @@ function requiredMonthly(
 // a high, equity-like discount rate would impose.
 const HC_DISCOUNT = 3; // % real
 
+// The lifecycle chart runs a full lifespan, drawing the nest egg down to age 100.
+const LIFE_END = 100;
+
 /**
  * Human capital at a given age: the present value of remaining labor income up
  * to retirement, in real (today's-dollar) terms. Real income grows at
@@ -724,15 +727,31 @@ export default function CompoundGrowthExplorer() {
   const inflationFactor = Math.pow(1 + inflation / 100, years);
   const realFinal = result.finalBalance / inflationFactor;
   const feeCost = Math.max(0, resultNoFee.finalBalance - result.finalBalance);
+  // The headline fee % is only meaningful when one fee applies throughout. Once a
+  // phase overrides the fee, we report the total dollar drag instead of a single %.
+  const feesVary = activePhases.some((p) => p.fee != null && p.fee !== fee);
 
-  const addPhase = () => {
+  // A retirement phase is a drawdown (negative contribution); a life phase adds
+  // or changes a positive contribution. Either can be added independently, up to
+  // three life phases and one retirement, and no more than four phases in all.
+  const retirePhaseCount = activePhases.filter((p) => p.monthly < 0).length;
+  const lifePhaseCount = activePhases.length - retirePhaseCount;
+  const canAddLife = activePhases.length < 4 && lifePhaseCount < 3;
+  const canAddRetire = activePhases.length < 4 && retirePhaseCount < 1;
+
+  const addPhase = (kind: "life" | "retire") => {
     setPhases((prev) => {
-      if (prev.length >= 4) return prev; // up to 3 life phases + 1 retirement drawdown
+      if (prev.length >= 4) return prev;
+      const retires = prev.filter((p) => p.monthly < 0).length;
+      if (kind === "retire" && retires >= 1) return prev;
+      if (kind === "life" && prev.length - retires >= 3) return prev;
       phaseCounter.current += 1;
-      const lastStart = prev.length ? prev[prev.length - 1].startYear : 0;
-      const startYear = Math.min(years, Math.max(lastStart + 5, Math.round(years / 2)));
-      // The first three additions are life phases; the fourth is retirement.
-      const monthlyDefault = prev.length >= 3 ? -2000 : monthly;
+      const lastStart = prev.length ? Math.max(...prev.map((p) => p.startYear)) : 0;
+      const startYear =
+        kind === "retire"
+          ? Math.min(years, Math.max(lastStart + 5, Math.round(years * 0.7)))
+          : Math.min(years, Math.max(lastStart + 5, Math.round(years / 2)));
+      const monthlyDefault = kind === "retire" ? -2000 : monthly;
       return [...prev, { id: phaseCounter.current, startYear, monthly: monthlyDefault }];
     });
   };
@@ -813,16 +832,18 @@ export default function CompoundGrowthExplorer() {
     const nestEgg = out[out.length - 1]?.fin ?? 0;
     const withdrawal = (withdrawalRate / 100) * nestEgg; // constant in real terms
     let bal = nestEgg;
-    for (let s = 1; s <= retYears; s++) {
+    // Draw the nest egg down across a full lifespan, out to age 100.
+    for (let age = retireAge + 1; age <= LIFE_END; age++) {
       bal = Math.max(0, bal * (1 + retRealReturn) - withdrawal);
-      out.push({ age: retireAge + s, fin: bal, hc: 0, total: bal });
+      out.push({ age, fin: bal, hc: 0, total: bal });
     }
     return out;
-  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retYears, retRealReturn]);
+  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retRealReturn]);
 
   const hcNow = lifecycle[0]?.hc ?? 0;
   const nestEggReal = lifecycle[years]?.fin ?? 0;
   const endBalance = lifecycle[lifecycle.length - 1]?.fin ?? 0;
+  const endAge = lifecycle[lifecycle.length - 1]?.age ?? LIFE_END;
   // Age at which the nest egg is exhausted, if it happens within the horizon.
   const depletedAge = (() => {
     for (let i = years + 1; i < lifecycle.length; i++) {
@@ -1033,10 +1054,19 @@ export default function CompoundGrowthExplorer() {
                 />
               </div>
             ))}
-            {activePhases.length < 4 && (
-              <button type="button" className="cge-phase-add" onClick={addPhase}>
-                + {activePhases.length < 3 ? "Add a different life phase" : "Add retirement"}
-              </button>
+            {(canAddLife || canAddRetire) && (
+              <div className="cge-phase-actions">
+                {canAddLife && (
+                  <button type="button" className="cge-phase-add" onClick={() => addPhase("life")}>
+                    + Add a life phase
+                  </button>
+                )}
+                {canAddRetire && (
+                  <button type="button" className="cge-phase-add" onClick={() => addPhase("retire")}>
+                    + Add retirement drawdown
+                  </button>
+                )}
+              </div>
             )}
           </>
         )}
@@ -1104,11 +1134,18 @@ export default function CompoundGrowthExplorer() {
             <strong>{currency(realFinal)}</strong>
           </span>
           <span className="cge-realfee-item">
-            {fee > 0 ? (
-              <>
-                {fee}% fee costs you{" "}
-                <strong className="cge-realfee-cost">{currency(feeCost)}</strong>
-              </>
+            {Math.round(feeCost) > 0 ? (
+              feesVary ? (
+                <span title="The total drag from your base fee plus every per-phase fee change, added across the whole timeline.">
+                  Fees cost you{" "}
+                  <strong className="cge-realfee-cost">{currency(feeCost)}</strong>
+                </span>
+              ) : (
+                <>
+                  {fee}% fee costs you{" "}
+                  <strong className="cge-realfee-cost">{currency(feeCost)}</strong>
+                </>
+              )
             ) : (
               <>No fee drag</>
             )}
@@ -1246,7 +1283,7 @@ export default function CompoundGrowthExplorer() {
               <p className="cge-life-caption">
                 Everything here is in <strong>today's dollars</strong>, built from your inputs above: invest for {years} years,
                 retire at <strong>{retireAge}</strong>, then draw <strong>{withdrawalRate}%</strong> a year from a{" "}
-                {retStock}%-stock nest egg for {retYears} years.
+                {retStock}%-stock nest egg through age {LIFE_END}.
               </p>
               <LifecycleChart data={lifecycle} retireAge={retireAge} />
               <div className="cge-life-legend">
@@ -1262,14 +1299,14 @@ export default function CompoundGrowthExplorer() {
                 <strong>{compactCurrency(nestEggReal)}</strong> nest egg, and human capital is gone.{" "}
                 {depletedAge !== null ? (
                   <>From there, drawing {withdrawalRate}% a year with a {retStock}%-stock mix, the money{" "}
-                  <strong>runs dry at age {depletedAge}</strong> — the drawdown outpaces the returns.</>
+                  <strong>runs dry at age {depletedAge}</strong>, because the drawdown outpaces the returns.</>
                 ) : endBalance > nestEggReal * 1.05 ? (
                   <>From there, drawing {withdrawalRate}% a year earns more than you spend, so the nest egg{" "}
-                  <strong>keeps growing</strong> to about {compactCurrency(endBalance)} by {retireAge + retYears} —
-                  runaway compounding, even in retirement.</>
+                  <strong>keeps growing</strong> to about {compactCurrency(endBalance)} by age {endAge}: runaway
+                  compounding, even in retirement.</>
                 ) : (
                   <>From there, drawing {withdrawalRate}% a year roughly balances the returns, so the nest egg{" "}
-                  <strong>lasts the full {retYears} years</strong>, ending near {compactCurrency(endBalance)}.</>
+                  <strong>still holds about {compactCurrency(endBalance)}</strong> at age {endAge}.</>
                 )}
               </p>
             </div>

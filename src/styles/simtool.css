@@ -1043,6 +1043,14 @@
   .cge-phase-remove:hover {
     color: var(--color-error);
   }
+  .cge-phase-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .cge-phase-actions .cge-phase-add {
+    flex: 1 1 auto;
+  }
   .cge-phase-add {
     font-family: var(--font-sans);
     font-size: var(--step--1);
