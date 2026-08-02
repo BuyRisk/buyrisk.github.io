@@ -110,10 +110,17 @@ function requiredMonthly(
   return (target - fvPrincipal) / annuityFactor;
 }
 
+// Human capital is the present value of future *real* earnings. Because labor
+// income is relatively safe (bond-like), we discount it at a modest real rate:
+// the line then falls to roughly zero at retirement without the steep curvature
+// a high, equity-like discount rate would impose.
+const HC_DISCOUNT = 3; // % real
+
 /**
  * Human capital at a given age: the present value of remaining labor income up
- * to retirement. Income grows at `growthPct`/yr from its value at `startAge`,
- * discounted back at `discountPct`/yr. Falls to zero at retirement.
+ * to retirement, in real (today's-dollar) terms. Real income grows at
+ * `growthPct`/yr from its value at `startAge`, discounted back at
+ * `discountPct`/yr. Falls to zero at retirement.
  */
 function humanCapital(
   atAge: number,
@@ -328,49 +335,81 @@ function NumberField({
 
 type LifePoint = { age: number; fin: number; hc: number; total: number };
 
+/**
+ * Bernstein-style lifecycle chart: three lines over a lifetime — human capital
+ * (the value of future earnings), investment capital (savings, which become the
+ * retirement nest egg), and their sum, total capital. Human capital falls to
+ * zero at retirement; from there the nest egg is drawn down and either lasts or
+ * runs dry, depending on the withdrawal rate.
+ */
 function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: number }) {
-  const width = 680;
-  const height = 280;
-  const pad = { top: 16, right: 16, bottom: 36, left: 62 };
+  const width = 720;
+  const height = 320;
+  const pad = { top: 22, right: 20, bottom: 42, left: 66 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
-  const ageMin = data[0]?.age ?? 30;
-  const ageMax = data[data.length - 1]?.age ?? 65;
+  const ageMin = data[0]?.age ?? 20;
+  const ageMax = data[data.length - 1]?.age ?? 80;
   const maxTotal = Math.max(...data.map((d) => d.total), 1);
 
   const x = (age: number) => pad.left + ((age - ageMin) / (ageMax - ageMin || 1)) * plotW;
   const y = (v: number) => height - pad.bottom - (v / maxTotal) * plotH;
 
-  const finArea =
-    "M" + data.map((d) => `${x(d.age)},${y(d.fin)}`).join(" L") +
-    ` L${x(ageMax)},${y(0)} L${x(ageMin)},${y(0)} Z`;
-  const hcArea =
-    "M" + data.map((d) => `${x(d.age)},${y(d.total)}`).join(" L") + " L" +
-    [...data].reverse().map((d) => `${x(d.age)},${y(d.fin)}`).join(" L") + " Z";
+  const path = (key: "fin" | "hc" | "total") =>
+    data.map((d, i) => `${i === 0 ? "M" : "L"}${x(d.age).toFixed(1)},${y(d[key]).toFixed(1)}`).join(" ");
+
+  // Nearest data point to a target age, for anchoring inline labels to a line.
+  const at = (age: number) => data.reduce((a, b) => (Math.abs(b.age - age) < Math.abs(a.age - age) ? b : a));
 
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const labelText = { fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 700 } as const;
   const showRetire = retireAge > ageMin && retireAge < ageMax;
 
+  // Age ticks at tidy 5- or 10-year marks across the span.
+  const span = ageMax - ageMin;
+  const tickStep = span > 55 ? 10 : 5;
+  const firstTick = Math.ceil(ageMin / tickStep) * tickStep;
+  const ageTicks: number[] = [];
+  for (let a = firstTick; a <= ageMax; a += tickStep) ageTicks.push(a);
+
+  // Inline-label anchors, positioned along each line like Bernstein's figure.
+  const accSpan = Math.max(retireAge - ageMin, 1);
+  const hcAnchor = at(ageMin + accSpan * 0.16);
+  const totAnchor = at(ageMin + accSpan * 0.34);
+  const invAnchor = at(ageMin + accSpan * 0.62);
+  const nestAnchor = at(retireAge + (ageMax - retireAge) * 0.35);
+
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Human capital and financial capital over your lifetime">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Human capital, investment capital, and total capital over your lifetime, in today's dollars">
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
         <g key={f}>
           <line x1={pad.left} x2={width - pad.right} y1={y(maxTotal * f)} y2={y(maxTotal * f)} stroke="var(--color-border)" />
           <text x={pad.left - 8} y={y(maxTotal * f) + 4} textAnchor="end" style={axisText}>{compactCurrency(maxTotal * f)}</text>
         </g>
       ))}
-      <path d={finArea} fill="var(--color-accent)" opacity={0.75} />
-      <path d={hcArea} fill="var(--pl-c3)" opacity={0.55} />
+
       {showRetire && (
         <>
-          <line x1={x(retireAge)} x2={x(retireAge)} y1={pad.top} y2={height - pad.bottom} stroke="var(--color-text)" strokeWidth={1} strokeDasharray="3 3" />
-          <text x={x(retireAge)} y={pad.top + 2} textAnchor="middle" style={{ ...axisText, fontSize: 10 }}>retire {retireAge}</text>
+          <line x1={x(retireAge)} x2={x(retireAge)} y1={pad.top} y2={height - pad.bottom} stroke="var(--color-muted)" strokeWidth={1} strokeDasharray="3 3" />
+          <text x={x(retireAge)} y={pad.top - 6} textAnchor="middle" style={{ ...axisText, fontSize: 10, fill: "var(--color-text-soft)" }}>retire at {retireAge}</text>
         </>
       )}
-      {data.filter((_, i) => i % Math.ceil(data.length / 6) === 0).map((d) => (
-        <text key={d.age} x={x(d.age)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{Math.round(d.age)}</text>
+
+      <path d={path("hc")} fill="none" stroke="var(--pl-c3)" strokeWidth={2} />
+      <path d={path("fin")} fill="none" stroke="var(--color-accent)" strokeWidth={2} />
+      <path d={path("total")} fill="none" stroke="var(--color-text)" strokeWidth={2.5} />
+
+      <text x={x(hcAnchor.age)} y={y(hcAnchor.hc) - 8} textAnchor="middle" style={{ ...labelText, fill: "var(--pl-c3)" }}>Human capital</text>
+      <text x={x(totAnchor.age)} y={y(totAnchor.total) - 8} textAnchor="middle" style={{ ...labelText, fill: "var(--color-text)" }}>Total capital</text>
+      <text x={x(invAnchor.age)} y={y(invAnchor.fin) + 16} textAnchor="middle" style={{ ...labelText, fill: "var(--color-accent)" }}>Investment capital</text>
+      {showRetire && (
+        <text x={x(nestAnchor.age)} y={y(nestAnchor.fin) - 8} textAnchor="middle" style={{ ...labelText, fill: "var(--color-accent)", fontSize: 11 }}>Retirement nest egg</text>
+      )}
+
+      {ageTicks.map((a) => (
+        <text key={a} x={x(a)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{a}</text>
       ))}
-      <text x={pad.left + plotW / 2} y={height - 3} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Age →</text>
+      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Age</text>
     </svg>
   );
 }
@@ -646,11 +685,9 @@ export default function CompoundGrowthExplorer() {
   const [phases, setPhases] = useState<Phase[]>([]);
   const phaseCounter = useRef(0);
   const [showLifecycle, setShowLifecycle] = useState(true);
-  const [currentAge, setCurrentAge] = useState(30);
+  const [currentAge, setCurrentAge] = useState(20);
   const [income, setIncome] = useState(70_000);
   const [incomeGrowth, setIncomeGrowth] = useState(2);
-  const [retireAge, setRetireAge] = useState(65);
-  const [stockPct, setStockPct] = useState(90);
   const [simMode, setSimMode] = useState<"simple" | "historical">("simple");
   const [histStock, setHistStock] = useState(90);
 
@@ -746,18 +783,53 @@ export default function CompoundGrowthExplorer() {
             ? { tone: "bad", label: "A coin flip", text: "ran out of money in roughly half of all histories." }
             : { tone: "bad", label: "Very likely to fail", text: "ran out of money in most histories. A rate this high has rarely survived a full retirement." };
 
-  // Lifecycle: financial capital (the balance) vs human capital (PV of income).
-  const lifecycle = useMemo(
-    () =>
-      result.points.map((pt) => {
-        const age = currentAge + pt.year;
-        const hc = humanCapital(age, currentAge, income, incomeGrowth, rate, retireAge);
-        return { age, fin: pt.balance, hc, total: pt.balance + hc };
-      }),
-    [result, currentAge, income, incomeGrowth, rate, retireAge]
-  );
-  const hcNow = humanCapital(currentAge, currentAge, income, incomeGrowth, rate, retireAge);
-  const trueEquity = principal + hcNow > 0 ? (principal * (stockPct / 100)) / (principal + hcNow) : 0;
+  // Retirement happens when the accumulation horizon ends: you invest for
+  // `years`, so you retire at currentAge + years and the nest egg is exactly the
+  // balance the tool projects above (in real, today's-dollar terms).
+  const retireAge = currentAge + years;
+
+  // Geometric-mean real return of the retirement stock/bond mix, straight from
+  // US history — the same allocation the survival odds above are built on. This
+  // deterministic rate drives whether the drawn-down nest egg grows or shrinks.
+  const retRealReturn = useMemo(() => {
+    const rs = retStock / 100;
+    let g = 1;
+    for (const yr of HISTORY.series) g *= (1 + (rs * yr.stocks + (1 - rs) * yr.tbonds)) / (1 + yr.inflation);
+    return Math.pow(g, 1 / HISTORY.series.length) - 1;
+  }, [retStock]);
+
+  // The full lifecycle, in real dollars: human capital falls to zero at
+  // retirement while investment capital accumulates into the nest egg, then the
+  // nest egg is drawn down (constant real withdrawal) and either lasts or fails.
+  const lifecycle = useMemo(() => {
+    const infl = 1 + inflation / 100;
+    const out: LifePoint[] = [];
+    for (let t = 0; t <= years; t++) {
+      const age = currentAge + t;
+      const fin = (result.points[t]?.balance ?? 0) / Math.pow(infl, t); // nominal -> real
+      const hc = humanCapital(age, currentAge, income, incomeGrowth, HC_DISCOUNT, retireAge);
+      out.push({ age, fin, hc, total: fin + hc });
+    }
+    const nestEgg = out[out.length - 1]?.fin ?? 0;
+    const withdrawal = (withdrawalRate / 100) * nestEgg; // constant in real terms
+    let bal = nestEgg;
+    for (let s = 1; s <= retYears; s++) {
+      bal = Math.max(0, bal * (1 + retRealReturn) - withdrawal);
+      out.push({ age: retireAge + s, fin: bal, hc: 0, total: bal });
+    }
+    return out;
+  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retYears, retRealReturn]);
+
+  const hcNow = lifecycle[0]?.hc ?? 0;
+  const nestEggReal = lifecycle[years]?.fin ?? 0;
+  const endBalance = lifecycle[lifecycle.length - 1]?.fin ?? 0;
+  // Age at which the nest egg is exhausted, if it happens within the horizon.
+  const depletedAge = (() => {
+    for (let i = years + 1; i < lifecycle.length; i++) {
+      if (lifecycle[i].fin <= 0) return lifecycle[i].age;
+    }
+    return null;
+  })();
 
   return (
     <div className="cge">
@@ -766,8 +838,8 @@ export default function CompoundGrowthExplorer() {
           onReset={() => {
             setMode("project"); setPrincipal(10_000); setMonthly(300); setRate(10);
             setInflation(3); setFee(0.5); setYears(30); setTarget(1_000_000);
-            setWithdrawalRate(4); setRetYears(30); setRetStock(60); setPhases([]); setShowLifecycle(true); setCurrentAge(30);
-            setIncome(70_000); setIncomeGrowth(2); setRetireAge(65); setStockPct(90);
+            setWithdrawalRate(4); setRetYears(30); setRetStock(60); setPhases([]); setShowLifecycle(true); setCurrentAge(20);
+            setIncome(70_000); setIncomeGrowth(2);
             setSimMode("simple"); setHistStock(90);
           }}
         />
@@ -1162,29 +1234,43 @@ export default function CompoundGrowthExplorer() {
       {simMode === "simple" && mode === "project" && (
         <div className="cge-lifecycle-wrap">
           <button type="button" className="cge-life-toggle" onClick={() => setShowLifecycle((v) => !v)}>
-            {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view: human &amp; financial capital
+            {showLifecycle ? "▾ Hide" : "▸ Show"} lifecycle view: human capital, savings &amp; the drawdown
           </button>
           {showLifecycle && (
             <div className="cge-lifecycle">
               <div className="cge-life-controls">
-                <NumberField label="Current age" info="Your age today, the left edge of the lifecycle chart." value={currentAge} min={18} max={80} step={1} integer onCommit={setCurrentAge} />
-                <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks." value={income} min={0} max={1_000_000} step={5_000} prefix="$" integer onCommit={setIncome} />
-                <NumberField label="Income growth" info="How fast your pay rises each year." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
-                <NumberField label="Retirement age" info="When labor income stops, the point where human capital reaches zero." value={retireAge} min={40} max={90} step={1} integer onCommit={setRetireAge} />
-                <NumberField label="Stocks in portfolio" info="The share of your invested savings held in stocks, used to gauge your true, total-wealth stock exposure." value={stockPct} min={0} max={100} step={5} suffix="%" integer onCommit={setStockPct} />
+                <NumberField label="Current age" info="Your age today, the left edge of the chart. You invest for the horizon set above, so you retire at this age plus that many years." value={currentAge} min={16} max={70} step={1} integer onCommit={setCurrentAge} />
+                <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks, in today's dollars." value={income} min={0} max={1_000_000} step={5_000} prefix="$" integer onCommit={setIncome} />
+                <NumberField label="Income growth" info="How fast your real pay rises each year, above inflation." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
               </div>
+              <p className="cge-life-caption">
+                Everything here is in <strong>today's dollars</strong>, built from your inputs above: invest for {years} years,
+                retire at <strong>{retireAge}</strong>, then draw <strong>{withdrawalRate}%</strong> a year from a{" "}
+                {retStock}%-stock nest egg for {retYears} years.
+              </p>
               <LifecycleChart data={lifecycle} retireAge={retireAge} />
               <div className="cge-life-legend">
-                <span><span className="cge-life-key" style={{ background: "var(--color-accent)" }} /> Financial capital (your savings)</span>
+                <span><span className="cge-life-key" style={{ background: "var(--color-text)" }} /> Total capital</span>
                 <span><span className="cge-life-key" style={{ background: "var(--pl-c3)" }} /> Human capital (future earnings)</span>
+                <span><span className="cge-life-key" style={{ background: "var(--color-accent)" }} /> Investment capital (your nest egg)</span>
               </div>
               <p className="cge-life-insight">
-                At age {currentAge}, your wealth is mostly <strong>human capital</strong>:
-                about {compactCurrency(hcNow)} of future earnings versus {compactCurrency(principal)} saved.
-                So even a {stockPct}%-stock portfolio is only{" "}
-                <strong>{Math.round(trueEquity * 100)}%</strong> of your <em>total</em> capital
-                in stocks, the classic case that the young can afford more equity risk, and
-                why target-date funds start aggressive and glide safer as human capital runs out.
+                At {currentAge}, almost all your wealth is <strong>human capital</strong>: about{" "}
+                {compactCurrency(hcNow)} of future earnings versus {compactCurrency(principal)} saved. A paycheck
+                you haven't earned yet behaves like a bond, which is why the young can afford more equity risk.
+                By <strong>{retireAge}</strong> you've converted that into a{" "}
+                <strong>{compactCurrency(nestEggReal)}</strong> nest egg, and human capital is gone.{" "}
+                {depletedAge !== null ? (
+                  <>From there, drawing {withdrawalRate}% a year with a {retStock}%-stock mix, the money{" "}
+                  <strong>runs dry at age {depletedAge}</strong> — the drawdown outpaces the returns.</>
+                ) : endBalance > nestEggReal * 1.05 ? (
+                  <>From there, drawing {withdrawalRate}% a year earns more than you spend, so the nest egg{" "}
+                  <strong>keeps growing</strong> to about {compactCurrency(endBalance)} by {retireAge + retYears} —
+                  runaway compounding, even in retirement.</>
+                ) : (
+                  <>From there, drawing {withdrawalRate}% a year roughly balances the returns, so the nest egg{" "}
+                  <strong>lasts the full {retYears} years</strong>, ending near {compactCurrency(endBalance)}.</>
+                )}
               </p>
             </div>
           )}
