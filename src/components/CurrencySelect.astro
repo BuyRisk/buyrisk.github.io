@@ -1,15 +1,21 @@
 ---
 // Site-wide currency picker. Writes localStorage and fires an event that the
 // React tool islands listen to (see src/lib/currency.ts). Kept dependency-free
-// and inline so the saved choice is applied before the tools hydrate.
+// and inline so the saved choice is applied before the tools hydrate. Options
+// come from the shared CURRENCIES list so adding one there adds it here too.
+import { CURRENCIES } from "../lib/currency";
 ---
 
 <label class="currency-select" title="Display currency">
   <span class="sr-only">Currency</span>
   <select id="currency-select" aria-label="Display currency">
-    <option value="USD">$ USD</option>
-    <option value="EUR">€ EUR</option>
-    <option value="GBP">£ GBP</option>
+    {
+      CURRENCIES.map((c) => (
+        <option value={c.code}>
+          {c.symbol} {c.label}
+        </option>
+      ))
+    }
   </select>
 </label>
 
@@ -55,7 +61,11 @@
     var sel = document.getElementById("currency-select");
     if (!sel) return;
     var saved = localStorage.getItem(KEY);
-    if (saved === "USD" || saved === "EUR" || saved === "GBP") sel.value = saved;
+    // Apply the saved choice only if it matches a currency we actually offer
+    // (reads the rendered options, so it never drifts from the source list).
+    if (saved && sel.querySelector('option[value="' + saved + '"]')) {
+      sel.value = saved;
+    }
     sel.addEventListener("change", function () {
       try {
         localStorage.setItem(KEY, sel.value);

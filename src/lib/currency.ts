@@ -3,31 +3,46 @@ import { useSyncExternalStore } from "react";
 /**
  * Site-wide currency selection, shared across every React island.
  *
- * Feasibility spike (USD / EUR / GBP): switching currency swaps the SYMBOL and
- * formatting, keeping the same numeric values. Those three are close enough in
- * magnitude that the defaults stay sensible without FX conversion. Currencies
- * with very different scale (e.g. JPY) would additionally need the slider
- * ranges and defaults rescaled — deliberately out of scope here.
+ * Switching currency swaps the SYMBOL and formatting, keeping the same numeric
+ * values. That only stays honest for currencies close to the US dollar in
+ * magnitude, so the defaults (a $50k salary, a $1M portfolio) still read
+ * sensibly without FX conversion. Every currency offered here trades within
+ * roughly 2× of the dollar. Currencies with very different scale (e.g. JPY at
+ * ~150/USD, or HKD at ~7.8/USD) would additionally need every slider range and
+ * default rescaled — deliberately out of scope, so they're not offered.
  *
  * The source of truth is localStorage (so it survives navigation and syncs
  * across islands and tabs). A plain formatter reads the current currency each
  * call; islands call `useCurrencyCode()` once so they re-render on a change.
+ *
+ * To add a currency: extend CURRENCIES below (and mirror the option list in
+ * CurrencySelect.astro). Keep it near dollar parity, or the ranges will lie.
  */
 
-export type CurrencyCode = "USD" | "EUR" | "GBP";
-
-export const CURRENCIES: { code: CurrencyCode; symbol: string; label: string }[] = [
+export const CURRENCIES = [
   { code: "USD", symbol: "$", label: "USD" },
   { code: "EUR", symbol: "€", label: "EUR" },
   { code: "GBP", symbol: "£", label: "GBP" },
-];
+  { code: "CAD", symbol: "CA$", label: "CAD" },
+  { code: "AUD", symbol: "A$", label: "AUD" },
+  { code: "NZD", symbol: "NZ$", label: "NZD" },
+  { code: "CHF", symbol: "Fr", label: "CHF" },
+  { code: "SGD", symbol: "S$", label: "SGD" },
+] as const;
 
-const SYMBOL: Record<CurrencyCode, string> = { USD: "$", EUR: "€", GBP: "£" };
+export type CurrencyCode = (typeof CURRENCIES)[number]["code"];
+
+const SYMBOL = Object.fromEntries(
+  CURRENCIES.map((c) => [c.code, c.symbol]),
+) as Record<CurrencyCode, string>;
+
+const CODES = new Set<string>(CURRENCIES.map((c) => c.code));
 const KEY = "buy-risk-currency";
 const EVENT = "buy-risk-currency-change";
 const DEFAULT: CurrencyCode = "USD";
 
-const isCode = (c: unknown): c is CurrencyCode => c === "USD" || c === "EUR" || c === "GBP";
+const isCode = (c: unknown): c is CurrencyCode =>
+  typeof c === "string" && CODES.has(c);
 
 export function getCurrency(): CurrencyCode {
   if (typeof localStorage === "undefined") return DEFAULT;
