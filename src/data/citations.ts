@@ -203,6 +203,15 @@ export const STUDIES: Record<string, Study> = {
   },
 
   // --- Market efficiency & active management ------------------------------
+  kahnemanTversky1979: {
+    authors: "Kahneman, D., & Tversky, A.",
+    year: 1979,
+    title: "Prospect Theory: An Analysis of Decision under Risk",
+    venue: "Econometrica 47(2): 263–291",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "The foundation of behavioral finance; losses loom larger than equivalent gains.",
+  },
   dicksonShoven1995: {
     authors: "Dickson, J. M., & Shoven, J. B.",
     year: 1995,
@@ -592,5 +601,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   "risk-tolerance": {
     studies: ["markowitz1952"],
     datasets: ["damodaran"],
+  },
+  "behavioral-finance": {
+    studies: ["kahnemanTversky1979", "barberOdean2000"],
+    datasets: ["french"],
   },
 };

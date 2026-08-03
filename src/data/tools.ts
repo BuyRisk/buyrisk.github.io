@@ -73,6 +73,13 @@ export const TOOLS: Tool[] = [
       "Four bets against the market (predicting it, timing it, deploying into it, and hiring active managers), and the one answer that keeps appearing. The whole case for indexing.",
   },
   {
+    title: "Behavioral Finance: Your Own Worst Enemy",
+    href: "/tools/behavioral-finance",
+    blurb:
+      "The market doesn't lose you money — your reactions to it do. Watch the behavior gap open up between a buy-and-hold investor and a panic-seller over real market history, then meet the biases (loss aversion, recency, herding) that make selling low feel smart.",
+    tag: "New",
+  },
+  {
     title: "Retirement, Social Security & Roth",
     href: "/tools/retirement",
     blurb:
