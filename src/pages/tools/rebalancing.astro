@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RebalanceLab from "../../components/RebalanceLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Rebalancing: Discipline vs. Drift"
+  description="See how the rule you use to rebalance a stock/bond portfolio (never, annually, or on a threshold band) changes its risk and return. The surprising lesson: rebalancing controls risk, it doesn't boost returns."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Rebalancing: discipline vs. drift</h1>
+    <p class="lede">
+      Left alone, a portfolio drifts. Because stocks out-grow bonds over time, a
+      tidy 60/40 slowly becomes a risky 80/20 without you touching it.
+      Rebalancing is the discipline of trimming winners back to your target. Watch
+      how <em>never</em>, <em>annual</em>, and <em>threshold</em> rebalancing
+      change the risk and return you actually get.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <RebalanceLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>What rebalancing really does</h2>
+      <ul>
+        <li>
+          <strong>It controls risk, not return.</strong> The common myth is that
+          rebalancing boosts returns. Usually the opposite: letting stocks run
+          leaves you holding more of the higher-returning asset, so <em>never</em>
+          rebalancing often earns a touch more, at the price of a portfolio far
+          riskier than you chose. Rebalancing's job is to keep risk where you want it.
+        </li>
+        <li>
+          <strong>Calendar vs. threshold.</strong> Rebalancing on a fixed schedule
+          (yearly) and rebalancing when the mix strays past a band both keep you
+          near target. The threshold rule usually trades less often for similar
+          control, which matters once costs and taxes enter the picture.
+        </li>
+        <li>
+          <strong>Frequency barely matters.</strong> Monthly, quarterly, annual:
+          the research finds little difference in outcome. What matters is having a
+          rule and following it, rather than letting drift, or emotion, decide.
+        </li>
+      </ul>
+      <p>
+        This simulation ignores trading costs and taxes, which in the real world
+        argue for rebalancing less often and using new contributions to do it.
+        Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="rebalancing" />
+
+  <NextTool current="/tools/rebalancing" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>

@@ -47,6 +47,20 @@ export const TOOLS: Tool[] = [
       "Build the actual portfolio: mix assets to find the efficient frontier, dial the all-important stock/bond split, and see why the 'safe' bond sleeve still moves with interest rates.",
   },
   {
+    title: "Rebalancing: Discipline vs. Drift",
+    href: "/tools/rebalancing",
+    blurb:
+      "Left alone, a portfolio drifts: stocks out-grow bonds and a tidy 60/40 quietly becomes a risky 80/20. See how never, annual, and threshold rebalancing change the risk and return you actually get, and why rebalancing controls risk rather than boosting returns.",
+    tag: "New",
+  },
+  {
+    title: "Options Pricing, Demystified",
+    href: "/tools/options",
+    blurb:
+      "What is an option actually worth? Drag the strike, time to expiry, and volatility and watch the Black–Scholes price and payoff diagram respond, until calls, puts, intrinsic value, and time value finally click.",
+    tag: "New",
+  },
+  {
     title: "Risk & Return: CAPM & Factors",
     href: "/tools/factors",
     blurb:

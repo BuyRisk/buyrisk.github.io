@@ -76,6 +76,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Portfolio theory",
     note: "Introduces the separation theorem.",
   },
+  peroldSharpe1988: {
+    authors: "Perold, A. F., & Sharpe, W. F.",
+    year: 1988,
+    title: "Dynamic Strategies for Asset Allocation",
+    venue: "Financial Analysts Journal 44(1): 16–27",
+    kind: "paper",
+    category: "Portfolio theory",
+    note: "The classic analysis of buy-and-hold vs. rebalancing (constant-mix): rebalancing trades a little return for lower, steadier risk.",
+  },
 
   // --- Asset pricing & the CAPM -------------------------------------------
   treynor1962: {
@@ -117,6 +126,23 @@ export const STUDIES: Record<string, Study> = {
     year: 1973,
     title: "Risk, Return, and Equilibrium: Empirical Tests",
     venue: "Journal of Political Economy 81(3): 607–636",
+    kind: "paper",
+    category: "Asset pricing & the CAPM",
+  },
+  black1973: {
+    authors: "Black, F., & Scholes, M.",
+    year: 1973,
+    title: "The Pricing of Options and Corporate Liabilities",
+    venue: "Journal of Political Economy 81(3): 637–654",
+    kind: "paper",
+    category: "Asset pricing & the CAPM",
+    note: "The Black–Scholes option-pricing formula.",
+  },
+  merton1973: {
+    authors: "Merton, R. C.",
+    year: 1973,
+    title: "Theory of Rational Option Pricing",
+    venue: "The Bell Journal of Economics and Management Science 4(1): 141–183",
     kind: "paper",
     category: "Asset pricing & the CAPM",
   },
@@ -528,5 +554,13 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   retirement: {
     studies: ["bengen1994", "cooley1998", "shovenSlavov2014"],
     datasets: ["damodaran", "shiller", "ssa", "irsPub915", "cmsIrmaa"],
+  },
+  options: {
+    studies: ["black1973", "merton1973"],
+    datasets: [],
+  },
+  rebalancing: {
+    studies: ["markowitz1952", "peroldSharpe1988"],
+    datasets: ["damodaran"],
   },
 };
