@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import RiskToleranceLab from "../../components/RiskToleranceLab.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -20,6 +21,14 @@ import "../../styles/simtool.css";
       truly <em>needs</em>. Six quick questions place you on the spectrum and
       suggest a starting point.
     </p>
+  </section>
+
+  <section class="container">
+    <RegionNote kind="data">
+      The questions and the three-dimension framing are universal, but the
+      best/worst-year outcome ranges use US market history (1928–present). Expect
+      similar shapes, not identical numbers, in other markets.
+    </RegionNote>
   </section>
 
   <section class="container wl-host">

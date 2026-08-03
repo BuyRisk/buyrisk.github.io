@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import TaxDragLab from "../../components/TaxDragLab.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -20,6 +21,15 @@ import "../../styles/simtool.css";
       never compounds again. Watch the gap open up, then see what actually
       causes it.
     </p>
+  </section>
+
+  <section class="container">
+    <RegionNote>
+      US-focused — this tool assumes US tax treatment: ordinary-income vs.
+      long-term capital-gains rates, and a taxable brokerage alongside a
+      tax-sheltered account. The drag exists in any taxed account anywhere; the
+      specific rates and account types shown are American.
+    </RegionNote>
   </section>
 
   <section class="container wl-host">

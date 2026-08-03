@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import BehavioralLab from "../../components/BehavioralLab.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -19,6 +20,14 @@ import "../../styles/simtool.css";
       returns usually isn't a crash; it's how you react to one. Meet the behavior
       gap, and the wiring behind it.
     </p>
+  </section>
+
+  <section class="container">
+    <RegionNote kind="data">
+      The biases are human, not national — but the behavior-gap simulation runs on
+      US market history (1990–present). The pattern holds in any market with
+      booms and busts; only the return data is American.
+    </RegionNote>
   </section>
 
   <section class="container wl-host">

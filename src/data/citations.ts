@@ -493,6 +493,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.cms.gov/newsroom/fact-sheets",
     note: "Income-related monthly adjustment amounts and tiers, based on MAGI from two years prior.",
   },
+  bogleheads: {
+    name: "Prioritizing investments",
+    publisher: "Bogleheads wiki",
+    url: "https://www.bogleheads.org/wiki/Prioritizing_investments",
+    note: "The community 'order of operations' the Next Dollar ladder follows.",
+  },
   jst: {
     name: "The Jordà-Schularick-Taylor Macrohistory Database",
     publisher: "macrohistory.net",
@@ -605,5 +611,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   "behavioral-finance": {
     studies: ["kahnemanTversky1979", "barberOdean2000"],
     datasets: ["french"],
+  },
+  "next-dollar": {
+    studies: [],
+    datasets: ["bogleheads"],
   },
 };

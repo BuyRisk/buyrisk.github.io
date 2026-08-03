@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import AssetLocationLab from "../../components/AssetLocationLab.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -19,6 +20,15 @@ import "../../styles/simtool.css";
       tax win most investors never take. Hold the same portfolio, but put the
       tax-hungry asset in your sheltered account, and you keep more of it.
     </p>
+  </section>
+
+  <section class="container">
+    <RegionNote>
+      US-focused — this tool assumes US account types (Roth and Traditional
+      IRAs / 401(k)s) and the US split between ordinary-income and long-term
+      capital-gains tax rates. The location logic applies wherever some accounts
+      are taxed and others sheltered; the specific accounts and rates are American.
+    </RegionNote>
   </section>
 
   <section class="container wl-host">
