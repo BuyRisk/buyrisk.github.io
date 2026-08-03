@@ -9,6 +9,7 @@ import {
   type Sex,
   type Smoking,
   type Exercise,
+  type Condition,
   type OptimizeResult,
   type CoupleResult,
 } from "../lib/socialSecurity";
@@ -65,6 +66,7 @@ export default function SocialSecurityLab() {
   const [sex, setSex] = useState<Sex>("male");
   const [smoking, setSmoking] = useState<Smoking>("former");
   const [exercise, setExercise] = useState<Exercise>("moderate");
+  const [condition, setCondition] = useState<Condition>("none");
   // Person B (spouse).
   const [piaB, setPiaB] = useState(1200);
   const [birthYearB, setBirthYearB] = useState(1967);
@@ -72,36 +74,44 @@ export default function SocialSecurityLab() {
   const [sexB, setSexB] = useState<Sex>("female");
   const [smokingB, setSmokingB] = useState<Smoking>("never");
   const [exerciseB, setExerciseB] = useState<Exercise>("moderate");
+  const [conditionB, setConditionB] = useState<Condition>("none");
   const [discountRate, setDiscountRate] = useState(2);
-  // Advanced tax + IRMAA layer (single mode only).
+  // A disabled adult child drawing on the (higher) record — reshapes the timing.
+  const [disabledChild, setDisabledChild] = useState(false);
+  // Advanced tax + IRMAA layer.
   const [advanced, setAdvanced] = useState(false);
   const [filing, setFiling] = useState<FilingStatus>("single");
   const [otherIncome, setOtherIncome] = useState(30000);
   const [marginalRate, setMarginalRate] = useState(22);
+  const [survivorIncome, setSurvivorIncome] = useState(30000);
   const singleTax =
     advanced && mode === "single" ? { filing, otherIncome, marginalRate } : undefined;
-  const coupleTax = advanced && mode === "couple" ? { otherIncome, marginalRate } : undefined;
+  const coupleTax =
+    advanced && mode === "couple"
+      ? { otherIncome, marginalRate, survivorOtherIncome: survivorIncome }
+      : undefined;
 
-  const health = { sex, smoking, exercise };
+  const health = { sex, smoking, exercise, condition };
   const result = useMemo(
-    () => optimize({ pia, birthYear, currentAge, discountRate, health, tax: singleTax }),
-    [pia, birthYear, currentAge, discountRate, sex, smoking, exercise, advanced, mode, filing, otherIncome, marginalRate]
+    () => optimize({ pia, birthYear, currentAge, discountRate, health, tax: singleTax, disabledChild }),
+    [pia, birthYear, currentAge, discountRate, sex, smoking, exercise, condition, disabledChild, advanced, mode, filing, otherIncome, marginalRate]
   );
-  // Population-average reference (former/moderate ⇒ hazard multiplier 1.0), to
+  // Population-average reference (former/moderate/no-condition ⇒ hazard 1.0), to
   // isolate the health "premium".
   const ref = useMemo(
-    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" }, tax: singleTax }),
-    [pia, birthYear, currentAge, discountRate, sex, advanced, mode, filing, otherIncome, marginalRate]
+    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" }, tax: singleTax, disabledChild }),
+    [pia, birthYear, currentAge, discountRate, sex, disabledChild, advanced, mode, filing, otherIncome, marginalRate]
   );
   const couple = useMemo(
     () =>
       optimizeCouple({
-        a: { pia, birthYear, currentAge, health: { sex, smoking, exercise } },
-        b: { pia: piaB, birthYear: birthYearB, currentAge: currentAgeB, health: { sex: sexB, smoking: smokingB, exercise: exerciseB } },
+        a: { pia, birthYear, currentAge, health: { sex, smoking, exercise, condition } },
+        b: { pia: piaB, birthYear: birthYearB, currentAge: currentAgeB, health: { sex: sexB, smoking: smokingB, exercise: exerciseB, condition: conditionB } },
         discountRate,
         tax: coupleTax,
+        disabledChild,
       }),
-    [pia, birthYear, currentAge, sex, smoking, exercise, piaB, birthYearB, currentAgeB, sexB, smokingB, exerciseB, discountRate, advanced, mode, otherIncome, marginalRate]
+    [pia, birthYear, currentAge, sex, smoking, exercise, condition, piaB, birthYearB, currentAgeB, sexB, smokingB, exerciseB, conditionB, disabledChild, discountRate, advanced, mode, otherIncome, marginalRate, survivorIncome]
   );
 
   const bestAgeLabel = monthsToLabel(result.best.ageMonths);
@@ -112,10 +122,10 @@ export default function SocialSecurityLab() {
 
   const resetAll = () => {
     setMode("single");
-    setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male"); setSmoking("former"); setExercise("moderate");
-    setPiaB(1200); setBirthYearB(1967); setCurrentAgeB(60); setSexB("female"); setSmokingB("never"); setExerciseB("moderate");
-    setDiscountRate(2);
-    setAdvanced(false); setFiling("single"); setOtherIncome(30000); setMarginalRate(22);
+    setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male"); setSmoking("former"); setExercise("moderate"); setCondition("none");
+    setPiaB(1200); setBirthYearB(1967); setCurrentAgeB(60); setSexB("female"); setSmokingB("never"); setExerciseB("moderate"); setConditionB("none");
+    setDiscountRate(2); setDisabledChild(false);
+    setAdvanced(false); setFiling("single"); setOtherIncome(30000); setMarginalRate(22); setSurvivorIncome(30000);
   };
 
   return (
@@ -137,13 +147,16 @@ export default function SocialSecurityLab() {
           <PersonFields
             pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
             sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
+            condition={condition} setCondition={setCondition}
           />
         ) : (
           <>
             <PersonFields title="You" pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
-              sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise} />
+              sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
+              condition={condition} setCondition={setCondition} />
             <PersonFields title="Your spouse" pia={piaB} setPia={setPiaB} birthYear={birthYearB} setBirthYear={setBirthYearB} age={currentAgeB} setAge={setCurrentAgeB}
-              sex={sexB} setSex={setSexB} smoking={smokingB} setSmoking={setSmokingB} exercise={exerciseB} setExercise={setExerciseB} />
+              sex={sexB} setSex={setSexB} smoking={smokingB} setSmoking={setSmokingB} exercise={exerciseB} setExercise={setExerciseB}
+              condition={conditionB} setCondition={setConditionB} />
           </>
         )}
 
@@ -155,6 +168,17 @@ export default function SocialSecurityLab() {
           </span>
           <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
         </label>
+
+        <div className="wl-field" style={{ marginTop: "0.6rem" }}>
+          <span className="wl-field-label">
+            {mode === "couple" ? "Disabled adult child (on the higher earner's record)?" : "Disabled adult child on your record?"}
+            <InfoTip text="A child disabled before age 22 can draw on your Social Security record: about 50% of your full benefit while you're claiming, then 75% as a survivor benefit for their life after you're gone. Because that 50% only starts once you claim, it tends to favor claiming earlier. Educational — the family-maximum cap and the child's own eligibility/income rules aren't modeled." />
+          </span>
+          <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Disabled adult child on record">
+            <button type="button" className={!disabledChild ? "active" : ""} aria-pressed={!disabledChild} onClick={() => setDisabledChild(false)}>No</button>
+            <button type="button" className={disabledChild ? "active" : ""} aria-pressed={disabledChild} onClick={() => setDisabledChild(true)}>Yes</button>
+          </div>
+        </div>
 
         {(
           <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "var(--border)" }}>
@@ -187,6 +211,16 @@ export default function SocialSecurityLab() {
                   </span>
                   <input type="range" min={0} max={300000} step={5000} value={otherIncome} onChange={(e) => setOtherIncome(Number(e.target.value))} />
                 </label>
+                {mode === "couple" && (
+                  <label className="wl-slider">
+                    <span>
+                      Survivor's other income
+                      <InfoTip text="The household's non-SS income once only one of you is left. A widow(er) often has less — a pension may drop, and they file as single (lower tax thresholds). Defaults to the same as while you're both alive; lower it to reflect a drop." />{" "}
+                      <strong>{currency(survivorIncome)}</strong>
+                    </span>
+                    <input type="range" min={0} max={300000} step={5000} value={survivorIncome} onChange={(e) => setSurvivorIncome(Number(e.target.value))} />
+                  </label>
+                )}
                 <label className="wl-slider">
                   <span>
                     Marginal tax rate
@@ -207,7 +241,8 @@ export default function SocialSecurityLab() {
                     <li>It applies this year's ({IRMAA.year}) IRMAA tiers and the fixed benefit-taxation thresholds to every year, rather than modeling how those unindexed thresholds pull more of your benefit into tax over time.</li>
                     <li>IRMAA uses your current income (not the real two-year MAGI lookback) from age 65, and charges only the surcharge your benefit itself triggers.</li>
                     <li>Taxes use the single marginal rate you enter — not a full return with deductions, credits, state rules, ACA subsidies before 65, or the net investment income tax.</li>
-                    <li>Couple mode files jointly while both live and single as a survivor, with household income unchanged after a death.</li>
+                    <li>Couple mode files jointly while both live and single as a survivor; you can set the survivor's income separately, but it's still assumed constant after that.</li>
+                    <li>A disabled child is modeled on the higher earner's record at 50% (while claimed) then 75% (survivor), assumed to outlive you, and ignoring the family-maximum cap and the child's own eligibility/income rules.</li>
                     <li>It still omits spousal top-ups, the earnings test if you work before full retirement age, and rules like WEP/GPO.</li>
                   </ul>
                 </details>
@@ -270,8 +305,8 @@ export default function SocialSecurityLab() {
                 <p className="wl-fnote" style={{ marginTop: "0.5rem" }}>
                   <strong>After tax &amp; IRMAA:</strong> about{" "}
                   <strong>{(result.tax.taxablePct * 100).toFixed(0)}%</strong> of the
-                  benefit is federally taxable, trimming lifetime value from{" "}
-                  {currency(result.tax.grossNpv)} before tax to {currency(result.best.npv)}.{" "}
+                  benefit is federally taxable, trimming your benefit's value from{" "}
+                  {currency(result.tax.grossNpv)} before tax to {currency(result.tax.netWorkerNpv)}.{" "}
                   {result.tax.annualIrmaa > 0 ? (
                     <>
                       Claiming at the optimum also lands you in <strong>IRMAA tier{" "}
@@ -283,6 +318,15 @@ export default function SocialSecurityLab() {
                     <>At this income, claiming doesn't trigger an added Medicare (IRMAA)
                       surcharge (you're in tier {result.tax.irmaaTier}).</>
                   )}
+                </p>
+              )}
+              {result.childNpv != null && (
+                <p className="wl-fnote" style={{ marginTop: "0.5rem" }}>
+                  <strong>Disabled child:</strong> their benefits add about{" "}
+                  <strong>{currency(result.childNpv)}</strong> of expected lifetime value
+                  (≈50% of your PIA while you claim, 75% after you're gone). Because that 50%
+                  starts only once you claim, it pulls the best age <em>earlier</em>; the value
+                  above already includes it.
                 </p>
               )}
             </div>
@@ -331,6 +375,7 @@ function PersonFields(props: {
   sex: Sex; setSex: (v: Sex) => void;
   smoking: Smoking; setSmoking: (v: Smoking) => void;
   exercise: Exercise; setExercise: (v: Exercise) => void;
+  condition: Condition; setCondition: (v: Condition) => void;
 }) {
   const fra = fraMonths(props.birthYear);
   return (
@@ -363,6 +408,7 @@ function PersonFields(props: {
       <Segmented label="Sex (for life table)" value={props.sex} onChange={props.setSex} options={[{ value: "male", label: "Male" }, { value: "female", label: "Female" }]} />
       <Segmented label="Smoking" info="Current smoking roughly doubles all-cause mortality; quitting recovers most of the gap over time. Illustrative hazard multipliers, not a medical model." value={props.smoking} onChange={props.setSmoking} options={[{ value: "never", label: "Never" }, { value: "former", label: "Former" }, { value: "current", label: "Current" }]} />
       <Segmented label="Exercise" info="Regular activity is associated with ~20–30% lower mortality. Illustrative." value={props.exercise} onChange={props.setExercise} options={[{ value: "sedentary", label: "Little" }, { value: "moderate", label: "Some" }, { value: "active", label: "Active" }, { value: "daily", label: "Daily" }]} />
+      <Segmented label="Serious health condition" info="A diagnosed chronic or serious illness shortens life expectancy in the model, which tends to favor claiming earlier. Coarse, illustrative multipliers — a teaching device, not a medical prognosis." value={props.condition} onChange={props.setCondition} options={[{ value: "none", label: "None" }, { value: "chronic", label: "Chronic" }, { value: "serious", label: "Serious" }]} />
     </div>
   );
 }
@@ -421,6 +467,14 @@ function CoupleOutput({ couple, piaA, piaB }: { couple: CoupleResult; piaA: numb
               {couple.tax.irmaaTierBoth > 1
                 ? " — each of you pays an income surcharge on Medicare premiums."
                 : " (no income surcharge)."}
+            </p>
+          )}
+          {couple.childNpv != null && (
+            <p className="wl-fnote" style={{ marginTop: "0.5rem" }}>
+              <strong>Disabled child:</strong> a child on the higher earner's record adds about{" "}
+              <strong>{currency(couple.childNpv)}</strong> of expected value (≈50% of that PIA while
+              they claim, 75% for the child's life after). It's included above, and because the 50%
+              starts at claim, it nudges the higher earner's timing earlier.
             </p>
           )}
         </div>

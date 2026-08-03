@@ -36,10 +36,14 @@ import {
 export type Sex = "male" | "female";
 export type Smoking = "never" | "former" | "current";
 export type Exercise = "sedentary" | "moderate" | "active" | "daily";
+/** A known health outlook, layered on top of smoking/exercise. */
+export type Condition = "none" | "chronic" | "serious";
 export interface Health {
   sex: Sex;
   smoking: Smoking;
   exercise: Exercise;
+  /** Optional diagnosed condition that shortens the survival curve. */
+  condition?: Condition;
 }
 
 /** Full retirement age in months, by birth year (SSA schedule). */
@@ -67,9 +71,13 @@ export function benefitFactor(claimMonths: number, fra: number): number {
 // from epidemiology; a teaching approximation, not a medical model.
 const SMOKE_MULT: Record<Smoking, number> = { never: 0.85, former: 1.0, current: 2.0 };
 const EXERCISE_MULT: Record<Exercise, number> = { sedentary: 1.25, moderate: 1.0, active: 0.8, daily: 0.7 };
+// A diagnosed serious/chronic illness raises mortality. Deliberately coarse and
+// illustrative — a teaching device to show a shorter horizon favors claiming
+// earlier, not a medical prognosis.
+const CONDITION_MULT: Record<Condition, number> = { none: 1.0, chronic: 1.7, serious: 3.5 };
 
 export function hazardMultiplier(h: Health): number {
-  return SMOKE_MULT[h.smoking] * EXERCISE_MULT[h.exercise];
+  return SMOKE_MULT[h.smoking] * EXERCISE_MULT[h.exercise] * CONDITION_MULT[h.condition ?? "none"];
 }
 
 /**
@@ -118,8 +126,10 @@ export interface TaxInfo {
   annualIrmaa: number;
   /** IRMAA tier (1 = no surcharge … 6 = top) at the best claim's MAGI. */
   irmaaTier: number;
-  /** Survival-weighted PV ignoring tax & IRMAA, for side-by-side comparison. */
+  /** Survival-weighted PV of the worker's benefit ignoring tax & IRMAA. */
   grossNpv: number;
+  /** Survival-weighted PV of the worker's benefit after tax & IRMAA. */
+  netWorkerNpv: number;
   /** Net monthly benefit after tax & IRMAA once on Medicare, at the best claim. */
   netMonthly65Plus: number;
 }
@@ -132,6 +142,8 @@ export interface OptimizeResult {
   points: AgePoint[]; // one per whole claim age 62..70
   breakevenAge: number; // 62-vs-70 cumulative crossover
   tax?: TaxInfo; // present only when a tax layer was supplied
+  /** PV of a disabled adult child's benefit at the best claim (if modeled). */
+  childNpv?: number;
 }
 
 export interface OptimizeInput {
@@ -141,6 +153,8 @@ export interface OptimizeInput {
   discountRate: number; // real, percent
   health: Health;
   tax?: TaxParams; // optional Advanced tax + IRMAA layer
+  /** Model a disabled adult child drawing on this record (50% while you claim, 75% survivor). */
+  disabledChild?: boolean;
 }
 
 export function optimize(inp: OptimizeInput): OptimizeResult {
@@ -174,23 +188,37 @@ export function optimize(inp: OptimizeInput): OptimizeResult {
     return { taxAnnual, irmaaAnnual: Math.max(0, irmaa), taxable, tier: irmaaTierIndex(magiWith, tax.filing) };
   };
 
-  // Survival-weighted PV of the net (after tax & IRMAA) stream. IRMAA applies
-  // only from age 65 (Medicare); benefit taxation applies at every age.
+  const child = inp.disabledChild;
+  const childAux = child ? 0.5 * inp.pia : 0; // 50% of PIA while you're claiming
+  const childSurv = child ? 0.75 * inp.pia : 0; // 75% of PIA once you're gone
+
+  // Survival-weighted PV of the net (after tax & IRMAA) worker stream, plus an
+  // optional disabled-adult-child stream. IRMAA applies only from age 65; benefit
+  // taxation applies at every age. Child benefits are the child's own income, so
+  // they aren't taxed on the worker's return here.
   const pv = (claimMonth: number) => {
     const monthly = inp.pia * benefitFactor(claimMonth, fra);
     const c = charges(monthly * 12);
     const taxM = c.taxAnnual / 12;
     const irmaaM = c.irmaaAnnual / 12;
-    let net = 0;
-    let gross = 0;
+    let workerNet = 0;
+    let workerGross = 0;
     for (let m = claimMonth; m <= 119 * 12 + 11; m++) {
       const age = Math.floor(m / 12);
-      const disc = Math.pow(1 + d, (m - nowMonth) / 12);
-      const w = S[age] / disc;
-      gross += monthly * w;
-      net += (monthly - taxM - (age >= 65 ? irmaaM : 0)) * w;
+      const w = S[age] / Math.pow(1 + d, (m - nowMonth) / 12);
+      workerGross += monthly * w;
+      workerNet += (monthly - taxM - (age >= 65 ? irmaaM : 0)) * w;
     }
-    return { monthly, npv: net, grossNpv: gross };
+    let childPv = 0;
+    if (child) {
+      for (let m = Math.round(nowMonth); m <= 119 * 12 + 11; m++) {
+        const age = Math.floor(m / 12);
+        const disc = Math.pow(1 + d, (m - nowMonth) / 12);
+        // Auxiliary while you're alive AND have claimed; survivor once you've died.
+        childPv += ((m >= claimMonth ? childAux : 0) * S[age] + childSurv * (1 - S[age])) / disc;
+      }
+    }
+    return { monthly, workerNet, workerGross, childPv, npv: workerNet + childPv };
   };
 
   const startMonth = Math.max(62 * 12, Math.round(inp.currentAge * 12));
@@ -219,12 +247,22 @@ export function optimize(inp: OptimizeInput): OptimizeResult {
       annualTax: c.taxAnnual,
       annualIrmaa: c.irmaaAnnual,
       irmaaTier: c.tier,
-      grossNpv: best.grossNpv,
+      grossNpv: best.workerGross,
+      netWorkerNpv: best.workerNet,
       netMonthly65Plus: best.monthly - c.taxAnnual / 12 - c.irmaaAnnual / 12,
     };
   }
 
-  return { fraMonths: fra, hazardMult: mult, lifeExpectancy, best, points, breakevenAge, tax: taxInfo };
+  return {
+    fraMonths: fra,
+    hazardMult: mult,
+    lifeExpectancy,
+    best: { ageMonths: best.ageMonths, monthly: best.monthly, npv: best.npv },
+    points,
+    breakevenAge,
+    tax: taxInfo,
+    childNpv: child ? best.childPv : undefined,
+  };
 }
 
 // ---- Couple / survivor-aware optimization -------------------------------------
@@ -242,6 +280,8 @@ export interface Person {
 export interface CoupleTaxParams {
   otherIncome: number;
   marginalRate: number;
+  /** Household non-SS income for a lone survivor (often lower). Defaults to `otherIncome`. */
+  survivorOtherIncome?: number;
 }
 
 export interface CoupleInput {
@@ -249,6 +289,8 @@ export interface CoupleInput {
   b: Person;
   discountRate: number;
   tax?: CoupleTaxParams;
+  /** Model a disabled adult child drawing on the higher earner's record. */
+  disabledChild?: boolean;
 }
 
 export interface CouplePoint {
@@ -271,6 +313,8 @@ export interface CoupleResult {
     /** Household IRMAA tier while both are on Medicare, at the best claim pair. */
     irmaaTierBoth: number;
   };
+  /** PV of a disabled adult child's benefit at the best claim pair (if modeled). */
+  childNpv?: number;
 }
 
 /** Survival curve (conditioned on being alive at currentAge), FRA, and LE. */
@@ -319,18 +363,21 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   }
 
   const tax = inp.tax;
+  const survInc = tax ? tax.survivorOtherIncome ?? tax.otherIncome : 0;
   // Net a monthly benefit for tax + per-person IRMAA. `filing` is married while
   // both live, single for a survivor; `irmaaCount` is how many in that state are
-  // 65+ (each pays IRMAA, computed on the state's MAGI).
-  const netMonthly = (monthly: number, filing: FilingStatus, irmaaCount: number): number => {
+  // 65+ (each pays IRMAA, computed on the state's MAGI); `income` is the state's
+  // other income (household while both live, survivor's alone once one dies).
+  const netMonthly = (monthly: number, filing: FilingStatus, irmaaCount: number, income: number): number => {
     if (!tax || monthly <= 0) return monthly;
     const annual = monthly * 12;
-    const taxable = taxableSocialSecurity(annual, tax.otherIncome, filing);
+    const taxable = taxableSocialSecurity(annual, income, filing);
     const taxCost = taxable * (tax.marginalRate / 100);
-    const irmaaPer = Math.max(0, irmaaAnnual(tax.otherIncome + taxable, filing) - irmaaAnnual(tax.otherIncome, filing));
+    const irmaaPer = Math.max(0, irmaaAnnual(income + taxable, filing) - irmaaAnnual(income, filing));
     return monthly - taxCost / 12 - (irmaaPer * irmaaCount) / 12;
   };
 
+  // Worker (retirement + survivor) household PV only — no child benefits.
   const pv = (claimA: number, claimB: number, applyTax: boolean): number => {
     const benA = inp.a.pia * benefitFactor(claimA, A.fra);
     const benB = inp.b.pia * benefitFactor(claimB, B.fra);
@@ -351,14 +398,34 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
       if (applyTax && tax) {
         const a65 = ageMA[t] >= 65 * 12 ? 1 : 0;
         const b65 = ageMB[t] >= 65 * 12 ? 1 : 0;
-        cBoth = netMonthly(cBoth, "married", a65 + b65);
-        cA = netMonthly(cA, "single", a65);
-        cB = netMonthly(cB, "single", b65);
+        cBoth = netMonthly(cBoth, "married", a65 + b65, tax.otherIncome);
+        cA = netMonthly(cA, "single", a65, survInc);
+        cB = netMonthly(cB, "single", b65, survInc);
       }
       npv += (both * cBoth + onlyA * cA + onlyB * cB) * disc[t];
     }
     return npv;
   };
+
+  // Disabled-adult-child stream, modeled on the higher earner's record: 50% of
+  // that PIA while they're alive and have claimed, 75% once they've died.
+  const child = inp.disabledChild;
+  const hiIsA = inp.a.pia >= inp.b.pia;
+  const piaHi = hiIsA ? inp.a.pia : inp.b.pia;
+  const pHi = hiIsA ? pA : pB;
+  const ageMHi = hiIsA ? ageMA : ageMB;
+  const childPvAt = (claimHi: number): number => {
+    let v = 0;
+    for (let t = 0; t <= T; t++) {
+      const aux = (ageMHi[t] >= claimHi ? 0.5 * piaHi : 0) * pHi[t];
+      const surv = 0.75 * piaHi * (1 - pHi[t]);
+      v += (aux + surv) * disc[t];
+    }
+    return v;
+  };
+  // Total household value used for the decision: worker stream + child stream.
+  const score = (claimA: number, claimB: number): number =>
+    pv(claimA, claimB, !!tax) + (child ? childPvAt(hiIsA ? claimA : claimB) : 0);
 
   const loA = Math.max(62, Math.ceil(inp.a.currentAge));
   const loB = Math.max(62, Math.ceil(inp.b.currentAge));
@@ -372,7 +439,7 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   let coarse = { aMonths: loA * 12, bMonths: loB * 12, npv: -Infinity };
   for (const a of agesA) {
     for (const b of agesB) {
-      const npv = pv(a * 12, b * 12, !!tax);
+      const npv = score(a * 12, b * 12);
       grid.push({ ageA: a, ageB: b, npv });
       if (npv > coarse.npv) coarse = { aMonths: a * 12, bMonths: b * 12, npv };
     }
@@ -386,7 +453,7 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   const bTo = Math.min(70 * 12, coarse.bMonths + 11);
   for (let am = aFrom; am <= aTo; am++) {
     for (let bm = bFrom; bm <= bTo; bm++) {
-      const npv = pv(am, bm, !!tax);
+      const npv = score(am, bm);
       if (npv > best.npv) best = { aMonths: am, bMonths: bm, npv };
     }
   }
@@ -397,13 +464,12 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
 
   let taxInfo: CoupleResult["tax"];
   if (tax) {
-    const grossNpv = pv(best.aMonths, best.bMonths, false);
     const benA = inp.a.pia * benefitFactor(best.aMonths, A.fra);
     const benB = inp.b.pia * benefitFactor(best.bMonths, B.fra);
     const taxable = taxableSocialSecurity((benA + benB) * 12, tax.otherIncome, "married");
     taxInfo = {
-      grossNpv,
-      netNpv: best.npv,
+      grossNpv: pv(best.aMonths, best.bMonths, false), // worker only, no tax
+      netNpv: pv(best.aMonths, best.bMonths, true), // worker only, after tax
       irmaaTierBoth: irmaaTierIndex(tax.otherIncome + taxable, "married"),
     };
   }
@@ -415,8 +481,9 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
     agesA,
     agesB,
     grid,
-    jointIndependentNpv: pv(soloA, soloB, !!tax),
+    jointIndependentNpv: score(soloA, soloB),
     tax: taxInfo,
+    childNpv: child ? childPvAt(hiIsA ? best.aMonths : best.bMonths) : undefined,
   };
 }
 
