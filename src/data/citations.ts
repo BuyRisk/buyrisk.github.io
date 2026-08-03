@@ -85,6 +85,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Portfolio theory",
     note: "The classic analysis of buy-and-hold vs. rebalancing (constant-mix): rebalancing trades a little return for lower, steadier risk.",
   },
+  peroldSchulman1988: {
+    authors: "Perold, A. F., & Schulman, E. C.",
+    year: 1988,
+    title: "The Free Lunch in Currency Hedging: Implications for Investment Policy and Performance Standards",
+    venue: "Financial Analysts Journal 44(3): 45–50",
+    kind: "paper",
+    category: "Portfolio theory",
+    note: "Argues currency hedging has ~zero long-run expected return, so it lowers risk for free.",
+  },
   dammonSpattZhang2004: {
     authors: "Dammon, R. M., Spatt, C. S., & Zhang, H. H.",
     year: 2004,
@@ -628,5 +637,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   "home-bias": {
     studies: ["frenchPoterba1991"],
     datasets: ["ftseGlobalAllCap", "vanguardVT"],
+  },
+  "currency-risk": {
+    studies: ["peroldSchulman1988"],
+    datasets: [],
   },
 };

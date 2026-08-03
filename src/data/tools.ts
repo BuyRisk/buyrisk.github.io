@@ -120,4 +120,11 @@ export const TOOLS: Tool[] = [
       "A globally diversified investor holds each country in proportion to its size — almost nobody does. Pick your home market, see how small a slice of the world it really is, and what tilting toward home costs you in diversification.",
     tag: "New",
   },
+  {
+    title: "Currency Risk: Hedged vs. Unhedged",
+    href: "/tools/currency-risk",
+    blurb:
+      "Own a foreign stock or bond and you own its currency too. See how currency swings add volatility — a lot for calm bonds, little for volatile stocks — and why the evidence says hedge your bonds but rarely your stocks.",
+    tag: "New",
+  },
 ];

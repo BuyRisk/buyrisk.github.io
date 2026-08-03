@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CurrencyRiskLab from "../../components/CurrencyRiskLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Currency Risk: Hedged vs. Unhedged"
+  description="Own a foreign stock or bond and you own its currency too. See how currency swings add volatility — a lot for calm bonds, a little for volatile stocks — and why the rule of thumb is to hedge bonds but rarely stocks."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Should you hedge the currency?</h1>
+    <p class="lede">
+      Buy an international fund and you're making two bets, not one: on the assets,
+      and on their currency. Those exchange-rate swings add risk. Hedging strips
+      them out — but it's worth the trouble for some assets far more than others.
+      See exactly when it matters.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <CurrencyRiskLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>One ratio decides it</h2>
+      <ul>
+        <li>
+          <strong>It's currency vol vs. asset vol.</strong> A currency that swings
+          ~9% a year is enormous next to a bond that swings ~5%, and minor next to
+          a stock that swings ~16%. Hedging removes that currency swing, so its
+          value depends entirely on how big it is relative to the asset.
+        </li>
+        <li>
+          <strong>Hedge your foreign bonds.</strong> Left unhedged, currency can be
+          the dominant source of a bond fund's volatility — often roughly doubling
+          it. Hedging brings it back down for essentially no cost to expected
+          return, which is why it's the standard advice.
+        </li>
+        <li>
+          <strong>Don't sweat your foreign stocks.</strong> Currency adds only a
+          little to already-volatile equities, and can even diversify them (some
+          currencies rise when markets fall). Most global stock investors leave the
+          currency unhedged, and it barely matters over the long run.
+        </li>
+      </ul>
+      <p>
+        This is an illustrative model, not real exchange-rate data — the point is
+        the mechanism, not a forecast. Currency hedging is close to free over long
+        horizons, so the whole question is simply how much risk it removes.
+        Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="currency-risk" />
+
+  <NextTool current="/tools/currency-risk" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>
