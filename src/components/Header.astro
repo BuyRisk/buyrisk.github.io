@@ -1,13 +1,15 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
 import CurrencySelect from "./CurrencySelect.astro";
-import { TOOLS } from "../data/tools";
+import { TOOLS, type Tool } from "../data/tools";
+import { INFO_PAGES } from "../data/info";
 
-type NavItem = { href: string; label: string; children?: typeof TOOLS };
+type NavItem = { href: string; label: string; children?: Tool[] };
 
 const navItems: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/tools", label: "Portfolio Playground", children: TOOLS },
+  { href: "/info", label: "Info", children: INFO_PAGES },
   { href: "/about", label: "About" },
 ];
 

@@ -392,6 +392,18 @@ export const DATASETS: Record<string, Dataset> = {
     publisher: "Federal Reserve Bank of St. Louis",
     url: "https://fred.stlouisfed.org/",
   },
+  ftseGlobalAllCap: {
+    name: "FTSE Global All Cap Index — Factsheet",
+    publisher: "FTSE Russell (LSEG)",
+    url: "https://research.ftserussell.com/Analytics/Factsheets/Home/DownloadSingleIssue?issueName=GEISLMS&IsManual=false",
+    note: "Monthly factsheet for the whole-world index Vanguard's VT tracks. The region weights on this site are refreshed from here.",
+  },
+  vanguardVT: {
+    name: "Total World Stock ETF (VT) — Portfolio composition",
+    publisher: "The Vanguard Group",
+    url: "https://investor.vanguard.com/investment-products/etfs/profile/vt",
+    note: "Region allocations used to cross-check and seed the market-cap breakdown.",
+  },
   jst: {
     name: "The Jordà-Schularick-Taylor Macrohistory Database",
     publisher: "macrohistory.net",
