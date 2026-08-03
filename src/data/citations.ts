@@ -589,4 +589,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["dicksonShoven1995", "sharpe1991"],
     datasets: [],
   },
+  "risk-tolerance": {
+    studies: ["markowitz1952"],
+    datasets: ["damodaran"],
+  },
 };

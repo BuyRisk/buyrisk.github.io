@@ -92,4 +92,11 @@ export const TOOLS: Tool[] = [
       "Same portfolio, same allocation, same tax rates — but which account holds your bonds versus your stocks changes your after-tax wealth. See why the tax-hungry asset belongs in your tax-advantaged account.",
     tag: "New",
   },
+  {
+    title: "Risk Tolerance Questionnaire",
+    href: "/tools/risk-tolerance",
+    blurb:
+      "Six quick questions place you on the risk/return spectrum and suggest a stock/bond starting point — scored across your ability, willingness, and need to take risk, with the honest reminder that the lowest of the three is the one that binds.",
+    tag: "New",
+  },
 ];
