@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { GLOSSARY } from "../../data/glossary";
+import "../../styles/info.css";
+
+const terms = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term));
+---
+
+<BaseLayout
+  title="Investing Glossary"
+  description="Plain-language definitions of the investing terms this site uses — from asset allocation and basis points to volatility, wash sales, and yield curves. Jargon defined before it's used."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>Investing glossary</h1>
+    <p class="ref-lede">
+      Every term the site leans on, defined in plain language. No assumed
+      vocabulary, no circular definitions that send you looking up three more words.
+      Where an idea has a tool or reference that shows it in action, there's a link.
+    </p>
+    <p class="ref-asof">{terms.length} terms</p>
+  </section>
+
+  <section class="container ref-block">
+    <dl class="gl-list">
+      {
+        terms.map((t) => (
+          <div class="gl-entry" id={t.term.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
+            <dt class="gl-term">
+              {t.term}
+              <span class="gl-tag">{t.tag}</span>
+            </dt>
+            <dd class="gl-def">
+              {t.def}
+              {t.see && (
+                <>
+                  {" "}
+                  <a class="gl-see" href={t.see.href}>
+                    {t.see.label} →
+                  </a>
+                </>
+              )}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools" class="card">
+          <h3>See the ideas move</h3>
+          <p>
+            The Portfolio Playground turns these definitions into sliders you can
+            actually play with.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info" class="card">
+          <h3>The rest of the reference desk</h3>
+          <p>
+            Market-cap weights, fees, returns, rates, and more — the facts behind
+            the terms.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .gl-list {
+    margin: 0;
+    display: grid;
+    gap: 0;
+  }
+  .gl-entry {
+    padding: var(--space-md) 0;
+    border-bottom: var(--border);
+    scroll-margin-top: 5rem;
+  }
+  .gl-entry:first-child {
+    padding-top: 0;
+  }
+  .gl-term {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: var(--color-text);
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .gl-tag {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+    background: var(--color-surface-alt);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+  }
+  .gl-def {
+    margin: 0.3rem 0 0;
+    max-width: var(--measure);
+    color: var(--color-text-soft);
+  }
+  .gl-see {
+    display: inline-block;
+    margin-top: 0.2rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+</style>

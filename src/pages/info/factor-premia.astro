@@ -1,0 +1,156 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { FACTORS } from "../../data/factors";
+import "../../styles/info.css";
+
+const byKey = (k: string) => FACTORS.find((f) => f.key === k)!;
+const mkt = byKey("mkt");
+const val = byKey("hml");
+const size = byKey("smb");
+
+const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
+const sourceNote =
+  "Kenneth R. French Data Library. Long-run annualized US averages (≈1963–present) of each factor's long-short return spread. Every premium is period-dependent — value in particular has had long droughts.";
+---
+
+<BaseLayout
+  title="Factor Premia"
+  description="The historical extra return of the Fama–French factors — market, size, value, profitability, investment — and the volatility that came with each. Real, but period-dependent."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>The factor premiums, in numbers</h1>
+    <p class="ref-lede">
+      Decades of research found that a handful of measurable traits — a company's
+      <strong>size</strong>, how <strong>cheap</strong> it is, how
+      <strong>profitable</strong>, how it <strong>invests</strong> — have
+      historically explained differences in stock returns. Each "factor" is the
+      return of buying one side and shorting the other. Here's how much each has
+      paid, on average, and how bumpy it was.
+    </p>
+    <p class="ref-asof">
+      Long-run US averages
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(mkt.premium)}</span>
+        <span class="ref-stat-label"
+          >the <strong>market</strong> premium — stocks over T-bills, the biggest
+          reward of all</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(val.premium)}</span>
+        <span class="ref-stat-label"
+          >the <strong>value</strong> premium — cheap stocks over expensive ones</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(size.premium)}</span>
+        <span class="ref-stat-label"
+          >the <strong>size</strong> premium — small companies over large</span
+        >
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Every factor</h2>
+    <p class="ref-prose">
+      The annualized average premium (extra return) and volatility of each factor.
+      A premium isn't free money — it's compensation for a risk or discomfort that
+      shows up as that volatility, and it can vanish for a decade at a time.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Factor</th>
+            <th scope="col" class="num">
+              Premium
+              <InfoNote text="Annualized average excess return of the factor's long-short spread. Not a guaranteed future return — a historical average with wide swings." />
+            </th>
+            <th scope="col" class="num">Volatility</th>
+            <th scope="col">What it is</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            FACTORS.map((f) => (
+              <tr>
+                <td>
+                  <span class="sw" style={`background:${f.color};display:inline-block;width:.7rem;height:.7rem;border-radius:2px;margin-right:.45rem`} />
+                  {f.name} <span class="ref-sub ref-mono">({f.short})</span>
+                </td>
+                <td class="num strong">{pct(f.premium)}</td>
+                <td class="num muted">{pct(f.vol)}</td>
+                <td class="ref-sub">{f.blurb}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="container ref-block">
+    <h2>How to read a premium</h2>
+    <div class="ref-callout">
+      <p>
+        <strong>These are historical averages, not promises.</strong> Every factor
+        premium is measured over a specific past period and swings enormously
+        year to year — the value premium famously went missing for much of the
+        2010s. A positive long-run average doesn't guarantee the next decade.
+      </p>
+      <p>
+        <strong>Premiums come with risk, and with cost.</strong> Capturing a
+        factor means tilting away from the total market, holding through the lean
+        stretches, and often paying higher fees and taxes to do it. Whether that's
+        worthwhile is a genuine judgment call — this page is the evidence, not a
+        recommendation to tilt.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["french"]}
+      studies={["famaFrench1992", "famaFrench1993", "famaFrench2015", "carhart1997"]}
+      title="Sources &amp; method"
+      intro="Annualized factor premia and volatilities from the Kenneth French Data Library."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools/factors" class="card">
+          <h3>Build a factor tilt</h3>
+          <p>
+            The CAPM &amp; Factors tool lets you dial factor exposures and watch how
+            they change a portfolio's expected return.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/historical-returns" class="card">
+          <h3>Where the premiums show up</h3>
+          <p>
+            Small-cap value's high long-run return in the historical-returns table
+            is the size and value premiums combined.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

@@ -410,6 +410,24 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.irs.gov/publications/p550",
     note: "The wash-sale rule (IRC §1091) and the “substantially identical” standard. The IRS does not define the term for funds tracking different indexes.",
   },
+  bls: {
+    name: "Consumer Price Index (CPI) series",
+    publisher: "U.S. Bureau of Labor Statistics, via FRED",
+    url: "https://www.bls.gov/cpi/",
+    note: "Annual price levels by spending category.",
+  },
+  irsRetirementLimits: {
+    name: "2026 Retirement Plan Contribution Limits (COLA)",
+    publisher: "Internal Revenue Service",
+    url: "https://www.irs.gov/retirement-plans/cost-of-living-adjustments-for-retirement-items",
+    note: "Elective deferral, catch-up, and IRA limits and phase-outs, indexed annually.",
+  },
+  irsHsaLimits: {
+    name: "Rev. Proc. 2025-19 (2026 HSA & HDHP limits)",
+    publisher: "Internal Revenue Service",
+    url: "https://www.irs.gov/pub/irs-drop/rp-25-19.pdf",
+    note: "Inflation-adjusted HSA contribution limits and HDHP parameters for 2026.",
+  },
   jst: {
     name: "The Jordà-Schularick-Taylor Macrohistory Database",
     publisher: "macrohistory.net",
