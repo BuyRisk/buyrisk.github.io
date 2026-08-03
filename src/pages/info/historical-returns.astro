@@ -1,0 +1,248 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { assetStats } from "../../data/generated/asset-stats";
+import { historicalReturns } from "../../data/generated/historical-returns";
+import "../../styles/info.css";
+
+// Long-run REAL (after-inflation) geometric returns, computed from the annual
+// series so they compound exactly. Real = (1+nominal)/(1+inflation) − 1.
+const S = historicalReturns.series;
+const geoReal = (key: "stocks" | "tbonds" | "tbills") => {
+  let g = 1;
+  for (const y of S) g *= (1 + y[key]) / (1 + y.inflation);
+  return g ** (1 / S.length) - 1;
+};
+const geoInflation = (() => {
+  let g = 1;
+  for (const y of S) g *= 1 + y.inflation;
+  return g ** (1 / S.length) - 1;
+})();
+const stocksReal = geoReal("stocks");
+const bondsReal = geoReal("tbonds");
+const billsReal = geoReal("tbills");
+
+// Nominal risk/return table (arithmetic annual mean + volatility) from the
+// asset-stats dataset. Real estate is intentionally omitted: this dataset's
+// series is a housing price index, not a REIT total-return series, so its
+// figure would understate real-estate returns and mislead.
+const LABELS: Record<string, string> = {
+  "us-stocks": "US stocks (S&P 500)",
+  "small-cap-value": "US small-cap value",
+  "corporate-bonds": "Corporate bonds (Baa)",
+  treasuries: "US Treasuries (10-yr)",
+  tbills: "T-bills (cash)",
+  gold: "Gold",
+};
+const SHORT: Record<string, string> = {
+  "us-stocks": "US stk",
+  "small-cap-value": "SCV",
+  "corporate-bonds": "Corp",
+  treasuries: "10y Tsy",
+  tbills: "T-bill",
+  gold: "Gold",
+};
+const IDS = Object.keys(LABELS);
+
+const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
+const [y0, y1] = assetStats.span;
+const sourceNote = `Aswath Damodaran, Historical Returns on Stocks, Bonds and Bills (NYU Stern). Annual US series, ${y0}–${y1}. Nominal figures are arithmetic averages of annual returns; real returns are geometric (compounded) after CPI inflation.`;
+---
+
+<BaseLayout
+  title="Historical Returns by Asset Class"
+  description="Long-run US returns and risk for stocks, bonds, bills, and gold since 1928 — nominal and after-inflation — plus how the asset classes move together. From Damodaran's dataset."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>What each asset class has returned</h1>
+    <p class="ref-lede">
+      Nearly a century of US data, in one place: how much stocks, bonds, cash, and
+      gold have returned, how bumpy the ride was, and how they move relative to one
+      another. It's the empirical backdrop for the site's whole thesis — that
+      <strong>return is compensation for bearing risk</strong>. Past results never
+      guarantee future ones; this is history, not a forecast.
+    </p>
+    <p class="ref-asof">
+      {y0}–{y1}, United States
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>The number that matters most: real returns</h2>
+    <p class="ref-prose">
+      What you can actually spend is the return <em>after inflation</em>. Averaged
+      over {y1 - y0} years and compounded, here is what a dollar earned in real,
+      purchasing-power terms:
+    </p>
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(stocksReal)}</span>
+        <span class="ref-stat-label"
+          >US stocks, annualized real return — the reward for the roughest ride</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(bondsReal)}</span>
+        <span class="ref-stat-label">10-year Treasuries, annualized real</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(billsReal)}</span>
+        <span class="ref-stat-label"
+          >T-bills (cash), annualized real — barely ahead of inflation</span
+        >
+      </li>
+    </ul>
+    <p class="ref-caption">
+      Inflation itself averaged {pct(geoInflation)} a year over the period. The
+      ranking is the whole story: the assets that swung the most also paid the
+      most. That extra return is the risk premium.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Return and risk by asset class</h2>
+    <p class="ref-prose">
+      Nominal (before inflation) figures across the full period. "Average annual
+      return" is the arithmetic mean of yearly returns; "volatility" is their
+      standard deviation — a plain measure of how much the yearly result bounced
+      around.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Asset class</th>
+            <th scope="col" class="num">
+              Avg. annual return
+              <InfoNote text="Arithmetic mean of annual nominal returns. It runs higher than the compound (geometric) growth you'd actually realize — the bigger the volatility, the bigger that gap." />
+            </th>
+            <th scope="col" class="num">Volatility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            IDS.map((id) => {
+              const a = assetStats.assets[id];
+              return (
+                <tr>
+                  <td>{LABELS[id]}</td>
+                  <td class="num strong">{pct(a.mu)}</td>
+                  <td class="num muted">{pct(a.sigma)}</td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="ref-caption">
+      Real estate is omitted here: the source's long-run series is a housing price
+      index rather than a REIT total return, so it isn't comparable to the rest.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>How the asset classes move together</h2>
+    <p class="ref-prose">
+      Correlation of annual returns, from −1 (move exactly opposite) to +1 (move in
+      lockstep). Low and negative pairings are what make diversification work: when
+      one zigs, the other doesn't follow. Negative values are highlighted.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table ref-corr">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            {IDS.map((id) => <th scope="col" class="num">{SHORT[id]}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            IDS.map((rid) => (
+              <tr>
+                <th scope="row">{SHORT[rid]}</th>
+                {IDS.map((cid) => {
+                  const v = assetStats.correlation[rid][cid];
+                  const diag = rid === cid;
+                  return (
+                    <td
+                      class:list={["num", { strong: diag, "corr-neg": v < 0 }]}
+                    >
+                      {v.toFixed(2)}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="ref-caption">
+      Notice Treasuries and gold sit near zero or below against stocks — the reason
+      a bond or gold sleeve can steady an equity portfolio.
+    </p>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["damodaran"]}
+      studies={["dimsonMarshStaunton2002", "jorda2019"]}
+      title="Sources &amp; method"
+      intro="Return, volatility, and correlations computed from Damodaran's annual US series; real returns compounded against CPI. Refresh when the dataset updates (npm run data:assets, npm run data:historical)."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--3 ref-related-grid">
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Mix them into a portfolio</h3>
+          <p>
+            The Portfolio tool lets you blend these assets and trace the
+            risk/return frontier they form.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/diversification" class="card">
+          <h3>See correlation at work</h3>
+          <p>
+            The Diversification tool shows how combining assets that don't move
+            together lowers a portfolio's overall risk.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/compound-growth" class="card">
+          <h3>Compound it over time</h3>
+          <p>
+            Feed a real return into the Growth tool to see what decades of
+            compounding actually build.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .ref-corr th[scope="row"] {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step--1);
+    white-space: nowrap;
+  }
+  .ref-corr .corr-neg {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+</style>

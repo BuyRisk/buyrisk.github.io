@@ -404,6 +404,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://investor.vanguard.com/investment-products/etfs/profile/vt",
     note: "Region allocations used to cross-check and seed the market-cap breakdown.",
   },
+  irsPub550: {
+    name: "Publication 550: Investment Income and Expenses (Wash Sales)",
+    publisher: "Internal Revenue Service",
+    url: "https://www.irs.gov/publications/p550",
+    note: "The wash-sale rule (IRC §1091) and the “substantially identical” standard. The IRS does not define the term for funds tracking different indexes.",
+  },
   jst: {
     name: "The Jordà-Schularick-Taylor Macrohistory Database",
     publisher: "macrohistory.net",

@@ -1,0 +1,195 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { spiva } from "../../data/generated/spiva";
+import "../../styles/info.css";
+
+const H = spiva.horizons; // [1, 3, 5, 10, 15, 20]
+const tenIdx = H.indexOf(10);
+
+const at = (catId: string, h: number) => {
+  for (const g of spiva.groups) {
+    const c = g.categories.find((x) => x.id === catId);
+    if (c) return c.rates[H.indexOf(h)];
+  }
+  return null;
+};
+
+const largeCap10 = at("large-cap", 10); // 85.59
+const allDom20 = at("all-domestic", 20); // 95.01
+const largeCap1 = at("large-cap", 1); // 78.78
+
+const fmt = (v: number | null) => (v == null ? "—" : `${Math.round(v)}%`);
+const sourceNote = `${spiva.source} Figures are the share of actively managed funds that underperformed their benchmark (absolute return). As of ${spiva.asOf}.`;
+---
+
+<BaseLayout
+  title="Active vs. Index: the SPIVA Scorecard"
+  description="What share of professional, actively managed funds fail to beat a simple index — by fund category and time horizon, from the SPIVA U.S. Scorecard. The evidence behind low-cost indexing."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>How often does active management beat the index?</h1>
+    <p class="ref-lede">
+      Twice a year, S&amp;P Dow Jones Indices publishes the <strong>SPIVA
+      Scorecard</strong> — a tally of how many professional, actively managed
+      funds actually beat the plain index they're measured against. The numbers
+      below are the share that <em>fell short</em>. The pattern is remarkably
+      consistent: the longer the clock runs, the more managers fall behind.
+    </p>
+    <p class="ref-asof">
+      Data as of <strong>{spiva.asOf}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{fmt(largeCap10)}</span>
+        <span class="ref-stat-label"
+          >of US large-cap funds trailed the S&amp;P 500 over the last
+          <strong>10 years</strong></span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{fmt(allDom20)}</span>
+        <span class="ref-stat-label"
+          >of all US stock funds trailed their benchmark over
+          <strong>20 years</strong></span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{fmt(largeCap1)}</span>
+        <span class="ref-stat-label"
+          >trailed over just <strong>1 year</strong> — even short-term, most
+          don't win</span
+        >
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>The full scorecard</h2>
+    <p class="ref-prose">
+      Each number is the percentage of funds in that category that
+      <strong>underperformed</strong> their benchmark index over the period, so
+      higher means worse for active management. A blank means SPIVA doesn't report
+      that category at that horizon. The 10-year column is highlighted as a
+      sensible middle horizon.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Fund category</th>
+            <th scope="col">Benchmark</th>
+            {
+              H.map((h, i) => (
+                <th scope="col" class:list={["num", { hi: i === tenIdx }]}>
+                  {h}y
+                </th>
+              ))
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            spiva.groups.map((g) => (
+              <>
+                <tr class="ref-group-row">
+                  <th scope="rowgroup" colspan={2 + H.length}>
+                    {g.label}
+                  </th>
+                </tr>
+                {g.categories.map((c) => (
+                  <tr>
+                    <td>{c.name}</td>
+                    <td class="ref-sub ref-mono">{c.benchmark}</td>
+                    {c.rates.map((r, i) => (
+                      <td class:list={["num", { hi: i === tenIdx }]}>{fmt(r)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ref-caption">
+      Above 50%, more than half the professionals in a category lost to a fund
+      that simply bought the index and held it.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Why this happens</h2>
+    <div class="ref-prose">
+      <ul>
+        <li>
+          <strong>Costs are a near-certainty; outperformance isn't.</strong> A
+          fund's fees and trading costs come out every year, whether or not its
+          picks beat the market. Over a decade that steady drag is hard to
+          overcome — see <a href="/info/fund-fees">fund fees over time</a>.
+        </li>
+        <li>
+          <strong>Active management is a zero-sum game before costs.</strong> For
+          every investor who beats the market, another must lag it, because
+          together they <em>are</em> the market. After costs, the average active
+          dollar must trail a low-cost index dollar — an arithmetic point, not a
+          forecast (W. Sharpe, 1991).
+        </li>
+        <li>
+          <strong>Winners are hard to identify in advance.</strong> A fund near
+          the top over one stretch is roughly as likely as any other to lag over
+          the next. Past performance genuinely doesn't predict future
+          performance.
+        </li>
+      </ul>
+      <p>
+        None of this says beating the index is impossible — a minority of funds
+        do, and this is a description of the odds, not advice about what you
+        should hold.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["spiva"]}
+      studies={["sharpe1991", "famaFrench2010", "malkiel1973"]}
+      title="Sources &amp; method"
+      intro="Failure rates are transcribed directly from the SPIVA U.S. Scorecard (absolute-return tables). Refresh when S&P Dow Jones Indices publishes a new scorecard (npm run data:spiva)."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools/beat-the-market" class="card">
+          <h3>Play with the horizon</h3>
+          <p>
+            The Can-You-Outsmart-the-Market tool turns this scorecard into a
+            slider — pick a category and horizon and watch the failure rate climb.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/fees" class="card">
+          <h3>See what fees cost</h3>
+          <p>
+            The Fees &amp; Inflation tool shows how the yearly drag that sinks
+            most active funds compounds against a balance over decades.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

@@ -1,0 +1,178 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { fees } from "../../data/generated/fees";
+import "../../styles/info.css";
+
+const ratioAt = (id: string, year: number) =>
+  fees.series.find((s) => s.id === id)?.points.find((p) => p.year === year)
+    ?.ratio ?? null;
+
+const milestones = [1996, 2006, 2016, 2025];
+const MAX = 1.1; // scale for the latest-value bars (1996 active equity ≈ 1.08)
+
+const rows = fees.series.map((s) => ({
+  id: s.id,
+  name: s.name,
+  active: s.active,
+  cells: milestones.map((y) => ratioAt(s.id, y)),
+  latest: ratioAt(s.id, fees.end),
+}));
+
+const gapX = Math.round(fees.latest.activeEquity / fees.latest.indexEquity);
+const fmt = (v: number | null) => (v == null ? "—" : `${v.toFixed(2)}%`);
+const sourceNote = `${fees.source} These are asset-weighted averages — what fund investors actually paid, weighting each fund by the money in it. ${fees.start}–${fees.end}.`;
+---
+
+<BaseLayout
+  title="Fund Fees Over Time"
+  description="The average expense ratios investors actually pay, 1996 to today, for active vs. index funds and stocks vs. bonds — from ICI data. Fees are the cost you control."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>What funds actually cost</h1>
+    <p class="ref-lede">
+      A fund's <strong>expense ratio</strong> is the slice of your money it takes
+      every year, whether it beats the market or not. It's the rare cost you fully
+      control — and over the last three decades it has collapsed, especially for
+      index funds. These are the <em>asset-weighted</em> averages: what investors
+      actually paid, not the sticker prices.
+    </p>
+    <p class="ref-asof">
+      Data as of <strong>{fees.end}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{fees.latest.indexEquity.toFixed(2)}%</span>
+        <span class="ref-stat-label"
+          >average index stock fund today — about ${(
+            fees.latest.indexEquity * 100
+          ).toFixed(0)} a year per $10,000</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{fees.latest.activeEquity.toFixed(2)}%</span>
+        <span class="ref-stat-label"
+          >average active stock fund — roughly <strong>{gapX}×</strong> more than
+          the index average</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value"
+          >{ratioAt("active-equity", 1996)?.toFixed(2)}%</span
+        >
+        <span class="ref-stat-label"
+          >what the average active stock fund charged back in
+          <strong>1996</strong></span
+        >
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Expense ratios over time</h2>
+    <p class="ref-prose">
+      Asset-weighted average expense ratio by fund type, at four points across the
+      series. The bar shows today's level against the {fees.start} starting point.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Fund type</th>
+            {milestones.map((y) => <th scope="col" class="num">{y}</th>)}
+            <th scope="col">Today, vs. {fees.start}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <td>
+                  {r.name}
+                  {!r.active && <span class="ref-badge" style="margin-left:.4rem">Index</span>}
+                </td>
+                {r.cells.map((c) => (
+                  <td class="num">{fmt(c)}</td>
+                ))}
+                <td>
+                  <span class="ref-track" aria-hidden="true">
+                    <span
+                      class="ref-fill"
+                      style={`width:${((r.latest ?? 0) / MAX) * 100}%;background:${r.active ? "var(--pl-c4)" : "var(--pl-c6)"}`}
+                    />
+                  </span>
+                  <span class="ref-sub">{fmt(r.latest)} now</span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ref-caption">
+      Index funds now average around {fees.latest.indexEquity.toFixed(2)}% — close
+      to free. The gap between an active and an index fund is small as a percentage
+      but, taken every year, it compounds.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Why a fraction of a percent matters</h2>
+    <div class="ref-prose">
+      <p>
+        A fee isn't charged on your gains — it's charged on your
+        <em>whole balance</em>, every year, so it compounds against you in
+        lockstep with your returns. The gap between {fees.latest.activeEquity.toFixed(
+          2
+        )}% and {fees.latest.indexEquity.toFixed(2)}% looks trivial on a
+        statement, but over an investing lifetime it can quietly consume a large
+        share of the wealth you'd otherwise keep. The
+        <a href="/tools/fees">Fees &amp; Inflation tool</a> lets you watch that
+        drag play out over decades.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["ici"]}
+      studies={["sharpe1991", "malkiel1973"]}
+      title="Sources &amp; method"
+      intro="Asset-weighted average expense ratios, transcribed from ICI's annual fee study. Refresh when a new edition is published (npm run data:fees)."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools/fees" class="card">
+          <h3>Watch fees compound</h3>
+          <p>
+            The Fees &amp; Inflation tool turns a small yearly percentage into the
+            dollars it costs a portfolio over 30+ years.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/active-vs-index" class="card">
+          <h3>Do you get what you pay for?</h3>
+          <p>
+            The SPIVA scorecard shows how rarely the higher-fee active funds
+            actually beat the cheap index they're measured against.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
