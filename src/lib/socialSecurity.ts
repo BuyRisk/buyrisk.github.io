@@ -487,6 +487,114 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   };
 }
 
+// ---- Surviving-spouse (widow/widower) optimization -----------------------------
+
+/**
+ * Survivor-benefit reduction factor for a claim age (months), given FRA. Survivor
+ * benefits are available from 60, reduced to 71.5% at 60, rising linearly to 100%
+ * at (survivor) full retirement age. Unlike retirement benefits, they earn NO
+ * delayed credits past FRA. (We approximate survivor FRA with the retirement FRA.)
+ */
+export function survivorFactor(claimMonths: number, fra: number): number {
+  const start = 60 * 12;
+  if (claimMonths >= fra) return 1;
+  if (claimMonths <= start) return 0.715;
+  return 0.715 + 0.285 * ((claimMonths - start) / (fra - start));
+}
+
+export interface WidowInput {
+  /** The survivor's OWN benefit at their full retirement age (their PIA). */
+  ownPia: number;
+  /** The full survivor benefit — what the late spouse was receiving (or would at the survivor's FRA). */
+  survivorFull: number;
+  birthYear: number;
+  currentAge: number;
+  discountRate: number;
+  health: Health;
+}
+
+export interface WidowStrategy {
+  firstType: "own" | "survivor";
+  firstAgeMonths: number;
+  secondType: "own" | "survivor" | null; // null = never switch (single benefit)
+  switchAgeMonths: number;
+  firstMonthly: number;
+  secondMonthly: number;
+  npv: number;
+}
+
+export interface WidowResult {
+  fraMonths: number;
+  lifeExpectancy: number;
+  best: WidowStrategy;
+  /** Best single-benefit plan (no switching), for the value-of-switching comparison. */
+  naive: WidowStrategy;
+}
+
+/**
+ * A surviving spouse can draw a survivor benefit and their own retirement benefit,
+ * and can take one first and switch to the other — once, before 70. Because own
+ * retirement earns delayed credits to 70 while survivor benefits max out at FRA,
+ * the usual play is to take the smaller/soon-to-be-smaller benefit early and let
+ * the other grow. This searches whole-year (start, switch) combinations for the
+ * survival-weighted best, and also reports the best no-switch plan for contrast.
+ * Educational; taxes/IRMAA and the survivor "RIB-LIM" cap are not modeled here.
+ */
+export function optimizeWidow(inp: WidowInput): WidowResult {
+  const fra = fraMonths(inp.birthYear);
+  const mult = hazardMultiplier(inp.health);
+  const l = survivorsWithHazard(inp.health.sex, mult);
+  const baseAge = Math.min(119, Math.max(0, Math.round(inp.currentAge)));
+  const S = l.map((v) => v / (l[baseAge] || 1e-9));
+  let rem = 0.5;
+  for (let age = baseAge + 1; age <= 120; age++) rem += S[age];
+  const lifeExpectancy = baseAge + rem;
+
+  const d = inp.discountRate / 100;
+  const nowMonth = inp.currentAge * 12;
+  const ownAt = (m: number) => inp.ownPia * benefitFactor(m, fra);
+  const survAt = (m: number) => inp.survivorFull * survivorFactor(m, fra);
+  const fraYr = Math.round(fra / 12);
+
+  // PV of: benefit1 from a1 up to switchM, then benefit2 from switchM onward.
+  const pv = (a1: number, benefit1: number, switchM: number, benefit2: number) => {
+    let t = 0;
+    for (let m = a1; m <= 119 * 12 + 11; m++) {
+      const age = Math.floor(m / 12);
+      const b = m < switchM ? benefit1 : benefit2;
+      t += (b * S[age]) / Math.pow(1 + d, (m - nowMonth) / 12);
+    }
+    return t;
+  };
+
+  let best: WidowStrategy | null = null;
+  let naive: WidowStrategy | null = null;
+  const NEVER = 200 * 12;
+  const record = (s: WidowStrategy) => {
+    if (!best || s.npv > best.npv) best = s;
+    if (!s.secondType && (!naive || s.npv > naive.npv)) naive = s;
+  };
+  const consider = (firstType: "own" | "survivor", a1: number, secondType: "own" | "survivor" | null, switchM: number) => {
+    if (a1 < Math.round(inp.currentAge) * 12) return; // can't claim in the past
+    const b1 = firstType === "own" ? ownAt(a1) : survAt(a1);
+    const sw = secondType ? switchM : NEVER;
+    const b2 = secondType ? (secondType === "own" ? ownAt(switchM) : survAt(switchM)) : b1;
+    record({ firstType, firstAgeMonths: a1, secondType, switchAgeMonths: secondType ? switchM : a1, firstMonthly: b1, secondMonthly: b2, npv: pv(a1, b1, sw, b2) });
+  };
+
+  // Survivor first → switch to own (own keeps growing to 70).
+  for (let y1 = 60; y1 <= 70; y1++)
+    for (let y2 = Math.max(y1, 62); y2 <= 70; y2++) consider("survivor", y1 * 12, "own", y2 * 12);
+  // Own first → switch to survivor (survivor maxes at FRA).
+  for (let y1 = 62; y1 <= 70; y1++)
+    for (let y2 = Math.max(y1, 60); y2 <= fraYr; y2++) consider("own", y1 * 12, "survivor", y2 * 12);
+  // Single-benefit plans (no switch).
+  for (let y = 62; y <= 70; y++) consider("own", y * 12, null, 0);
+  for (let y = 60; y <= fraYr; y++) consider("survivor", y * 12, null, 0);
+
+  return { fraMonths: fra, lifeExpectancy, best: best!, naive: naive! };
+}
+
 export const monthsToLabel = (m: number) => {
   const y = Math.floor(m / 12);
   const mo = Math.round(m - y * 12);

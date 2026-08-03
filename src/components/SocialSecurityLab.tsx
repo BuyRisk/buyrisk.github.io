@@ -4,6 +4,7 @@ import ResetButton from "./ResetButton";
 import {
   optimize,
   optimizeCouple,
+  optimizeWidow,
   fraMonths,
   monthsToLabel,
   type Sex,
@@ -12,6 +13,7 @@ import {
   type Condition,
   type OptimizeResult,
   type CoupleResult,
+  type WidowResult,
 } from "../lib/socialSecurity";
 import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
 import { IRMAA, type FilingStatus } from "../data/tax-irmaa";
@@ -58,7 +60,8 @@ function Segmented<T extends string>({
 
 export default function SocialSecurityLab() {
   const symbol = currencySymbol(useCurrencyCode()); // re-render + dynamic symbol
-  const [mode, setMode] = useState<"single" | "couple">("single");
+  const [mode, setMode] = useState<"single" | "couple" | "widow">("single");
+  const [deceasedBenefit, setDeceasedBenefit] = useState(2200);
   // Person A (also "you" in single mode).
   const [pia, setPia] = useState(2400);
   const [birthYear, setBirthYear] = useState(1965);
@@ -113,6 +116,10 @@ export default function SocialSecurityLab() {
       }),
     [pia, birthYear, currentAge, sex, smoking, exercise, condition, piaB, birthYearB, currentAgeB, sexB, smokingB, exerciseB, conditionB, disabledChild, discountRate, advanced, mode, otherIncome, marginalRate, survivorIncome]
   );
+  const widow = useMemo(
+    () => optimizeWidow({ ownPia: pia, survivorFull: deceasedBenefit, birthYear, currentAge, discountRate, health }),
+    [pia, deceasedBenefit, birthYear, currentAge, discountRate, sex, smoking, exercise, condition]
+  );
 
   const bestAgeLabel = monthsToLabel(result.best.ageMonths);
   const leDelta = result.lifeExpectancy - ref.lifeExpectancy;
@@ -124,7 +131,7 @@ export default function SocialSecurityLab() {
     setMode("single");
     setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male"); setSmoking("former"); setExercise("moderate"); setCondition("none");
     setPiaB(1200); setBirthYearB(1967); setCurrentAgeB(60); setSexB("female"); setSmokingB("never"); setExerciseB("moderate"); setConditionB("none");
-    setDiscountRate(2); setDisabledChild(false);
+    setDiscountRate(2); setDisabledChild(false); setDeceasedBenefit(2200);
     setAdvanced(false); setFiling("single"); setOtherIncome(30000); setMarginalRate(22); setSurvivorIncome(30000);
   };
 
@@ -138,12 +145,34 @@ export default function SocialSecurityLab() {
           filing strategy; ours adds health, debt &amp; survivor levers for intuition.
         </div>
 
-        <div className="wl-simmode" role="group" aria-label="Who's claiming">
+        <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Who's claiming">
           <button type="button" className={mode === "single" ? "active" : ""} aria-pressed={mode === "single"} onClick={() => setMode("single")}>Just me</button>
           <button type="button" className={mode === "couple" ? "active" : ""} aria-pressed={mode === "couple"} onClick={() => setMode("couple")}>Married couple</button>
+          <button type="button" className={mode === "widow" ? "active" : ""} aria-pressed={mode === "widow"} onClick={() => setMode("widow")}>Surviving spouse</button>
         </div>
 
-        {mode === "single" ? (
+        {mode === "widow" ? (
+          <>
+            <p className="wl-note" style={{ marginTop: 0 }}>
+              As a surviving spouse you can draw a <strong>survivor benefit</strong> (from your late
+              spouse's record) and your <strong>own</strong> retirement benefit — taking one first and
+              switching to the other, once, before 70. Enter both below.
+            </p>
+            <PersonFields
+              pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
+              sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
+              condition={condition} setCondition={setCondition}
+            />
+            <label className="wl-slider">
+              <span>
+                Late spouse's benefit
+                <InfoTip text="The monthly benefit your late spouse was receiving, or would have received — the basis for your survivor benefit (its full amount at your full retirement age). If they claimed early it may be capped; if late it includes their delayed credits." />{" "}
+                <strong>{currency(deceasedBenefit)}/mo</strong>
+              </span>
+              <input type="range" min={800} max={4500} step={50} value={deceasedBenefit} onChange={(e) => setDeceasedBenefit(Number(e.target.value))} />
+            </label>
+          </>
+        ) : mode === "single" ? (
           <PersonFields
             pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
             sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
@@ -169,6 +198,7 @@ export default function SocialSecurityLab() {
           <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
         </label>
 
+        {mode !== "widow" && (
         <div className="wl-field" style={{ marginTop: "0.6rem" }}>
           <span className="wl-field-label">
             {mode === "couple" ? "Disabled adult child (on the higher earner's record)?" : "Disabled adult child on your record?"}
@@ -179,8 +209,9 @@ export default function SocialSecurityLab() {
             <button type="button" className={disabledChild ? "active" : ""} aria-pressed={disabledChild} onClick={() => setDisabledChild(true)}>Yes</button>
           </div>
         </div>
+        )}
 
-        {(
+        {mode !== "widow" && (
           <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "var(--border)" }}>
             <div className="wl-field">
               <span className="wl-field-label">
@@ -243,7 +274,7 @@ export default function SocialSecurityLab() {
                     <li>Taxes use the single marginal rate you enter — not a full return with deductions, credits, state rules, ACA subsidies before 65, or the net investment income tax.</li>
                     <li>Couple mode files jointly while both live and single as a survivor; you can set the survivor's income separately, but it's still assumed constant after that.</li>
                     <li>A disabled child is modeled on the higher earner's record at 50% (while claimed) then 75% (survivor), assumed to outlive you, and ignoring the family-maximum cap and the child's own eligibility/income rules.</li>
-                    <li>It still omits spousal top-ups, the earnings test if you work before full retirement age, and rules like WEP/GPO.</li>
+                    <li>It still omits spousal top-ups and the earnings test if you work before full retirement age. (The old WEP and GPO benefit reductions were repealed by the Social Security Fairness Act in 2025, so they no longer apply.)</li>
                   </ul>
                 </details>
               </div>
@@ -254,14 +285,31 @@ export default function SocialSecurityLab() {
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>
           {mode === "single" ? (
             <>Single-earner teaching model: no spousal, survivor, tax, or earnings-test rules.</>
+          ) : mode === "widow" ? (
+            <>Surviving-spouse model: your own retirement vs. the survivor benefit with a one-time switch; omits taxes, the earnings test, and the survivor "widow limit" (RIB-LIM) cap.</>
           ) : (
             <>Couple model: retirement + survivor benefits over joint mortality; omits spousal top-ups, taxes, and the earnings test.</>
           )}{" "}
           Benefits are in today's dollars. Data: SSA period life table, AWI, bend points, COLA.
         </p>
+
+        <details style={{ marginTop: "var(--space-md)", fontSize: "var(--step--1)", color: "var(--color-text-soft)" }}>
+          <summary style={{ cursor: "pointer", fontFamily: "var(--font-sans)", fontWeight: 600, color: "var(--color-text)" }}>Common claiming mistakes to avoid</summary>
+          <ul style={{ margin: "0.5rem 0 0", paddingLeft: "1.1rem", lineHeight: 1.5, display: "grid", gap: "0.4rem" }}>
+            <li><strong style={{ color: "var(--color-text)" }}>"I get the greater of my own or a spousal/survivor benefit."</strong> You actually get your own benefit <em>plus</em> the amount a spousal or survivor benefit exceeds it — so both matter.</li>
+            <li><strong style={{ color: "var(--color-text)" }}>"A spousal benefit is half of what my spouse gets."</strong> It's half their <em>PIA</em> (full-retirement-age amount), regardless of when they claimed.</li>
+            <li><strong style={{ color: "var(--color-text)" }}>"Benefits lost to the earnings test are gone."</strong> If you claim before full retirement age and keep working, withheld benefits aren't lost — they're added back as a higher check at your full retirement age.</li>
+            <li><strong style={{ color: "var(--color-text)" }}>Surviving spouses can switch.</strong> You can take a survivor benefit and your own retirement benefit at <em>different</em> times, taking one while the other grows — use the "Surviving spouse" mode above.</li>
+            <li><strong style={{ color: "var(--color-text)" }}>The higher earner's early claim is permanent for the survivor.</strong> It doesn't just cut your own check — it lowers the survivor benefit your spouse may collect for life.</li>
+            <li><strong style={{ color: "var(--color-text)" }}>You can sometimes undo it.</strong> Withdraw an application within 12 months (and repay), or voluntarily suspend at full retirement age to earn delayed credits.</li>
+            <li><strong style={{ color: "var(--color-text)" }}>Remarrying before 60</strong> can forfeit survivor benefits from a late spouse; remarrying after 60 doesn't.</li>
+          </ul>
+        </details>
       </div>
 
-      {mode === "single" ? (
+      {mode === "widow" ? (
+        <WidowOutput widow={widow} money={currency} />
+      ) : mode === "single" ? (
         <div className="wl-stage">
           <div className="wl-frontier">
             <h3>Lifetime value by claiming age</h3>
@@ -477,6 +525,65 @@ function CoupleOutput({ couple, piaA, piaB }: { couple: CoupleResult; piaA: numb
               starts at claim, it nudges the higher earner's timing earlier.
             </p>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WidowOutput({ widow, money }: { widow: WidowResult; money: (n: number) => string }) {
+  const b = widow.best;
+  const cap = (t: "own" | "survivor") => (t === "own" ? "Own" : "Survivor");
+  const phrase = (t: "own" | "survivor") => (t === "own" ? "your own retirement benefit" : "the survivor benefit");
+  const firstAge = monthsToLabel(b.firstAgeMonths);
+  const switchAge = monthsToLabel(b.switchAgeMonths);
+  const hasSwitch = b.secondType != null;
+  const switchGain = Math.max(0, b.npv - widow.naive.npv);
+
+  return (
+    <div className="wl-stage">
+      <div className="wl-frontier">
+        <div className="ss-headline">
+          <span className="ss-headline-label">Your best claiming plan</span>
+          <span className="ss-headline-value" style={{ fontSize: "var(--step-1)", lineHeight: 1.25 }}>
+            {hasSwitch
+              ? `${cap(b.firstType)} at ${firstAge} → ${cap(b.secondType!)} at ${switchAge}`
+              : `${cap(b.firstType)} benefit at ${firstAge}`}
+          </span>
+          <span className="ss-headline-sub">
+            {hasSwitch
+              ? <>Take {phrase(b.firstType)} first (~{money(b.firstMonthly)}/mo), then switch to {phrase(b.secondType!)} (~{money(b.secondMonthly)}/mo)</>
+              : <>~{money(b.firstMonthly)}/mo</>}
+          </span>
+        </div>
+        <p className="wl-fnote" style={{ marginTop: "var(--space-md)" }}>
+          A surviving spouse can take one benefit while the other keeps growing — your own retirement earns
+          delayed credits to 70, while the survivor benefit stops growing at your full retirement age. Taking
+          the right one first, then switching, is often worth a great deal.
+        </p>
+      </div>
+      <div className="wl-lower">
+        <div className="wl-readout">
+          <dl className="ss-stats">
+            <div><dt>First benefit</dt><dd>{cap(b.firstType)} · {firstAge}</dd></div>
+            <div><dt>First check</dt><dd>{money(b.firstMonthly)}/mo</dd></div>
+            {hasSwitch && <div><dt>Switch to</dt><dd>{cap(b.secondType!)} · {switchAge}</dd></div>}
+            {hasSwitch && <div><dt>After switch</dt><dd>{money(b.secondMonthly)}/mo</dd></div>}
+          </dl>
+          <p className="wl-saved">
+            {switchGain > 1 ? (
+              <>Sequencing this way is worth about <strong>{money(switchGain)}</strong> more (survival-weighted,
+                in today's dollars) than just claiming the larger benefit alone — the costly mistake many
+                surviving spouses make. </>
+            ) : (
+              <>Here one benefit dominates, so switching adds little; claiming it directly is fine. </>
+            )}
+            Survivor benefits start at 60 (50 if disabled) and don't grow past your full retirement age, while
+            your own retirement grows to 70. Remarrying before 60 can forfeit survivor benefits. This is
+            educational, not advice — a survivor claim can't be filed online and the rules are unforgiving, so
+            confirm with the SSA or a professional, and cross-check with{" "}
+            <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a>.
+          </p>
         </div>
       </div>
     </div>
