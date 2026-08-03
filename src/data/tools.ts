@@ -59,9 +59,9 @@ export const TOOLS: Tool[] = [
       "Four bets against the market (predicting it, timing it, deploying into it, and hiring active managers), and the one answer that keeps appearing. The whole case for indexing.",
   },
   {
-    title: "Retirement & Roth",
+    title: "Retirement, Social Security & Roth",
     href: "/tools/retirement",
     blurb:
-      "Funding and spending retirement: what it costs and whether your money lasts, when to claim Social Security, and choosing Roth vs. Traditional (and grabbing the employer match).",
+      "Funding and spending retirement: what it costs and whether your money lasts, the big Social Security claiming decision (including survivor and tax/IRMAA cases), and choosing Roth vs. Traditional (and grabbing the employer match).",
   },
 ];
