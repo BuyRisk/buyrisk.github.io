@@ -48,7 +48,15 @@ export default function BondLab() {
     const dy = rateMove / 100;
     const bars = MATS.map((m) => ({ m, change: priceChange(y0, dy, m) * 100, dur: modDuration(y0, m) }));
     const focused = bars.find((b) => b.m === focus)!;
-    return { bars, focused };
+    // Fix the y-axis to the most extreme ±3% move (the slider's max) for the
+    // longest maturity, so dragging "rates move by" scales the bars within a
+    // stable frame instead of rescaling the axis to fit each time.
+    const maxMat = MATS[MATS.length - 1];
+    const axisMag = Math.max(
+      0.05,
+      Math.max(Math.abs(priceChange(y0, 0.03, maxMat)), Math.abs(priceChange(y0, -0.03, maxMat))) * 1.08,
+    );
+    return { bars, focused, axisMag };
   }, [startYield, rateMove, focus]);
 
   const inverted = bondYields.curve[0].yield > bondYields.curve[bondYields.curve.length - 1].yield;
@@ -134,7 +142,7 @@ export default function BondLab() {
           <>
             <div className="wl-frontier">
               <h3>Same rate move, very different pain</h3>
-              <RateRiskChart bars={risk.bars} focus={focus} rateMove={rateMove} />
+              <RateRiskChart bars={risk.bars} focus={focus} rateMove={rateMove} mag={risk.axisMag} />
               <p className="wl-fnote">
                 Every bar is the same {pctText(rateMove)} rate move, but the longer the bond, the more of its value sits
                 in far-off payments that get repriced, so the bigger the price move. That sensitivity has a name: <strong>duration</strong>.
@@ -189,13 +197,13 @@ export default function BondLab() {
   );
 }
 
-function RateRiskChart({ bars, focus, rateMove }: { bars: { m: number; change: number; dur: number }[]; focus: number; rateMove: number }) {
+function RateRiskChart({ bars, focus, rateMove, mag }: { bars: { m: number; change: number; dur: number }[]; focus: number; rateMove: number; mag: number }) {
   const width = 760;
   const height = 380;
   const pad = { top: 30, right: 18, bottom: 46, left: 54 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
-  const mag = Math.max(0.05, ...bars.map((b) => Math.abs(b.change / 100))) * 1.15;
+  // `mag` is fixed to the ±3% extreme (passed in), so the axis stays put.
   const y = (v: number) => pad.top + plotH / 2 - (v / mag) * (plotH / 2);
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
   const bandW = plotW / bars.length;
