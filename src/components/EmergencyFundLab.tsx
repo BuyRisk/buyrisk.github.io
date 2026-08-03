@@ -24,7 +24,7 @@ function Seg<T extends string>({ label, info, value, options, onChange }: {
   );
 }
 
-type Stability = "stable" | "variable" | "veryVariable";
+type Stability = "riskless" | "steady" | "variable" | "veryVariable";
 type Earners = "two" | "one";
 type Deps = "no" | "yes";
 
@@ -32,16 +32,16 @@ export default function EmergencyFundLab() {
   useCurrencyCode();
   const money = (n: number) => formatMoney(n);
   const [essentials, setEssentials] = useState(3200);
-  const [stability, setStability] = useState<Stability>("stable");
+  const [stability, setStability] = useState<Stability>("steady");
   const [earners, setEarners] = useState<Earners>("two");
   const [deps, setDeps] = useState<Deps>("no");
   const [saved, setSaved] = useState(4000);
   const [contribution, setContribution] = useState(400);
 
-  const reset = () => { setEssentials(3200); setStability("stable"); setEarners("two"); setDeps("no"); setSaved(4000); setContribution(400); };
+  const reset = () => { setEssentials(3200); setStability("steady"); setEarners("two"); setDeps("no"); setSaved(4000); setContribution(400); };
 
   const months = Math.min(12, Math.max(3,
-    3 + ({ stable: 0, variable: 1.5, veryVariable: 3 }[stability])
+    3 + ({ riskless: 0, steady: 1, variable: 2.5, veryVariable: 4 }[stability])
       + (earners === "one" ? 1.5 : 0)
       + (deps === "yes" ? 1.5 : 0)));
   const target = months * essentials;
@@ -76,8 +76,8 @@ export default function EmergencyFundLab() {
           <input type="range" min={800} max={12000} step={100} value={essentials} onChange={(e) => setEssentials(Number(e.target.value))} />
         </label>
 
-        <Seg label="Income stability" info="Salaried and steady needs less cushion; commission, gig, or self-employed income needs more." value={stability}
-          onChange={setStability} options={[{ value: "stable", label: "Steady" }, { value: "variable", label: "Variable" }, { value: "veryVariable", label: "Very variable" }]} />
+        <Seg label="Income stability" info="Nearly riskless: tenured or very secure government work, where a layoff is almost unthinkable — you mainly need a cushion for non-job emergencies (medical, car, home). Steady: a typical salaried job (layoffs still happen). Variable: commission, gig, or seasonal. Very variable: self-employed or fully commission." value={stability}
+          onChange={setStability} options={[{ value: "riskless", label: "Nearly riskless" }, { value: "steady", label: "Steady" }, { value: "variable", label: "Variable" }, { value: "veryVariable", label: "Very variable" }]} />
         <Seg label="Earners in household" value={earners} onChange={setEarners}
           info="Two incomes cushion each other, so a smaller fund goes further. One income carries all the risk."
           options={[{ value: "two", label: "Two" }, { value: "one", label: "One" }]} />
