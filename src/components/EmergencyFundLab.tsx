@@ -37,18 +37,42 @@ export default function EmergencyFundLab() {
   const [deps, setDeps] = useState<Deps>("no");
   const [saved, setSaved] = useState(4000);
   const [contribution, setContribution] = useState(400);
+  // Optional "Advanced" lumpy-risk buffer, added on top of the months-based fund.
+  const [advanced, setAdvanced] = useState(false);
+  const [health, setHealth] = useState<"low" | "hdhp" | "high">("low");
+  const [housing, setHousing] = useState<"rent" | "own">("rent");
+  const [pets, setPets] = useState(0);
+  const [otherRisk, setOtherRisk] = useState(0);
 
-  const reset = () => { setEssentials(3200); setStability("steady"); setEarners("two"); setDeps("no"); setSaved(4000); setContribution(400); };
+  const reset = () => {
+    setEssentials(3200); setStability("steady"); setEarners("two"); setDeps("no"); setSaved(4000); setContribution(400);
+    setAdvanced(false); setHealth("low"); setHousing("rent"); setPets(0); setOtherRisk(0);
+  };
 
   const months = Math.min(12, Math.max(3,
     3 + ({ riskless: 0, steady: 1, variable: 2.5, veryVariable: 4 }[stability])
       + (earners === "one" ? 1.5 : 0)
       + (deps === "yes" ? 1.5 : 0)));
-  const target = months * essentials;
+  const baseFund = months * essentials;
+
+  const healthBuf = advanced ? ({ low: 2500, hdhp: 6000, high: 12000 }[health]) : 0;
+  const homeBuf = advanced && housing === "own" ? 5000 : 0;
+  const petBuf = advanced ? pets * 1500 : 0;
+  const otherBuf = advanced ? otherRisk : 0;
+  const buffer = healthBuf + homeBuf + petBuf + otherBuf;
+
+  const target = baseFund + buffer;
   const funded = target > 0 ? Math.min(1, saved / target) : 1;
   const gap = Math.max(0, target - saved);
   const monthsToFill = contribution > 0 ? Math.ceil(gap / contribution) : Infinity;
   const done = gap <= 0;
+  const monthsStr = months.toFixed(1).replace(/\.0$/, "");
+  const bufferParts = [
+    healthBuf ? `health ${money(healthBuf)}` : "",
+    homeBuf ? `home ${money(homeBuf)}` : "",
+    petBuf ? `pets ${money(petBuf)}` : "",
+    otherBuf ? `other ${money(otherBuf)}` : "",
+  ].filter(Boolean).join(", ");
 
   const toGoLabel = (m: number) => {
     if (!isFinite(m)) return "never at $0/mo";
@@ -85,6 +109,35 @@ export default function EmergencyFundLab() {
           info="People who rely on your income raise the cost of an interruption, so the cushion should be larger."
           options={[{ value: "no", label: "None" }, { value: "yes", label: "Yes" }]} />
 
+        <div className="wl-field" style={{ marginTop: "0.6rem" }}>
+          <span className="wl-field-label">
+            One-off risks
+            <InfoTip text="An emergency fund also covers lumpy surprises, not just lost income — a health deductible, a home repair, a big vet bill. Even a rock-solid job can carry these. Add a buffer for the ones you're exposed to, or skip it for a quick estimate." />
+          </span>
+          <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="One-off risks">
+            <button type="button" className={!advanced ? "active" : ""} aria-pressed={!advanced} onClick={() => setAdvanced(false)}>Skip</button>
+            <button type="button" className={advanced ? "active" : ""} aria-pressed={advanced} onClick={() => setAdvanced(true)}>Add a buffer</button>
+          </div>
+        </div>
+        {advanced && (
+          <>
+            <Seg label="Health coverage" value={health} onChange={setHealth}
+              info="A high-deductible plan can leave you owing several thousand before insurance helps, so hold more. Rough buffers, not your exact plan — check your deductible and out-of-pocket max."
+              options={[{ value: "low", label: "Low deductible" }, { value: "hdhp", label: "High-deductible" }, { value: "high", label: "Very high / limited" }]} />
+            <Seg label="Home" value={housing} onChange={setHousing}
+              info="Owning brings surprise repairs — HVAC, roof, plumbing, appliances. Renting shifts most of that to the landlord."
+              options={[{ value: "rent", label: "Rent" }, { value: "own", label: "Own" }]} />
+            <label className="wl-slider">
+              <span>Pets<InfoTip text="A single emergency vet visit can run into the thousands. Adds a rough reserve of about $1,500 per pet." /> <strong>{pets}</strong></span>
+              <input type="range" min={0} max={5} step={1} value={pets} onChange={(e) => setPets(Number(e.target.value))} />
+            </label>
+            <label className="wl-slider">
+              <span>Other one-off risks<InfoTip text="Anything else lumpy you'd cover from savings: an aging car, a high auto or home insurance deductible, an older appliance, family obligations." /> <strong>{money(otherRisk)}</strong></span>
+              <input type="range" min={0} max={20000} step={500} value={otherRisk} onChange={(e) => setOtherRisk(Number(e.target.value))} />
+            </label>
+          </>
+        )}
+
         <label className="wl-slider" style={{ marginTop: "var(--space-sm)" }}>
           <span>Already saved <strong>{money(saved)}</strong></span>
           <input type="range" min={0} max={60000} step={500} value={saved} onChange={(e) => setSaved(Number(e.target.value))} />
@@ -100,7 +153,7 @@ export default function EmergencyFundLab() {
           <div className="ss-headline">
             <span className="ss-headline-label">Target emergency fund</span>
             <span className="ss-headline-value">{money(target)}</span>
-            <span className="ss-headline-sub">{months.toFixed(1).replace(/\.0$/, "")} months of essentials</span>
+            <span className="ss-headline-sub">{monthsStr} months of essentials{buffer > 0 ? ` + ${money(buffer)} for one-off risks` : ""}</span>
           </div>
 
           <p className="ef-progresslabel">{done ? "Fully funded 🎉" : `${(funded * 100).toFixed(0)}% there — ${money(gap)} to go`}</p>
@@ -122,6 +175,12 @@ export default function EmergencyFundLab() {
               <div><dt>Still to save</dt><dd>{money(gap)}</dd></div>
               <div><dt>Time to fund</dt><dd>{done ? "Done" : toGoLabel(monthsToFill)}</dd></div>
             </dl>
+            {buffer > 0 && (
+              <p className="wl-fnote" style={{ marginTop: "calc(-1 * var(--space-sm))" }}>
+                Target = <strong>{money(baseFund)}</strong> ({monthsStr} months of expenses) +{" "}
+                <strong>{money(buffer)}</strong> buffer{bufferParts ? ` (${bufferParts})` : ""}.
+              </p>
+            )}
             <p className="wl-saved">
               {done ? (
                 <>You're covered. Once the fund is full, redirect that monthly contribution toward
