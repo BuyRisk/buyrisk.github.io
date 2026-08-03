@@ -38,12 +38,12 @@ function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="ss-seg-field">
-      <span className="ss-seg-label">
+    <div className="wl-field">
+      <span className="wl-field-label">
         {label}
         {info && <InfoTip text={info} />}
       </span>
-      <div className="ss-seg" role="group" aria-label={label}>
+      <div className="wl-simmode wl-simmode--wrap" role="group" aria-label={label}>
         {options.map((o) => (
           <button key={o.value} type="button" className={value === o.value ? "active" : ""} aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
             {o.label}
