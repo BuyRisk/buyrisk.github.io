@@ -161,11 +161,13 @@ const isActive = (href: string) =>
     z-index: 60;
     min-width: 17rem;
     max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 5.5rem);
+    overflow-y: auto;
     margin: 0;
-    padding: 0.4rem;
+    padding: 0.3rem;
     list-style: none;
     display: grid;
-    gap: 0.1rem;
+    gap: 0.05rem;
     background: var(--color-surface);
     border: var(--border);
     border-radius: var(--radius);
@@ -207,7 +209,7 @@ const isActive = (href: string) =>
   }
   .nav-menu-link {
     display: block;
-    padding: 0.5rem 0.6rem;
+    padding: 0.35rem 0.6rem;
     border-radius: 7px;
     text-decoration: none;
     color: var(--color-text);
