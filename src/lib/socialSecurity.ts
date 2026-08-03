@@ -236,10 +236,19 @@ export interface Person {
   health: Health;
 }
 
+/** Household tax layer for couples. Filing is automatic: married-filing-jointly
+ *  while both are alive, single once one is a survivor. `otherIncome` is the
+ *  household's non-SS income (today's $). */
+export interface CoupleTaxParams {
+  otherIncome: number;
+  marginalRate: number;
+}
+
 export interface CoupleInput {
   a: Person;
   b: Person;
   discountRate: number;
+  tax?: CoupleTaxParams;
 }
 
 export interface CouplePoint {
@@ -256,6 +265,12 @@ export interface CoupleResult {
   agesB: number[];
   grid: CouplePoint[]; // household NPV for every whole-age pair
   jointIndependentNpv: number; // value if each claims at their own solo optimum
+  tax?: {
+    grossNpv: number; // household PV ignoring tax & IRMAA
+    netNpv: number; // household PV after tax & IRMAA (= best.npv)
+    /** Household IRMAA tier while both are on Medicare, at the best claim pair. */
+    irmaaTierBoth: number;
+  };
 }
 
 /** Survival curve (conditioned on being alive at currentAge), FRA, and LE. */
@@ -303,7 +318,20 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
     disc[t] = 1 / Math.pow(1 + d, t / 12);
   }
 
-  const pv = (claimA: number, claimB: number): number => {
+  const tax = inp.tax;
+  // Net a monthly benefit for tax + per-person IRMAA. `filing` is married while
+  // both live, single for a survivor; `irmaaCount` is how many in that state are
+  // 65+ (each pays IRMAA, computed on the state's MAGI).
+  const netMonthly = (monthly: number, filing: FilingStatus, irmaaCount: number): number => {
+    if (!tax || monthly <= 0) return monthly;
+    const annual = monthly * 12;
+    const taxable = taxableSocialSecurity(annual, tax.otherIncome, filing);
+    const taxCost = taxable * (tax.marginalRate / 100);
+    const irmaaPer = Math.max(0, irmaaAnnual(tax.otherIncome + taxable, filing) - irmaaAnnual(tax.otherIncome, filing));
+    return monthly - taxCost / 12 - (irmaaPer * irmaaCount) / 12;
+  };
+
+  const pv = (claimA: number, claimB: number, applyTax: boolean): number => {
     const benA = inp.a.pia * benefitFactor(claimA, A.fra);
     const benB = inp.b.pia * benefitFactor(claimB, B.fra);
     const survFromA = Math.max(benA, 0.825 * inp.a.pia); // what B inherits if A dies
@@ -317,8 +345,17 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
       const both = pA[t] * pB[t];
       const onlyA = pA[t] * (1 - pB[t]);
       const onlyB = (1 - pA[t]) * pB[t];
-      const cash = both * (aOwn + bOwn) + onlyA * Math.max(aOwn, sfB) + onlyB * Math.max(bOwn, sfA);
-      npv += cash * disc[t];
+      let cBoth = aOwn + bOwn;
+      let cA = Math.max(aOwn, sfB);
+      let cB = Math.max(bOwn, sfA);
+      if (applyTax && tax) {
+        const a65 = ageMA[t] >= 65 * 12 ? 1 : 0;
+        const b65 = ageMB[t] >= 65 * 12 ? 1 : 0;
+        cBoth = netMonthly(cBoth, "married", a65 + b65);
+        cA = netMonthly(cA, "single", a65);
+        cB = netMonthly(cB, "single", b65);
+      }
+      npv += (both * cBoth + onlyA * cA + onlyB * cB) * disc[t];
     }
     return npv;
   };
@@ -335,7 +372,7 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   let coarse = { aMonths: loA * 12, bMonths: loB * 12, npv: -Infinity };
   for (const a of agesA) {
     for (const b of agesB) {
-      const npv = pv(a * 12, b * 12);
+      const npv = pv(a * 12, b * 12, !!tax);
       grid.push({ ageA: a, ageB: b, npv });
       if (npv > coarse.npv) coarse = { aMonths: a * 12, bMonths: b * 12, npv };
     }
@@ -349,7 +386,7 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   const bTo = Math.min(70 * 12, coarse.bMonths + 11);
   for (let am = aFrom; am <= aTo; am++) {
     for (let bm = bFrom; bm <= bTo; bm++) {
-      const npv = pv(am, bm);
+      const npv = pv(am, bm, !!tax);
       if (npv > best.npv) best = { aMonths: am, bMonths: bm, npv };
     }
   }
@@ -358,6 +395,19 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
   const soloA = optimize({ pia: inp.a.pia, birthYear: inp.a.birthYear, currentAge: inp.a.currentAge, discountRate: inp.discountRate, health: inp.a.health }).best.ageMonths;
   const soloB = optimize({ pia: inp.b.pia, birthYear: inp.b.birthYear, currentAge: inp.b.currentAge, discountRate: inp.discountRate, health: inp.b.health }).best.ageMonths;
 
+  let taxInfo: CoupleResult["tax"];
+  if (tax) {
+    const grossNpv = pv(best.aMonths, best.bMonths, false);
+    const benA = inp.a.pia * benefitFactor(best.aMonths, A.fra);
+    const benB = inp.b.pia * benefitFactor(best.bMonths, B.fra);
+    const taxable = taxableSocialSecurity((benA + benB) * 12, tax.otherIncome, "married");
+    taxInfo = {
+      grossNpv,
+      netNpv: best.npv,
+      irmaaTierBoth: irmaaTierIndex(tax.otherIncome + taxable, "married"),
+    };
+  }
+
   return {
     a: { fraMonths: A.fra, lifeExpectancy: A.le, soloBestMonths: soloA, bestMonths: best.aMonths },
     b: { fraMonths: B.fra, lifeExpectancy: B.le, soloBestMonths: soloB, bestMonths: best.bMonths },
@@ -365,7 +415,8 @@ export function optimizeCouple(inp: CoupleInput): CoupleResult {
     agesA,
     agesB,
     grid,
-    jointIndependentNpv: pv(soloA, soloB),
+    jointIndependentNpv: pv(soloA, soloB, !!tax),
+    tax: taxInfo,
   };
 }
 

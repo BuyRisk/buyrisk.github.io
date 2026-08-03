@@ -78,18 +78,19 @@ export default function SocialSecurityLab() {
   const [filing, setFiling] = useState<FilingStatus>("single");
   const [otherIncome, setOtherIncome] = useState(30000);
   const [marginalRate, setMarginalRate] = useState(22);
-  const taxParams =
+  const singleTax =
     advanced && mode === "single" ? { filing, otherIncome, marginalRate } : undefined;
+  const coupleTax = advanced && mode === "couple" ? { otherIncome, marginalRate } : undefined;
 
   const health = { sex, smoking, exercise };
   const result = useMemo(
-    () => optimize({ pia, birthYear, currentAge, discountRate, health, tax: taxParams }),
+    () => optimize({ pia, birthYear, currentAge, discountRate, health, tax: singleTax }),
     [pia, birthYear, currentAge, discountRate, sex, smoking, exercise, advanced, mode, filing, otherIncome, marginalRate]
   );
   // Population-average reference (former/moderate ⇒ hazard multiplier 1.0), to
   // isolate the health "premium".
   const ref = useMemo(
-    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" }, tax: taxParams }),
+    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" }, tax: singleTax }),
     [pia, birthYear, currentAge, discountRate, sex, advanced, mode, filing, otherIncome, marginalRate]
   );
   const couple = useMemo(
@@ -98,8 +99,9 @@ export default function SocialSecurityLab() {
         a: { pia, birthYear, currentAge, health: { sex, smoking, exercise } },
         b: { pia: piaB, birthYear: birthYearB, currentAge: currentAgeB, health: { sex: sexB, smoking: smokingB, exercise: exerciseB } },
         discountRate,
+        tax: coupleTax,
       }),
-    [pia, birthYear, currentAge, sex, smoking, exercise, piaB, birthYearB, currentAgeB, sexB, smokingB, exerciseB, discountRate]
+    [pia, birthYear, currentAge, sex, smoking, exercise, piaB, birthYearB, currentAgeB, sexB, smokingB, exerciseB, discountRate, advanced, mode, otherIncome, marginalRate]
   );
 
   const bestAgeLabel = monthsToLabel(result.best.ageMonths);
@@ -154,7 +156,7 @@ export default function SocialSecurityLab() {
           <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
         </label>
 
-        {mode === "single" && (
+        {(
           <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "var(--border)" }}>
             <div className="wl-field">
               <span className="wl-field-label">
@@ -169,16 +171,18 @@ export default function SocialSecurityLab() {
 
             {advanced && (
               <div style={{ marginTop: "0.7rem" }}>
-                <Segmented
-                  label="Tax filing status"
-                  value={filing}
-                  onChange={setFiling}
-                  options={[{ value: "single", label: "Single" }, { value: "married", label: "Married (joint)" }]}
-                />
+                {mode === "single" && (
+                  <Segmented
+                    label="Tax filing status"
+                    value={filing}
+                    onChange={setFiling}
+                    options={[{ value: "single", label: "Single" }, { value: "married", label: "Married (joint)" }]}
+                  />
+                )}
                 <label className="wl-slider">
                   <span>
-                    Other annual income
-                    <InfoTip text="Your non-Social-Security taxable income in today's dollars: pensions, IRA/401(k) withdrawals, wages, interest, dividends, plus any tax-exempt interest. Assumed constant. It drives how much of your benefit is taxed and your IRMAA tier." />{" "}
+                    {mode === "couple" ? "Other household income" : "Other annual income"}
+                    <InfoTip text="Non-Social-Security taxable income in today's dollars (the household's, in couple mode): pensions, IRA/401(k) withdrawals, wages, interest, dividends, plus any tax-exempt interest. Assumed constant. It drives how much of the benefit is taxed and your IRMAA tier." />{" "}
                     <strong>{currency(otherIncome)}</strong>
                   </span>
                   <input type="range" min={0} max={300000} step={5000} value={otherIncome} onChange={(e) => setOtherIncome(Number(e.target.value))} />
@@ -196,6 +200,17 @@ export default function SocialSecurityLab() {
                   This adds taxes and IRMAA with real simplifications: constant income, {IRMAA.year} brackets, no RMDs, ACA, state specifics, or the two-year IRMAA lookback. Claiming is an <strong style={{ color: "var(--color-text)" }}>irreversible, once-in-a-lifetime decision</strong>. Please consult a qualified tax or financial professional, and cross-check with{" "}
                   <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a>, before you claim.
                 </div>
+                <details style={{ marginTop: "0.6rem", fontSize: "var(--step--1)", color: "var(--color-text-soft)" }}>
+                  <summary style={{ cursor: "pointer", fontFamily: "var(--font-sans)", fontWeight: 600, color: "var(--color-text)" }}>What Advanced assumes</summary>
+                  <ul style={{ margin: "0.4rem 0 0", paddingLeft: "1.1rem", lineHeight: 1.5 }}>
+                    <li>Your other income stays constant in today's dollars — no future raises, and no required minimum distributions (RMDs) at 73+ that would push it (and your taxes) up.</li>
+                    <li>It applies this year's ({IRMAA.year}) IRMAA tiers and the fixed benefit-taxation thresholds to every year, rather than modeling how those unindexed thresholds pull more of your benefit into tax over time.</li>
+                    <li>IRMAA uses your current income (not the real two-year MAGI lookback) from age 65, and charges only the surcharge your benefit itself triggers.</li>
+                    <li>Taxes use the single marginal rate you enter — not a full return with deductions, credits, state rules, ACA subsidies before 65, or the net investment income tax.</li>
+                    <li>Couple mode files jointly while both live and single as a survivor, with household income unchanged after a death.</li>
+                    <li>It still omits spousal top-ups, the earnings test if you work before full retirement age, and rules like WEP/GPO.</li>
+                  </ul>
+                </details>
               </div>
             )}
           </div>
@@ -397,6 +412,17 @@ function CoupleOutput({ couple, piaA, piaB }: { couple: CoupleResult; piaA: numb
             worth about <strong>{currency(coordValue)}</strong> more than each of you optimizing
             separately.
           </p>
+          {couple.tax && (
+            <p className="wl-fnote" style={{ marginTop: "0.5rem" }}>
+              <strong>After tax &amp; IRMAA:</strong> household lifetime value is about{" "}
+              {currency(couple.tax.netNpv)}, down from {currency(couple.tax.grossNpv)} before tax
+              ({Math.round((couple.tax.netNpv / couple.tax.grossNpv) * 100)}% kept). While you're
+              both on Medicare, the household sits in <strong>IRMAA tier {couple.tax.irmaaTierBoth}</strong>
+              {couple.tax.irmaaTierBoth > 1
+                ? " — each of you pays an income surcharge on Medicare premiums."
+                : " (no income surcharge)."}
+            </p>
+          )}
         </div>
       </div>
     </div>
