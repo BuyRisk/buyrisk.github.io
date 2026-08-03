@@ -28,6 +28,8 @@ export default defineConfig({
     '/tools/burn-rate': '/tools/retirement',
     '/tools/social-security': '/tools/retirement',
     '/tools/roth-vs-traditional': '/tools/retirement',
+    // Rent-vs-Buy moved to the Personal Finance section.
+    '/tools/rent-vs-buy': '/personal-finance/rent-vs-buy',
   },
   markdown: {
     shikiConfig: {

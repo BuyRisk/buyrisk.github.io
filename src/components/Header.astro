@@ -3,12 +3,14 @@ import ThemeToggle from "./ThemeToggle.astro";
 import CurrencySelect from "./CurrencySelect.astro";
 import { TOOLS, type Tool } from "../data/tools";
 import { INFO_PAGES } from "../data/info";
+import { PF_TOOLS } from "../data/personal-finance";
 
 type NavItem = { href: string; label: string; children?: Tool[] };
 
 const navItems: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/tools", label: "Portfolio Playground", children: TOOLS },
+  { href: "/personal-finance", label: "Personal Finance", children: PF_TOOLS },
   { href: "/info", label: "Info", children: INFO_PAGES },
   { href: "/about", label: "About" },
 ];

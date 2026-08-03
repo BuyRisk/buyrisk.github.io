@@ -64,10 +64,4 @@ export const TOOLS: Tool[] = [
     blurb:
       "Funding and spending retirement: what it costs and whether your money lasts, when to claim Social Security, and choosing Roth vs. Traditional (and grabbing the employer match).",
   },
-  {
-    title: "Rent or Buy?",
-    href: "/tools/rent-vs-buy",
-    blurb:
-      "Renting isn't throwing money away. Run a buyer and a renter side by side (investing the difference) and find the year buying actually breaks even.",
-  },
 ];

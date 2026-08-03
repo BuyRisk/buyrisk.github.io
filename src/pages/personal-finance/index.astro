@@ -1,0 +1,149 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { PF_TOOLS, PF_UPCOMING } from "../../data/personal-finance";
+---
+
+<BaseLayout
+  title="Personal Finance"
+  description="Free, no-login calculators for the money decisions that come before investing: budgeting, debt payoff, emergency funds, savings goals, and rent vs. buy."
+>
+  <section class="container pf-intro">
+    <p class="eyebrow">Personal Finance</p>
+    <h1>The foundation beneath your investing</h1>
+    <p class="lede">
+      Investing is where this site is headed — but it works best from solid ground.
+      A budget frees up money to invest, an emergency fund keeps you from selling
+      investments in a crisis, and clearing a 22% credit card beats any return the
+      market can promise. Get these foundations right and investing becomes something
+      you can actually keep doing. Like everything here, these tools are free,
+      ad-free, and <strong>stateless</strong>: no login, no linked accounts, nothing
+      stored. Type your numbers, get an answer, close the tab.
+    </p>
+  </section>
+
+  <section class="container">
+    <ul class="grid grid--2 pf-grid">
+      {
+        PF_TOOLS.map((tool) => (
+          <li>
+            <a href={tool.href} class="card pf-card">
+              <h2>{tool.title}</h2>
+              <p>{tool.blurb}</p>
+              <span class="pf-cta">Open →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  {
+    PF_UPCOMING.length > 0 && (
+      <section class="container upcoming-section">
+        <h2 class="section-heading">On the way</h2>
+        <ul class="grid grid--2 upcoming-grid">
+          {PF_UPCOMING.map((tool) => (
+            <li class="card upcoming-card">
+              <span class="badge">Coming soon</span>
+              <h3>{tool.title}</h3>
+              <p>{tool.blurb}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="container pf-foot">
+    <p>
+      Educational only, never personalized financial advice. These are calculators
+      to build intuition, not a substitute for a professional who knows your full
+      situation.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .pf-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .pf-grid,
+  .upcoming-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .pf-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.4rem;
+    background: linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-accent-soft)
+    );
+  }
+  .pf-card h2 {
+    margin: 0.3rem 0 0;
+    font-size: var(--step-1);
+  }
+  .pf-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .pf-cta {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-top: var(--space-xs);
+  }
+  .upcoming-section {
+    margin-top: var(--space-xl);
+  }
+  .section-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .upcoming-card {
+    height: 100%;
+  }
+  .upcoming-card h3 {
+    margin: 0.5rem 0 0.4rem;
+    font-size: var(--step-1);
+  }
+  .upcoming-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+  }
+  .badge {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+  }
+  .pf-foot {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: var(--border);
+    color: var(--color-muted);
+    font-size: var(--step--1);
+    max-width: var(--measure);
+  }
+</style>

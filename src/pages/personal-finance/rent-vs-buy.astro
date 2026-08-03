@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import RentVsBuyLab from "../../components/RentVsBuyLab.tsx";
-import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
@@ -11,7 +10,7 @@ import "../../styles/simtool.css";
   description="A fair, opportunity-cost-aware rent-vs-buy comparison: run a buyer and a renter side by side, invest the difference, and find the year buying breaks even, with real mortgage and home-price data."
 >
   <section class="container wl-intro">
-    <p class="eyebrow">Interactive Tool</p>
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
     <h1>Rent or buy?</h1>
     <p class="lede">
       "Renting is throwing money away." You've heard it. But a mortgage payment
@@ -63,7 +62,26 @@ import "../../styles/simtool.css";
 
   <Sources tool="rent-vs-buy" />
 
-  <NextTool current="/tools/rent-vs-buy" />
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/personal-finance" class="card">
+          <h3>More personal-finance tools</h3>
+          <p>Budgeting, debt payoff, emergency funds, and savings goals.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/compound-growth" class="card">
+          <h3>Invest the difference</h3>
+          <p>
+            See what the money a renter invests instead of buying can grow into over
+            the years.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>
@@ -78,6 +96,35 @@ import "../../styles/simtool.css";
   }
   .wl-explainer {
     margin-top: var(--space-lg);
+  }
+  .pf-related {
+    margin-top: var(--space-xl);
+  }
+  .pf-related-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .pf-related-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .pf-related-grid a.card {
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .pf-related-grid h3 {
+    margin: 0 0 0.3rem;
+    font-size: var(--step-1);
+  }
+  .pf-related-grid p {
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
   }
 </style>
 
