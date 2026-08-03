@@ -48,18 +48,20 @@ const tierOpacity: Record<string, number> = {
 
 <BaseLayout
   title="Global Market-Cap Breakdown"
-  description="How the world's investable stock market splits across the US, developed-ex-US, and emerging markets, and large, mid, and small caps within each — with the funds that cover each slice, so you can assemble a total-world portfolio across separate accounts."
+  description="How the world's investable stock market splits across the US, developed-ex-US, and emerging markets, and large, mid, and small caps within each — with the funds that cover each slice, for anyone assembling a total-world portfolio across separate accounts."
 >
   <section class="container gmc-intro">
     <p class="eyebrow">Info · Reference</p>
-    <h1>Build your own total-world portfolio</h1>
+    <h1>The global stock market, slice by slice</h1>
     <p class="lede">
       A single global fund like <strong>VT</strong> just holds the whole
-      investable stock market in proportion to each company's size. But most
-      people can't buy that one fund everywhere: a 401(k), an IRA, and an HSA each
-      offer a different, limited menu. So you rebuild the whole-world weighting
-      from whatever building blocks each account gives you. This page is the
-      recipe — the current size of every slice, and the funds that cover each one.
+      investable stock market in proportion to each company's size. Holding the
+      world in those market-cap weights is one rational, widely used starting
+      point for a stock portfolio — not a recommendation, and not the only
+      sensible approach. Someone who wants it often can't buy a single such fund
+      in every account, since a 401(k), an IRA, and an HSA each offer a different,
+      limited menu. This page provides the current size of every slice of the
+      market.
     </p>
     <p class="gmc-asof">
       Data as of <strong>{asOfLabel}</strong>
@@ -76,7 +78,7 @@ const tierOpacity: Record<string, number> = {
       The simplest cut of the world is two pieces. Roughly
       <strong>{pct(twoFund.us)}</strong> of global stock-market value sits in the
       United States; the other <strong>{pct(twoFund.exUs)}</strong> is everywhere
-      else. Own those two in proportion and you already have the shape of a
+      else. Held in that proportion, those two pieces already have the shape of a
       total-world portfolio.
     </p>
 
@@ -89,10 +91,10 @@ const tierOpacity: Record<string, number> = {
       </div>
     </div>
     <p class="gmc-caption">
-      Two funds get you here: a US total-market fund and a total-international
-      fund, held about {Math.round(twoFund.us)}&nbsp;/&nbsp;{Math.round(
+      This split can be matched with two funds — a US total-market fund and a
+      total-international fund — in roughly {Math.round(twoFund.us)}&nbsp;/&nbsp;{Math.round(
         twoFund.exUs
-      )}.
+      )} proportion.
     </p>
   </section>
 
@@ -189,8 +191,9 @@ const tierOpacity: Record<string, number> = {
   <section class="container gmc-block">
     <h2>Piecing it together across accounts</h2>
     <p class="prose">
-      Here's where the map earns its keep. Depending on which funds your accounts
-      offer, you reach the same whole-world weighting a few different ways.
+      For anyone who chooses to match this market-cap weighting, the specific
+      funds each account offers shape how it's approximated. A few common
+      combinations people use:
     </p>
 
     <div class="grid grid--3 gmc-recipes">
@@ -338,19 +341,20 @@ const tierOpacity: Record<string, number> = {
     <ul class="grid grid--2 gmc-related-grid">
       <li>
         <a href="/tools/diversification" class="card">
-          <h3>Why hold the whole world?</h3>
+          <h3>Why hold a broad mix?</h3>
           <p>
             The Diversification tool shows how mixing assets that don't move
-            together lowers risk — the reason cap-weighting the globe works.
+            together lowers risk — part of the case for holding a broad, global
+            set of stocks.
           </p>
         </a>
       </li>
       <li>
         <a href="/tools/portfolio" class="card">
-          <h3>Add bonds and dial the mix</h3>
+          <h3>Where bonds fit in</h3>
           <p>
-            Once you own the world's stocks, the Portfolio tool helps you set the
-            stock/bond split that fits your risk tolerance.
+            Whatever stocks you hold, the Portfolio tool shows how a stock/bond
+            split changes a portfolio's risk and return.
           </p>
         </a>
       </li>
