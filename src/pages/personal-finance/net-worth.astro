@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NetWorthLab from "../../components/NetWorthLab.tsx";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Net Worth Tracker"
+  description="Add up what you own and subtract what you owe to see your net worth — the truest single number in personal finance — plus a rough projection of where consistent investing takes it."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
+    <h1>What's your net worth?</h1>
+    <p class="lede">
+      Everything you own, minus everything you owe. Net worth is the one number that
+      captures your whole financial picture — and, tracked over time, the clearest
+      sign of progress. Today's figure barely matters; the direction is everything.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <NetWorthLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Why it's the number that matters</h2>
+      <ul>
+        <li>
+          <strong>It nets out the whole picture.</strong> Income tells you what comes
+          in; spending tells you what goes out; net worth tells you what's actually
+          <em>accumulating</em>. A big salary with big debts can hide a net worth
+          that's barely moving — or negative.
+        </li>
+        <li>
+          <strong>It turns habits into a trend.</strong> Every dollar of debt you clear
+          and every dollar you invest shows up here. Checked a few times a year, the
+          line reveals whether your day-to-day choices are compounding in your favor.
+        </li>
+        <li>
+          <strong>Investing is what bends the curve.</strong> Paying down debt lifts
+          net worth dollar for dollar; investing lifts it dollar for dollar
+          <em>and then keeps lifting it</em> as those dollars compound. That's why the
+          save-and-invest habit, sustained, is what separates a flat line from a
+          rising one.
+        </li>
+      </ul>
+      <p>
+        The projection here is a deliberately simple sketch — it grows your
+        investments and new contributions and holds your home, other assets, and
+        debts flat. Real life is messier, but the shape of the lesson holds.
+        Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/personal-finance/debt-payoff" class="card">
+          <h3>Shrink the red bar</h3>
+          <p>Clearing debt raises net worth directly. Find the fastest, cheapest way to do it.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Grow the green bar</h3>
+          <p>Once you're investing, the Portfolio tool helps you set a stock/bond mix that fits your risk.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
+</style>
+
+<style is:global>
+  .ss-headline { display: flex; flex-direction: column; gap: 0.15rem; padding: var(--space-sm) var(--space-md); border-radius: var(--radius); background: var(--color-accent-soft); border: 1px solid var(--color-accent); }
+  .ss-headline-label { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); }
+  .ss-headline-value { font-family: var(--font-sans); font-weight: 700; font-size: var(--step-3); line-height: 1.1; color: var(--color-accent); font-variant-numeric: tabular-nums; }
+  .ss-headline-sub { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); }
+
+  .nw-group { font-family: var(--font-sans); font-size: var(--step-0); font-weight: 700; margin: var(--space-sm) 0 0.4rem; padding-bottom: 0.2rem; border-bottom: var(--border); }
+  .nw-input { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; font-family: var(--font-sans); font-size: var(--step--1); margin-bottom: 0.35rem; }
+  .nw-money { display: inline-flex; align-items: center; gap: 0.2rem; color: var(--color-muted); }
+  .nw-money input { width: 8rem; font-family: var(--font-sans); font-size: var(--step--1); padding: 0.3rem 0.45rem; border: var(--border); border-radius: 7px; background: var(--color-surface); color: var(--color-text); text-align: right; }
+  .nw-money input:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  .nw-barlabel { font-family: var(--font-sans); font-size: var(--step--1); font-weight: 600; color: var(--color-text-soft); margin: var(--space-sm) 0 0.25rem; }
+  .nw-bar { width: 100%; height: 1.4rem; border-radius: 999px; background: var(--color-surface-alt); overflow: hidden; border: var(--border); }
+  .nw-fill { height: 100%; border-radius: 999px; transition: width var(--transition); }
+  .nw-fill--asset { background: var(--color-accent); }
+  .nw-fill--debt { background: var(--color-error); }
+</style>
