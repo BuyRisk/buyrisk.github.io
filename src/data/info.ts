@@ -31,6 +31,12 @@ export const INFO_PAGES: Tool[] = [
       "The historical extra return of the Fama–French factors — market, size, value, profitability, investment — and the volatility that came with each.",
   },
   {
+    title: "Market Valuations (CAPE)",
+    href: "/info/market-valuations",
+    blurb:
+      "The Shiller CAPE ratio today versus 140+ years of history — a gauge of whether US stocks are historically cheap or expensive. Useful for expectations, useless for timing.",
+  },
+  {
     title: "Active vs. Index (SPIVA)",
     href: "/info/active-vs-index",
     blurb:
@@ -82,11 +88,6 @@ export const INFO_PAGES: Tool[] = [
 
 /** Planned pages, shown as "coming soon" cards on /info. Not yet routes. */
 export const INFO_UPCOMING: { title: string; blurb: string }[] = [
-  {
-    title: "Market Valuations (CAPE)",
-    blurb:
-      "The Shiller CAPE ratio and other valuation gauges over time — a sense of whether the market is historically cheap or expensive, with the usual caveats.",
-  },
   {
     title: "Live Rates Dashboard",
     blurb:

@@ -1,0 +1,206 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { shillerCape as c } from "../../data/generated/shiller-cape";
+import "../../styles/info.css";
+
+// Build the long-run line chart. Sample to ~quarterly to keep the path light.
+const n = c.cape.length;
+const yearFrac = (i: number) => c.startYear + (c.startMonth - 1 + i) / 12;
+const x0 = yearFrac(0);
+const x1 = yearFrac(n - 1);
+const yMax = Math.ceil(c.max.cape / 10) * 10; // 50
+
+const W = 760;
+const Hc = 320;
+const pad = { top: 16, right: 14, bottom: 30, left: 34 };
+const plotW = W - pad.left - pad.right;
+const plotH = Hc - pad.top - pad.bottom;
+const sx = (yf: number) => pad.left + ((yf - x0) / (x1 - x0)) * plotW;
+const sy = (v: number) => pad.top + plotH - (v / yMax) * plotH;
+
+const stride = 3;
+const pathPts: string[] = [];
+for (let i = 0; i < n; i += stride) {
+  pathPts.push(`${sx(yearFrac(i)).toFixed(1)},${sy(c.cape[i]).toFixed(1)}`);
+}
+pathPts.push(`${sx(x1).toFixed(1)},${sy(c.cape[n - 1]).toFixed(1)}`);
+const linePath = "M" + pathPts.join(" L");
+
+const yTicks = [10, 20, 30, 40, yMax].filter((v) => v <= yMax);
+const xTicks = [1900, 1925, 1950, 1975, 2000, 2025].filter((y) => y >= x0 && y <= x1);
+// Famous markers.
+const markers = [
+  { year: 1929.7, cape: 30, label: "1929" },
+  { year: 1999.92, cape: c.max.cape, label: `1999 peak ${c.max.cape}` },
+  { year: 1920.92, cape: c.min.cape, label: `1920 low ${c.min.cape}` },
+];
+
+const monthName = (m: number) =>
+  ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1];
+const asOfLabel = `${monthName(c.endMonth)} ${c.endYear}`;
+const vsMedian = c.current / c.median;
+const sourceNote = `${c.source} CAPE (P/E10) is the real S&P price divided by the average of the last 10 years of real earnings. Monthly, ${c.startYear}–${c.endYear}. Latest ${asOfLabel}.`;
+const p1 = (x: number) => x.toFixed(1);
+---
+
+<BaseLayout
+  title="Market Valuations (CAPE)"
+  description="The Shiller CAPE ratio today versus 140+ years of history — a gauge of whether US stocks are historically cheap or expensive. Useful for expectations, useless for timing."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>Is the market expensive?</h1>
+    <p class="ref-lede">
+      One number tries to answer that: the <strong>CAPE ratio</strong> (cyclically
+      adjusted price-to-earnings, or P/E10). It's the market's price divided by the
+      average of the last <em>ten years</em> of earnings — smoothing out booms and
+      busts so today's price can be compared across more than a century. Higher
+      means pricier relative to earnings.
+    </p>
+    <p class="ref-asof">
+      Latest <strong>{asOfLabel}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p1(c.current)}</span>
+        <span class="ref-stat-label"
+          >CAPE today — about <strong>{vsMedian.toFixed(1)}×</strong> its long-run
+          median</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p1(c.median)}</span>
+        <span class="ref-stat-label">the median since {c.startYear} (mean {p1(c.mean)})</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{c.percentile.toFixed(0)}th</span>
+        <span class="ref-stat-label"
+          >percentile — today's reading is higher than {c.percentile.toFixed(0)}% of
+          all months on record</span
+        >
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>140+ years of CAPE</h2>
+    <div class="ref-tablewrap">
+      <svg
+        viewBox={`0 0 ${W} ${Hc}`}
+        style="width:100%;height:auto;display:block;min-width:34rem"
+        role="img"
+        aria-label={`Shiller CAPE ratio from ${c.startYear} to ${c.endYear}. Currently ${c.current}, versus a long-run median of ${c.median}.`}
+      >
+        {
+          yTicks.map((v) => (
+            <g>
+              <line x1={pad.left} x2={W - pad.right} y1={sy(v)} y2={sy(v)} stroke="var(--color-border)" />
+              <text x={pad.left - 6} y={sy(v) + 4} text-anchor="end" style="fill:var(--color-muted);font-family:var(--font-sans);font-size:11px">{v}</text>
+            </g>
+          ))
+        }
+        {/* median reference line */}
+        <line
+          x1={pad.left}
+          x2={W - pad.right}
+          y1={sy(c.median)}
+          y2={sy(c.median)}
+          stroke="var(--color-text-soft)"
+          stroke-dasharray="5 4"
+        />
+        <text x={W - pad.right} y={sy(c.median) - 5} text-anchor="end" style="fill:var(--color-text-soft);font-family:var(--font-sans);font-size:11px;font-style:italic">median {c.median}</text>
+
+        <path d={linePath} fill="none" stroke="var(--color-accent)" stroke-width="1.6" />
+
+        {
+          markers.map((m) => (
+            <g>
+              <circle cx={sx(m.year)} cy={sy(m.cape)} r="3.5" fill="var(--pl-c4)" />
+              <text x={sx(m.year)} y={sy(m.cape) - 8} text-anchor="middle" style="fill:var(--color-text-soft);font-family:var(--font-sans);font-size:10px">{m.label}</text>
+            </g>
+          ))
+        }
+        {/* current point */}
+        <circle cx={sx(x1)} cy={sy(c.current)} r="4" fill="var(--color-accent)" stroke="var(--color-bg)" stroke-width="1.5" />
+        <text x={sx(x1)} y={sy(c.current) - 9} text-anchor="end" style="fill:var(--color-accent);font-family:var(--font-sans);font-size:11px;font-weight:700">now {c.current}</text>
+
+        {
+          xTicks.map((y) => (
+            <text x={sx(y)} y={Hc - 8} text-anchor="middle" style="fill:var(--color-muted);font-family:var(--font-sans);font-size:11px">{y}</text>
+          ))
+        }
+      </svg>
+    </div>
+    <p class="ref-caption">
+      The two great peaks are 1929 and the {c.max.cape} record of {c.max.year}
+      (the dot-com bubble); the {c.min.cape} trough came in {c.min.year}. Today's
+      reading sits near the top of that whole range.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>What it does — and doesn't — tell you</h2>
+    <div class="ref-callout">
+      <p>
+        <strong>A high CAPE is not a sell signal.</strong> It has essentially no
+        power to predict next year's return, and the market can stay expensive for
+        many years — it has been above its historical average for most of the last
+        three decades. As a timing tool it's useless.
+      </p>
+      <p>
+        <strong>What it weakly tracks is long-run returns.</strong> Historically, a
+        higher starting CAPE has gone with somewhat <em>lower</em> average real
+        returns over the following 10–15 years — a loose tendency, not a guarantee,
+        and one with a wide margin of error.
+      </p>
+      <p>
+        <strong>Comparisons across a century deserve caution.</strong> Accounting
+        rules, tax, interest rates, buybacks, and the mix of industries have all
+        changed, so some argue a permanently higher CAPE is now justified. Treat it
+        as context for your expectations, not a recommendation to act — nothing here
+        is financial advice.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["shiller"]}
+      studies={["campbellShiller1988", "shiller2000"]}
+      title="Sources &amp; method"
+      intro="CAPE from Robert Shiller's ie_data.xls. Refresh with npm run data:cape."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools/beat-the-market" class="card">
+          <h3>Why timing fails</h3>
+          <p>
+            Even a valuation this stretched is a poor timing signal. The
+            Beat-the-Market tool shows how hard it is to profit from calling tops.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/historical-returns" class="card">
+          <h3>Long-run returns</h3>
+          <p>
+            See the real returns stocks have delivered across every valuation
+            regime, expensive and cheap alike.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
