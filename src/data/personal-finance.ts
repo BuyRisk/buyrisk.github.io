@@ -12,6 +12,12 @@ import type { Tool } from "./tools";
 /** Live Personal Finance tools, in learning order. */
 export const PF_TOOLS: Tool[] = [
   {
+    title: "Debt Payoff: Avalanche vs. Snowball",
+    href: "/personal-finance/debt-payoff",
+    blurb:
+      "Compare the two payoff strategies on your own debts — highest-rate-first vs. smallest-balance-first — and see months to debt-free, total interest, and whether a rate is high enough to refinance.",
+  },
+  {
     title: "Rent or Buy?",
     href: "/personal-finance/rent-vs-buy",
     blurb:
