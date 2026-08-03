@@ -79,6 +79,13 @@ export const TOOLS: Tool[] = [
       "Funding and spending retirement: what it costs and whether your money lasts, the big Social Security claiming decision (including survivor and tax/IRMAA cases), and choosing Roth vs. Traditional (and grabbing the employer match).",
   },
   {
+    title: "The Tax Drag: What a Taxable Account Costs",
+    href: "/tools/tax-drag",
+    blurb:
+      "Tax on a taxable account isn't a one-off haircut — it's a leak that compounds. Watch the gap between a sheltered and a taxable account widen year by year, then break the drag into its sources: dividends, fund turnover, and the capital-gains tax finally due at sale.",
+    tag: "New",
+  },
+  {
     title: "Asset Location: Which Account Holds What",
     href: "/tools/asset-location",
     blurb:

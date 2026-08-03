@@ -203,6 +203,15 @@ export const STUDIES: Record<string, Study> = {
   },
 
   // --- Market efficiency & active management ------------------------------
+  dicksonShoven1995: {
+    authors: "Dickson, J. M., & Shoven, J. B.",
+    year: 1995,
+    title: "Taxation and Mutual Funds: An Investor Perspective",
+    venue: "Tax Policy and the Economy 9: 151–180",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "Quantifies how fund turnover and distributions erode after-tax returns.",
+  },
   samuelson1965: {
     authors: "Samuelson, P. A.",
     year: 1965,
@@ -574,6 +583,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "asset-location": {
     studies: ["dammonSpattZhang2004"],
+    datasets: [],
+  },
+  "tax-drag": {
+    studies: ["dicksonShoven1995", "sharpe1991"],
     datasets: [],
   },
 };

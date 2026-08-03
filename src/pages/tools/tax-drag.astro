@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TaxDragLab from "../../components/TaxDragLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="The Tax Drag: What a Taxable Account Costs"
+  description="Tax on a taxable account isn't a one-off haircut — it's a leak that compounds. Watch the gap between a sheltered and a taxable account widen year by year, and see exactly where the drag comes from."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>The tax drag, over time</h1>
+    <p class="lede">
+      Hold the same investment in a tax-sheltered account and in a taxable one,
+      and the two don't just finish apart — they <em>drift</em> apart, a little
+      more every year. Every dollar paid in tax along the way is a dollar that
+      never compounds again. Watch the gap open up, then see what actually
+      causes it.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <TaxDragLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Why the drag compounds</h2>
+      <ul>
+        <li>
+          <strong>Tax paid along the way never compounds.</strong> Dividends and
+          the gains a fund distributes are taxed the year they happen, even if you
+          reinvest. That's money pulled out of the compounding machine forever, so
+          the shortfall grows faster than the tax itself.
+        </li>
+        <li>
+          <strong>Turnover is the villain.</strong> A fund that trades a lot is
+          forced to realize and hand you gains every year, much of it short-term
+          and taxed at your ordinary rate. A broad index fund barely turns over,
+          so it defers almost everything. This is a big, underrated reason indexing
+          wins after tax.
+        </li>
+        <li>
+          <strong>Deferral is a superpower.</strong> The capital-gains tax you owe
+          at the end is often the smallest slice, because it waited decades before
+          coming due, letting the whole balance compound in the meantime. Not
+          selling is itself a tax strategy.
+        </li>
+      </ul>
+      <p>
+        This models a single lump sum with no state taxes or tax-loss harvesting,
+        to keep the mechanism clear. It's the case for sheltering what you can and
+        holding tax-efficient funds where you can't. Educational only, not
+        financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="tax-drag" />
+
+  <NextTool current="/tools/tax-drag" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>
