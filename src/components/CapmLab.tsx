@@ -389,8 +389,8 @@ function RealSML() {
         CAPM says return should rise <strong>{(d.marketExcess * 100).toFixed(1)}%</strong> per unit
         of beta. In the real data it rises only <strong>{(d.empiricalSlope * 100).toFixed(1)}%</strong>.
         The line is too flat. Low-beta industries (like {lowest.name.toLowerCase()}) beat their
-        beta; high-beta ones lag. That gap is the "betting against beta" anomaly, and the reason
-        beta alone isn't the whole story.
+        beta; high-beta ones lag. That gap is the <strong>low-beta paradox</strong> (the "betting
+        against beta" anomaly), and the reason beta alone isn't the whole story.
       </p>
     </div>
   );
