@@ -113,4 +113,11 @@ export const TOOLS: Tool[] = [
       "Match, debt, Roth, or brokerage? The order you fund things in beats almost any single investment choice. Check off what you've handled and see the one next step in the priority ladder — and the logic that ranks it there. (US accounts.)",
     tag: "New",
   },
+  {
+    title: "Home Bias: How Much of the World Do You Own?",
+    href: "/tools/home-bias",
+    blurb:
+      "A globally diversified investor holds each country in proportion to its size — almost nobody does. Pick your home market, see how small a slice of the world it really is, and what tilting toward home costs you in diversification.",
+    tag: "New",
+  },
 ];

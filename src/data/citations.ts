@@ -305,6 +305,15 @@ export const STUDIES: Record<string, Study> = {
   },
 
   // --- Diversification & return concentration -----------------------------
+  frenchPoterba1991: {
+    authors: "French, K. R., & Poterba, J. M.",
+    year: 1991,
+    title: "Investor Diversification and International Equity Markets",
+    venue: "American Economic Review 81(2): 222–226",
+    kind: "paper",
+    category: "Diversification & return concentration",
+    note: "The classic documentation of home bias: investors hold far more domestic equity than market weights imply.",
+  },
   evansArcher1968: {
     authors: "Evans, J. L., & Archer, S. H.",
     year: 1968,
@@ -615,5 +624,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   "next-dollar": {
     studies: [],
     datasets: ["bogleheads"],
+  },
+  "home-bias": {
+    studies: ["frenchPoterba1991"],
+    datasets: ["ftseGlobalAllCap", "vanguardVT"],
   },
 };

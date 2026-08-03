@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import HomeBiasLab from "../../components/HomeBiasLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Home Bias: How Much of the World Do You Own?"
+  description="A globally diversified investor holds each country in proportion to its size. Almost nobody does. Pick your home market and see how small a slice of the world it really is — and what tilting toward home does to your diversification."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>How much of the world do you own?</h1>
+    <p class="lede">
+      Own the whole market, and you own it in proportion to each country's size —
+      no bets on which nation wins next. Yet almost everyone piles into their home
+      market far beyond its weight in the world. Pick where you invest from and
+      see how big that tilt really is, and what it costs in diversification.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <HomeBiasLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The case for owning the world</h2>
+      <ul>
+        <li>
+          <strong>No country is the whole market.</strong> Even the US, the
+          largest, is under two-thirds of global stock value; most home markets are
+          a few percent or less. Holding only your home market means skipping most
+          of the world's companies.
+        </li>
+        <li>
+          <strong>Leadership rotates.</strong> The US led the 2010s; international
+          stocks led the 2000s; Japan was a third of the world before a
+          decades-long slump. Each era's winner felt obvious only in hindsight, and
+          market-cap weighting quietly owns whoever is winning without having to
+          guess.
+        </li>
+        <li>
+          <strong>Some home tilt is reasonable.</strong> You spend in your home
+          currency, and home stocks can be cheaper to hold and more tax-friendly.
+          A modest tilt is defensible; a large one is a concentrated bet on a single
+          country's next few decades.
+        </li>
+      </ul>
+      <p>
+        This is the humility of indexing taken global: rather than guess the next
+        winning country, own them all in proportion and rebalance as the map
+        changes. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="home-bias" />
+
+  <NextTool current="/tools/home-bias" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>
