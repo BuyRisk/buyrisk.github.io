@@ -428,6 +428,18 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.irs.gov/pub/irs-drop/rp-25-19.pdf",
     note: "Inflation-adjusted HSA contribution limits and HDHP parameters for 2026.",
   },
+  irsPub915: {
+    name: "Publication 915: Social Security and Equivalent Railroad Retirement Benefits",
+    publisher: "Internal Revenue Service",
+    url: "https://www.irs.gov/publications/p915",
+    note: "The worksheet for how much of a Social Security benefit is federally taxable.",
+  },
+  cmsIrmaa: {
+    name: "2026 Medicare Parts B & D Premiums (IRMAA)",
+    publisher: "Centers for Medicare & Medicaid Services",
+    url: "https://www.cms.gov/newsroom/fact-sheets",
+    note: "Income-related monthly adjustment amounts and tiers, based on MAGI from two years prior.",
+  },
   jst: {
     name: "The Jordà-Schularick-Taylor Macrohistory Database",
     publisher: "macrohistory.net",
@@ -515,6 +527,6 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   retirement: {
     studies: ["bengen1994", "cooley1998", "shovenSlavov2014"],
-    datasets: ["damodaran", "shiller", "ssa"],
+    datasets: ["damodaran", "shiller", "ssa", "irsPub915", "cmsIrmaa"],
   },
 };

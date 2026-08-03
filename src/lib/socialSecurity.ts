@@ -1,4 +1,10 @@
 import { socialSecurity } from "../data/generated/social-security";
+import {
+  taxableSocialSecurity,
+  irmaaAnnual,
+  irmaaTierIndex,
+  type FilingStatus,
+} from "../data/tax-irmaa";
 
 /**
  * A Social Security claiming optimizer, in the spirit of Mike Piper's Open Social
@@ -89,6 +95,35 @@ export interface AgePoint {
   npv: number; // survival-weighted present value from currentAge
 }
 
+/**
+ * Optional "Advanced" tax + IRMAA layer. When present, the optimizer values the
+ * *after-tax* benefit stream: it subtracts federal tax on the taxable portion of
+ * benefits and the marginal Medicare IRMAA surcharge the benefit triggers (from
+ * age 65). Everything is in today's dollars; `otherIncome` is assumed constant.
+ */
+export interface TaxParams {
+  filing: FilingStatus;
+  /** Annual non-SS income that counts toward provisional income & MAGI (today's $). */
+  otherIncome: number;
+  /** Marginal tax rate applied to the taxable portion of benefits (percent). */
+  marginalRate: number;
+}
+
+export interface TaxInfo {
+  /** Fraction of the benefit that is federally taxable, at the best claim age. */
+  taxablePct: number;
+  /** Annual federal tax on benefits, at the best claim age (today's $). */
+  annualTax: number;
+  /** Marginal annual IRMAA surcharge the benefit triggers (age 65+, today's $). */
+  annualIrmaa: number;
+  /** IRMAA tier (1 = no surcharge … 6 = top) at the best claim's MAGI. */
+  irmaaTier: number;
+  /** Survival-weighted PV ignoring tax & IRMAA, for side-by-side comparison. */
+  grossNpv: number;
+  /** Net monthly benefit after tax & IRMAA once on Medicare, at the best claim. */
+  netMonthly65Plus: number;
+}
+
 export interface OptimizeResult {
   fraMonths: number;
   hazardMult: number;
@@ -96,6 +131,7 @@ export interface OptimizeResult {
   best: { ageMonths: number; monthly: number; npv: number };
   points: AgePoint[]; // one per whole claim age 62..70
   breakevenAge: number; // 62-vs-70 cumulative crossover
+  tax?: TaxInfo; // present only when a tax layer was supplied
 }
 
 export interface OptimizeInput {
@@ -104,6 +140,7 @@ export interface OptimizeInput {
   currentAge: number; // age at the decision point
   discountRate: number; // real, percent
   health: Health;
+  tax?: TaxParams; // optional Advanced tax + IRMAA layer
 }
 
 export function optimize(inp: OptimizeInput): OptimizeResult {
@@ -122,14 +159,38 @@ export function optimize(inp: OptimizeInput): OptimizeResult {
 
   const d = inp.discountRate / 100;
   const nowMonth = inp.currentAge * 12;
+  const tax = inp.tax;
+
+  // Annual tax + marginal-IRMAA charge for a given gross annual benefit. The
+  // IRMAA figure is the *incremental* surcharge the benefit causes (MAGI with vs.
+  // without the taxable benefit), so income the person owes regardless isn't
+  // charged to the claim decision.
+  const charges = (annualGross: number) => {
+    if (!tax || annualGross <= 0) return { taxAnnual: 0, irmaaAnnual: 0, taxable: 0, tier: 1 };
+    const taxable = taxableSocialSecurity(annualGross, tax.otherIncome, tax.filing);
+    const taxAnnual = taxable * (tax.marginalRate / 100);
+    const magiWith = tax.otherIncome + taxable;
+    const irmaa = irmaaAnnual(magiWith, tax.filing) - irmaaAnnual(tax.otherIncome, tax.filing);
+    return { taxAnnual, irmaaAnnual: Math.max(0, irmaa), taxable, tier: irmaaTierIndex(magiWith, tax.filing) };
+  };
+
+  // Survival-weighted PV of the net (after tax & IRMAA) stream. IRMAA applies
+  // only from age 65 (Medicare); benefit taxation applies at every age.
   const pv = (claimMonth: number) => {
     const monthly = inp.pia * benefitFactor(claimMonth, fra);
-    let total = 0;
+    const c = charges(monthly * 12);
+    const taxM = c.taxAnnual / 12;
+    const irmaaM = c.irmaaAnnual / 12;
+    let net = 0;
+    let gross = 0;
     for (let m = claimMonth; m <= 119 * 12 + 11; m++) {
       const age = Math.floor(m / 12);
-      total += (monthly * S[age]) / Math.pow(1 + d, (m - nowMonth) / 12);
+      const disc = Math.pow(1 + d, (m - nowMonth) / 12);
+      const w = S[age] / disc;
+      gross += monthly * w;
+      net += (monthly - taxM - (age >= 65 ? irmaaM : 0)) * w;
     }
-    return { monthly, npv: total };
+    return { monthly, npv: net, grossNpv: gross };
   };
 
   const startMonth = Math.max(62 * 12, Math.round(inp.currentAge * 12));
@@ -150,7 +211,20 @@ export function optimize(inp: OptimizeInput): OptimizeResult {
   const m70 = inp.pia * benefitFactor(70 * 12, fra);
   const breakevenAge = (70 * m70 - 62 * m62) / (m70 - m62);
 
-  return { fraMonths: fra, hazardMult: mult, lifeExpectancy, best, points, breakevenAge };
+  let taxInfo: TaxInfo | undefined;
+  if (tax) {
+    const c = charges(best.monthly * 12);
+    taxInfo = {
+      taxablePct: best.monthly > 0 ? c.taxable / (best.monthly * 12) : 0,
+      annualTax: c.taxAnnual,
+      annualIrmaa: c.irmaaAnnual,
+      irmaaTier: c.tier,
+      grossNpv: best.grossNpv,
+      netMonthly65Plus: best.monthly - c.taxAnnual / 12 - c.irmaaAnnual / 12,
+    };
+  }
+
+  return { fraMonths: fra, hazardMult: mult, lifeExpectancy, best, points, breakevenAge, tax: taxInfo };
 }
 
 // ---- Couple / survivor-aware optimization -------------------------------------

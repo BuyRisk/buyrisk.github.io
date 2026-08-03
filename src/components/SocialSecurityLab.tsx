@@ -13,6 +13,7 @@ import {
   type CoupleResult,
 } from "../lib/socialSecurity";
 import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
+import { IRMAA, type FilingStatus } from "../data/tax-irmaa";
 
 /**
  * A survival-weighted Social Security claiming optimizer, our take on Mike
@@ -72,17 +73,24 @@ export default function SocialSecurityLab() {
   const [smokingB, setSmokingB] = useState<Smoking>("never");
   const [exerciseB, setExerciseB] = useState<Exercise>("moderate");
   const [discountRate, setDiscountRate] = useState(2);
+  // Advanced tax + IRMAA layer (single mode only).
+  const [advanced, setAdvanced] = useState(false);
+  const [filing, setFiling] = useState<FilingStatus>("single");
+  const [otherIncome, setOtherIncome] = useState(30000);
+  const [marginalRate, setMarginalRate] = useState(22);
+  const taxParams =
+    advanced && mode === "single" ? { filing, otherIncome, marginalRate } : undefined;
 
   const health = { sex, smoking, exercise };
   const result = useMemo(
-    () => optimize({ pia, birthYear, currentAge, discountRate, health }),
-    [pia, birthYear, currentAge, discountRate, sex, smoking, exercise]
+    () => optimize({ pia, birthYear, currentAge, discountRate, health, tax: taxParams }),
+    [pia, birthYear, currentAge, discountRate, sex, smoking, exercise, advanced, mode, filing, otherIncome, marginalRate]
   );
   // Population-average reference (former/moderate ⇒ hazard multiplier 1.0), to
   // isolate the health "premium".
   const ref = useMemo(
-    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" } }),
-    [pia, birthYear, currentAge, discountRate, sex]
+    () => optimize({ pia, birthYear, currentAge, discountRate, health: { sex, smoking: "former", exercise: "moderate" }, tax: taxParams }),
+    [pia, birthYear, currentAge, discountRate, sex, advanced, mode, filing, otherIncome, marginalRate]
   );
   const couple = useMemo(
     () =>
@@ -105,6 +113,7 @@ export default function SocialSecurityLab() {
     setPia(2400); setBirthYear(1965); setCurrentAge(62); setSex("male"); setSmoking("former"); setExercise("moderate");
     setPiaB(1200); setBirthYearB(1967); setCurrentAgeB(60); setSexB("female"); setSmokingB("never"); setExerciseB("moderate");
     setDiscountRate(2);
+    setAdvanced(false); setFiling("single"); setOtherIncome(30000); setMarginalRate(22);
   };
 
   return (
@@ -144,6 +153,54 @@ export default function SocialSecurityLab() {
           </span>
           <input type="range" min={0} max={8} step={0.5} value={discountRate} onChange={(e) => setDiscountRate(Number(e.target.value))} />
         </label>
+
+        {mode === "single" && (
+          <div style={{ marginTop: "0.8rem", paddingTop: "0.8rem", borderTop: "var(--border)" }}>
+            <div className="wl-field">
+              <span className="wl-field-label">
+                Detail level
+                <InfoTip text="Advanced adds federal taxation of your benefits and Medicare IRMAA surcharges. It needs a few more inputs and is only a rough estimate to inform a conversation with a professional." />
+              </span>
+              <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Detail level">
+                <button type="button" className={!advanced ? "active" : ""} aria-pressed={!advanced} onClick={() => setAdvanced(false)}>Simple</button>
+                <button type="button" className={advanced ? "active" : ""} aria-pressed={advanced} onClick={() => setAdvanced(true)}>Advanced: tax &amp; IRMAA</button>
+              </div>
+            </div>
+
+            {advanced && (
+              <div style={{ marginTop: "0.7rem" }}>
+                <Segmented
+                  label="Tax filing status"
+                  value={filing}
+                  onChange={setFiling}
+                  options={[{ value: "single", label: "Single" }, { value: "married", label: "Married (joint)" }]}
+                />
+                <label className="wl-slider">
+                  <span>
+                    Other annual income
+                    <InfoTip text="Your non-Social-Security taxable income in today's dollars: pensions, IRA/401(k) withdrawals, wages, interest, dividends, plus any tax-exempt interest. Assumed constant. It drives how much of your benefit is taxed and your IRMAA tier." />{" "}
+                    <strong>{currency(otherIncome)}</strong>
+                  </span>
+                  <input type="range" min={0} max={300000} step={5000} value={otherIncome} onChange={(e) => setOtherIncome(Number(e.target.value))} />
+                </label>
+                <label className="wl-slider">
+                  <span>
+                    Marginal tax rate
+                    <InfoTip text="The rate applied to the taxable portion of your benefits. Use your combined federal (and, if you wish, state) marginal bracket." />{" "}
+                    <strong>{marginalRate}%</strong>
+                  </span>
+                  <input type="range" min={0} max={45} step={1} value={marginalRate} onChange={(e) => setMarginalRate(Number(e.target.value))} />
+                </label>
+                <div style={{ marginTop: "0.6rem", padding: "0.6rem 0.85rem", borderLeft: "3px solid var(--color-warn)", background: "color-mix(in srgb, var(--color-warn) 10%, transparent)", borderRadius: "0 8px 8px 0", fontSize: "var(--step--1)", color: "var(--color-text-soft)", lineHeight: 1.5 }}>
+                  <strong style={{ color: "var(--color-text)" }}>A best guess, not a filing recommendation.</strong>{" "}
+                  This adds taxes and IRMAA with real simplifications: constant income, {IRMAA.year} brackets, no RMDs, ACA, state specifics, or the two-year IRMAA lookback. Claiming is an <strong style={{ color: "var(--color-text)" }}>irreversible, once-in-a-lifetime decision</strong>. Please consult a qualified tax or financial professional, and cross-check with{" "}
+                  <a href="https://opensocialsecurity.com" target="_blank" rel="noopener noreferrer">Open Social Security</a>, before you claim.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <p className="wl-note" style={{ marginTop: "0.4rem" }}>
           {mode === "single" ? (
             <>Single-earner teaching model: no spousal, survivor, tax, or earnings-test rules.</>
@@ -194,6 +251,25 @@ export default function SocialSecurityLab() {
                 ({currency(result.best.npv)} in today's dollars). Breakeven for
                 delaying to 70 is about age <strong>{result.breakevenAge.toFixed(0)}</strong>.
               </p>
+              {result.tax && (
+                <p className="wl-fnote" style={{ marginTop: "0.5rem" }}>
+                  <strong>After tax &amp; IRMAA:</strong> about{" "}
+                  <strong>{(result.tax.taxablePct * 100).toFixed(0)}%</strong> of the
+                  benefit is federally taxable, trimming lifetime value from{" "}
+                  {currency(result.tax.grossNpv)} before tax to {currency(result.best.npv)}.{" "}
+                  {result.tax.annualIrmaa > 0 ? (
+                    <>
+                      Claiming at the optimum also lands you in <strong>IRMAA tier{" "}
+                      {result.tax.irmaaTier}</strong>, about{" "}
+                      <strong>{currency(result.tax.annualIrmaa)}/yr</strong> in extra
+                      Medicare surcharges from age 65.
+                    </>
+                  ) : (
+                    <>At this income, claiming doesn't trigger an added Medicare (IRMAA)
+                      surcharge (you're in tier {result.tax.irmaaTier}).</>
+                  )}
+                </p>
+              )}
             </div>
 
             <div className="wl-readout ss-health">
