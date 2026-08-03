@@ -78,4 +78,11 @@ export const TOOLS: Tool[] = [
     blurb:
       "Funding and spending retirement: what it costs and whether your money lasts, the big Social Security claiming decision (including survivor and tax/IRMAA cases), and choosing Roth vs. Traditional (and grabbing the employer match).",
   },
+  {
+    title: "Asset Location: Which Account Holds What",
+    href: "/tools/asset-location",
+    blurb:
+      "Same portfolio, same allocation, same tax rates — but which account holds your bonds versus your stocks changes your after-tax wealth. See why the tax-hungry asset belongs in your tax-advantaged account.",
+    tag: "New",
+  },
 ];

@@ -85,6 +85,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Portfolio theory",
     note: "The classic analysis of buy-and-hold vs. rebalancing (constant-mix): rebalancing trades a little return for lower, steadier risk.",
   },
+  dammonSpattZhang2004: {
+    authors: "Dammon, R. M., Spatt, C. S., & Zhang, H. H.",
+    year: 2004,
+    title: "Optimal Asset Location and Allocation with Taxable and Tax-Deferred Investing",
+    venue: "The Journal of Finance 59(3): 999–1037",
+    kind: "paper",
+    category: "Portfolio theory",
+    note: "Formalizes asset location: hold the more heavily-taxed asset (bonds) in the tax-deferred account.",
+  },
 
   // --- Asset pricing & the CAPM -------------------------------------------
   treynor1962: {
@@ -562,5 +571,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   rebalancing: {
     studies: ["markowitz1952", "peroldSharpe1988"],
     datasets: ["damodaran"],
+  },
+  "asset-location": {
+    studies: ["dammonSpattZhang2004"],
+    datasets: [],
   },
 };
