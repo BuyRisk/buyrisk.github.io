@@ -1,0 +1,138 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import LiveRatesLab from "../../components/LiveRatesLab.tsx";
+import { bondYields } from "../../data/generated/bond-yields";
+import "../../styles/info.css";
+
+// Normalise the static snapshot to the same maturity labels the live CSV uses,
+// so it drops in cleanly as the fallback when the live fetch can't run.
+const LABEL_BY_YEARS: Record<string, string> = {
+  "0.25": "3 Mo", "0.5": "6 Mo", "1": "1 Yr", "2": "2 Yr", "3": "3 Yr",
+  "5": "5 Yr", "7": "7 Yr", "10": "10 Yr", "20": "20 Yr", "30": "30 Yr",
+};
+const fallbackCurve = bondYields.curve.map((pt) => ({
+  label: LABEL_BY_YEARS[String(pt.years)] ?? pt.label,
+  years: pt.years,
+  yield: pt.yield,
+}));
+---
+
+<BaseLayout
+  title="Live Treasury Rates"
+  description="Today's US Treasury yield curve, fetched live from the Treasury's public feed in your browser — 1 month to 30 years, plus the 2s10s spread. Falls back to a monthly snapshot if the live feed is unavailable."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>Live Treasury rates</h1>
+    <p class="ref-lede">
+      A rate that's a month old is often just wrong, so this page doesn't paste a
+      number — it pulls today's <strong>US Treasury par yield curve</strong>
+      straight from the Treasury's public feed when your browser loads it. These
+      are the closest thing markets have to a risk-free benchmark, from one-month
+      bills to thirty-year bonds.
+    </p>
+    <p class="ref-asof">
+      Fetched live in your browser
+      <InfoNote text="The daily Constant Maturity Treasury (CMT) par yields, published by the U.S. Treasury near 3:30pm each trading day and fetched directly from their CSV feed. If that request can't complete, the page shows the repo's most recent monthly snapshot instead, labelled as such." />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <LiveRatesLab client:load fallback={{ asOf: bondYields.asOf, curve: fallbackCurve }} />
+  </section>
+
+  <section class="container ref-block">
+    <h2>How to read it</h2>
+    <p class="ref-prose">
+      The <strong>curve</strong> lines up what the government pays to borrow at
+      each maturity. An upward slope (longer = higher) is the normal, healthy
+      shape. When it <strong>inverts</strong> — short rates above long — it has
+      preceded most US recessions, though the lead time is loose and it's no
+      precise timer. The <strong>2s10s spread</strong> (10-year minus 2-year) is
+      the most-watched summary of that shape.
+    </p>
+    <p class="ref-prose">
+      This covers Treasury yields, the live piece. A fuller dashboard with Fed
+      funds, mortgage rates, and money-market yields needs a separate daily feed
+      and is still on the list.
+    </p>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["treasuryDaily"]}
+      title="Sources &amp; method"
+      intro="Daily Treasury Par Yield Curve Rates, fetched client-side from the U.S. Department of the Treasury's public CSV feed (no API key). Falls back to the repo's FRED-derived monthly snapshot when the live request can't complete."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/info/treasury-yields" class="card">
+          <h3>The curve, explained</h3>
+          <p>The snapshot page splits the 10-year into its real and inflation parts, and shows 70+ years of history.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Why bond prices move</h3>
+          <p>See how a bond's price falls when yields rise, and why longer bonds fall harder (duration).</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .lr-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-soft);
+    background: var(--color-surface);
+  }
+  .lr-status--live {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .lr-status--snapshot {
+    border-color: var(--color-warn);
+    color: var(--color-warn);
+    background: color-mix(in srgb, var(--color-warn) 8%, var(--color-surface));
+  }
+  .lr-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 60%, transparent);
+    animation: lr-pulse 2s infinite;
+  }
+  @keyframes lr-pulse {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent); }
+    70% { box-shadow: 0 0 0 8px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  @media (prefers-reduced-motion: reduce) { .lr-dot { animation: none; } }
+  .lr-chartwrap {
+    margin-top: var(--space-lg);
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: var(--space-md);
+  }
+</style>

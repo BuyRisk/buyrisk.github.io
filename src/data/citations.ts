@@ -517,6 +517,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.bogleheads.org/wiki/Prioritizing_investments",
     note: "The community 'order of operations' the Next Dollar ladder follows.",
   },
+  treasuryDaily: {
+    name: "Daily Treasury Par Yield Curve Rates",
+    publisher: "U.S. Department of the Treasury",
+    url: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve",
+    note: "The daily CMT par yields, fetched client-side from Treasury's public CSV feed (no API key).",
+  },
   jst: {
     name: "The Jordà-Schularick-Taylor Macrohistory Database",
     publisher: "macrohistory.net",

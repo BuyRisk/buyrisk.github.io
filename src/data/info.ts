@@ -55,6 +55,12 @@ export const INFO_PAGES: Tool[] = [
       "How prices have really risen — the headline CPI plus how differently college, healthcare, housing, cars, and electronics have moved since the 1970s.",
   },
   {
+    title: "Live Treasury Rates",
+    href: "/info/live-rates",
+    blurb:
+      "Today's US Treasury yield curve, fetched live from the Treasury's public feed when the page loads — 1 month to 30 years, plus the 2s10s recession gauge. Falls back to a monthly snapshot if the live feed is unavailable.",
+  },
+  {
     title: "Treasury Yields & the Yield Curve",
     href: "/info/treasury-yields",
     blurb:
@@ -89,8 +95,8 @@ export const INFO_PAGES: Tool[] = [
 /** Planned pages, shown as "coming soon" cards on /info. Not yet routes. */
 export const INFO_UPCOMING: { title: string; blurb: string }[] = [
   {
-    title: "Live Rates Dashboard",
+    title: "Fed Funds, Mortgages & Money-Market Yields",
     blurb:
-      "The always-current companion to the Treasury snapshot — Fed funds, mortgage rates, and money-market yields, refreshed automatically from official feeds.",
+      "Extending the live Treasury page with the other rates that matter — the Fed funds rate, 30-year mortgage rates, and money-market/HYSA yields — from a daily automated feed.",
   },
 ];
