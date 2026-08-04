@@ -26,8 +26,10 @@ export default defineConfig({
     '/tools/dollar-cost-averaging': '/tools/beat-the-market',
     '/tools/active-vs-passive': '/tools/beat-the-market',
     '/tools/burn-rate': '/tools/retirement',
-    '/tools/social-security': '/tools/retirement',
-    '/tools/roth-vs-traditional': '/tools/retirement',
+    // Social Security + Roth split out of the Playground into Personal Finance;
+    // the "will my money last" sim stays at /tools/retirement.
+    '/tools/social-security': '/personal-finance/retirement-accounts',
+    '/tools/roth-vs-traditional': '/personal-finance/retirement-accounts',
     '/tools/tax-drag': '/tools/taxes',
     '/tools/asset-location': '/tools/taxes',
     '/tools/home-bias': '/tools/global',

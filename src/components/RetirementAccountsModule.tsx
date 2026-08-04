@@ -1,20 +1,18 @@
 import ModuleTabs from "./ModuleTabs";
-import BurnRateLab from "./BurnRateLab";
 import SocialSecurityLab from "./SocialSecurityLab";
 import RothLab from "./RothLab";
 
 /**
- * Retirement & Roth module: funding and drawing down the nest egg.
- *  • Burn rate: what retirement costs, the nest egg it implies, and whether it lasts.
- *  • Social Security: when to claim the guaranteed inflation-adjusted income.
+ * Retirement Accounts module (Personal Finance): the two big US account
+ * decisions, split out from the investing-side "will my money last" sim.
+ *  • Social Security: when to claim the guaranteed, inflation-adjusted income.
  *  • Roth vs Traditional: which account, and the employer match to grab first.
  */
-export default function RetirementModule() {
+export default function RetirementAccountsModule() {
   return (
     <ModuleTabs
-      label="Funding and spending your retirement"
+      label="Your retirement accounts"
       tabs={[
-        { id: "burn", label: "What will it cost?", render: () => <BurnRateLab /> },
         { id: "ss", label: "When to claim Social Security", render: () => <SocialSecurityLab /> },
         { id: "roth", label: "Roth or Traditional?", render: () => <RothLab /> },
       ]}

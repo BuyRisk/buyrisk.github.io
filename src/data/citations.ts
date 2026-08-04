@@ -609,8 +609,12 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["french", "shiller", "spiva"],
   },
   retirement: {
-    studies: ["bengen1994", "cooley1998", "shovenSlavov2014"],
-    datasets: ["damodaran", "shiller", "ssa", "irsPub915", "cmsIrmaa"],
+    studies: ["bengen1994", "cooley1998"],
+    datasets: ["damodaran", "shiller"],
+  },
+  "retirement-accounts": {
+    studies: ["shovenSlavov2014"],
+    datasets: ["ssa", "irsPub915", "cmsIrmaa"],
   },
   options: {
     studies: ["black1973", "merton1973"],

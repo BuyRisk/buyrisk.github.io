@@ -1,52 +1,59 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import RetirementModule from "../../components/RetirementModule.tsx";
+import BurnRateLab from "../../components/BurnRateLab.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
 <BaseLayout
-  title="Retirement & Roth"
-  description="Everything about funding and drawing down retirement: what it will cost and whether your money lasts, when to claim Social Security, and how to choose between Roth and Traditional accounts (and grab the employer match)."
+  title="Will Your Money Last? Retirement Spending"
+  description="Turn the 4% rule around: your spending sets the nest egg you need, and guaranteed income shrinks it. Then stress-test the plan against real market history and see sequence-of-returns risk — whether your money survives bad luck, not just an average."
 >
   <section class="container wl-intro">
     <p class="eyebrow">Interactive Tool</p>
-    <h1>Funding (and spending) retirement</h1>
+    <h1>Will your money last?</h1>
     <p class="lede">
-      Retirement is two problems: building the pile, and living off it. See what your
-      spending implies for the nest egg you need and whether it survives real market
-      history; decide when to claim Social Security's guaranteed, inflation-adjusted
-      income; and choose the account (Roth or Traditional) that keeps the most after
-      tax, starting with the employer match you should never leave behind.
+      Retirement's second problem is living off the pile. Your spending sets the nest
+      egg you need — about 25× at a 4% withdrawal rate — and any guaranteed income
+      shrinks it. But an average hides the real danger: <em>sequence risk</em>, the
+      bad luck of poor early returns. Run your plan through real market history and
+      watch the whole spread of outcomes, not just the tidy average.
     </p>
   </section>
 
   <section class="container wl-host">
-    <RetirementModule client:load />
+    <BurnRateLab client:load />
   </section>
 
   <section class="container wl-explainer">
     <div class="prose">
-      <h2>The three levers</h2>
+      <h2>From spending to survival</h2>
       <ul>
         <li>
-          <strong>What it costs.</strong> Flip the 4% rule around: your spending sets
-          the nest egg you need (about 25× at 4%), and guaranteed income shrinks it.
-          A Monte Carlo over real history shows whether the plan survives bad luck.
+          <strong>Spending sets the target.</strong> Flip the 4% rule around: annual
+          spending ÷ withdrawal rate is the nest egg you need (about 25× at 4%). It's
+          the fastest way to turn a lifestyle into a number.
         </li>
         <li>
-          <strong>Social Security.</strong> Claiming later means bigger checks for
-          life, inflation-adjusted longevity insurance. The breakeven age, and a
-          spouse's survivor benefit, decide whether waiting pays.
+          <strong>Guaranteed income shrinks it.</strong> A pension or Social Security
+          check is subtracted from spending first, so only the remaining gap has to
+          come from the portfolio. Because of the 25× multiplier, even a modest
+          guaranteed income slashes the nest egg you need.
         </li>
         <li>
-          <strong>Roth or Traditional.</strong> It comes down to your tax rate now vs.
-          in retirement. And whatever you choose, capture the full employer match
-          first: an instant, guaranteed return nothing else matches.
+          <strong>Sequence risk is the real test.</strong> Two retirees with the same
+          average return can end up worlds apart if one meets a crash early. The
+          historical stress test runs your plan through hundreds of real market paths
+          so you see the odds it lasts, not just a single hopeful line.
         </li>
       </ul>
-      <p>Educational only, not financial advice.</p>
+      <p>
+        This is the drawdown half of retirement. The account decisions that get you
+        here — when to claim Social Security, and Roth vs. Traditional — now live in
+        the <a href="/personal-finance/retirement-accounts">Retirement Accounts tool</a>.
+        Educational only, not financial advice.
+      </p>
     </div>
   </section>
 

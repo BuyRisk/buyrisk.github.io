@@ -54,6 +54,12 @@ export const PF_TOOLS: Tool[] = [
       "Six quick questions place you on the risk/return spectrum and suggest a stock/bond starting point — scored across your ability, willingness, and need to take risk, with the honest reminder that the lowest of the three is the one that binds.",
   },
   {
+    title: "Retirement Accounts: Social Security & Roth",
+    href: "/personal-finance/retirement-accounts",
+    blurb:
+      "The two big US retirement-account decisions: when to claim Social Security (guaranteed, inflation-adjusted income you can't outlive) and whether to save Roth or Traditional — starting with the employer match you should never leave behind.",
+  },
+  {
     title: "Rent or Buy?",
     href: "/personal-finance/rent-vs-buy",
     blurb:

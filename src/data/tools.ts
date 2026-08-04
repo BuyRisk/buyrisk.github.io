@@ -80,10 +80,10 @@ export const TOOLS: Tool[] = [
     tag: "New",
   },
   {
-    title: "Retirement, Social Security & Roth",
+    title: "Will Your Money Last? Retirement Spending",
     href: "/tools/retirement",
     blurb:
-      "Funding and spending retirement: what it costs and whether your money lasts, the big Social Security claiming decision (including survivor and tax/IRMAA cases), and choosing Roth vs. Traditional (and grabbing the employer match).",
+      "Turn the 4% rule around: your spending sets the nest egg you need, and guaranteed income shrinks it. Then stress-test the plan against real market history to see sequence-of-returns risk — whether your money survives bad luck, not just an average.",
   },
   {
     title: "Taxes: The Drag & Asset Location",
