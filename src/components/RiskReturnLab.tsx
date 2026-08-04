@@ -63,9 +63,25 @@ const GROWTH: GrowthRow[] = (() => {
 const growthMoney = (v: number) => (v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${v.toFixed(0)}`);
 const GROWTH_SPAN = `${GROWTH[1].year}–${GROWTH[GROWTH.length - 1].year}`;
 
+// "Simplified" model: each asset compounds at its own steady long-run rate to
+// the SAME endpoint — a straight line on a log scale. Toggling to Historical
+// keeps the destination but restores the real, bumpy road (and the crashes).
+const SIMPLE: GrowthRow[] = (() => {
+  const n = GROWTH.length - 1;
+  const end = GROWTH[GROWTH.length - 1];
+  return GROWTH.map((r, i) => ({
+    year: r.year,
+    stocks: end.stocks ** (i / n),
+    bonds: end.bonds ** (i / n),
+    bills: end.bills ** (i / n),
+    infl: end.infl ** (i / n),
+  }));
+})();
+
 export default function RiskReturnLab() {
   const [risk, setRisk] = useState(0.194); // chosen volatility (default ≈ US stocks)
   const [showParadox, setShowParadox] = useState(true);
+  const [growthMode, setGrowthMode] = useState<"simplified" | "historical">("historical");
 
   const expected = FIT.a + FIT.b * risk;
   const tbills = A["tbills"], scv = A["small-cap-value"];
@@ -148,8 +164,14 @@ export default function RiskReturnLab() {
         </div>
 
         <div className="wl-frontier">
-          <h3>Watch it play out: the growth of $1, {GROWTH_SPAN}</h3>
-          <GrowthOverTimeChart />
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+            <h3 style={{ margin: 0 }}>Watch it play out: the growth of $1, {GROWTH_SPAN}</h3>
+            <div className="wl-simmode" role="group" aria-label="Growth view">
+              <button type="button" className={growthMode === "simplified" ? "active" : ""} aria-pressed={growthMode === "simplified"} onClick={() => setGrowthMode("simplified")}>Simplified</button>
+              <button type="button" className={growthMode === "historical" ? "active" : ""} aria-pressed={growthMode === "historical"} onClick={() => setGrowthMode("historical")}>Historical</button>
+            </div>
+          </div>
+          <GrowthOverTimeChart mode={growthMode} />
           <div className="wl-flegend">
             <span><span className="wl-fdot" style={{ background: "var(--pl-c1)" }} /> US stocks</span>
             <span><span className="wl-fdot" style={{ background: "var(--color-link)" }} /> Treasury bonds</span>
@@ -157,23 +179,38 @@ export default function RiskReturnLab() {
             <span><span className="wl-fdot" style={{ background: "var(--color-warn)", opacity: 0.7 }} /> Inflation</span>
           </div>
           <p className="wl-fnote">
-            The same lesson, over a lifetime: the <em>squiggliest</em> line — stocks — is also the one that ends far
-            highest, while the calm assets barely wiggle and barely grow. On this log scale every gridline is 10×, so a
-            straight-ish rise is steady compounding and the deep dips (1929, 2008…) are the crashes you had to sit through
-            to earn it. Nominal dollars; the dashed line is inflation — what $1 needed just to keep its purchasing power.
+            {growthMode === "simplified" ? (
+              <>Straightened out: each asset compounds at its own steady long-run rate, so on this log scale it's a straight
+              line to the same endpoint. Flip to <strong>Historical</strong> to see the bumpy road stocks actually took —
+              same destination, a wild ride.</>
+            ) : (
+              <>The <em>squiggliest</em> line — stocks — is also the one that ends far highest, while the calm assets barely
+              wiggle and barely grow. Every gridline is 10×, and the deep dips (1929, 2008…) are the crashes you had to sit
+              through to earn it.</>
+            )}{" "}
+            Nominal dollars; the dashed line is inflation — what $1 needed just to keep its purchasing power.
           </p>
+          <div className="rr-paradox">
+            <strong>The catch: this only holds when you're diversified.</strong> These lines are broad, whole-market
+            indices, and CAPM only pays you for the <em>market</em> risk you can't diversify away. Hold a single,
+            undiversified stock and you take on a pile of extra risk that earns nothing on average — most individual stocks
+            have historically trailed even T-bills, with a handful of winners carrying the whole market. The smooth model
+            describes the <em>basket</em>, not the ticket. (See <a href="/tools/stock-picking">Stock-Picking</a>.)
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function GrowthOverTimeChart() {
+function GrowthOverTimeChart({ mode }: { mode: "simplified" | "historical" }) {
+  const data = mode === "simplified" ? SIMPLE : GROWTH;
   const width = 760, height = 400;
   const pad = { top: 20, right: 78, bottom: 40, left: 44 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
-  const yr0 = GROWTH[0].year, yr1 = GROWTH[GROWTH.length - 1].year;
+  const yr0 = data[0].year, yr1 = data[data.length - 1].year;
+  // Axis fixed to the (shared) endpoints so the frame doesn't jump on toggle.
   const maxV = Math.max(...GROWTH.map((r) => r.stocks));
   const loLog = Math.log10(0.6), hiLog = Math.log10(maxV * 1.5);
   const x = (yr: number) => pad.left + ((yr - yr0) / (yr1 - yr0)) * plotW;
@@ -187,12 +224,12 @@ function GrowthOverTimeChart() {
     { key: "infl", color: "var(--color-warn)", dash: true },
   ];
   const path = (key: keyof GrowthRow) =>
-    GROWTH.map((r, i) => `${i === 0 ? "M" : "L"}${x(r.year).toFixed(1)},${y(r[key] as number).toFixed(1)}`).join(" ");
+    data.map((r, i) => `${i === 0 ? "M" : "L"}${x(r.year).toFixed(1)},${y(r[key] as number).toFixed(1)}`).join(" ");
 
   const decades: number[] = [];
   for (let p = Math.ceil(loLog); p <= Math.floor(hiLog); p++) decades.push(10 ** p);
   const xTicks = [1940, 1960, 1980, 2000, 2020].filter((t) => t >= yr0 && t <= yr1);
-  const last = GROWTH[GROWTH.length - 1];
+  const last = data[data.length - 1];
   // Space the end labels so the low three (bonds/bills/inflation) don't collide.
   const endYs = lines.map((l) => y(last[l.key] as number));
   const adjY = [...endYs];
