@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import { assetStats } from "../data/generated/asset-stats";
 import { historicalReturns } from "../data/generated/historical-returns";
+import { mulberry32, makeNormal } from "../lib/portfolio";
 
 /**
  * "Risk & return: the big idea" — the simplest, most important picture in
@@ -61,27 +62,68 @@ const GROWTH: GrowthRow[] = (() => {
   return rows;
 })();
 const growthMoney = (v: number) => (v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${v.toFixed(0)}`);
-const GROWTH_SPAN = `${GROWTH[1].year}–${GROWTH[GROWTH.length - 1].year}`;
 
-// "Simplified" model: each asset compounds at its own steady long-run rate to
-// the SAME endpoint — a straight line on a log scale. Toggling to Historical
-// keeps the destination but restores the real, bumpy road (and the crashes).
-const SIMPLE: GrowthRow[] = (() => {
-  const n = GROWTH.length - 1;
-  const end = GROWTH[GROWTH.length - 1];
-  return GROWTH.map((r, i) => ({
-    year: r.year,
-    stocks: end.stocks ** (i / n),
-    bonds: end.bonds ** (i / n),
-    bills: end.bills ** (i / n),
-    infl: end.infl ** (i / n),
-  }));
+// The three CAPM-consistent, diversified asset classes we grow over time.
+type AssetKey = "stocks" | "bonds" | "bills";
+const RR_ASSETS: { key: AssetKey; statKey: string; retKey: "stocks" | "tbonds" | "tbills"; label: string; color: string }[] = [
+  { key: "stocks", statKey: "us-stocks", retKey: "stocks", label: "US stocks", color: "var(--pl-c1)" },
+  { key: "bonds", statKey: "treasuries", retKey: "tbonds", label: "Treasury bonds", color: "var(--color-link)" },
+  { key: "bills", statKey: "tbills", retKey: "tbills", label: "T-bills (cash)", color: "var(--color-muted)" },
+];
+const NYEARS = GROWTH.length - 1;
+const INFL_REF = GROWTH.map((r) => r.infl); // real cumulative inflation, the "bar to beat"
+
+// "Simplified": one hypothetical path per asset drawn at that asset's real
+// long-run volatility (a static-vol random walk). Same idea as the scatter —
+// higher volatility means a wilder squiggle — but a clean model, not real history.
+const SIMPLE_PATHS: Record<AssetKey, number[]> = (() => {
+  const rng = mulberry32(20260804);
+  const norm = makeNormal(rng);
+  const last = GROWTH[GROWTH.length - 1];
+  const out = { stocks: [1], bonds: [1], bills: [1] } as Record<AssetKey, number[]>;
+  for (const a of RR_ASSETS) {
+    const sigma = assetStats.assets[a.statKey].sigma;
+    // De-mean the noise and set the drift so the path both wiggles by σ AND
+    // lands on the real historical endpoint (so stocks still finish highest).
+    const target = last[a.key];
+    const z = Array.from({ length: NYEARS }, () => norm());
+    const zbar = z.reduce((s, x) => s + x, 0) / NYEARS;
+    const muLog = Math.log(target) / NYEARS;
+    let cum = 0;
+    for (let t = 0; t < NYEARS; t++) { cum += muLog + sigma * (z[t] - zbar); out[a.key].push(Math.exp(cum)); }
+  }
+  return out;
+})();
+
+// "Historical": a block-bootstrap Monte Carlo of the REAL annual returns. Every
+// path draws one shared 5-year-block timeline (so the assets co-move within an
+// alternate history), giving each asset a cloud of paths plus a bold median.
+const MC_PATHS = 24, MC_BLOCK = 5;
+const MC: { paths: Record<AssetKey, number[][]>; medians: Record<AssetKey, number[]> } = (() => {
+  const rng = mulberry32(13572468);
+  const R = historicalReturns.series, N = R.length;
+  const paths: Record<AssetKey, number[][]> = { stocks: [], bonds: [], bills: [] };
+  for (let p = 0; p < MC_PATHS; p++) {
+    const idx: number[] = [];
+    let i = 0;
+    while (i < NYEARS) { const start = (rng() * N) | 0; for (let b = 0; b < MC_BLOCK && i < NYEARS; b++, i++) idx.push((start + b) % N); }
+    let s = 1, bd = 1, bl = 1;
+    const sA = [1], bA = [1], lA = [1];
+    for (const j of idx) { s *= 1 + R[j].stocks; bd *= 1 + R[j].tbonds; bl *= 1 + R[j].tbills; sA.push(s); bA.push(bd); lA.push(bl); }
+    paths.stocks.push(sA); paths.bonds.push(bA); paths.bills.push(lA);
+  }
+  const median = (arrs: number[][]) => {
+    const T = arrs[0].length, med = new Array<number>(T), col = new Array<number>(arrs.length);
+    for (let t = 0; t < T; t++) { for (let k = 0; k < arrs.length; k++) col[k] = arrs[k][t]; col.sort((a, b) => a - b); med[t] = col[col.length >> 1]; }
+    return med;
+  };
+  return { paths, medians: { stocks: median(paths.stocks), bonds: median(paths.bonds), bills: median(paths.bills) } };
 })();
 
 export default function RiskReturnLab() {
   const [risk, setRisk] = useState(0.194); // chosen volatility (default ≈ US stocks)
   const [showParadox, setShowParadox] = useState(true);
-  const [growthMode, setGrowthMode] = useState<"simplified" | "historical">("historical");
+  const [growthMode, setGrowthMode] = useState<"simplified" | "historical">("simplified");
 
   const expected = FIT.a + FIT.b * risk;
   const tbills = A["tbills"], scv = A["small-cap-value"];
@@ -126,6 +168,44 @@ export default function RiskReturnLab() {
 
       <div className="wl-stage">
         <div className="wl-frontier">
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
+            <h3 style={{ margin: 0 }}>Watch it play out: the growth of $1 over a lifetime</h3>
+            <div className="wl-simmode" role="group" aria-label="Growth view">
+              <button type="button" className={growthMode === "simplified" ? "active" : ""} aria-pressed={growthMode === "simplified"} onClick={() => setGrowthMode("simplified")}>Simplified</button>
+              <button type="button" className={growthMode === "historical" ? "active" : ""} aria-pressed={growthMode === "historical"} onClick={() => setGrowthMode("historical")}>Historical</button>
+            </div>
+          </div>
+          <GrowthOverTimeChart mode={growthMode} />
+          <div className="wl-flegend">
+            <span><span className="wl-fdot" style={{ background: "var(--pl-c1)" }} /> US stocks</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-link)" }} /> Treasury bonds</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-muted)" }} /> T-bills (cash)</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-warn)", opacity: 0.7 }} /> Inflation</span>
+          </div>
+          <p className="wl-fnote">
+            {growthMode === "simplified" ? (
+              <>Each line is <strong>one</strong> hypothetical path drawn at that asset's real long-run volatility — the
+              higher the volatility, the wilder the squiggle. Stocks lurch around and pull far ahead; cash barely moves,
+              and barely grows. Flip to <strong>Historical</strong> to swap this model for real-return Monte Carlo.</>
+            ) : (
+              <>Each faint line is <strong>one alternate history</strong>, stitched from real US return blocks; the bold
+              line is each asset's <strong>median</strong>. The stock cloud is vast — huge upside, but real runs that
+              disappoint — while cash barely spreads. More volatility means more uncertainty, and a higher typical
+              destination.</>
+            )}{" "}
+            Log scale (every gridline is 10×), nominal dollars; the dashed line is inflation — what $1 needed to keep its
+            purchasing power.
+          </p>
+          <div className="rr-paradox">
+            <strong>The catch: this only holds when you're diversified.</strong> These lines are broad, whole-market
+            indices, and CAPM only pays you for the <em>market</em> risk you can't diversify away. Hold a single,
+            undiversified stock and you take on a pile of extra risk that earns nothing on average — most individual stocks
+            have historically trailed even T-bills, with a handful of winners carrying the whole market. This describes the
+            <em> basket</em>, not the ticket. (See <a href="/tools/stock-picking">Stock-Picking</a>.)
+          </div>
+        </div>
+
+        <div className="wl-frontier">
           <h3>More risk, more reward — the century-long pattern</h3>
           <RiskReturnChart risk={risk} expected={expected} showParadox={showParadox} />
           <div className="wl-flegend">
@@ -162,85 +242,39 @@ export default function RiskReturnLab() {
             )}
           </div>
         </div>
-
-        <div className="wl-frontier">
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
-            <h3 style={{ margin: 0 }}>Watch it play out: the growth of $1, {GROWTH_SPAN}</h3>
-            <div className="wl-simmode" role="group" aria-label="Growth view">
-              <button type="button" className={growthMode === "simplified" ? "active" : ""} aria-pressed={growthMode === "simplified"} onClick={() => setGrowthMode("simplified")}>Simplified</button>
-              <button type="button" className={growthMode === "historical" ? "active" : ""} aria-pressed={growthMode === "historical"} onClick={() => setGrowthMode("historical")}>Historical</button>
-            </div>
-          </div>
-          <GrowthOverTimeChart mode={growthMode} />
-          <div className="wl-flegend">
-            <span><span className="wl-fdot" style={{ background: "var(--pl-c1)" }} /> US stocks</span>
-            <span><span className="wl-fdot" style={{ background: "var(--color-link)" }} /> Treasury bonds</span>
-            <span><span className="wl-fdot" style={{ background: "var(--color-muted)" }} /> T-bills (cash)</span>
-            <span><span className="wl-fdot" style={{ background: "var(--color-warn)", opacity: 0.7 }} /> Inflation</span>
-          </div>
-          <p className="wl-fnote">
-            {growthMode === "simplified" ? (
-              <>Straightened out: each asset compounds at its own steady long-run rate, so on this log scale it's a straight
-              line to the same endpoint. Flip to <strong>Historical</strong> to see the bumpy road stocks actually took —
-              same destination, a wild ride.</>
-            ) : (
-              <>The <em>squiggliest</em> line — stocks — is also the one that ends far highest, while the calm assets barely
-              wiggle and barely grow. Every gridline is 10×, and the deep dips (1929, 2008…) are the crashes you had to sit
-              through to earn it.</>
-            )}{" "}
-            Nominal dollars; the dashed line is inflation — what $1 needed just to keep its purchasing power.
-          </p>
-          <div className="rr-paradox">
-            <strong>The catch: this only holds when you're diversified.</strong> These lines are broad, whole-market
-            indices, and CAPM only pays you for the <em>market</em> risk you can't diversify away. Hold a single,
-            undiversified stock and you take on a pile of extra risk that earns nothing on average — most individual stocks
-            have historically trailed even T-bills, with a handful of winners carrying the whole market. The smooth model
-            describes the <em>basket</em>, not the ticket. (See <a href="/tools/stock-picking">Stock-Picking</a>.)
-          </div>
-        </div>
       </div>
     </div>
   );
 }
 
 function GrowthOverTimeChart({ mode }: { mode: "simplified" | "historical" }) {
-  const data = mode === "simplified" ? SIMPLE : GROWTH;
   const width = 760, height = 400;
-  const pad = { top: 20, right: 78, bottom: 40, left: 44 };
+  const pad = { top: 20, right: 72, bottom: 40, left: 46 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
-  const yr0 = data[0].year, yr1 = data[data.length - 1].year;
-  // Axis fixed to the (shared) endpoints so the frame doesn't jump on toggle.
-  const maxV = Math.max(...GROWTH.map((r) => r.stocks));
-  const loLog = Math.log10(0.6), hiLog = Math.log10(maxV * 1.5);
-  const x = (yr: number) => pad.left + ((yr - yr0) / (yr1 - yr0)) * plotW;
-  const y = (v: number) => pad.top + plotH - ((Math.log10(Math.max(v, 0.4)) - loLog) / (hiLog - loLog)) * plotH;
+  // Fixed log axis (stable across the toggle); x is years elapsed, 0..NYEARS.
+  const loLog = Math.log10(0.4), hiLog = Math.log10(300_000);
+  const x = (t: number) => pad.left + (t / NYEARS) * plotW;
+  const y = (v: number) => pad.top + plotH - ((Math.log10(Math.max(v, 0.3)) - loLog) / (hiLog - loLog)) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-
-  const lines: { key: keyof GrowthRow; color: string; dash: boolean }[] = [
-    { key: "stocks", color: "var(--pl-c1)", dash: false },
-    { key: "bonds", color: "var(--color-link)", dash: false },
-    { key: "bills", color: "var(--color-muted)", dash: false },
-    { key: "infl", color: "var(--color-warn)", dash: true },
-  ];
-  const path = (key: keyof GrowthRow) =>
-    data.map((r, i) => `${i === 0 ? "M" : "L"}${x(r.year).toFixed(1)},${y(r[key] as number).toFixed(1)}`).join(" ");
+  const pathOf = (arr: number[]) => arr.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
 
   const decades: number[] = [];
   for (let p = Math.ceil(loLog); p <= Math.floor(hiLog); p++) decades.push(10 ** p);
-  const xTicks = [1940, 1960, 1980, 2000, 2020].filter((t) => t >= yr0 && t <= yr1);
-  const last = data[data.length - 1];
-  // Space the end labels so the low three (bonds/bills/inflation) don't collide.
-  const endYs = lines.map((l) => y(last[l.key] as number));
+  const xTicks = [0, 20, 40, 60, 80].filter((t) => t <= NYEARS);
+
+  // End labels (single path in Simplified; the median in Historical), spaced apart.
+  const ends = RR_ASSETS.map((a) => ({ color: a.color, v: mode === "simplified" ? SIMPLE_PATHS[a.key][NYEARS] : MC.medians[a.key][NYEARS] }));
+  const endYs = ends.map((e) => y(e.v));
   const adjY = [...endYs];
-  const order = lines.map((_, i) => i).sort((a, b) => endYs[a] - endYs[b]);
+  const order = ends.map((_, i) => i).sort((a, b) => endYs[a] - endYs[b]);
   for (let k = 1; k < order.length; k++) {
     const prev = order[k - 1], cur = order[k];
     if (adjY[cur] - adjY[prev] < 13) adjY[cur] = adjY[prev] + 13;
   }
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Growth of one dollar over the long run: stocks, bonds, bills and inflation on a log scale">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Growth of one dollar over time: stocks, bonds, bills and inflation on a log scale">
       {decades.map((v) => (
         <g key={v}>
           <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" />
@@ -248,18 +282,31 @@ function GrowthOverTimeChart({ mode }: { mode: "simplified" | "historical" }) {
         </g>
       ))}
       {xTicks.map((t) => (
-        <text key={t} x={x(t)} y={height - pad.bottom + 18} textAnchor="middle" style={axisText}>{t}</text>
+        <text key={t} x={x(t)} y={height - pad.bottom + 18} textAnchor="middle" style={axisText}>{t === 0 ? "start" : `yr ${t}`}</text>
       ))}
-      {lines.map((l) => (
-        <path key={l.key} d={path(l.key)} fill="none" stroke={l.color} strokeWidth={l.key === "stocks" ? 2.4 : 1.8} strokeDasharray={l.dash ? "5 4" : undefined} opacity={l.dash ? 0.75 : 1} strokeLinejoin="round" />
-      ))}
-      {lines.map((l, i) => (
-        <text key={`end-${l.key}`} x={x(yr1) + 6} y={adjY[i] + 4} style={{ ...axisText, fill: l.color, fontWeight: 700, fontSize: 11 }}>
-          {growthMoney(last[l.key] as number)}
-        </text>
+      {/* inflation reference (dashed) */}
+      <path d={pathOf(INFL_REF)} fill="none" stroke="var(--color-warn)" strokeWidth={1.6} strokeDasharray="5 4" opacity={0.7} />
+      {mode === "simplified"
+        ? RR_ASSETS.map((a) => (
+            <path key={a.key} d={pathOf(SIMPLE_PATHS[a.key])} fill="none" stroke={a.color} strokeWidth={a.key === "stocks" ? 2.2 : 1.8} strokeLinejoin="round" />
+          ))
+        : (
+          <>
+            {RR_ASSETS.flatMap((a) =>
+              MC.paths[a.key].map((p, pi) => (
+                <path key={`${a.key}-${pi}`} d={pathOf(p)} fill="none" stroke={a.color} strokeWidth={0.7} opacity={0.12} />
+              )),
+            )}
+            {RR_ASSETS.map((a) => (
+              <path key={`med-${a.key}`} d={pathOf(MC.medians[a.key])} fill="none" stroke={a.color} strokeWidth={2.6} strokeLinejoin="round" />
+            ))}
+          </>
+        )}
+      {ends.map((e, i) => (
+        <text key={`end-${i}`} x={x(NYEARS) + 6} y={adjY[i] + 4} style={{ ...axisText, fill: e.color, fontWeight: 700, fontSize: 11 }}>{growthMoney(e.v)}</text>
       ))}
       <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Growth of $1 (log scale, nominal) · every gridline is 10×
+        Years invested → · growth of $1 (log scale, nominal)
       </text>
     </svg>
   );
