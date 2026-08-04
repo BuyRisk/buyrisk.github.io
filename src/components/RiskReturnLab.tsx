@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import { assetStats } from "../data/generated/asset-stats";
+import { historicalReturns } from "../data/generated/historical-returns";
 
 /**
  * "Risk & return: the big idea" — the simplest, most important picture in
@@ -44,6 +45,23 @@ function fitLadder() {
   return { a: my - b * mx, b };
 }
 const FIT = fitLadder();
+
+// Growth of $1 compounded by each year's nominal return, for stocks / 10-yr
+// Treasuries / T-bills, plus inflation as a "just to keep up" reference. Same
+// risk-return lesson as the scatter, played out over a century: the squiggliest
+// line (stocks) is also the one that climbs the highest.
+type GrowthRow = { year: number; stocks: number; bonds: number; bills: number; infl: number };
+const GROWTH: GrowthRow[] = (() => {
+  let s = 1, b = 1, t = 1, i = 1;
+  const rows: GrowthRow[] = [{ year: historicalReturns.series[0].year - 1, stocks: 1, bonds: 1, bills: 1, infl: 1 }];
+  for (const y of historicalReturns.series) {
+    s *= 1 + y.stocks; b *= 1 + y.tbonds; t *= 1 + y.tbills; i *= 1 + y.inflation;
+    rows.push({ year: y.year, stocks: s, bonds: b, bills: t, infl: i });
+  }
+  return rows;
+})();
+const growthMoney = (v: number) => (v >= 1000 ? `$${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `$${v.toFixed(0)}`);
+const GROWTH_SPAN = `${GROWTH[1].year}–${GROWTH[GROWTH.length - 1].year}`;
 
 export default function RiskReturnLab() {
   const [risk, setRisk] = useState(0.194); // chosen volatility (default ≈ US stocks)
@@ -128,8 +146,85 @@ export default function RiskReturnLab() {
             )}
           </div>
         </div>
+
+        <div className="wl-frontier">
+          <h3>Watch it play out: the growth of $1, {GROWTH_SPAN}</h3>
+          <GrowthOverTimeChart />
+          <div className="wl-flegend">
+            <span><span className="wl-fdot" style={{ background: "var(--pl-c1)" }} /> US stocks</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-link)" }} /> Treasury bonds</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-muted)" }} /> T-bills (cash)</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-warn)", opacity: 0.7 }} /> Inflation</span>
+          </div>
+          <p className="wl-fnote">
+            The same lesson, over a lifetime: the <em>squiggliest</em> line — stocks — is also the one that ends far
+            highest, while the calm assets barely wiggle and barely grow. On this log scale every gridline is 10×, so a
+            straight-ish rise is steady compounding and the deep dips (1929, 2008…) are the crashes you had to sit through
+            to earn it. Nominal dollars; the dashed line is inflation — what $1 needed just to keep its purchasing power.
+          </p>
+        </div>
       </div>
     </div>
+  );
+}
+
+function GrowthOverTimeChart() {
+  const width = 760, height = 400;
+  const pad = { top: 20, right: 78, bottom: 40, left: 44 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const yr0 = GROWTH[0].year, yr1 = GROWTH[GROWTH.length - 1].year;
+  const maxV = Math.max(...GROWTH.map((r) => r.stocks));
+  const loLog = Math.log10(0.6), hiLog = Math.log10(maxV * 1.5);
+  const x = (yr: number) => pad.left + ((yr - yr0) / (yr1 - yr0)) * plotW;
+  const y = (v: number) => pad.top + plotH - ((Math.log10(Math.max(v, 0.4)) - loLog) / (hiLog - loLog)) * plotH;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+
+  const lines: { key: keyof GrowthRow; color: string; dash: boolean }[] = [
+    { key: "stocks", color: "var(--pl-c1)", dash: false },
+    { key: "bonds", color: "var(--color-link)", dash: false },
+    { key: "bills", color: "var(--color-muted)", dash: false },
+    { key: "infl", color: "var(--color-warn)", dash: true },
+  ];
+  const path = (key: keyof GrowthRow) =>
+    GROWTH.map((r, i) => `${i === 0 ? "M" : "L"}${x(r.year).toFixed(1)},${y(r[key] as number).toFixed(1)}`).join(" ");
+
+  const decades: number[] = [];
+  for (let p = Math.ceil(loLog); p <= Math.floor(hiLog); p++) decades.push(10 ** p);
+  const xTicks = [1940, 1960, 1980, 2000, 2020].filter((t) => t >= yr0 && t <= yr1);
+  const last = GROWTH[GROWTH.length - 1];
+  // Space the end labels so the low three (bonds/bills/inflation) don't collide.
+  const endYs = lines.map((l) => y(last[l.key] as number));
+  const adjY = [...endYs];
+  const order = lines.map((_, i) => i).sort((a, b) => endYs[a] - endYs[b]);
+  for (let k = 1; k < order.length; k++) {
+    const prev = order[k - 1], cur = order[k];
+    if (adjY[cur] - adjY[prev] < 13) adjY[cur] = adjY[prev] + 13;
+  }
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Growth of one dollar over the long run: stocks, bonds, bills and inflation on a log scale">
+      {decades.map((v) => (
+        <g key={v}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" />
+          <text x={pad.left - 6} y={y(v) + 4} textAnchor="end" style={axisText}>{growthMoney(v)}</text>
+        </g>
+      ))}
+      {xTicks.map((t) => (
+        <text key={t} x={x(t)} y={height - pad.bottom + 18} textAnchor="middle" style={axisText}>{t}</text>
+      ))}
+      {lines.map((l) => (
+        <path key={l.key} d={path(l.key)} fill="none" stroke={l.color} strokeWidth={l.key === "stocks" ? 2.4 : 1.8} strokeDasharray={l.dash ? "5 4" : undefined} opacity={l.dash ? 0.75 : 1} strokeLinejoin="round" />
+      ))}
+      {lines.map((l, i) => (
+        <text key={`end-${l.key}`} x={x(yr1) + 6} y={adjY[i] + 4} style={{ ...axisText, fill: l.color, fontWeight: 700, fontSize: 11 }}>
+          {growthMoney(last[l.key] as number)}
+        </text>
+      ))}
+      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        Growth of $1 (log scale, nominal) · every gridline is 10×
+      </text>
+    </svg>
   );
 }
 
