@@ -641,6 +641,40 @@
   box-shadow: var(--shadow);
 }
 
+/* Shared intro equation block used on tool landing pages (compound growth,
+   CAPM, diversification): a mono formula alongside a plain-language key. */
+.intro-formula {
+  margin-top: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+}
+.intro-formula-eq {
+  font-family: var(--font-mono);
+  font-size: var(--step-2);
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.intro-formula-eq sup,
+.intro-formula-eq sub {
+  font-size: 0.6em;
+}
+.intro-formula-key {
+  font-size: var(--step--1);
+  color: var(--color-muted);
+  max-width: 44rem;
+}
+.intro-formula-key b {
+  color: var(--color-text-soft);
+  font-family: var(--font-mono);
+}
+.intro-formula-key sub {
+  font-size: 0.75em;
+}
+
 /* Low-beta paradox callout in the Risk & Return sub-tool. */
 .rr-paradox {
   margin-top: var(--space-md);
