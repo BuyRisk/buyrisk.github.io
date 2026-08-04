@@ -1163,6 +1163,7 @@ export default function CompoundGrowthExplorer() {
         )}
       </div>
 
+      <div className="cge-rightcol">
       {simMode === "historical" ? (
         <HistoricalGrowthPanel
           principal={principal}
@@ -1361,6 +1362,7 @@ export default function CompoundGrowthExplorer() {
             <a href="/tools/burn-rate">Stress-test it against your real costs →</a>
           </p>
         </div>
+      </div>
 
       {/* Lifecycle view is a deterministic companion; show it in every mode. */}
       {(

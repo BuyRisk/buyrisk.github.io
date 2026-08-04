@@ -597,35 +597,48 @@
   letter-spacing: 0.06em;
   color: var(--color-accent);
 }
-/* Override the pill look for module-level tabs → underlined tab bar. */
+/* Binder / folder-style tabs: each sub-tool is a raised tab with its own
+   background, border and rounded top, so it reads as clickable AT REST — not
+   only on hover. The active tab lifts (lighter fill, accent top edge, shadow)
+   and sits over the baseline "spine" so it reads as the open folder. */
 .module-tabs .wl-simmode {
   width: 100%;
   max-width: none;
-  gap: 0.15rem;
+  gap: 0.35rem;
   padding: 0;
   background: transparent;
   border-radius: 0;
   border-bottom: 2px solid var(--color-border);
+  flex-wrap: wrap;
+  align-items: flex-end;
 }
 .module-tabs .wl-simmode button {
   font-size: var(--step-0);
-  font-weight: 700;
-  padding: 0.6rem 1rem;
-  border-radius: 8px 8px 0 0;
-  border: none;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
+  font-weight: 600;
+  padding: 0.6rem 1.15rem;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: var(--color-surface-alt);
   color: var(--color-text-soft);
+  margin-bottom: -2px;
+  box-shadow: none;
+  transition: background var(--transition), color var(--transition),
+    border-color var(--transition);
 }
 .module-tabs .wl-simmode button:hover {
   color: var(--color-text);
-  background: var(--color-surface-alt);
+  background: var(--color-surface);
+  border-color: var(--color-accent);
 }
 .module-tabs .wl-simmode button.active {
-  background: transparent;
+  background: var(--color-surface);
   color: var(--color-accent);
-  box-shadow: none;
-  border-bottom-color: var(--color-accent);
+  font-weight: 700;
+  border-color: var(--color-accent);
+  border-top-width: 3px;
+  padding-top: calc(0.6rem - 2px);
+  box-shadow: var(--shadow);
 }
 
 /* Low-beta paradox callout in the Risk & Return sub-tool. */
@@ -939,6 +952,12 @@
   .cge {
     display: grid;
     gap: var(--space-md);
+  }
+  /* The output figure and the retirement box share the right column, so the
+     retirement box stays beside the controls (below the figure) instead of
+     wrapping into the left column. */
+  .cge-rightcol {
+    min-width: 0;
   }
   @media (min-width: 820px) {
     .cge {
