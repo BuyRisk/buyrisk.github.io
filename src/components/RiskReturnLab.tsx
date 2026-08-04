@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import { assetStats } from "../data/generated/asset-stats";
 import { historicalReturns } from "../data/generated/historical-returns";
+import { globalEquity } from "../data/generated/global-equity";
 import { mulberry32, makeNormal } from "../lib/portfolio";
 
 /**
@@ -46,6 +47,16 @@ function fitLadder() {
   return { a: my - b * mx, b };
 }
 const FIT = fitLadder();
+
+// Broad, diversified equity by region (Ken French, since 1990) — all
+// CAPM-consistent, yet realized returns over this window show US exceptionalism.
+const REGIONS = [
+  { key: "us", label: "US", mu: globalEquity.assets.us.mu, sigma: globalEquity.assets.us.sigma, color: "var(--pl-c1)" },
+  { key: "dev", label: "Developed ex-US", mu: globalEquity.assets.devExUs.mu, sigma: globalEquity.assets.devExUs.sigma, color: "var(--color-link)" },
+  { key: "em", label: "Emerging", mu: globalEquity.assets.emerging.mu, sigma: globalEquity.assets.emerging.sigma, color: "var(--color-warn)" },
+];
+const MAX_REG_MU = Math.max(...REGIONS.map((r) => r.mu));
+const G_SPAN = `${globalEquity.span[0].slice(0, 4)}–${globalEquity.span[1].slice(0, 4)}`;
 
 // Growth of $1 compounded by each year's nominal return, for stocks / 10-yr
 // Treasuries / T-bills, plus inflation as a "just to keep up" reference. Same
@@ -240,6 +251,31 @@ export default function RiskReturnLab() {
                 not <em>sufficient</em>. Educational only, not advice.
               </div>
             )}
+
+            <div className="rr-regions">
+              <p className="wl-diversify-title" style={{ marginBottom: "var(--space-sm)" }}>
+                One level up: which region wins is anyone's guess
+              </p>
+              {REGIONS.map((r) => (
+                <div className="wl-bar" key={r.key}>
+                  <span className="wl-bar-label">{r.label} <span style={{ color: "var(--color-muted)" }}>· {pct(r.sigma, 0)} vol</span></span>
+                  <span className="wl-bar-value">{pct(r.mu, 1)}/yr</span>
+                  <div className="wl-bar-track"><div className="wl-bar-fill" style={{ width: `${(r.mu / MAX_REG_MU) * 100}%`, background: r.color }} /></div>
+                </div>
+              ))}
+              <p className="wl-saved" style={{ marginTop: "var(--space-sm)" }}>
+                All three are broad, diversified, <strong>CAPM-consistent</strong> equity — bearing market risk they should
+                be paid for. Yet since {G_SPAN} the <strong>US delivered the most return at the least risk</strong> ("US
+                exceptionalism"), while developed international <em>lagged</em> despite higher volatility. Realized returns
+                over any one window drift from the clean line, and leadership rotates: the US led the 2010s, international
+                the 2000s, Japan was once a third of the world. You can't call the next winner — which is the whole case
+                for owning them all in proportion. <a href="/tools/home-bias">See Home Bias →</a>
+              </p>
+              <p className="wl-note" style={{ marginTop: "0.4rem" }}>
+                Realized nominal annual return &amp; volatility of each region's broad market, {G_SPAN}. Data: Ken French
+                Data Library.
+              </p>
+            </div>
           </div>
         </div>
       </div>
