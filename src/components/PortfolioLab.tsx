@@ -697,8 +697,23 @@ export default function PortfolioLab() {
   }, [portfolioPath, fanPaths, showFan, assets, years]);
 
   // --- Handlers ----------------------------------------------------------
+  // Dragging one asset's weight sets it to that %, then redistributes the rest
+  // across the other assets in proportion to their current weights, so every
+  // slider stays in sync (the others visibly move) and the mix always sums to
+  // 100%. Keeping rawWeights normalized means each slider reflects its badge.
   const setWeight = (i: number, v: number) =>
-    setRawWeights((prev) => prev.map((w, idx) => (idx === i ? v : w)));
+    setRawWeights((prev) => {
+      // Current weights as percentages (normalizeWeights returns fractions).
+      const pctW = normalizeWeights(prev).map((w) => w * 100);
+      const target = Math.max(0, Math.min(100, v));
+      const otherSum = pctW.reduce((s, x, idx) => (idx === i ? s : s + x), 0);
+      const remaining = 100 - target;
+      const n = pctW.length;
+      return pctW.map((x, idx) => {
+        if (idx === i) return target;
+        return otherSum > 0 ? (x / otherSum) * remaining : remaining / Math.max(1, n - 1);
+      });
+    });
 
   const updateAsset = (i: number, patch: Partial<Asset>) =>
     setAssets((prev) => prev.map((a, idx) => (idx === i ? { ...a, ...patch } : a)));
@@ -833,7 +848,7 @@ export default function PortfolioLab() {
                   min={0}
                   max={100}
                   step={1}
-                  value={rawWeights[i]}
+                  value={Math.round(weights[i] * 100)}
                   onChange={(e) => setWeight(i, Number(e.target.value))}
                 />
               </label>
