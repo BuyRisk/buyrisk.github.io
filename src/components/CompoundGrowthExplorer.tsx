@@ -387,6 +387,32 @@ function LifecycleChart({ data, retireAge }: { data: LifePoint[]; retireAge: num
       <path d={path("fin")} fill="none" stroke="var(--color-accent)" strokeWidth={2} />
       <path d={path("total")} fill="none" stroke="var(--color-text)" strokeWidth={2.5} />
 
+      {/* On-figure series labels, in a mostly-opaque box so the text stays legible
+          over the lines. Anchored during accumulation, where the three lines are
+          most distinct. */}
+      {(() => {
+        const accEnd = Math.max(2, retireAge - ageMin);
+        const labels = [
+          { key: "total" as const, name: "Total capital", color: "var(--color-text)", frac: 0.12, dy: -15 },
+          { key: "hc" as const, name: "Human capital", color: "var(--pl-c3)", frac: 0.44, dy: -15 },
+          { key: "fin" as const, name: "Investment capital", color: "var(--color-accent)", frac: 0.7, dy: 17 },
+        ];
+        return labels.map((l) => {
+          const idx = Math.min(data.length - 1, Math.max(1, Math.round(accEnd * l.frac)));
+          const d = data[idx];
+          const w = l.name.length * 6.4 + 12;
+          const h = 17;
+          const cy = Math.min(height - pad.bottom - h / 2 - 2, Math.max(pad.top + h / 2, y(d[l.key]) + l.dy));
+          const bx = Math.min(width - pad.right - w, Math.max(pad.left, x(d.age) - w / 2));
+          return (
+            <g key={l.key}>
+              <rect x={bx} y={cy - h / 2} width={w} height={h} rx={4} fill="var(--color-surface)" opacity={0.9} stroke={l.color} strokeOpacity={0.45} />
+              <text x={bx + w / 2} y={cy + 4} textAnchor="middle" style={{ fill: l.color, fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700 }}>{l.name}</text>
+            </g>
+          );
+        });
+      })()}
+
       {ageTicks.map((a) => (
         <text key={a} x={x(a)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{a}</text>
       ))}
