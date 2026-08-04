@@ -73,6 +73,13 @@ export const TOOLS: Tool[] = [
       "Four bets against the market (predicting it, timing it, deploying into it, and hiring active managers), and the one answer that keeps appearing. The whole case for indexing.",
   },
   {
+    title: "Closet Indexing: Are You Overpaying?",
+    href: "/tools/closet-indexing",
+    blurb:
+      "A fund's Active Share is the slice of it that actually differs from the index — the rest is a clone you could buy for pennies. See why a low Active Share turns a modest fee into a steep charge on the part that's genuinely active, and watch closet indexing's real rise since 1980.",
+    tag: "New",
+  },
+  {
     title: "Behavioral Finance: Your Own Worst Enemy",
     href: "/tools/behavioral-finance",
     blurb:

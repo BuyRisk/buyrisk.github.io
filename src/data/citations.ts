@@ -288,6 +288,24 @@ export const STUDIES: Record<string, Study> = {
     category: "Market efficiency & active management",
     note: "The more households traded, the worse they did: the most active fifth trailed the market by about 6.5 points a year, mostly from trading costs.",
   },
+  cremersPetajisto2009: {
+    authors: "Cremers, M., & Petajisto, A.",
+    year: 2009,
+    title: "How Active Is Your Fund Manager? A New Measure That Predicts Performance",
+    venue: "The Review of Financial Studies 22(9): 3329–3365",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "Introduced Active Share — the fraction of holdings that differ from the benchmark. Funds with the highest Active Share beat their benchmarks; closet indexers (low Active Share, active fees) lagged.",
+  },
+  petajisto2013: {
+    authors: "Petajisto, A.",
+    year: 2013,
+    title: "Active Share and Mutual Fund Performance",
+    venue: "Financial Analysts Journal 69(4): 73–93",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "Documents the rise of closet indexing and frames the fee on the active slice: a low Active Share turns a modest expense ratio into a steep effective fee on the part that's genuinely active.",
+  },
   sharpe1991: {
     authors: "Sharpe, W. F.",
     year: 1991,
@@ -441,6 +459,12 @@ export const DATASETS: Record<string, Dataset> = {
     name: "Kenneth R. French Data Library",
     publisher: "Tuck School of Business, Dartmouth College",
     url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html",
+  },
+  petajisto: {
+    name: "Active Share dataset (US equity mutual funds)",
+    publisher: "Antti Petajisto",
+    url: "https://www.petajisto.net/data.html",
+    note: "Used per the author's terms, which require citing this website as the source and citing Petajisto (2013). We ship asset-weighted aggregates only; the raw fund-level panel is licensed and not redistributed.",
   },
   crsp: {
     name: "CRSP US Stock Database",
@@ -607,6 +631,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "barberOdean2000",
     ],
     datasets: ["french", "shiller", "spiva"],
+  },
+  "closet-indexing": {
+    studies: ["cremersPetajisto2009", "petajisto2013"],
+    datasets: ["petajisto"],
   },
   retirement: {
     studies: ["bengen1994", "cooley1998"],

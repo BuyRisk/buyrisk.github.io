@@ -1,0 +1,74 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ClosetIndexingLab from "../../components/ClosetIndexingLab.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Closet Indexing: Are You Overpaying?"
+  description="A fund's Active Share is the fraction of its holdings that differ from the benchmark — the rest is an index clone you could buy for pennies. See how a low Active Share turns a modest expense ratio into a steep fee on the part that's genuinely active."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Are you overpaying for a closet indexer?</h1>
+    <p class="lede">
+      Some "active" funds barely stray from the index they're measured against — yet
+      they charge active-management fees. The giveaway is <strong>Active Share</strong>:
+      the slice of the portfolio that actually differs from the benchmark. The rest is
+      a clone you could buy for a few basis points. When Active Share is low, a
+      reasonable-looking expense ratio becomes a steep fee on the tiny part that's
+      really doing anything.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <ClosetIndexingLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Active Share, and the fee hiding inside it</h2>
+      <ul>
+        <li>
+          <strong>What Active Share measures.</strong> It's the fraction of a fund's
+          holdings that differ from its benchmark index (Cremers &amp; Petajisto,
+          2009). Zero means a perfect index clone; 100% means it shares nothing with
+          the index. A broadly diversified "active" fund under ~60% is hugging its
+          benchmark more than picking stocks.
+        </li>
+        <li>
+          <strong>The fee on the active part.</strong> You pay the expense ratio on
+          the whole fund, but only the active slice is doing anything an index fund
+          wouldn't. So the real price of the management is (fee − index cost) ÷ Active
+          Share. A 1% fund that's only 30% active is charging roughly 3% on its actual
+          stock-picking — for a portfolio that's two-thirds index.
+        </li>
+        <li>
+          <strong>Why closet indexers are the worst deal.</strong> A genuine
+          stock-picker at least gives you a real shot at beating the index; a cheap
+          index fund gives you the market for almost nothing. The closet indexer sits
+          between them — index-like holdings at active prices — and the evidence
+          (Petajisto, 2013) is that this group has reliably lagged after fees.
+        </li>
+      </ul>
+      <p>
+        This is the companion to <a href="/tools/beat-the-market">Can You Outsmart the
+        Market?</a> and the <a href="/tools/fees">Fees</a> tool: even before asking
+        whether active management can win, check how much of what you're buying is
+        actually active. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="closet-indexing" />
+
+  <NextTool current="/tools/closet-indexing" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>
