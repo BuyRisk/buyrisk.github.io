@@ -31,7 +31,7 @@
     "data:active-share": "node scripts/reduce-active-share.mjs"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
+    "@astrojs/check": "^0.9.10",
     "@astrojs/react": "^4.4.0",
     "astro": "^5.14.1",
     "react": "^19.2.0",
@@ -39,8 +39,8 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }
