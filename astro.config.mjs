@@ -28,6 +28,11 @@ export default defineConfig({
     '/tools/burn-rate': '/tools/retirement',
     '/tools/social-security': '/tools/retirement',
     '/tools/roth-vs-traditional': '/tools/retirement',
+    '/tools/tax-drag': '/tools/taxes',
+    '/tools/asset-location': '/tools/taxes',
+    '/tools/home-bias': '/tools/global',
+    '/tools/currency-risk': '/tools/global',
+    '/tools/us-vs-world': '/tools/global',
     // Rent-vs-Buy moved to the Personal Finance section.
     '/tools/rent-vs-buy': '/personal-finance/rent-vs-buy',
   },

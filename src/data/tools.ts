@@ -86,17 +86,10 @@ export const TOOLS: Tool[] = [
       "Funding and spending retirement: what it costs and whether your money lasts, the big Social Security claiming decision (including survivor and tax/IRMAA cases), and choosing Roth vs. Traditional (and grabbing the employer match).",
   },
   {
-    title: "The Tax Drag: What a Taxable Account Costs",
-    href: "/tools/tax-drag",
+    title: "Taxes: The Drag & Asset Location",
+    href: "/tools/taxes",
     blurb:
-      "Tax on a taxable account isn't a one-off haircut — it's a leak that compounds. Watch the gap between a sheltered and a taxable account widen year by year, then break the drag into its sources: dividends, fund turnover, and the capital-gains tax finally due at sale.",
-    tag: "New",
-  },
-  {
-    title: "Asset Location: Which Account Holds What",
-    href: "/tools/asset-location",
-    blurb:
-      "Same portfolio, same allocation, same tax rates — but which account holds your bonds versus your stocks changes your after-tax wealth. See why the tax-hungry asset belongs in your tax-advantaged account.",
+      "Tax on a taxable account is a leak that compounds, not a one-off haircut. Watch the drag widen year by year and break it into its sources — dividends, turnover, capital gains — then learn asset location: which account should hold your bonds versus your stocks for a free after-tax win.",
     tag: "New",
   },
   {
@@ -114,24 +107,10 @@ export const TOOLS: Tool[] = [
     tag: "New",
   },
   {
-    title: "Home Bias: How Much of the World Do You Own?",
-    href: "/tools/home-bias",
+    title: "Global Investing: Home Bias, Currency & Cycles",
+    href: "/tools/global",
     blurb:
-      "A globally diversified investor holds each country in proportion to its size — almost nobody does. Pick your home market, see how small a slice of the world it really is, and what tilting toward home costs you in diversification.",
-    tag: "New",
-  },
-  {
-    title: "Currency Risk: Hedged vs. Unhedged",
-    href: "/tools/currency-risk",
-    blurb:
-      "Own a foreign stock or bond and you own its currency too. See how currency swings add volatility — a lot for calm bonds, little for volatile stocks — and why the evidence says hedge your bonds but rarely your stocks.",
-    tag: "New",
-  },
-  {
-    title: "US vs. the World: The Leadership Cycle",
-    href: "/tools/us-vs-world",
-    blurb:
-      "US and international stocks trade the lead in long, multi-year cycles. Watch the rolling return gap swing from US-led to foreign-led and back — and see why nobody can time the turn, so the humble move is to own both.",
+      "Own the whole world, not just home. See how small a slice your home market really is, why the lead trades between the US and international in long untimeable cycles, and when a foreign holding's currency is worth hedging — the case for owning every country in proportion.",
     tag: "New",
   },
 ];

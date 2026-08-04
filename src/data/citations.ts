@@ -620,12 +620,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["markowitz1952", "peroldSharpe1988"],
     datasets: ["damodaran"],
   },
-  "asset-location": {
-    studies: ["dammonSpattZhang2004"],
-    datasets: [],
-  },
-  "tax-drag": {
-    studies: ["dicksonShoven1995", "sharpe1991"],
+  taxes: {
+    studies: ["dammonSpattZhang2004", "dicksonShoven1995", "sharpe1991"],
     datasets: [],
   },
   "risk-tolerance": {
@@ -640,16 +636,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: [],
     datasets: ["bogleheads"],
   },
-  "home-bias": {
-    studies: ["frenchPoterba1991"],
-    datasets: ["ftseGlobalAllCap", "vanguardVT"],
-  },
-  "currency-risk": {
-    studies: ["peroldSchulman1988"],
-    datasets: [],
-  },
-  "us-vs-world": {
-    studies: ["frenchPoterba1991"],
-    datasets: ["french"],
+  global: {
+    studies: ["frenchPoterba1991", "peroldSchulman1988"],
+    datasets: ["ftseGlobalAllCap", "vanguardVT", "french"],
   },
 };

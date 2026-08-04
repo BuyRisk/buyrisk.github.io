@@ -140,7 +140,7 @@ export default function RollingReturnsLab() {
               stretch feels permanent, which is exactly when people give up on the laggard right before it turns. Since
               this window can't be timed in advance, the humble move is to <strong>own both in proportion</strong> and
               rebalance as the tide shifts. The recent US dominance is real, but it's a phase, not a law — international
-              led the decade before it. <a href="/tools/home-bias">See Home Bias →</a> Educational only, not advice.
+              led the decade before it. <a href="/tools/global">See Home Bias →</a> Educational only, not advice.
             </p>
           </div>
         </div>

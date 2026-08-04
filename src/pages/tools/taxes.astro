@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TaxesModule from "../../components/TaxesModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Taxes: The Drag & Asset Location"
+  description="Tax on a taxable account is a leak that compounds — but you can blunt it. Watch the drag widen year by year and see where it comes from, then learn which account should hold your bonds versus your stocks."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Keeping more of what you earn</h1>
+    <p class="lede">
+      Tax isn't a one-off haircut on your returns — it's a leak that compounds, a
+      little more every year. Two tools for blunting it: watch the gap between a
+      sheltered and a taxable account widen and see exactly what causes it, then
+      learn the free tax win of putting the right asset in the right account.
+    </p>
+  </section>
+
+  <section class="container">
+    <RegionNote>
+      US-focused — these tools assume US tax treatment: ordinary-income vs.
+      long-term capital-gains rates, and US account types (Roth and Traditional
+      IRAs / 401(k)s) alongside a taxable brokerage. The mechanisms exist wherever
+      some accounts are taxed and others sheltered; the specific rates and accounts
+      shown are American.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-host">
+    <TaxesModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The leak, and how to blunt it</h2>
+      <ul>
+        <li>
+          <strong>The drag compounds.</strong> Dividends and the gains a fund
+          distributes are taxed the year they happen, even if you reinvest — money
+          pulled out of the compounding machine forever, so the shortfall grows
+          faster than the tax itself. High-turnover funds are the villain; deferral
+          is the superpower.
+        </li>
+        <li>
+          <strong>Location is a free win.</strong> Asset <em>allocation</em> is how
+          much you hold in stocks versus bonds; asset <em>location</em> is which
+          account each one sits in. Same portfolio, same risk — but shelter the
+          tax-hungry asset and you keep more of it. Traditional space usually wants
+          the bonds; Roth space often wants the highest-returning asset instead.
+        </li>
+      </ul>
+      <p>
+        Both keep the mechanism clear by simplifying — a single lump sum, no state
+        taxes or tax-loss harvesting. Use them to see the logic, not as filing
+        instructions. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="taxes" />
+
+  <NextTool current="/tools/taxes" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>

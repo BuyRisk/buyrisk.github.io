@@ -269,7 +269,7 @@ export default function RiskReturnLab() {
                 exceptionalism"), while developed international <em>lagged</em> despite higher volatility. Realized returns
                 over any one window drift from the clean line, and leadership rotates: the US led the 2010s, international
                 the 2000s, Japan was once a third of the world. You can't call the next winner — which is the whole case
-                for owning them all in proportion. <a href="/tools/home-bias">See Home Bias →</a>
+                for owning them all in proportion. <a href="/tools/global">See Home Bias →</a>
               </p>
               <p className="wl-note" style={{ marginTop: "0.4rem" }}>
                 Realized nominal annual return &amp; volatility of each region's broad market, {G_SPAN}. Data: Ken French
