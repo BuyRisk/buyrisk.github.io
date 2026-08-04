@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
@@ -242,7 +242,17 @@ function NumberField({
 }: NumberFieldProps) {
   const [text, setText] = useState(() => String(value));
   const [error, setError] = useState(false);
+  const [focused, setFocused] = useState(false);
   const errorId = useId();
+
+  // Keep the text box in sync when the value changes from outside (Reset, or the
+  // horizon clamp pulling a phase's start year in) — but never while the user is
+  // typing, so the cursor doesn't jump.
+  useEffect(() => {
+    if (focused) return;
+    setText(integer ? Math.round(value).toLocaleString("en-US") : String(value));
+    setError(false);
+  }, [value, integer, focused]);
 
   const parse = (raw: string) => Number(raw.replace(/[,$%\s]/g, ""));
 
@@ -298,7 +308,8 @@ function NumberField({
             aria-invalid={error}
             aria-describedby={error ? errorId : undefined}
             onChange={(e) => handleType(e.target.value)}
-            onBlur={handleBlur}
+            onFocus={() => setFocused(true)}
+            onBlur={() => { setFocused(false); handleBlur(); }}
           />
           {suffix && <span className="cge-adorn">{suffix}</span>}
         </span>
@@ -766,38 +777,61 @@ export default function CompoundGrowthExplorer() {
   // phase overrides the fee, we report the total dollar drag instead of a single %.
   const feesVary = activePhases.some((p) => p.fee != null && p.fee !== fee);
 
-  // A retirement phase is a drawdown (negative contribution); a life phase adds
-  // or changes a positive contribution. Either can be added independently, up to
-  // three life phases and one retirement, and no more than four phases in all.
-  const retirePhaseCount = activePhases.filter((p) => p.monthly < 0).length;
-  const lifePhaseCount = activePhases.length - retirePhaseCount;
-  const canAddLife = activePhases.length < 4 && lifePhaseCount < 3;
-  const canAddRetire = activePhases.length < 4 && retirePhaseCount < 1;
+  // Life phases change your *contribution* (a raise, the kids leaving home). They
+  // are contributions-only — retirement spending is modelled by the withdrawal
+  // box below, so there is only ever one drawdown and no double-counting.
+  const canAddLife = activePhases.length < 4;
 
-  const addPhase = (kind: "life" | "retire") => {
+  const addPhase = () => {
     setPhases((prev) => {
       if (prev.length >= 4) return prev;
-      const retires = prev.filter((p) => p.monthly < 0).length;
-      if (kind === "retire" && retires >= 1) return prev;
-      if (kind === "life" && prev.length - retires >= 3) return prev;
       phaseCounter.current += 1;
       const lastStart = prev.length ? Math.max(...prev.map((p) => p.startYear)) : 0;
-      const startYear =
-        kind === "retire"
-          ? Math.min(years, Math.max(lastStart + 5, Math.round(years * 0.7)))
-          : Math.min(years, Math.max(lastStart + 5, Math.round(years / 2)));
-      const monthlyDefault = kind === "retire" ? -2000 : monthly;
-      return [...prev, { id: phaseCounter.current, startYear, monthly: monthlyDefault }];
+      const startYear = Math.min(years, Math.max(lastStart + 5, Math.round(years / 2)));
+      return [...prev, { id: phaseCounter.current, startYear, monthly: monthly }];
     });
   };
+
+  // Keep phase start years inside the horizon: if the user shortens the horizon
+  // below a phase's start, pull it back in so the phase can't silently go stale.
+  useEffect(() => {
+    setPhases((prev) =>
+      prev.some((p) => p.startYear > years)
+        ? prev.map((p) => (p.startYear > years ? { ...p, startYear: years } : p))
+        : prev,
+    );
+  }, [years]);
+
+  // Mode-appropriate real nest egg (today's dollars), so the retirement box and
+  // the lifecycle chart always agree with the headline on screen: the
+  // deterministic ending balance in Simplified, the block-bootstrap MEDIAN in
+  // Historical. (Goal mode targets `target` either way, so it uses the
+  // deterministic path.)
+  const detNestEggReal = realFinal;
+  const histMedianReal = useMemo(() => {
+    if (simMode !== "historical" || mode !== "project") return null;
+    const paths = bootstrapReturns({ years, paths: HIST_PATHS, blockLen: HIST_BLOCK, stockPct: histStock / 100, real: true, seed: HIST_SEED });
+    const annual = effectiveMonthly * 12;
+    const finals = paths.map((pr) => {
+      let bal = principal;
+      for (let y = 0; y < years; y++) bal = bal * (1 + pr[y]) + annual;
+      return bal;
+    });
+    return quantile(finals, 0.5);
+  }, [simMode, mode, years, histStock, principal, effectiveMonthly]);
+  const nestEggReal = histMedianReal ?? detNestEggReal;
+  // Scale the deterministic lifecycle accumulation so its endpoint lands on that
+  // nest egg (a no-op in Simplified; in Historical it aligns the curve to the
+  // median so the chart and the headline tell the same story).
+  const lifeScale = detNestEggReal > 0 ? nestEggReal / detNestEggReal : 1;
   const removePhase = (id: number) => setPhases((prev) => prev.filter((p) => p.id !== id));
   const updatePhase = (id: number, patch: Partial<Phase>) =>
     setPhases((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
 
-  // First-year retirement income from the ending balance (4%-rule style).
-  const annualIncome = (result.finalBalance * withdrawalRate) / 100;
-  const monthlyIncome = annualIncome / 12;
-  const monthlyIncomeReal = monthlyIncome / inflationFactor;
+  // First-year retirement income (4%-rule style), in today's dollars, from the
+  // mode-appropriate real nest egg so it matches the chart and the headline.
+  const annualIncomeReal = (nestEggReal * withdrawalRate) / 100;
+  const monthlyIncomeReal = annualIncomeReal / 12;
 
   // Retirement-survival simulation. It doesn't depend on the size of the pile,
   // only on the withdrawal rate, horizon, and stock/bond mix, so one
@@ -860,7 +894,7 @@ export default function CompoundGrowthExplorer() {
     const out: LifePoint[] = [];
     for (let t = 0; t <= years; t++) {
       const age = currentAge + t;
-      const fin = (result.points[t]?.balance ?? 0) / Math.pow(infl, t); // nominal -> real
+      const fin = ((result.points[t]?.balance ?? 0) / Math.pow(infl, t)) * lifeScale; // nominal -> real, aligned to the nest egg
       const hc = humanCapital(age, currentAge, income, incomeGrowth, HC_DISCOUNT, retireAge);
       out.push({ age, fin, hc, total: fin + hc });
     }
@@ -873,10 +907,9 @@ export default function CompoundGrowthExplorer() {
       out.push({ age: retireAge + s, fin: bal, hc: 0, total: bal });
     }
     return out;
-  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retYears, retRealReturn]);
+  }, [result, currentAge, years, income, incomeGrowth, inflation, retireAge, withdrawalRate, retYears, retRealReturn, lifeScale]);
 
   const hcNow = lifecycle[0]?.hc ?? 0;
-  const nestEggReal = lifecycle[years]?.fin ?? 0;
   const endBalance = lifecycle[lifecycle.length - 1]?.fin ?? 0;
   const endAge = lifecycle[lifecycle.length - 1]?.age ?? retireAge + retYears;
   // Age at which the nest egg is exhausted, if it happens within the horizon.
@@ -1031,7 +1064,7 @@ export default function CompoundGrowthExplorer() {
             {activePhases.map((ph) => (
               <div className="cge-phase" key={ph.id}>
                 <div className="cge-phase-head">
-                  <span>{ph.monthly < 0 ? "Retirement drawdown" : "Life phase"}</span>
+                  <span>Life phase</span>
                   <button
                     type="button"
                     className="cge-phase-remove"
@@ -1055,10 +1088,10 @@ export default function CompoundGrowthExplorer() {
                 />
                 <NumberField
                   key={`amt-${ph.id}`}
-                  label="Monthly amount"
-                  info="From that year on: positive keeps contributing, negative withdraws each month (e.g. spending in retirement)."
+                  label="New monthly contribution"
+                  info="From that year on, how much you contribute each month (e.g. a raise lets you save more, or the kids leaving home frees up cash). Contributions only — model retirement spending with the withdrawal box below."
                   value={ph.monthly}
-                  min={-20_000}
+                  min={0}
                   max={20_000}
                   step={100}
                   prefix={symbol}
@@ -1089,20 +1122,17 @@ export default function CompoundGrowthExplorer() {
                 />
               </div>
             ))}
-            {(canAddLife || canAddRetire) && (
+            {canAddLife && (
               <div className="cge-phase-actions">
-                {canAddLife && (
-                  <button type="button" className="cge-phase-add" onClick={() => addPhase("life")}>
-                    + Add a life phase
-                  </button>
-                )}
-                {canAddRetire && (
-                  <button type="button" className="cge-phase-add" onClick={() => addPhase("retire")}>
-                    + Add retirement drawdown
-                  </button>
-                )}
+                <button type="button" className="cge-phase-add" onClick={() => addPhase()}>
+                  + Add a life phase
+                </button>
               </div>
             )}
+            <p className="cge-note" style={{ marginTop: "0.3rem" }}>
+              Life phases change your <strong>contribution</strong> from a chosen year on (a raise, or the kids leaving
+              home). They add money only — <strong>retirement spending is modelled by the withdrawal box below.</strong>
+            </p>
           </>
         )}
       </div>
@@ -1200,8 +1230,13 @@ export default function CompoundGrowthExplorer() {
             in year {Math.round(result.depletedYear)}.
           </p>
         )}
+      </div>
+      )}
 
-        <div className="cge-retire">
+      {/* Retirement drawdown — rendered in every mode, so the withdrawal box is the
+          single, always-visible drawdown control. It reads the real nest egg, which
+          tracks the headline (deterministic in Simplified, median in Historical). */}
+      <div className="cge-retire">
           <div className="cge-retire-top">
             <span className="cge-retire-title">Retirement income</span>
             <label className="cge-retire-rate">
@@ -1236,11 +1271,11 @@ export default function CompoundGrowthExplorer() {
             </label>
           </div>
           <p className="cge-retire-figure">
-            ≈ <strong>{currency(monthlyIncome)}</strong> / month
-            <span className="cge-retire-year"> · {currency(annualIncome)} / year</span>
+            ≈ <strong>{currency(monthlyIncomeReal)}</strong> / month
+            <span className="cge-retire-year"> · {currency(annualIncomeReal)} / year</span>
           </p>
           <p className="cge-retire-real">
-            ≈ {currency(monthlyIncomeReal)} / month in today's dollars
+            in today's dollars, from a {compactCurrency(nestEggReal)} nest egg
           </p>
 
           <div className="cge-retire-strategy">
@@ -1300,8 +1335,6 @@ export default function CompoundGrowthExplorer() {
             <a href="/tools/burn-rate">Stress-test it against your real costs →</a>
           </p>
         </div>
-      </div>
-      )}
 
       {/* Lifecycle view is a deterministic companion; show it in every mode. */}
       {(
@@ -1317,9 +1350,11 @@ export default function CompoundGrowthExplorer() {
                 <NumberField label="Income growth" info="How fast your real pay rises each year, above inflation." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
               </div>
               <p className="cge-life-caption">
-                Everything here is in <strong>today's dollars</strong>, built from your inputs above: invest for {years} years,
+                Everything here is in <strong>today's dollars</strong>, built from your inputs above: invest for {years} year{years === 1 ? "" : "s"},
                 retire at <strong>{retireAge}</strong>, then draw <strong>{withdrawalRate}%</strong> a year from a{" "}
-                {retStock}%-stock nest egg for {retYears} years, through age {retireAge + retYears}.
+                {retStock}%-stock nest egg for {retYears} years, through age {retireAge + retYears}. The drawdown grows at
+                that mix's <em>historical</em> real return, while the build-up uses your steady <strong>{effectiveRate}%</strong>{" "}
+                assumption{simMode === "historical" ? "; the nest egg here is the median of the histories above" : ""}.
               </p>
               <LifecycleChart data={lifecycle} retireAge={retireAge} />
               <div className="cge-life-legend">
@@ -1343,7 +1378,10 @@ export default function CompoundGrowthExplorer() {
                 ) : (
                   <>From there, drawing {withdrawalRate}% a year roughly balances the returns, so the nest egg{" "}
                   <strong>still holds about {compactCurrency(endBalance)}</strong> at age {endAge}.</>
-                )}
+                )}{" "}
+                But this is one smooth, average path: the <strong>{survivalPct}% chance</strong> of lasting, above, comes
+                from the bumpy real histories, where a bad first decade (sequence-of-returns risk) sinks some runs even
+                when the average looks safe.
               </p>
             </div>
           )}
