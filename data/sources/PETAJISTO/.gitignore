@@ -1,0 +1,12 @@
+# Antti Petajisto's Active Share data (activeshare.csv) and the Cremers–Petajisto–
+# Zitzewitz index-based factor returns. Sourced from petajisto.net / WRDS-derived
+# academic datasets whose terms restrict redistribution — and this repo is PUBLIC
+# (deploys to buyrisk.github.io), so the raw files must never be committed. Like
+# aqr/, crsp/, and jst/, the originals are git-ignored; only reduced, attributed
+# aggregates would ship as generated TS. Re-download from the source to reproduce.
+*.csv
+*.sas7bdat
+*.pdf
+!.gitignore
+!README.md
+!*.manifest.json
