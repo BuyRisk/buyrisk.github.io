@@ -30,6 +30,12 @@ export const PF_TOOLS: Tool[] = [
       "Compare the two payoff strategies on your own debts — highest-rate-first vs. smallest-balance-first — and see months to debt-free, total interest, and whether a rate is high enough to refinance.",
   },
   {
+    title: "Your Next Dollar: Order of Operations",
+    href: "/personal-finance/next-dollar",
+    blurb:
+      "Match, debt, Roth, or brokerage? The order you fund things in beats almost any single investment choice. Check off what you've handled and see the one next step in the priority ladder — and the logic that ranks it there. (US accounts.)",
+  },
+  {
     title: "Savings Goal Planner",
     href: "/personal-finance/savings-goal",
     blurb:
@@ -40,6 +46,12 @@ export const PF_TOOLS: Tool[] = [
     href: "/personal-finance/net-worth",
     blurb:
       "Add up what you own, subtract what you owe, and see the one number that captures your whole financial picture — plus where consistent investing takes it.",
+  },
+  {
+    title: "Risk Tolerance Questionnaire",
+    href: "/personal-finance/risk-tolerance",
+    blurb:
+      "Six quick questions place you on the risk/return spectrum and suggest a stock/bond starting point — scored across your ability, willingness, and need to take risk, with the honest reminder that the lowest of the three is the one that binds.",
   },
   {
     title: "Rent or Buy?",

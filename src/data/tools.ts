@@ -93,20 +93,6 @@ export const TOOLS: Tool[] = [
     tag: "New",
   },
   {
-    title: "Risk Tolerance Questionnaire",
-    href: "/tools/risk-tolerance",
-    blurb:
-      "Six quick questions place you on the risk/return spectrum and suggest a stock/bond starting point — scored across your ability, willingness, and need to take risk, with the honest reminder that the lowest of the three is the one that binds.",
-    tag: "New",
-  },
-  {
-    title: "Your Next Dollar: Order of Operations",
-    href: "/tools/next-dollar",
-    blurb:
-      "Match, debt, Roth, or brokerage? The order you fund things in beats almost any single investment choice. Check off what you've handled and see the one next step in the priority ladder — and the logic that ranks it there. (US accounts.)",
-    tag: "New",
-  },
-  {
     title: "Global Investing: Home Bias, Currency & Cycles",
     href: "/tools/global",
     blurb:

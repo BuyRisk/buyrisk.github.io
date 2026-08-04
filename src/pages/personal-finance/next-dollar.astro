@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import NextDollarLab from "../../components/NextDollarLab.tsx";
-import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
 import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
@@ -12,7 +11,7 @@ import "../../styles/simtool.css";
   description="Where should the next dollar go — pay down debt, grab the match, fund a Roth, or invest in a brokerage? Check off what you've done and see the single next step in the priority ladder, and why it ranks there."
 >
   <section class="container wl-intro">
-    <p class="eyebrow">Interactive Tool</p>
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
     <h1>Where should your next dollar go?</h1>
     <p class="lede">
       Match? Debt? Roth? Brokerage? The order you fund things in matters more than
@@ -71,13 +70,35 @@ import "../../styles/simtool.css";
 
   <Sources tool="next-dollar" />
 
-  <NextTool current="/tools/next-dollar" />
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/personal-finance/debt-payoff" class="card">
+          <h3>Clear the high-interest debt first</h3>
+          <p>The ladder puts high-rate debt near the top. Compare avalanche vs. snowball and see months to debt-free.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/retirement" class="card">
+          <h3>Which account, and how much</h3>
+          <p>Once the order is clear, dig into the account choices themselves: Roth vs. Traditional, the match, and making it last.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>
   .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
   .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
   .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
 </style>
 
 <style is:global>

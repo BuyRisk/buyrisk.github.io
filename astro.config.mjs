@@ -33,8 +33,11 @@ export default defineConfig({
     '/tools/home-bias': '/tools/global',
     '/tools/currency-risk': '/tools/global',
     '/tools/us-vs-world': '/tools/global',
-    // Rent-vs-Buy moved to the Personal Finance section.
+    // Tools that fit Personal Finance better than the Playground (a checklist
+    // and a questionnaire, not interactive simulators).
     '/tools/rent-vs-buy': '/personal-finance/rent-vs-buy',
+    '/tools/next-dollar': '/personal-finance/next-dollar',
+    '/tools/risk-tolerance': '/personal-finance/risk-tolerance',
   },
   markdown: {
     shikiConfig: {

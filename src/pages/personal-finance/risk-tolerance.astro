@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import RiskToleranceLab from "../../components/RiskToleranceLab.tsx";
-import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
 import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
@@ -12,7 +11,7 @@ import "../../styles/simtool.css";
   description="Answer six short questions to see where you sit on the risk/return spectrum and a suggested stock/bond starting point — scored across your ability, willingness, and need to take risk."
 >
   <section class="container wl-intro">
-    <p class="eyebrow">Interactive Tool</p>
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
     <h1>How much risk actually fits you?</h1>
     <p class="lede">
       The single biggest investing decision is how much to keep in stocks versus
@@ -68,13 +67,35 @@ import "../../styles/simtool.css";
 
   <Sources tool="risk-tolerance" />
 
-  <NextTool current="/tools/risk-tolerance" />
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Put the allocation to work</h3>
+          <p>Take your stock/bond starting point into the Portfolio tool and see the risk/return trade-off it implies.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/personal-finance/net-worth" class="card">
+          <h3>Know where you stand today</h3>
+          <p>Your ability to take risk starts with the full picture — what you own, what you owe, and the cushion in between.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
 </BaseLayout>
 
 <style>
   .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
   .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
   .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
 </style>
 
 <style is:global>
