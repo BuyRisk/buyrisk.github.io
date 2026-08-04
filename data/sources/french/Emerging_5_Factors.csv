@@ -1,4 +1,4 @@
-This file was created using the 202605 Bloomberg database.
+This file was created using the 202606 Bloomberg database.
 
 Missing data are indicated by -99.99.
 
@@ -448,6 +448,7 @@ Missing data are indicated by -99.99.
 202603  ,-12.36    ,1.96   ,-0.67   ,-0.59    ,1.55    ,0.29
 202604   ,13.63   ,-2.16   ,-4.33    ,2.73   ,-4.31    ,0.29
 202605    ,7.44   ,-8.07    ,1.77    ,4.70   ,-3.40    ,0.31
+202606   ,-1.98   ,-0.87    ,1.37    ,2.06   ,-2.90    ,0.29
 
 
 
