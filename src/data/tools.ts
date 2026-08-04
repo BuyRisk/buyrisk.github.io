@@ -127,4 +127,11 @@ export const TOOLS: Tool[] = [
       "Own a foreign stock or bond and you own its currency too. See how currency swings add volatility — a lot for calm bonds, little for volatile stocks — and why the evidence says hedge your bonds but rarely your stocks.",
     tag: "New",
   },
+  {
+    title: "US vs. the World: The Leadership Cycle",
+    href: "/tools/us-vs-world",
+    blurb:
+      "US and international stocks trade the lead in long, multi-year cycles. Watch the rolling return gap swing from US-led to foreign-led and back — and see why nobody can time the turn, so the humble move is to own both.",
+    tag: "New",
+  },
 ];

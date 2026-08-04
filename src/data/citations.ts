@@ -648,4 +648,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     studies: ["peroldSchulman1988"],
     datasets: [],
   },
+  "us-vs-world": {
+    studies: ["frenchPoterba1991"],
+    datasets: ["french"],
+  },
 };
