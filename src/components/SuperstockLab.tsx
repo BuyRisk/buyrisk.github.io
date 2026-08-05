@@ -293,7 +293,7 @@ function RealRecord() {
           <strong>
             {d.medianLifetimeMultiple.toFixed(2)}× vs {Math.round(d.meanLifetimeMultiple)}×
           </strong>
-          <span>median vs mean lifetime</span>
+          <span>median vs mean lifetime return</span>
         </div>
         <div>
           <strong>{pct1(d.concentration.dollarWealthCreation.pctFirmsForAllNetCreation)}</strong>
