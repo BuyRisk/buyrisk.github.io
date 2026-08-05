@@ -1,31 +1,41 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import FeesInflationModule from "../../components/FeesInflationModule.tsx";
+import ReturnDrainsModule from "../../components/ReturnDrainsModule.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
 ---
 
 <BaseLayout
-  title="Fees & Inflation: the Silent Drains"
-  description="Two forces quietly erode your wealth: fund fees, the drag you control, and inflation, the invisible tax on every dollar you hold. See how a tiny expense ratio compounds against you, then how differently prices have actually risen."
+  title="What Eats Your Returns: Fees, Inflation & Taxes"
+  description="Four quiet drains erode the wealth you build: fund fees, inflation, the tax drag on a taxable account, and holding the wrong asset in the wrong account. See how each one compounds against you — and how to blunt the ones you control."
 >
   <section class="container wl-intro">
     <p class="eyebrow">Interactive Tool</p>
-    <h1>The two silent drains</h1>
+    <h1>What quietly eats your returns</h1>
     <p class="lede">
-      Two forces work against every dollar you invest, and both are easy to miss
-      because they act slowly. <strong>Fees</strong> are the drag you control: a
-      small yearly percentage that compounds against you. <strong>Inflation</strong>
-      is the invisible tax: the buying power your money quietly loses to rising
-      prices, whether you notice it or not. Understanding both is the whole reason
-      to invest in the first place: to earn a real return, after costs, that
-      outpaces rising prices.
+      Building wealth is only half the job; keeping it is the other half. Several
+      forces work against every dollar you invest, and all of them act slowly enough
+      to miss. <strong>Fees</strong> are the drag you control; <strong>inflation</strong>
+      is the invisible tax on buying power; <strong>tax</strong> on a taxable account
+      is a leak that compounds; and <strong>where</strong> you hold each asset quietly
+      changes your after-tax wealth. See how each one works — and which you can blunt.
     </p>
   </section>
 
+  <section class="container">
+    <RegionNote>
+      The Fees and Inflation tabs apply anywhere. The <strong>Tax Drag</strong> and
+      <strong>Asset Location</strong> tabs are US-focused — they assume US tax
+      treatment (ordinary-income vs. long-term capital-gains rates) and US account
+      types (Roth / Traditional IRAs and 401(k)s). The mechanisms exist wherever
+      some accounts are taxed and others sheltered; the specific rates are American.
+    </RegionNote>
+  </section>
+
   <section class="container wl-host">
-    <FeesInflationModule client:load />
+    <ReturnDrainsModule client:load />
   </section>
 
   <section class="container wl-explainer">
@@ -67,10 +77,27 @@ import "../../styles/simtool.css";
           basket, which is why outpacing it, not the headline, is what matters.
         </li>
       </ul>
+
+      <h2>Taxes: the drag, and where you hold what</h2>
+      <ul>
+        <li>
+          <strong>The tax drag compounds.</strong> Dividends and the gains a fund
+          distributes are taxed the year they happen, even if you reinvest — money
+          pulled out of the compounding machine for good. High-turnover funds are the
+          villain; deferral is the superpower, which is a big reason indexing wins
+          after tax.
+        </li>
+        <li>
+          <strong>Asset location is a free win.</strong> Same portfolio, same
+          allocation — but sheltering the tax-hungry asset and leaving the
+          tax-efficient one in the taxable account keeps more of your money, with no
+          extra risk. (US accounts.)
+        </li>
+      </ul>
       <p>
-        Put the two together and you get the point of investing: a low-cost
+        Put them together and you get the point of investing: a low-cost, tax-aware
         portfolio of productive assets is how you earn a <em>real</em> return that
-        stays ahead of both drains. Educational only, not financial advice.
+        stays ahead of every drain. Educational only, not financial advice.
       </p>
     </div>
   </section>

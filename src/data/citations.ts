@@ -583,7 +583,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["shiller", "damodaran", "fred"],
   },
   fees: {
-    studies: ["sharpe1991", "malkiel1973"],
+    studies: ["sharpe1991", "malkiel1973", "dammonSpattZhang2004", "dicksonShoven1995"],
     datasets: ["ici", "fred"],
   },
   "rent-vs-buy": {
@@ -599,7 +599,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["crsp"],
   },
   portfolio: {
-    studies: ["markowitz1952", "tobin1958", "sharpe1966"],
+    studies: ["markowitz1952", "tobin1958", "sharpe1966", "peroldSharpe1988"],
     datasets: ["damodaran", "fred"],
   },
   factors: {
@@ -629,12 +629,10 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "sharpe1991",
       "famaFrench2010",
       "barberOdean2000",
+      "cremersPetajisto2009",
+      "petajisto2013",
     ],
-    datasets: ["french", "shiller", "spiva"],
-  },
-  "closet-indexing": {
-    studies: ["cremersPetajisto2009", "petajisto2013"],
-    datasets: ["petajisto"],
+    datasets: ["french", "shiller", "spiva", "petajisto"],
   },
   retirement: {
     studies: ["bengen1994", "cooley1998"],
@@ -646,14 +644,6 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   options: {
     studies: ["black1973", "merton1973"],
-    datasets: [],
-  },
-  rebalancing: {
-    studies: ["markowitz1952", "peroldSharpe1988"],
-    datasets: ["damodaran"],
-  },
-  taxes: {
-    studies: ["dammonSpattZhang2004", "dicksonShoven1995", "sharpe1991"],
     datasets: [],
   },
   "risk-tolerance": {

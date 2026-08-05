@@ -23,10 +23,10 @@ export const TOOLS: Tool[] = [
       "The engine of personal finance (compounding) in every direction: how wealth builds, how your savings rate sets your timeline to independence, and how the same math runs in reverse as debt.",
   },
   {
-    title: "Fees & Inflation",
+    title: "What Eats Your Returns: Fees, Inflation & Taxes",
     href: "/tools/fees",
     blurb:
-      "The two silent drains on your money: fund fees (the drag you control) and inflation (the one you don't). See how a tiny fee compounds against you, then how unevenly prices really rise.",
+      "The quiet drains on your wealth in one place: fund fees (the drag you control), inflation (the one you don't), the tax drag on a taxable account, and asset location — holding the right asset in the right account. See how each compounds against you, and how to blunt the ones you can.",
   },
   {
     title: "Diversification",
@@ -45,13 +45,6 @@ export const TOOLS: Tool[] = [
     href: "/tools/portfolio",
     blurb:
       "Build the actual portfolio: mix assets to find the efficient frontier, dial the all-important stock/bond split, and see why the 'safe' bond sleeve still moves with interest rates.",
-  },
-  {
-    title: "Rebalancing: Discipline vs. Drift",
-    href: "/tools/rebalancing",
-    blurb:
-      "Left alone, a portfolio drifts: stocks out-grow bonds and a tidy 60/40 quietly becomes a risky 80/20. See how never, annual, and threshold rebalancing change the risk and return you actually get, and why rebalancing controls risk rather than boosting returns.",
-    tag: "New",
   },
   {
     title: "Options Pricing, Demystified",
@@ -73,13 +66,6 @@ export const TOOLS: Tool[] = [
       "Four bets against the market (predicting it, timing it, deploying into it, and hiring active managers), and the one answer that keeps appearing. The whole case for indexing.",
   },
   {
-    title: "Closet Indexing: Are You Overpaying?",
-    href: "/tools/closet-indexing",
-    blurb:
-      "A fund's Active Share is the slice of it that actually differs from the index — the rest is a clone you could buy for pennies. See why a low Active Share turns a modest fee into a steep charge on the part that's genuinely active, and watch closet indexing's real rise since 1980.",
-    tag: "New",
-  },
-  {
     title: "Behavioral Finance: Your Own Worst Enemy",
     href: "/tools/behavioral-finance",
     blurb:
@@ -91,13 +77,6 @@ export const TOOLS: Tool[] = [
     href: "/tools/retirement",
     blurb:
       "Turn the 4% rule around: your spending sets the nest egg you need, and guaranteed income shrinks it. Then stress-test the plan against real market history to see sequence-of-returns risk — whether your money survives bad luck, not just an average.",
-  },
-  {
-    title: "Taxes: The Drag & Asset Location",
-    href: "/tools/taxes",
-    blurb:
-      "Tax on a taxable account is a leak that compounds, not a one-off haircut. Watch the drag widen year by year and break it into its sources — dividends, turnover, capital gains — then learn asset location: which account should hold your bonds versus your stocks for a free after-tax win.",
-    tag: "New",
   },
   {
     title: "Global Investing: Home Bias, Currency & Cycles",

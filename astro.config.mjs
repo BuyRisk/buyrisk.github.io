@@ -30,8 +30,13 @@ export default defineConfig({
     // the "will my money last" sim stays at /tools/retirement.
     '/tools/social-security': '/personal-finance/retirement-accounts',
     '/tools/roth-vs-traditional': '/personal-finance/retirement-accounts',
-    '/tools/tax-drag': '/tools/taxes',
-    '/tools/asset-location': '/tools/taxes',
+    // Taxes merged into the "What Eats Your Returns" module at /tools/fees.
+    '/tools/tax-drag': '/tools/fees',
+    '/tools/asset-location': '/tools/fees',
+    '/tools/taxes': '/tools/fees',
+    // Rebalancing folded into the Portfolio module; Closet Indexing into Beat-the-Market.
+    '/tools/rebalancing': '/tools/portfolio',
+    '/tools/closet-indexing': '/tools/beat-the-market',
     '/tools/home-bias': '/tools/global',
     '/tools/currency-risk': '/tools/global',
     '/tools/us-vs-world': '/tools/global',
