@@ -15,9 +15,10 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { srcDir } from "./lib/data-paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SRC = join(root, "data", "sources", "PETAJISTO", "active share", "activeshare.csv");
+const SRC = join(srcDir("petajisto"), "active share", "activeshare.csv"); // shared library (licensed)
 const OUT = join(root, "src", "data", "generated", "active-share.ts");
 
 // Petajisto's closet-indexer threshold: Active Share below 0.60.

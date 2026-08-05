@@ -4,6 +4,11 @@
 # (deploys to buyrisk.github.io), so the raw files must never be committed. Like
 # aqr/, crsp/, and jst/, the originals are git-ignored; only reduced, attributed
 # aggregates would ship as generated TS. Re-download from the source to reproduce.
+#
+# The raw files now live in the shared cross-project library (DATA_LIB, default
+# E:\Finance\data\sources\petajisto\); the reducer resolves them via srcDir().
+# This stub stays in-repo to document the provider and guard against accidental
+# re-commit if raw files are ever dropped back here.
 *.csv
 *.sas7bdat
 *.pdf

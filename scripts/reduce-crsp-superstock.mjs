@@ -22,10 +22,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { streamStocks, loadTbillMonthly, monthIndex } from "./lib/parse-crsp.mjs";
+import { srcDir } from "./lib/data-paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CSV = join(root, "data", "sources", "crsp", "crsp_monthly.csv");
-const MANIFEST = join(root, "data", "sources", "crsp", "crsp_monthly.manifest.json");
+const CSV = join(srcDir("crsp"), "crsp_monthly.csv"); // shared library (licensed/large)
+const MANIFEST = join(root, "data", "sources", "crsp", "crsp_monthly.manifest.json"); // stays in-repo
 const FRENCH = join(root, "data", "sources", "french", "F-F_Research_Data_Factors.csv");
 const OUT = join(root, "src", "data", "generated", "crsp-superstock.ts");
 

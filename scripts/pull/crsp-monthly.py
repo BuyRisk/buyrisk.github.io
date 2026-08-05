@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Pull CRSP monthly US common-stock returns from WRDS into data/sources/crsp/.
+Pull CRSP monthly US common-stock returns from WRDS.
 
-This is the ONE licensed source in the project. The raw output it writes
-(crsp_monthly.csv) is git-ignored and must never be committed or shipped — see
-data/sources/crsp/README.md. Only the manifest it writes (provenance, no rows)
-and the downstream AGGREGATE reducers (src/data/generated/crsp-*.ts) enter the
-repo.
+This is a licensed source. The raw output (crsp_monthly.csv) is written to the
+shared cross-project data library (DATA_LIB\crsp_stock\, default E:\Finance\data\
+sources) — git-ignored and never committed or shipped, see data/sources/crsp/
+README.md. Only the manifest (provenance, no rows), which stays in the repo, and
+the downstream AGGREGATE reducers (src/data/generated/crsp-*.ts) enter the repo.
 
 Prereqs (on a machine with WRDS access, e.g. Northwestern faculty):
     pip install wrds pandas pyarrow
@@ -27,12 +27,17 @@ research question allows.
 import argparse
 import datetime as dt
 import json
+import os
 import pathlib
 import sys
 
-OUT_DIR = pathlib.Path(__file__).resolve().parents[2] / "data" / "sources" / "crsp"
-RAW_CSV = OUT_DIR / "crsp_monthly.csv"
-MANIFEST = OUT_DIR / "crsp_monthly.manifest.json"
+# Raw CSV -> shared cross-project data library (licensed/large; git-ignored).
+# Override the library location per machine with the DATA_LIB env var.
+# The manifest (provenance, no rows) stays committed in the Buy Risk repo.
+DATA_LIB = pathlib.Path(os.environ.get("DATA_LIB", r"E:\Finance\data\sources"))
+REPO_CRSP = pathlib.Path(__file__).resolve().parents[2] / "data" / "sources" / "crsp"
+RAW_CSV = DATA_LIB / "crsp_stock" / "crsp_monthly.csv"
+MANIFEST = REPO_CRSP / "crsp_monthly.manifest.json"
 
 # ---------------------------------------------------------------------------
 # CLASSIC (SIZ) query — crsp.msf + crsp.msenames + crsp.msedelist.
@@ -107,7 +112,8 @@ def main() -> int:
         print("Install deps first:  pip install wrds pandas pyarrow", file=sys.stderr)
         return 1
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    RAW_CSV.parent.mkdir(parents=True, exist_ok=True)
+    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     print(f"Connecting to WRDS as {args.user} …")
     db = wrds.Connection(wrds_username=args.user)
 

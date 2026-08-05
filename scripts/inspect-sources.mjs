@@ -13,6 +13,7 @@ import { parseFrench } from "./lib/parse-french.mjs";
 import { readWorkbook } from "./lib/read-xlsx.mjs";
 import { parseFred } from "./lib/parse-fred.mjs";
 import { parseDta } from "./lib/parse-dta.mjs";
+import { srcDir } from "./lib/data-paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sourcesDir = join(root, "data", "sources");
@@ -113,7 +114,7 @@ function inspectFred() {
 
 /** Catalog the Jordà-Schularick-Taylor Macrohistory .dta (formats 117/118). */
 function inspectJst() {
-  const dir = join(sourcesDir, "jst");
+  const dir = srcDir("jst"); // moved to the shared library
   if (!existsSync(dir)) return;
   const files = readdirSync(dir)
     .filter((f) => f.toLowerCase().endsWith(".dta"))

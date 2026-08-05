@@ -28,10 +28,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { streamStocks } from "./lib/parse-crsp.mjs";
+import { srcDir } from "./lib/data-paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const CSV = join(root, "data", "sources", "crsp", "crsp_monthly.csv");
-const MANIFEST = join(root, "data", "sources", "crsp", "crsp_monthly.manifest.json");
+const CSV = join(srcDir("crsp"), "crsp_monthly.csv"); // shared library (licensed/large)
+const MANIFEST = join(root, "data", "sources", "crsp", "crsp_monthly.manifest.json"); // stays in-repo
 const OUT = join(root, "src", "data", "generated", "crsp-diversification.ts");
 
 const WINDOW = 60; // months per estimation window (5 years)

@@ -19,9 +19,10 @@ import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { readWorkbook } from "./lib/read-xlsx.mjs";
+import { srcDir } from "./lib/data-paths.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SRC = join(root, "data", "sources", "ici", "per32-01-data.xlsx");
+const SRC = join(srcDir("ici"), "per32-01-data.xlsx"); // shared library
 const OUT = join(root, "src", "data", "generated", "fees.ts");
 
 // Figure S3 columns (0-indexed) — asset-weighted average expense ratios, %.

@@ -7,36 +7,54 @@ parse and *reduce* them into small, typed `.ts` files under
 [`src/data/generated/`](../../src/data/generated) that the interactive tools import.
 
 ```
-data/sources/<provider>/   raw files, never shipped to the browser
+<provider>/                raw files, never shipped to the browser
+   │  (in-repo for redistributable sources; shared library for licensed/large ones)
+   scripts/lib/data-paths.mjs   resolves each provider to its location (srcDir)
+   scripts/lib/*.mjs            provider-specific parsers
+   scripts/reduce-*.mjs         per-tool reducers (build-time, Node)
         │
-   scripts/lib/*.mjs        provider-specific parsers
-   scripts/reduce-*.mjs     per-tool reducers (build-time, Node)
-        │
- src/data/generated/*.ts    small typed outputs the site imports & ships
+ src/data/generated/*.ts        small typed outputs the site imports & ships
 ```
 
-Keeping the raw files in the repo is deliberate: it makes every number on the
-site reproducible from its primary source, which is the whole point of an
-evidence-based teaching site.
+### Two locations, one boundary: the git-ignore line
+
+Raw sources live in **one of two places**, split exactly along the git-ignore line:
+
+- **Committed, in this repo (`data/sources/<provider>/`)** — small, freely
+  redistributable sources: `french/`, `fred/`, `damodaran/`, `shiller/`, `ssa/`.
+  Committing them is a deliberate reproducibility feature: every number on the
+  site traces to a primary source checked into the repo.
+- **Shared cross-project library (git-ignored)** — licensed and/or large pulls:
+  `crsp/`, `jst/`, `aqr/`, `ici/`, `spiva/`, `petajisto/`. These are deduplicated
+  across projects in a machine-local library (default **`E:\Finance\data\sources`**)
+  and were never part of the repo's reproducibility story (which runs through the
+  pull scripts + manifests). Each provider keeps its `README`, `manifest`, and
+  `.gitignore` **in-repo** as documentation; only the raw bytes live in the library.
+
+[`scripts/lib/data-paths.mjs`](../../scripts/lib/data-paths.mjs) resolves each
+provider via `srcDir(provider)`. **Set `DATA_LIB` per machine** to point at that
+machine's library copy (the default matches the E: layout); committed providers
+don't need it. Reducers fail loud if the library is missing.
 
 ## Providers
 
-| Folder | Provider | Status |
-|---|---|---|
-| `french/` | Kenneth R. French Data Library (Tuck / Dartmouth) | ✅ ingested |
-| `damodaran/` | Aswath Damodaran historical returns (NYU Stern) | ✅ ingested |
-| `shiller/` | Robert Shiller long-run US data (Yale) | ✅ ingested |
-| `fred/` | Federal Reserve Economic Data (FRED) | ✅ ingested |
-| `crsp/` | CRSP individual-stock returns (via WRDS) | 🔒 licensed — pull script ready, raw git-ignored ([details](crsp/README.md)) |
-| `jst/` | Jordà-Schularick-Taylor Macrohistory (global, 1870–) | ✅ ingested — CC BY-NC-SA, raw git-ignored ([details](jst/README.md)) |
-| `aqr/` | AQR Capital factor data sets | ✅ ingested — terms restrict redistribution, raw git-ignored ([details](aqr/README.md)) |
-| `ssa/` | Social Security Administration life tables | ✅ ingested — public domain ([details](ssa/README.md)) |
+| Folder | Provider | Location | Status |
+|---|---|---|---|
+| `french/` | Kenneth R. French Data Library (Tuck / Dartmouth) | in-repo | ✅ ingested |
+| `damodaran/` | Aswath Damodaran historical returns (NYU Stern) | in-repo | ✅ ingested |
+| `shiller/` | Robert Shiller long-run US data (Yale) | in-repo | ✅ ingested |
+| `fred/` | Federal Reserve Economic Data (FRED) | in-repo | ✅ ingested |
+| `ssa/` | Social Security Administration life tables | in-repo | ✅ ingested — public domain ([details](ssa/README.md)) |
+| `crsp/` | CRSP individual-stock returns (via WRDS) | 📚 library (`crsp_stock/`) | 🔒 licensed — pull script ready ([details](crsp/README.md)) |
+| `jst/` | Jordà-Schularick-Taylor Macrohistory (global, 1870–) | 📚 library | ✅ ingested — CC BY-NC-SA ([details](jst/README.md)) |
+| `aqr/` | AQR Capital factor data sets | 📚 library | ✅ terms restrict redistribution ([details](aqr/README.md)) |
+| `ici/` | ICI mutual-fund fee data | 📚 library | ✅ ingested (fee reducer) |
+| `spiva/` | S&P SPIVA scorecard (PDF, hand-transcribed) | 📚 library | ✅ reference (figures transcribed) |
+| `petajisto/` | Antti Petajisto Active Share dataset | 📚 library | 🔒 licensed — cite website + Petajisto (2013) |
 
-**One licensed exception:** every provider above is free to redistribute *except*
-`crsp/`. CRSP (via WRDS) is a paid subscription whose raw rows may **not** be
-shipped, so — unlike the others — its raw pull is **git-ignored** and only
-aggregate, non-identifiable statistics derived from it enter the repo. See
-[`crsp/README.md`](crsp/README.md).
+**Licensed sources may not be redistributed** (`crsp/`, `petajisto/`, and per their
+terms `jst/`, `aqr/`) — their raw files are git-ignored and live only in the shared
+library; only aggregate, non-identifiable statistics derived from them enter the repo.
 
 **File formats:** French files are CSV (parsed by `scripts/lib/parse-french.mjs`).
 Damodaran and Shiller ship legacy binary `.xls` workbooks (parsed by
