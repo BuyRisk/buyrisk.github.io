@@ -990,6 +990,98 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* --- Factor Lab: two-mode segmented control + alpha-decay ladder --- */
+  .fl-modes {
+    margin-bottom: var(--space-xs);
+  }
+  .fl-mode-hint {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    margin: 0 0 var(--space-md);
+    max-width: 60ch;
+  }
+  /* 4-across variant of the model pill (Extended adds a fourth entry). */
+  .fl-model--4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .fl-port-blurb {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    margin: 0;
+  }
+  .fl-stepper {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  .fl-step-btn {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    padding: 0.35rem 0.6rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-soft);
+    cursor: pointer;
+  }
+  .fl-step-btn:hover:not(:disabled) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .fl-step-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .fl-step-now {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-align: center;
+    color: var(--color-accent);
+  }
+  .fl-headline-unit {
+    font-size: var(--step-0);
+    font-weight: 600;
+    color: var(--color-text-soft);
+  }
+  .fl-flag {
+    display: inline-block;
+    font-weight: 700;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    margin-right: 0.35rem;
+  }
+  .fl-flag-skill {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .fl-flag-luck {
+    background: var(--color-surface-alt);
+    color: var(--color-text-soft);
+  }
+  .fl-flag-drag {
+    background: color-mix(in srgb, var(--color-error) 16%, transparent);
+    color: var(--color-error);
+  }
+  .fl-ext-tag {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.03rem 0.3rem;
+    margin-left: 0.25rem;
+    border-radius: 4px;
+    background: var(--color-surface-alt);
+    color: var(--color-muted);
+    vertical-align: middle;
+  }
+
 /* from compound-growth.astro */
   /* Styles for the CompoundGrowthExplorer React island. Global so they reach
      the client-rendered component markup. */

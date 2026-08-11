@@ -17,6 +17,7 @@
     "data:historical": "node scripts/reduce-damodaran-returns.mjs",
     "data:ssa": "node scripts/reduce-ssa.mjs",
     "data:capm": "node scripts/reduce-capm.mjs",
+    "data:factor-premia": "node scripts/reduce-factor-premia.mjs",
     "data:assets": "node scripts/reduce-asset-stats.mjs",
     "data:inflation": "node scripts/reduce-inflation.mjs",
     "data:fees": "node scripts/reduce-fees.mjs",
