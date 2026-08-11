@@ -487,6 +487,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.crsp.org/",
     note: "Used under license. We ship only index-level aggregates — month-end concentration, index returns, and a few decade snapshots of top-10 tickers; no per-stock time series is redistributed.",
   },
+  crspMf: {
+    name: "CRSP Survivor-Bias-Free US Mutual Fund Database",
+    publisher: "Center for Research in Security Prices, LLC, via WRDS",
+    url: "https://www.crsp.org/",
+    note: "Used under license. The behavior gap is computed from fund monthly returns and net assets; only universe-level aggregates and a few illustrative fund figures are published — no full per-fund panel is redistributed.",
+  },
   shiller: {
     name: "U.S. Stock Markets 1871–Present and CAPE Ratio",
     publisher: "Robert J. Shiller, Yale University",
@@ -667,7 +673,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "behavioral-finance": {
     studies: ["kahnemanTversky1979", "barberOdean2000"],
-    datasets: ["french"],
+    datasets: ["french", "crspMf"],
   },
   "next-dollar": {
     studies: [],

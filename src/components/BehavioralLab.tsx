@@ -3,6 +3,7 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
 import { marketDaily } from "../data/generated/market-daily";
+import { behaviorGap as GAP } from "../data/generated/behavior-gap";
 
 /**
  * "Behavioral Finance: Your Own Worst Enemy" — the companion to the
@@ -27,6 +28,35 @@ const R = marketDaily.returns;
 const YEARS = R.length / 252;
 const START_YEAR = new Date(marketDaily.startDate).getFullYear();
 const END_YEAR = new Date(marketDaily.endDate).getFullYear();
+
+const pct1 = (x: number) => `${(x * 100).toFixed(1)}%`;
+const pp1 = (x: number) => `${(x * 100).toFixed(1)}pp`;
+
+/**
+ * "Flows chase returns": bucket each month by the fund industry's trailing
+ * 12-month return, then average the NEXT month's net investor flow (% of prior
+ * assets). Computed once — GAP.flows is static, baked at build time.
+ */
+const FLOW_BINS: { ret: number; flow: number }[] = (() => {
+  const f = GAP.flows;
+  const pts: { r: number; flow: number }[] = [];
+  for (let k = 12; k < f.length; k++) {
+    let g = 1;
+    for (let j = k - 12; j < k; j++) g *= 1 + f[j].ret;
+    pts.push({ r: g - 1, flow: f[k].flowPct });
+  }
+  pts.sort((a, b) => a.r - b.r);
+  const bins: { ret: number; flow: number }[] = [];
+  for (let q = 0; q < 5; q++) {
+    const seg = pts.slice(Math.floor((q * pts.length) / 5), Math.floor(((q + 1) * pts.length) / 5));
+    if (!seg.length) continue;
+    bins.push({
+      ret: seg.reduce((s, p) => s + p.r, 0) / seg.length,
+      flow: seg.reduce((s, p) => s + p.flow, 0) / seg.length,
+    });
+  }
+  return bins;
+})();
 
 /** Simulate buy-and-hold vs. an emotional investor over the full daily series. */
 function simulate(panicDrop: number, waitRise: number) {
@@ -75,10 +105,11 @@ const BIASES: Bias[] = [
 
 export default function BehavioralLab() {
   useCurrencyCode();
-  const [mode, setMode] = useState<"gap" | "biases">("gap");
+  const [mode, setMode] = useState<"gap" | "real" | "biases">("gap");
   const [panicDrop, setPanicDrop] = useState(0.2);
   const [waitRise, setWaitRise] = useState(0.1);
   const [bias, setBias] = useState(0);
+  const [fund, setFund] = useState(0);
 
   const sim = useMemo(() => simulate(panicDrop, waitRise), [panicDrop, waitRise]);
   const money = (v: number) => formatMoney(v);
@@ -88,9 +119,10 @@ export default function BehavioralLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton onReset={() => { setMode("gap"); setPanicDrop(0.2); setWaitRise(0.1); setBias(0); }} />
+        <ResetButton onReset={() => { setMode("gap"); setPanicDrop(0.2); setWaitRise(0.1); setBias(0); setFund(0); }} />
         <div className="wl-simmode" role="group" aria-label="View">
           <button type="button" className={mode === "gap" ? "active" : ""} aria-pressed={mode === "gap"} onClick={() => setMode("gap")}>The behavior gap</button>
+          <button type="button" className={mode === "real" ? "active" : ""} aria-pressed={mode === "real"} onClick={() => setMode("real")}>In real funds</button>
           <button type="button" className={mode === "biases" ? "active" : ""} aria-pressed={mode === "biases"} onClick={() => setMode("biases")}>Why we do it</button>
         </div>
 
@@ -130,6 +162,21 @@ export default function BehavioralLab() {
               nothing while out (a simplification). The point isn't the exact figure — it's the direction, which barely
               ever reverses. Educational only, not advice.
             </p>
+          </>
+        ) : mode === "real" ? (
+          <>
+            <p className="wl-note" style={{ fontStyle: "normal", color: "var(--color-text-soft)" }}>
+              That was a simulation. Here's the same gap in real money: across {GAP.nFunds.toLocaleString()} US equity
+              funds ({GAP.window}), <strong>{Math.round(GAP.pctPositive * 100)}%</strong> earned their investors less than
+              the fund itself earned. The gap is small in big steady funds — and brutal in the ones people chase. Pick one:
+            </p>
+            <div className="bf-list" role="tablist" aria-label="Example funds">
+              {GAP.cases.map((c, i) => (
+                <button key={c.name} type="button" role="tab" aria-selected={fund === i} className={`bf-item${fund === i ? " active" : ""}`} onClick={() => setFund(i)}>
+                  {c.name.split(":").pop()!.trim()}
+                </button>
+              ))}
+            </div>
           </>
         ) : (
           <>
@@ -183,6 +230,44 @@ export default function BehavioralLab() {
               </div>
             </div>
           </>
+        ) : mode === "real" ? (
+          <>
+            <div className="wl-frontier">
+              <h3>What investors in this fund actually earned</h3>
+              <div className="ss-headline" style={{ marginTop: 0 }}>
+                <span className="ss-headline-label">{GAP.cases[fund].name} · {GAP.cases[fund].years}</span>
+                <span className="ss-headline-value" style={{ color: "var(--color-warn)" }}>{pp1(GAP.cases[fund].gapPP)}/yr gap</span>
+                <span className="ss-headline-sub">
+                  The fund returned <strong>{pct1(GAP.cases[fund].tw)}/yr</strong>. Its investors earned{" "}
+                  <strong>{pct1(GAP.cases[fund].dw)}/yr</strong> — most of the money arrived after the run-up and fled after the fall.
+                </span>
+              </div>
+              <FlowChaseChart />
+              <p className="wl-fnote">
+                Each bar groups months by how the average equity fund had done over the prior year, then shows how much
+                new money investors added the next month. The better the recent past, the harder the money chases — which
+                is exactly how the average dollar keeps arriving late.
+              </p>
+            </div>
+            <div className="wl-lower">
+              <div className="wl-readout">
+                <dl className="ss-stats">
+                  <div><dt>Typical fund's gap</dt><dd>{pp1(GAP.medianGapPP)}/yr</dd></div>
+                  <div><dt>Funds with a gap</dt><dd>{Math.round(GAP.pctPositive * 100)}%</dd></div>
+                  <div><dt>This fund earned</dt><dd>{pct1(GAP.cases[fund].tw)}/yr</dd></div>
+                  <div><dt>Its investors earned</dt><dd>{pct1(GAP.cases[fund].dw)}/yr</dd></div>
+                </dl>
+                <p className="wl-saved">
+                  For the <strong>typical</strong> fund the gap is modest — about {pp1(GAP.medianGapPP)}/yr — but it
+                  explodes in volatile, heavily-marketed funds like these, where investors piled in near the top. Method:
+                  each fund's buy-and-hold return minus the <strong>dollar-weighted</strong> return its actual investor
+                  cash flows earned (CRSP mutual-fund data, {GAP.window}; dead funds included, so there's no survivorship
+                  flattery). The lesson matches the simulation: the surest way to close the gap is to stop timing — buy
+                  broadly, automate, and hold. Educational only, not advice.
+                </p>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="wl-frontier">
             <h3>{BIASES[bias].name}</h3>
@@ -207,6 +292,45 @@ export default function BehavioralLab() {
         )}
       </div>
     </div>
+  );
+}
+
+/** "Flows chase returns": net investor flow the month after weak vs strong fund years. */
+function FlowChaseChart() {
+  const width = 760, height = 300;
+  const pad = { top: 22, right: 18, bottom: 48, left: 58 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const bins = FLOW_BINS;
+  const maxFlow = Math.max(...bins.map((b) => b.flow)) * 1.18;
+  const bw = plotW / bins.length;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const y = (v: number) => pad.top + plotH - (v / maxFlow) * plotH;
+  const ticks = [0, 0.5, 1].map((f) => maxFlow * f);
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Investor net inflow the month after weak vs. strong fund returns">
+      {ticks.map((v) => (
+        <g key={v}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" />
+          <text x={pad.left - 6} y={y(v) + 4} textAnchor="end" style={axisText}>{(v * 100).toFixed(2)}%</text>
+        </g>
+      ))}
+      {bins.map((b, i) => {
+        const x0 = pad.left + i * bw + bw * 0.18;
+        const w = bw * 0.64;
+        return (
+          <g key={i}>
+            <rect x={x0} y={y(b.flow)} width={w} height={pad.top + plotH - y(b.flow)} rx={3} fill="var(--color-accent)" opacity={0.5 + 0.1 * i} />
+            <text x={x0 + w / 2} y={y(b.flow) - 6} textAnchor="middle" style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}>{(b.flow * 100).toFixed(2)}%</text>
+            <text x={x0 + w / 2} y={height - 30} textAnchor="middle" style={axisText}>{b.ret >= 0 ? "+" : ""}{Math.round(b.ret * 100)}%</text>
+          </g>
+        );
+      })}
+      <text x={pad.left + plotW / 2} y={height - 8} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        Fund's trailing 12-month return → investor's next-month net inflow
+      </text>
+    </svg>
   );
 }
 
