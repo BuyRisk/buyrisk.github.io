@@ -481,6 +481,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.crsp.org/",
     note: "Used under license; only aggregate, non-identifiable statistics are published here.",
   },
+  crspSp500: {
+    name: "CRSP S&P 500 Indexes & Daily Constituents",
+    publisher: "Center for Research in Security Prices, LLC, via WRDS",
+    url: "https://www.crsp.org/",
+    note: "Used under license. We ship only index-level aggregates — month-end concentration, index returns, and a few decade snapshots of top-10 tickers; no per-stock time series is redistributed.",
+  },
   shiller: {
     name: "U.S. Stock Markets 1871–Present and CAPE Ratio",
     publisher: "Robert J. Shiller, Yale University",
@@ -601,7 +607,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   diversification: {
     studies: ["markowitz1952", "samuelson1965"],
-    datasets: ["damodaran"],
+    datasets: ["damodaran", "crspSp500"],
   },
   "stock-picking": {
     studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987", "bessembinder2018", "bessembinder2023"],

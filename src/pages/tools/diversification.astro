@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import DiversificationModule from "../../components/DiversificationModule.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -16,9 +17,10 @@ import "../../styles/simtool.css";
     <p class="lede">
       Mixing assets that don't move in lockstep lowers a portfolio's risk without
       lowering its expected return: the closest thing investing has to a free
-      lunch. Meet it in two views: first the pure idea, where out-of-phase waves
+      lunch. Meet it in three views: first the pure idea, where out-of-phase waves
       cancel; then the messy reality, where randomness means cancellation is only
-      partial and every so often everything falls together.
+      partial and every so often everything falls together; and finally its
+      opposite, where a "500-stock" index turns out to ride on a handful of giants.
     </p>
     <div
       class="intro-formula"
@@ -36,6 +38,15 @@ import "../../styles/simtool.css";
 
   <section class="container wl-host">
     <DiversificationModule client:load />
+  </section>
+
+  <section class="container">
+    <RegionNote kind="data">
+      The <strong>How top-heavy is the market?</strong> tab uses US data — the
+      S&amp;P 500's own constituents (CRSP). The lesson is universal: any
+      cap-weighted index, in any country, can be quietly dominated by a few
+      giants. The specific names are American.
+    </RegionNote>
   </section>
 
   <section class="container wl-explainer">
@@ -67,6 +78,22 @@ import "../../styles/simtool.css";
           more often every holding is down at once: exactly when diversification
           helps least. That's why correlations, not just volatilities, drive
           portfolio risk.
+        </li>
+      </ul>
+      <h2>Concentration: diversification in reverse</h2>
+      <ul>
+        <li>
+          <strong>"500 stocks" can mean a handful.</strong> A cap-weighted index
+          hands the biggest companies the biggest share, so when a few giants swell,
+          the top 10 names can make up a third or more of the whole. The
+          <strong>effective number of stocks</strong> (1 ÷ the sum of squared
+          weights) shows how few names you're really diversified across.
+        </li>
+        <li>
+          <strong>Concentration is a bet.</strong> Equal-weighting every stock and
+          cap-weighting the same 500 give very different rides: cap weight wins when
+          the giants lead, and lags when they don't. Owning the index is convenient,
+          but it isn't the same as owning 500 things equally.
         </li>
       </ul>
       <p>

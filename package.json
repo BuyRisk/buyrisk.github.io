@@ -29,7 +29,8 @@
     "data:market-daily": "node scripts/reduce-french-daily.mjs",
     "data:bond-yields": "node scripts/reduce-fred-yields.mjs",
     "data:global-equity": "node scripts/reduce-global-equity.mjs",
-    "data:active-share": "node scripts/reduce-active-share.mjs"
+    "data:active-share": "node scripts/reduce-active-share.mjs",
+    "data:sp500-concentration": "node scripts/reduce-sp500-concentration.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
