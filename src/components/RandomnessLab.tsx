@@ -447,7 +447,7 @@ export default function RandomnessLab() {
           <label className="wl-corr">
             <span className="wl-corr-label">
               Correlation ({assets[0].name} ↔ {assets[1].name})
-              <InfoTip text="How the two assets move together (−1 to +1). Even near −1, real randomness leaves a residual wobble. Perfect cancellation never happens." />{" "}
+              <InfoTip text="How the two assets move together (−1 to +1). Even near −1, the noise leaves a residual wobble. Perfect cancellation never happens." />{" "}
               <strong>{pairCorr.toFixed(2)}</strong>
             </span>
             <input
@@ -459,7 +459,7 @@ export default function RandomnessLab() {
               onChange={(e) => setPairCorr(Number(e.target.value))}
             />
             <span className="wl-corr-hint">
-              Even near −1, real randomness leaves a residual wobble. It never
+              Even near −1, the noise leaves a residual wobble. It never
               fully cancels.
             </span>
           </label>
@@ -524,7 +524,7 @@ export default function RandomnessLab() {
             <p className="wl-saved">
               Diversification should cancel <strong>{pct(cancelled, 0)}</strong> of the
               volatility, but this run came out to {pct(realizedVol)}, not the theoretical{" "}
-              {pct(portVol)}. Randomness means it's never exact, and every asset fell
+              {pct(portVol)}. Noise means it's never exact, and every asset fell
               together <strong>{pct(allDownFrac, 0)}</strong> of the time.
             </p>
           </div>

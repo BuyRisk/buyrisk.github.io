@@ -32,7 +32,7 @@ export const TOOLS: Tool[] = [
     title: "Diversification",
     href: "/tools/diversification",
     blurb:
-      "The only free lunch in investing: how mixing assets that don't move together lowers risk. From pure out-of-phase waves to messy, real randomness.",
+      "The only free lunch in investing: how mixing assets that don't move together lowers risk. From pure out-of-phase waves to messy, real returns.",
   },
   {
     title: "Stock-Picking: How Many, and Why a Few Win",
