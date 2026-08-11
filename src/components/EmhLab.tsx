@@ -129,7 +129,7 @@ export default function EmhLab() {
           </div>
           <span className="emh-cum-val">
             {cum.total > 0 ? `${Math.round(cumAcc * 100)}% over ${cum.total} predictions` : "make some predictions…"}
-            {cum.total >= 10 && <>. The 50% line is where a coin flip lands.</>}
+            {cum.total >= 10 && <>. The 50% line is a coin flip — and because the market drifts upward, always guessing “up” already edges above it, no skill required.</>}
           </span>
         </div>
 

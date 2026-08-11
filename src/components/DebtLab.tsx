@@ -130,7 +130,7 @@ export default function DebtLab() {
             <>
               <span className="ss-headline-label">At {dollars(payment)}/mo</span>
               <span className="ss-headline-value">Never paid off</span>
-              <span className="ss-headline-sub">that barely covers the {dollars(firstMin)} minimum. The balance won't fall. Pay more.</span>
+              <span className="ss-headline-sub">that doesn't even cover the monthly interest, so the balance won't fall. Pay more.</span>
             </>
           ) : (
             <>
@@ -177,8 +177,7 @@ export default function DebtLab() {
               the amount you borrowed) and takes <strong>{yearsLabel(min.months)}</strong> to clear.
               That's the trap: the minimum falls as the balance does, so you mostly pay interest.
               Flip it around and paying down a <strong>{pct(apr)}</strong> balance is a{" "}
-              <strong>guaranteed {pct(apr)} return</strong>, tax-free, higher than the stock
-              market's ~10% long-run average, and with none of the risk. When your debt's rate beats
+              <strong>guaranteed {pct(apr)} return</strong>, tax-free{apr > 10 ? ", higher than the stock market's ~10% long-run average," : ","} and with none of the risk. When your debt's rate beats
               what you could earn investing, paying it off is the best "investment" available.
               Educational only, not advice.
             </p>

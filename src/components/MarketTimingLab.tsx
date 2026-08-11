@@ -15,9 +15,11 @@ import { formatMoney, useCurrencyCode } from "../lib/currency";
  *
  * Mode 2 ("Timing your buys", the Ben Carlson "worst market timer" story): four
  * savers contribute the same amount every month over decades. One deploys cash
- * only at the peak before every crash (worst), one only at the bottoms (best), one
- * invests immediately (steady), one never invests (cash). The worst timer still
- * buries the cash saver, because they stayed invested and rode every recovery.
+ * only at the peak before every crash (worst), one waits to buy each bottom (a
+ * dip-waiter, whose cash sits idle between lows), one invests immediately (steady),
+ * one never invests (cash). The worst timer still buries the cash saver, because
+ * they stayed invested and rode every recovery — and the dip-waiter trails steady,
+ * because waiting keeps money in cash.
  * Monthly returns are REAL (inflation-adjusted). Educational only, not advice.
  */
 
@@ -285,8 +287,8 @@ export default function MarketTimingLab() {
             <div className="wl-lower">
               <div className="wl-readout">
                 <dl className="ss-stats">
-                  <div><dt>Perfect timing (every bottom)</dt><dd>{dollars(timing.best)}</dd></div>
                   <div><dt>Invested steadily (every month)</dt><dd>{dollars(timing.steady)}</dd></div>
+                  <div><dt>Dip-buyer (waits for each low)</dt><dd>{dollars(timing.best)}</dd></div>
                   <div><dt>Worst timing (every peak)</dt><dd>{dollars(timing.worst)}</dd></div>
                   <div><dt>Never invested (cash)</dt><dd>{dollars(timing.cash)}</dd></div>
                 </dl>
@@ -295,9 +297,11 @@ export default function MarketTimingLab() {
                   bought at the {timing.crashes} peaks right before each crash, still turned {dollars(timing.contributed)} of
                   savings into <strong>{dollars(timing.worst)}</strong>, because he never sold and rode every recovery to the
                   end. The saver who stayed in cash ended with just {dollars(timing.cash)}, barely more than he put in, once
-                  inflation is counted. And notice the <strong>perfect</strong> dip-buyer only about tied the saver who
-                  invested every month on autopilot: waiting in cash for the perfect moment quietly costs you the growth you
-                  miss while waiting. Being <em>in</em> the market swamps timing it. Educational only, not advice.
+                  inflation is counted. And notice the <strong>dip-buyer</strong> who waited to buy every low actually
+                  <em> trailed</em> the saver who invested every month on autopilot ({dollars(timing.best)} vs{" "}
+                  {dollars(timing.steady)}): waiting in cash for a lower price costs you the growth you miss while waiting —
+                  and any cash still waiting for a dip at the end never gets in at all. Being <em>in</em> the market swamps
+                  timing it. Educational only, not advice.
                 </p>
               </div>
             </div>
@@ -356,8 +360,8 @@ function TimingBars({ timing }: { timing: ReturnType<typeof simulateTiming> }) {
   const plotH = height - pad.top - pad.bottom;
 
   const bars = [
-    { label: "Perfect", sub: "every bottom", value: timing.best, color: "var(--pl-c2)" },
     { label: "Steady", sub: "every month", value: timing.steady, color: "var(--color-accent)" },
+    { label: "Dip-buyer", sub: "waits for lows", value: timing.best, color: "var(--pl-c2)" },
     { label: "Worst", sub: "every peak", value: timing.worst, color: "var(--pl-c3)" },
     { label: "Cash", sub: "never invested", value: timing.cash, color: "var(--color-text-soft)" },
   ];

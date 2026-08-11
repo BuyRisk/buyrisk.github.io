@@ -12,7 +12,7 @@ const size = byKey("smb");
 
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
 const sourceNote =
-  "Kenneth R. French Data Library. Long-run annualized US averages (≈1963–present) of each factor's long-short return spread. Every premium is period-dependent — value in particular has had long droughts.";
+  "Core factors (market, size, value, profitability, investment, momentum) from the Kenneth R. French Data Library (US; ≈1963–present, momentum from 1927). Quality (QMJ) and Defensive (Betting-Against-Beta) from AQR; Liquidity from the Pástor–Stambaugh traded series (from 1968). Long-run annualized averages of each factor's long-short spread; every premium is period-dependent — value in particular has had long droughts.";
 ---
 
 <BaseLayout
@@ -43,8 +43,8 @@ const sourceNote =
       <li class="ref-stat">
         <span class="ref-stat-value">{pct(mkt.premium)}</span>
         <span class="ref-stat-label"
-          >the <strong>market</strong> premium — stocks over T-bills, the biggest
-          reward of all</span
+          >the <strong>market</strong> premium — stocks over T-bills, the reward
+          for simply owning the market</span
         >
       </li>
       <li class="ref-stat">
@@ -123,10 +123,10 @@ const sourceNote =
 
   <div id="sources">
     <Sources
-      datasets={["french"]}
+      datasets={["french", "aqr", "pastorStambaugh"]}
       studies={["famaFrench1992", "famaFrench1993", "famaFrench2015", "carhart1997"]}
       title="Sources &amp; method"
-      intro="Annualized factor premia and volatilities from the Kenneth French Data Library."
+      intro="Annualized factor premia from the Kenneth French Data Library, with quality and defensive from AQR and liquidity from Pástor–Stambaugh."
     />
   </div>
 

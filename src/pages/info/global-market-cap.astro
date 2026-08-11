@@ -17,9 +17,11 @@ const tierT = tierTotals(data);
 const cell = (regionKey: string, tier: string) =>
   sl.find((s) => s.region.key === regionKey && s.tier.tier === tier)?.ofGlobal ??
   0;
-const usLarge = cell("us", "Large cap");
-const usExtended =
-  Math.round((cell("us", "Mid cap") + cell("us", "Small cap")) * 10) / 10;
+// The S&P 500 ≈ 80% of the US market (large + mega + some mid), not the FTSE
+// large-cap size band; an "extended-market" fund covers the ~20% completion.
+const usTotal = cell("us", "Large cap") + cell("us", "Mid cap") + cell("us", "Small cap");
+const usLarge = Math.round(usTotal * 0.8 * 10) / 10;
+const usExtended = Math.round((usTotal - usLarge) * 10) / 10;
 const intl = twoFund.exUs;
 
 // Formatting helpers.
@@ -238,10 +240,10 @@ const tierOpacity: Record<string, number> = {
         <ul>
           <li>
             <strong>{pct(usLarge)}</strong> of the world — that's all an S&amp;P
-            500 fund covers (US large cap)
+            500 fund covers (the largest US companies)
           </li>
           <li>
-            add <strong>{pct(usExtended)}</strong> US mid + small (an
+            add <strong>{pct(usExtended)}</strong> for the rest of the US market (an
             "extended-market" fund)
           </li>
           <li>add <strong>{pct(intl)}</strong> international</li>

@@ -65,8 +65,9 @@ const QUICK_JUMPS: { label: string; idx: number; hint: string }[] = [
   { label: "Extended", idx: RUNG_COUNT - 1, hint: "+ Momentum, Quality, Defensive, Liquidity" },
 ];
 
-/** Which factor each rung adds (parallel to the reducer's RUNGS), for honesty copy. */
-const RUNG_FACTOR: (FactorKey | null)[] = [null, "hml", "cma", "umd", "qmj", "bab", "liq"];
+/** Which factors each rung adds (parallel to the reducer's RUNGS), for honesty copy.
+ *  FF3 adds Size+Value together; FF5 adds Profitability+Investment together. */
+const RUNG_FACTORS: FactorKey[][] = [[], ["smb", "hml"], ["rmw", "cma"], ["umd"], ["qmj"], ["bab"], ["liq"]];
 
 function skillFlag(rung: LadderRung): { label: string; cls: string } {
   if (Math.abs(rung.tStat) < 2) return { label: "Indistinguishable from luck", cls: "fl-flag-luck" };
@@ -86,12 +87,19 @@ function LadderView() {
     setRungIdx(0);
   };
 
-  // Honesty-guard copy: did the factor this rung added actually move alpha?
+  // Honesty-guard copy: did the factor(s) this rung added actually move alpha?
   const prevAlpha = rungIdx > 0 ? port.rungs[rungIdx - 1].alpha : rung.alpha;
   const deltaAlpha = rung.alpha - prevAlpha;
-  const addedFactorKey = RUNG_FACTOR[rungIdx];
-  const addedFactor = addedFactorKey ? FACTORS.find((f) => f.key === addedFactorKey)! : null;
+  const addedFactors = RUNG_FACTORS[rungIdx].map((k) => FACTORS.find((f) => f.key === k)!);
+  const hasAdded = addedFactors.length > 0;
+  const addedNames = addedFactors.map((f) => f.name).join(" and ");
+  const addedShorts = addedFactors.map((f) => f.short).join(", ");
   const barelyMoved = rungIdx > 0 && Math.abs(deltaAlpha) < 0.004;
+
+  // Does this portfolio's alpha shrink across the ladder, or grow? (Tech's grows.)
+  const capmAlpha = port.rungs[0].alpha;
+  const finalAlpha = port.rungs[port.rungs.length - 1].alpha;
+  const alphaShrinks = Math.abs(finalAlpha) <= Math.abs(capmAlpha);
 
   return (
     <div className="wl">
@@ -162,12 +170,20 @@ function LadderView() {
         </div>
 
         <div className="wl-frontier">
-          <h3>Watch the alpha melt</h3>
+          <h3>{alphaShrinks ? "Watch the alpha melt" : "Watch the alpha emerge"}</h3>
           <AlphaDecayChart port={port} rungIdx={rungIdx} onPick={setRungIdx} />
           <p className="wl-fnote">
-            Each rung adds a legitimate risk factor. As real factors soak up the
-            returns, the leftover alpha — the part no known risk explains —
-            shrinks toward zero. |<em>t</em>| ≥ 2 (bars past the dotted line)
+            {alphaShrinks ? (
+              <>Each rung adds a legitimate risk factor. As real factors soak up the
+              returns, the leftover alpha — the part no known risk explains —
+              shrinks toward zero.</>
+            ) : (
+              <>Each rung adds a legitimate risk factor — but here the leftover alpha
+              actually <em>grows</em>: once you account for the factors this portfolio
+              is tilted <em>against</em> (its size or value loadings can be negative),
+              a real outperformance CAPM alone couldn't see is revealed.</>
+            )}
+            {" "}|<em>t</em>| ≥ 2 (bars past the dotted line)
             marks alpha that's statistically hard to write off as luck.
           </p>
         </div>
@@ -186,13 +202,13 @@ function LadderView() {
 
           <div className="wl-readout">
             <h3>The honesty check</h3>
-            {barelyMoved && addedFactor ? (
+            {barelyMoved && hasAdded ? (
               <p className="wl-saved">
-                Adding <strong>{addedFactor.name}</strong> barely moved the alpha
+                Adding <strong>{addedNames}</strong> barely moved the alpha
                 ({signed1(deltaAlpha)}). That's the honest rule: a legitimate
                 factor only explains returns <em>where the portfolio is actually
-                exposed to it</em>. This portfolio has little {addedFactor.name.toLowerCase()}{" "}
-                exposure, so its {addedFactor.short} rung does almost nothing.
+                exposed to it</em>. This portfolio has little {addedNames.toLowerCase()}{" "}
+                exposure, so its {addedShorts} rung does almost nothing.
               </p>
             ) : rungIdx === 0 ? (
               <p className="wl-saved">
@@ -200,11 +216,11 @@ function LadderView() {
                 mysterious skill. Start adding factors and watch how much of it
                 was really just <strong>risk you could have targeted on purpose</strong>.
               </p>
-            ) : addedFactor ? (
+            ) : hasAdded ? (
               <p className="wl-saved">
-                Adding <strong>{addedFactor.name}</strong> ({addedFactor.short})
+                Adding <strong>{addedNames}</strong> ({addedShorts})
                 changed the alpha by <strong>{signed1(deltaAlpha)}</strong> — this
-                portfolio really is exposed to it, so the factor does real
+                portfolio really is exposed {addedFactors.length > 1 ? "to them" : "to it"}, so {addedFactors.length > 1 ? "they do" : "it does"} real
                 explanatory work here. Skill, or paid-for risk?
               </p>
             ) : (

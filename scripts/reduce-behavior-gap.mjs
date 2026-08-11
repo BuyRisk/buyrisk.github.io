@@ -258,8 +258,10 @@ async function main() {
 
   const o = {
     window: startY && endY ? `${startY}–${endY}` : "n/a",
-    category: "US-domiciled equity mutual funds",
-    nFunds: agg.nFunds,
+    // CRSP crsp_fundno identifies a share CLASS (A/B/C/I), not a distinct fund.
+    category: "US-domiciled equity mutual-fund share classes",
+    // Count the ANALYZED set (funds.length), so nFunds and pctPositive share a denominator.
+    nFunds: funds.length,
     // Headline: the TYPICAL fund. Median is outlier-robust; pctPositive shows how
     // common the gap is; meanGapPP is the equal-weighted average across funds.
     medianGapPP: round(medGap, 4),
@@ -277,7 +279,7 @@ async function main() {
 
   writeFileSync(OUT, render(o));
   console.error(
-    `Wrote ${OUT}\n  ${o.window}: median fund gap ${(medGap * 100).toFixed(2)}pp/yr, ${(o.pctPositive * 100).toFixed(0)}% of ${agg.nFunds} funds positive; ${flows.length} months, ${cases.length} cases.`,
+    `Wrote ${OUT}\n  ${o.window}: median fund gap ${(medGap * 100).toFixed(2)}pp/yr, ${(o.pctPositive * 100).toFixed(0)}% of ${o.nFunds} analyzed share classes positive; ${flows.length} months, ${cases.length} cases.`,
   );
 }
 

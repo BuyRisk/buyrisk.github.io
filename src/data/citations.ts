@@ -469,6 +469,18 @@ export const DATASETS: Record<string, Dataset> = {
     publisher: "Tuck School of Business, Dartmouth College",
     url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html",
   },
+  aqr: {
+    name: "AQR Factor & Quality-Minus-Junk / Betting-Against-Beta datasets",
+    publisher: "AQR Capital Management",
+    url: "https://www.aqr.com/Insights/Datasets",
+    note: "Quality (QMJ) and Defensive (Betting-Against-Beta) factor premia. Provided for research/educational use; we ship long-run annualized summary figures only.",
+  },
+  pastorStambaugh: {
+    name: "Liquidity factor (traded)",
+    publisher: "Ľuboš Pástor & Robert F. Stambaugh",
+    url: "https://faculty.chicagobooth.edu/lubos-pastor/data",
+    note: "The traded liquidity factor, monthly from 1968. We ship its long-run annualized premium only.",
+  },
   petajisto: {
     name: "Active Share dataset (US equity mutual funds)",
     publisher: "Antti Petajisto",
@@ -636,7 +648,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "jegadeeshTitman1993",
       "carhart1997",
     ],
-    datasets: ["french"],
+    datasets: ["french", "aqr", "pastorStambaugh"],
   },
   "beat-the-market": {
     studies: [

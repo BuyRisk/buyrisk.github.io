@@ -167,8 +167,9 @@ export default function BehavioralLab() {
           <>
             <p className="wl-note" style={{ fontStyle: "normal", color: "var(--color-text-soft)" }}>
               That was a simulation. Here's the same gap in real money: across {GAP.nFunds.toLocaleString()} US equity
-              funds ({GAP.window}), <strong>{Math.round(GAP.pctPositive * 100)}%</strong> earned their investors less than
-              the fund itself earned. The gap is small in big steady funds — and brutal in the ones people chase. Pick one:
+              mutual-fund share classes ({GAP.window}), <strong>{Math.round(GAP.pctPositive * 100)}%</strong> earned their
+              investors less than the fund itself earned. The gap is small in big steady funds — and brutal in the ones
+              people chase. Pick one:
             </p>
             <div className="bf-list" role="tablist" aria-label="Example funds">
               {GAP.cases.map((c, i) => (

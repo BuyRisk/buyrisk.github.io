@@ -125,7 +125,7 @@ export default function BondLab() {
               <span className="ss-headline-label">The 10-year Treasury yields</span>
               <span className="ss-headline-value">{bondYields.tenYear.nominal}%</span>
               <span className="ss-headline-sub">
-                = <strong>{bondYields.tenYear.real}%</strong> real (TIPS) + <strong>{bondYields.tenYear.breakeven}%</strong> expected inflation
+                ≈ <strong>{bondYields.tenYear.real}%</strong> real (TIPS) + <strong>{bondYields.tenYear.breakeven}%</strong> expected inflation
               </span>
             </div>
             <p className="wl-note" style={{ marginTop: "0.5rem" }}>

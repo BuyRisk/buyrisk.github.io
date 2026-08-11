@@ -810,8 +810,8 @@ export default function PortfolioLab() {
         </div>
         <p className="pl-mode-note">
           {locked
-            ? `Method: the efficient frontier and capital market line are computed analytically (mean–variance) from these inputs: real historical return, volatility, and correlation estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
-            : "Edit each asset's expected return, volatility, and market correlation. The frontier is recomputed analytically (mean–variance) from your inputs."}
+            ? `Method: the efficient frontier and capital market line are traced by Monte-Carlo sampling (thousands of random portfolios) from these inputs: nominal historical return, volatility, and correlation estimates from Damodaran (${assetStats.span[0]}–${assetStats.span[1]}), locked. Switch to Custom to edit.`
+            : "Edit each asset's expected return, volatility, and market correlation. The frontier is retraced by Monte-Carlo sampling from your inputs."}
         </p>
 
         <div className="pl-assets">
@@ -855,7 +855,7 @@ export default function PortfolioLab() {
 
               <div className="pl-params">
                 <label>
-                  <span>Return<InfoTip text="The asset's expected annual return: its reward. In Historical mode this is the real annualized average from Damodaran's data (1928–present)." /></span>
+                  <span>Return<InfoTip text="The asset's expected annual return: its reward. In Historical mode this is the actual (nominal) annualized average from Damodaran's data (1928–present), not inflation-adjusted." /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"

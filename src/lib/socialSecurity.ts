@@ -101,6 +101,7 @@ export interface AgePoint {
   age: number; // whole-year claim age
   monthly: number; // real monthly benefit if claimed here
   npv: number; // survival-weighted present value from currentAge
+  claimable: boolean; // false for ages already behind you (npv is not a reachable choice)
 }
 
 /**
@@ -231,7 +232,9 @@ export function optimize(inp: OptimizeInput): OptimizeResult {
   const points: AgePoint[] = [];
   for (let a = 62; a <= 70; a++) {
     const r = pv(a * 12);
-    points.push({ age: a, monthly: r.monthly, npv: r.npv });
+    // Ages already behind you aren't reachable choices; their npv double-counts
+    // pre-now months, so flag them and let the chart drop them.
+    points.push({ age: a, monthly: r.monthly, npv: r.npv, claimable: a * 12 >= startMonth });
   }
 
   // Undiscounted, unweighted 62-vs-70 cumulative crossover (the classic breakeven).

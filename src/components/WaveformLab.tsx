@@ -420,8 +420,8 @@ export default function WaveformLab() {
               {!isPair && (
                 <label className="wl-slider">
                   <span>
-                    Correlation
-                    <InfoTip text="How closely this asset moves with the others (−1 to +1). It sets the wave's phase: +1 lines up, −1 is the mirror image." />{" "}
+                    Market correlation
+                    <InfoTip text="How closely this asset moves with the common market wave (−1 to +1). It sets the wave's phase; each pair of assets is then correlated by the gap between their phases, so two assets that both only loosely track the market can still move together." />{" "}
                     <strong>{a.corr.toFixed(2)}</strong>
                   </span>
                   <input
@@ -454,7 +454,7 @@ export default function WaveformLab() {
               onChange={(e) => setPairCorr(Number(e.target.value))}
             />
             <span className="wl-corr-hint">
-              +1: waves line up (no cancellation). −1: opposite waves cancel completely.
+              +1: waves line up (no cancellation). −1: opposite waves cancel as much as possible — completely only when the two weighted amplitudes match.
             </span>
           </label>
         )}

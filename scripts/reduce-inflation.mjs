@@ -24,7 +24,7 @@ const CATEGORIES = [
   { id: "CPIAUCSL", name: "All items", baseline: true },
   { id: "CUUR0000SEEB", name: "College tuition" },
   { id: "CPIMEDSL", name: "Medical care" },
-  { id: "CUSR0000SAH1", name: "Housing" },
+  { id: "CUSR0000SAH1", name: "Shelter" },
   { id: "CPIFABSL", name: "Food & drink" },
   { id: "CPIENGSL", name: "Energy" },
   { id: "CUUR0000SETA01", name: "New cars" },

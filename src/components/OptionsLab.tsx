@@ -184,22 +184,24 @@ export default function OptionsLab() {
               </div>
               <p className="wl-fnote">
                 The straight kinked line is what the option pays if it expired <em>today</em>: nothing until it crosses the
-                strike, then dollar-for-dollar. The curved line is its value <em>now</em>, always higher — that cushion is
-                time value, and it melts to zero as expiration nears.
+                strike, then dollar-for-dollar. The curved line is its value <em>now</em>: for most options it sits above the
+                payoff line, and that cushion — time value — melts to zero as expiration nears.
+                {g.timeValue < -0.005 ? " The exception is a deep in-the-money European put like this one: its time value is negative, so the curve dips just below the payoff line — you can't collect the intrinsic value until expiry." : ""}
               </p>
             </>
           ) : (
             <>
               <h3 style={{ marginTop: 0 }}>The two levers that create value</h3>
               <div className="wl-lower" style={{ gridTemplateColumns: "1fr 1fr" }}>
-                <LeverChart title="More time → more value" xLabel="Months to expiry" xMax={36} sample={(m) => blackScholes(kind, spot, strike, m / 12, sigma, r).price} cur={months} curLabel={`${months}m`} money={money} yRef={curve.yMax} />
+                <LeverChart title={kind === "put" && g.timeValue < 0 ? "More time → less value" : "More time → more value"} xLabel="Months to expiry" xMax={36} sample={(m) => blackScholes(kind, spot, strike, m / 12, sigma, r).price} cur={months} curLabel={`${months}m`} money={money} yRef={curve.yMax} />
                 <LeverChart title="More volatility → more value" xLabel="Volatility (%/yr)" xMax={80} sample={(v) => blackScholes(kind, spot, strike, T, v / 100, r).price} cur={vol} curLabel={`${vol}%`} money={money} yRef={curve.yMax} />
               </div>
               <p className="wl-fnote">
                 An option is a bet on movement. Both more <em>time</em> and more <em>volatility</em> widen the range of
                 where the stock could land, and since your downside is capped at the premium but your upside isn't, a wider
-                range is worth more. That's why the same option gets cheaper every day it survives — and why calm stocks
-                have cheap options and wild ones have dear ones.
+                range is worth more. For almost every option that means it gets a little cheaper each day it survives — and
+                it's why calm stocks have cheap options and wild ones have dear ones.
+                {kind === "put" && g.timeValue < 0 ? " (One exception: a deep in-the-money European put, like this one, actually gains value as expiry nears — you're waiting to collect a payoff that's already locked in.)" : ""}
               </p>
             </>
           )}

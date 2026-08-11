@@ -42,8 +42,8 @@ export interface BehaviorGap {
 
 export const behaviorGap: BehaviorGap = {
   "window": "1991–2026",
-  "category": "US-domiciled equity mutual funds",
-  "nFunds": 28380,
+  "category": "US-domiciled equity mutual-fund share classes",
+  "nFunds": 25823,
   "medianGapPP": 0.0051,
   "meanGapPP": 0.0085,
   "pctPositive": 0.589,

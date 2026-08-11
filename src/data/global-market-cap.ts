@@ -77,7 +77,7 @@ export const GLOBAL_MARKET_CAP: MarketCapData = {
         {
           tier: "Large cap",
           withinRegion: 71,
-          note: "The S&P 500 lives here. What most 401(k) menus offer.",
+          note: "The biggest US stocks. An S&P 500 fund covers this band and reaches into the next, about 80% of the US market.",
         },
         {
           tier: "Mid cap",
@@ -164,8 +164,8 @@ export const GLOBAL_MARKET_CAP: MarketCapData = {
       ],
     },
     {
-      slice: "US — large cap (the S&P 500)",
-      ofGlobal: 44.2,
+      slice: "US — the S&P 500 (large & mega cap)",
+      ofGlobal: 49.8,
       funds: [
         { provider: "Vanguard", tickers: "VOO / VFIAX" },
         { provider: "iShares", tickers: "IVV" },
@@ -175,8 +175,8 @@ export const GLOBAL_MARKET_CAP: MarketCapData = {
       ],
     },
     {
-      slice: "US — extended market (mid + small; completes an S&P 500 fund)",
-      ofGlobal: 18.0,
+      slice: "US — extended market (completes an S&P 500 fund)",
+      ofGlobal: 12.4,
       funds: [
         { provider: "Vanguard", tickers: "VXF / VEXAX" },
         { provider: "Fidelity", tickers: "FSMAX" },

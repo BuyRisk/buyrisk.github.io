@@ -102,7 +102,7 @@ export default function RollingReturnsLab() {
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
           <span className="ss-headline-label">Right now, over the trailing {win / 12} years,</span>
           <span className="ss-headline-value">{leaderNow} leads</span>
-          <span className="ss-headline-sub">by <strong>{pct(Math.abs(data.current))}/yr</strong> — but that lead has flipped <strong>{data.flips}</strong> times since {M.dates[0].slice(0, 4)}</span>
+          <span className="ss-headline-sub">by <strong>{pct(Math.abs(data.current))}/yr</strong> — but that lead has flipped <strong>{data.flips}</strong> times since {data.dates[0].slice(0, 4)}</span>
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>

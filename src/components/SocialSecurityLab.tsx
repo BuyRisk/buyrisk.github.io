@@ -320,7 +320,7 @@ export default function SocialSecurityLab() {
               Delaying trades smaller-but-sooner checks for bigger-but-later ones, and
               wins only if you're likely to live to collect them.
               {(() => {
-                const s = valueScale(result.points);
+                const s = valueScale(result.points.filter((p) => p.claimable));
                 return s.zoomed ? (
                   <>
                     {" "}The vertical axis is <strong>zoomed in</strong>: it starts at {symbol}
@@ -682,7 +682,8 @@ function ValueChart({ result }: { result: OptimizeResult }) {
   const pad = { top: 18, right: 16, bottom: 40, left: 64 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
-  const pts = result.points;
+  const claimablePts = result.points.filter((p) => p.claimable);
+  const pts = claimablePts.length ? claimablePts : result.points.slice(-1);
   const bestAge = Math.round(result.best.ageMonths / 12);
   const scale = valueScale(pts);
   const bw = plotW / pts.length;

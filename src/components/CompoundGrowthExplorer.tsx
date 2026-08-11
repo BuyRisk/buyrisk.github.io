@@ -1356,9 +1356,10 @@ export default function CompoundGrowthExplorer() {
           <p className="cge-retire-note">
             The <strong>“4% rule”</strong> is a widely cited <em>approximation</em> of a safe
             withdrawal rate: draw 4% of your balance the first year, then raise that dollar
-            amount with inflation. William Bengen, whose research first found that roughly 4–5%
-            survived every historical 30-year retirement, never claimed a single number is
-            guaranteed; the odds above show why higher rates get dangerous fast.{" "}
+            amount with inflation. William Bengen, whose research first found that roughly 4%
+            (with a worst-case ceiling near 4.5%) survived every historical 30-year retirement,
+            never claimed a single number is guaranteed; the odds above show why higher rates get
+            dangerous fast.{" "}
             <a href="/tools/burn-rate">Stress-test it against your real costs →</a>
           </p>
         </div>
