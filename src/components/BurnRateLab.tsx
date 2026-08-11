@@ -48,18 +48,30 @@ interface StressResult {
   p10Terminal: number;
   p90Terminal: number;
   medianDepletion: number | null;
-  bands: { p: number; series: number[] }[];
+  bands: { p: number; series: number[] }[]; // portfolio balance over time
+  // Guardrails strategy only: spending flexes, so the story shifts to income.
+  spendBands?: { p: number; series: number[] }[]; // total annual spending over time
+  avgRate?: number; // mean realized withdrawal rate across all histories
+  startRate?: number; // initial withdrawal rate
+  medianSpend?: number; // median per-history average annual spending
+  p10Spend?: number; // unlucky 10% average annual spending
+  p90Spend?: number; // lucky 10% average annual spending
 }
+
+type Strategy = "fixed" | "guardrails";
 
 export default function BurnRateLab() {
   useCurrencyCode(); // re-render when the header currency picker changes
   const [mode, setMode] = useState<"plan" | "stress">("plan");
+  const [strategy, setStrategy] = useState<Strategy>("fixed");
   const [cats, setCats] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
   const [portfolio, setPortfolio] = useState(1_000_000);
   const [guaranteed, setGuaranteed] = useState(0); // $/month, real (inflation-adjusted)
   const [stockPct, setStockPct] = useState(60);
   const [horizon, setHorizon] = useState(30);
+  const [guardWidth, setGuardWidth] = useState(20); // guardrail band, ± % of the start rate
+  const [guardAdjust, setGuardAdjust] = useState(10); // spending cut/raise when a rail is hit, %
 
   const monthlyTotal = cats.reduce((s, c) => s + c.amount, 0);
   const annualTotal = monthlyTotal * 12;
@@ -100,14 +112,40 @@ export default function BurnRateLab() {
     const terminal: number[] = new Array(PATHS);
     const depletionYears: number[] = [];
     let successes = 0;
+
+    // Guardrails (simplified Guyton-Klinger): each year, if the withdrawal rate
+    // drifts a band above/below its start, cut/raise spending. Only meaningful
+    // when the portfolio actually funds a draw.
+    const guard = strategy === "guardrails" && portfolioDrawAnnual > 0;
+    const startRate = portfolio > 0 ? portfolioDrawAnnual / portfolio : 0;
+    const upper = startRate * (1 + guardWidth / 100);
+    const lower = startRate * (1 - guardWidth / 100);
+    const adj = guardAdjust / 100;
+    const spendPaths: number[][] | null = guard ? new Array(PATHS) : null;
+    const avgSpendPer = new Array<number>(PATHS);
+    let rateSum = 0, rateN = 0;
+
     for (let p = 0; p < PATHS; p++) {
       const row = new Array<number>(horizon + 1);
       row[0] = portfolio;
+      const srow = spendPaths ? new Array<number>(horizon + 1) : null;
+      if (srow) srow[0] = portfolioDrawAnnual + guaranteedAnnual;
       let bal = portfolio;
+      let spend = portfolioDrawAnnual; // real portfolio-funded draw, may flex
       let failed = false;
+      let spendSum = 0;
       for (let y = 0; y < horizon; y++) {
         if (!failed) {
-          bal -= portfolioDrawAnnual; // only the gap after guaranteed income
+          if (guard) {
+            const rate = bal > 0 ? spend / bal : Infinity;
+            if (rate > upper) spend *= 1 - adj; // capital-preservation rail
+            else if (rate < lower) spend *= 1 + adj; // prosperity rail
+          }
+          const draw = guard ? spend : portfolioDrawAnnual;
+          rateSum += bal > 0 ? draw / bal : 0;
+          rateN++;
+          bal -= draw;
+          spendSum += draw + guaranteedAnnual;
           if (bal <= 0) {
             bal = 0;
             failed = true;
@@ -115,15 +153,20 @@ export default function BurnRateLab() {
           } else {
             bal *= 1 + paths[p][y];
           }
+        } else {
+          spendSum += guaranteedAnnual; // portfolio gone: only guaranteed income left
         }
         row[y + 1] = bal;
+        if (srow) srow[y + 1] = failed ? guaranteedAnnual : spend + guaranteedAnnual;
       }
       balances[p] = row;
+      if (spendPaths && srow) spendPaths[p] = srow;
       terminal[p] = bal;
+      avgSpendPer[p] = spendSum / horizon;
       if (!failed) successes++;
     }
     const bands = bandsOverTime(balances, [0.1, 0.25, 0.5, 0.75, 0.9]);
-    return {
+    const result: StressResult = {
       successRate: successes / PATHS,
       failRate: 1 - successes / PATHS,
       medianTerminal: quantile(terminal, 0.5),
@@ -133,15 +176,25 @@ export default function BurnRateLab() {
       medianDepletion: depletionYears.length ? quantile(depletionYears, 0.5) : null,
       bands,
     };
-  }, [mode, horizon, stockPct, portfolio, portfolioDrawAnnual]);
+    if (guard && spendPaths) {
+      result.spendBands = bandsOverTime(spendPaths, [0.1, 0.25, 0.5, 0.75, 0.9]);
+      result.avgRate = rateN ? rateSum / rateN : 0;
+      result.startRate = startRate;
+      result.medianSpend = quantile(avgSpendPer, 0.5);
+      result.p10Spend = quantile(avgSpendPer, 0.1);
+      result.p90Spend = quantile(avgSpendPer, 0.9);
+    }
+    return result;
+  }, [mode, horizon, stockPct, portfolio, portfolioDrawAnnual, guaranteedAnnual, strategy, guardWidth, guardAdjust]);
 
   return (
     <div className="wl">
       <div className="wl-controls">
         <ResetButton
           onReset={() => {
-            setMode("plan"); setCats(DEFAULT_CATEGORIES); setWithdrawalRate(4);
+            setMode("plan"); setStrategy("fixed"); setCats(DEFAULT_CATEGORIES); setWithdrawalRate(4);
             setPortfolio(1_000_000); setGuaranteed(0); setStockPct(60); setHorizon(30);
+            setGuardWidth(20); setGuardAdjust(10);
           }}
         />
         <div className="wl-simmode" role="group" aria-label="Mode">
@@ -200,6 +253,39 @@ export default function BurnRateLab() {
           </label>
         ) : (
           <>
+            <p className="br-group">Withdrawal strategy</p>
+            <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="Withdrawal strategy">
+              <button type="button" className={strategy === "fixed" ? "active" : ""} aria-pressed={strategy === "fixed"} onClick={() => setStrategy("fixed")}
+                title="Bengen's 4% rule: pick a first-year amount and spend that same sum (inflation-adjusted) every year, regardless of markets.">
+                Fixed (Bengen)
+              </button>
+              <button type="button" className={strategy === "guardrails" ? "active" : ""} aria-pressed={strategy === "guardrails"} onClick={() => setStrategy("guardrails")}
+                title="Guyton-Klinger guardrails: flex spending each year — cut it after bad markets, raise it after good ones — to keep the money from running out.">
+                Guardrails
+              </button>
+            </div>
+
+            {strategy === "guardrails" && (
+              <>
+                <label className="wl-slider">
+                  <span>
+                    Guardrail width
+                    <InfoTip text="How far your withdrawal rate can drift from its starting point before you adjust. At ±20%, a start of 5% triggers a cut once the rate climbs past 6%, or a raise once it drops below 4%. Wider = steadier spending but more depletion risk; narrower = safer but choppier income." />{" "}
+                    <strong>±{guardWidth}%</strong>
+                  </span>
+                  <input type="range" min={5} max={40} step={5} value={guardWidth} onChange={(e) => setGuardWidth(Number(e.target.value))} />
+                </label>
+                <label className="wl-slider">
+                  <span>
+                    Spending adjustment
+                    <InfoTip text="How much you cut or raise spending when a guardrail is hit. Bigger adjustments defend the portfolio faster but make your income bumpier." />{" "}
+                    <strong>{guardAdjust}%</strong>
+                  </span>
+                  <input type="range" min={5} max={20} step={5} value={guardAdjust} onChange={(e) => setGuardAdjust(Number(e.target.value))} />
+                </label>
+              </>
+            )}
+
             <label className="wl-slider">
               <span>
                 Stocks in portfolio
@@ -219,7 +305,10 @@ export default function BurnRateLab() {
             <p className="wl-note" style={{ marginTop: "0.4rem" }}>
               {PATHS.toLocaleString()} alternate retirements, each stitched from real
               US return history ({HISTORY.span[0]}–{HISTORY.span[1]}) in {BLOCK}-year
-              blocks. Withdrawals are constant in today's dollars.
+              blocks.{" "}
+              {strategy === "fixed"
+                ? "Withdrawals are constant in today's dollars."
+                : "Withdrawals flex within the guardrails — cut after bad markets, raised after good ones."}
             </p>
           </>
         )}
@@ -267,10 +356,12 @@ export default function BurnRateLab() {
           sim && (
             <StressView
               sim={sim}
+              strategy={strategy}
               horizon={horizon}
               portfolio={portfolio}
               guaranteed={guaranteed}
               portfolioDrawAnnual={portfolioDrawAnnual}
+              firstYearSpend={portfolioDrawAnnual + guaranteed * 12}
               withdrawalPct={portfolio > 0 ? portfolioDrawAnnual / portfolio : 0}
             />
           )
@@ -360,21 +451,28 @@ function PlanView(props: {
 
 function StressView({
   sim,
+  strategy,
   horizon,
   portfolio,
   guaranteed,
   portfolioDrawAnnual,
+  firstYearSpend,
   withdrawalPct,
 }: {
   sim: StressResult;
+  strategy: Strategy;
   horizon: number;
   portfolio: number;
   guaranteed: number;
   portfolioDrawAnnual: number;
+  firstYearSpend: number;
   withdrawalPct: number;
 }) {
   const good = sim.successRate >= 0.9;
   const noDraw = portfolioDrawAnnual <= 0;
+  if (strategy === "guardrails" && sim.spendBands && !noDraw) {
+    return <GuardrailsView sim={sim} horizon={horizon} firstYearSpend={firstYearSpend} />;
+  }
   return (
     <>
       <div className="wl-readout">
@@ -446,7 +544,69 @@ function StressView({
   );
 }
 
-function FanChart({ bands, horizon, start }: { bands: { p: number; series: number[] }[]; horizon: number; start: number }) {
+/** Guardrails result: the story is income, not balance, so the lifecycle map
+ *  plots annual spending — how it flexes down in bad sequences and up in good. */
+function GuardrailsView({ sim, horizon, firstYearSpend }: { sim: StressResult; horizon: number; firstYearSpend: number }) {
+  return (
+    <>
+      <div className="wl-readout">
+        <div className="sk-headline" style={{ background: "var(--color-accent-soft)", borderColor: "var(--color-accent)" }}>
+          <span className="sk-headline-label">
+            Average withdrawal rate across every history (you start at {pctText(sim.startRate ?? 0)})
+          </span>
+          <span className="sk-headline-value" style={{ color: "var(--color-accent)" }}>
+            {pctText(sim.avgRate ?? 0)}
+          </span>
+        </div>
+        <FanChart
+          bands={sim.spendBands!}
+          horizon={horizon}
+          start={firstYearSpend}
+          color="var(--color-link)"
+          ariaLabel="Range of annual retirement spending over time across simulated histories"
+        />
+        <p className="wl-fnote">
+          This wedge is your <strong>spending</strong>, year by year — not your balance.
+          Guardrails cut it after bad markets and raise it after good ones, so it fans
+          out: the bottom paths had to tighten their belts, the top ones earned a raise.
+          Because income flexes, the portfolio itself rarely runs dry.
+        </p>
+      </div>
+
+      <div className="wl-readout">
+        <dl className="sk-stats">
+          <div>
+            <dt>Chance it lasts {horizon} years</dt>
+            <dd>{pctText(sim.successRate)}</dd>
+          </div>
+          <div>
+            <dt>Typical yearly spending</dt>
+            <dd>{currency(sim.medianSpend ?? 0)}</dd>
+          </div>
+          <div>
+            <dt>Unlucky 10% average</dt>
+            <dd>{currency(sim.p10Spend ?? 0)}</dd>
+          </div>
+          <div>
+            <dt>Lucky 10% average</dt>
+            <dd>{currency(sim.p90Spend ?? 0)}</dd>
+          </div>
+        </dl>
+        <p className="wl-saved">
+          Guardrails move the risk from your <strong>balance</strong> to your{" "}
+          <strong>income</strong>. Fixed withdrawals keep spending flat but can run the
+          portfolio to zero; guardrails almost never run out ({pctText(sim.successRate)}{" "}
+          here) because a bad sequence just means spending less — the unlucky live on
+          about {currency(sim.p10Spend ?? 0)}/yr while the lucky enjoy{" "}
+          {currency(sim.p90Spend ?? 0)}/yr. Neither is free; you're choosing which risk
+          to carry. Flip back to <strong>Fixed (Bengen)</strong> to see the other side.
+        </p>
+      </div>
+    </>
+  );
+}
+
+function FanChart({ bands, horizon, start, ariaLabel = "Range of retirement balances over time across simulated histories", color = "var(--color-accent)" }: { bands: { p: number; series: number[] }[]; horizon: number; start: number; ariaLabel?: string; color?: string }) {
   const width = 560;
   const height = 260;
   const pad = { top: 14, right: 14, bottom: 28, left: 58 };
@@ -469,16 +629,16 @@ function FanChart({ bands, horizon, start }: { bands: { p: number; series: numbe
   const fmt = (v: number) => formatMoney(v, { compact: true });
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Range of retirement balances over time across simulated histories">
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label={ariaLabel}>
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
         <g key={f}>
           <line x1={pad.left} x2={width - pad.right} y1={y(yMax * f)} y2={y(yMax * f)} stroke="var(--color-border)" />
           <text x={pad.left - 6} y={y(yMax * f) + 4} textAnchor="end" style={axisText}>{fmt(yMax * f)}</text>
         </g>
       ))}
-      <path d={band(b10, b90)} fill="var(--color-accent)" opacity={0.16} />
-      <path d={band(b25, b75)} fill="var(--color-accent)" opacity={0.28} />
-      <path d={median} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} />
+      <path d={band(b10, b90)} fill={color} opacity={0.16} />
+      <path d={band(b25, b75)} fill={color} opacity={0.28} />
+      <path d={median} fill="none" stroke={color} strokeWidth={2.5} />
       {[0, Math.round(horizon / 2), horizon].map((t) => (
         <text key={t} x={x(t)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{t === 0 ? "retire" : `yr ${t}`}</text>
       ))}

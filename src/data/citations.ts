@@ -444,6 +444,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Retirement & withdrawal",
     note: "The “Trinity study.”",
   },
+  guytonKlinger2006: {
+    authors: "Guyton, J. T., & Klinger, W. J.",
+    year: 2006,
+    title: "Decision Rules and Maximum Initial Withdrawal Rates",
+    venue: "Journal of Financial Planning 19(3): 48–58",
+    kind: "paper",
+    category: "Retirement & withdrawal",
+    note: "The guardrails approach: flexing spending with decision rules (capital-preservation and prosperity rules) lets you start at a higher withdrawal rate without running out.",
+  },
   shovenSlavov2014: {
     authors: "Shoven, J. B., & Slavov, S. N.",
     year: 2014,
@@ -635,7 +644,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["french", "shiller", "spiva", "petajisto"],
   },
   retirement: {
-    studies: ["bengen1994", "cooley1998"],
+    studies: ["bengen1994", "cooley1998", "guytonKlinger2006"],
     datasets: ["damodaran", "shiller"],
   },
   "retirement-accounts": {
