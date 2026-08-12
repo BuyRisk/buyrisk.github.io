@@ -7,7 +7,7 @@ export default defineConfig({
   // Public URL of the deployed site (used for canonical URLs, sitemaps, etc.).
   // For a GitHub user/org page repo named `buyrisk.github.io`, this is the root.
   // Change it here if you later move to a custom domain.
-  site: 'https://buyrisk.github.io',
+  site: 'https://buyrisk.org',
   integrations: [react()],
   // Consolidated modules: retired tool URLs redirect to their new home so
   // existing links keep working.
