@@ -16,8 +16,20 @@ import { existsSync } from "node:fs";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
-/** Shared raw-data library. Set DATA_LIB on each machine to point at its copy. */
-export const DATA_LIB = process.env.DATA_LIB ?? "E:\\Finance\\data\\sources";
+/**
+ * Shared raw-data library. Lives on an external drive whose letter varies by
+ * machine, so probe common letters for the expected layout. DATA_LIB still
+ * overrides when set.
+ */
+function findLib() {
+  if (process.env.DATA_LIB) return process.env.DATA_LIB;
+  for (const letter of "DEFGH") {
+    const candidate = `${letter}:\\Finance\\data\\sources`;
+    if (existsSync(candidate)) return candidate;
+  }
+  return "E:\\Finance\\data\\sources"; // historical default; assertLib reports it
+}
+export const DATA_LIB = findLib();
 
 /** Committed-in-repo providers (small, redistributable). */
 const IN_REPO = new Set(["french", "fred", "damodaran", "shiller", "ssa"]);
