@@ -61,7 +61,7 @@ function snapshot(members) {
   let total = 0;
   for (const m of members) total += m.cap;
   if (total <= 0) return null;
-  const w = members.map((m) => ({ ticker: m.ticker, weight: m.cap / total }));
+  const w = members.map((m) => ({ permno: m.permno, ticker: m.ticker, weight: m.cap / total }));
   w.sort((a, b) => b.weight - a.weight);
   let hhi = 0;
   for (const x of w) hhi += x.weight * x.weight;
@@ -77,7 +77,9 @@ function snapshot(members) {
     hhi,
     effN: hhi > 0 ? 1 / hhi : 0,
     n: members.length,
-    top10List: w.slice(0, 10).map((x) => ({ ticker: x.ticker, weight: x.weight })),
+    // Top 30 (top-10 derives from this; top-30 feeds the treemap). Keep permno so
+    // blank early-era tickers can be backfilled from the stock's later ticker.
+    top30List: w.slice(0, 30).map((x) => ({ permno: x.permno, ticker: x.ticker, weight: x.weight })),
   };
 }
 
@@ -118,6 +120,10 @@ async function main() {
   let curMonth = null;
   let monthAgg = new Map(); // permno -> { prod, startCap }
   let prevMonthEndCap = new Map(); // permno -> cap at prior month-end (for cap weights)
+  // Last ticker ever seen per permno: early CRSP rows often have a blank Ticker,
+  // but the same permno carries one later (AT&T's 1950 rows are blank, its later
+  // rows say "T"). Used to backfill names in the snapshots after the stream.
+  const lastTickerByPermno = new Map();
 
   const finalizeDay = () => {
     // Refresh the "latest completed day" cap map (used as next month's weights).
@@ -212,6 +218,7 @@ async function main() {
       if (Number.isFinite(cap) && cap > 0) {
         dayMembers.push({ permno, ticker, cap });
       }
+      if (ticker) lastTickerByPermno.set(permno, ticker);
 
       // --- Accumulate the month's per-stock compounded return ---
       let a = monthAgg.get(permno);
@@ -264,13 +271,31 @@ async function main() {
     const inYear = months.filter((m) => m.startsWith(`${year}-`));
     return inYear.length ? inYear[inYear.length - 1] : null;
   };
+  // Resolve a holding's ticker: same-day ticker, else the permno's latest-known
+  // ticker (backfills the blank early decades with the stock's eventual symbol).
+  const tick = (x) => x.ticker || lastTickerByPermno.get(x.permno) || "—";
   for (const y of SNAPSHOT_YEARS) {
     const key = pickYear(y);
-    if (key) TOP10_SNAPSHOTS[key] = concByMonth.get(key).top10List.map((x) => ({ ticker: x.ticker, weight: round(x.weight, 4) }));
+    if (key) TOP10_SNAPSHOTS[key] = concByMonth.get(key).top30List.slice(0, 10).map((x) => ({ ticker: tick(x), weight: round(x.weight, 4) }));
   }
   const latest = months[months.length - 1];
   if (latest && !TOP10_SNAPSHOTS[latest]) {
-    TOP10_SNAPSHOTS[latest] = concByMonth.get(latest).top10List.map((x) => ({ ticker: x.ticker, weight: round(x.weight, 4) }));
+    TOP10_SNAPSHOTS[latest] = concByMonth.get(latest).top30List.slice(0, 10).map((x) => ({ ticker: tick(x), weight: round(x.weight, 4) }));
+  }
+
+  // Treemap snapshots: one per year-end (last month-end of each year with enough
+  // breadth), the top-30 holdings + a combined "other" tile for the rest. Feeds
+  // the animated concentration treemap's year scrubber.
+  const TREEMAP_SNAPSHOTS = {};
+  const yearsPresent = [...new Set(months.map((m) => +m.slice(0, 4)))].sort((a, b) => a - b);
+  for (const y of yearsPresent) {
+    const key = pickYear(y);
+    if (!key) continue;
+    const s = concByMonth.get(key);
+    if (!s || s.n < 50) continue; // need ≥20 stocks outside the top 30 for "other" to mean something
+    const holdings = s.top30List.map((x) => ({ ticker: tick(x), weight: round(x.weight, 4) }));
+    const other = round(Math.max(0, 1 - holdings.reduce((a, h) => a + h.weight, 0)), 4);
+    TREEMAP_SNAPSHOTS[key] = { n: s.n, other, holdings };
   }
 
   // Cross-check our cap-weight monthly return against CRSP's official VW series.
@@ -313,6 +338,7 @@ async function main() {
     CONCENTRATION,
     EW_VS_CW,
     TOP10_SNAPSHOTS,
+    TREEMAP_SNAPSHOTS,
   };
 
   writeFileSync(OUT, renderTs(out));
@@ -384,6 +410,17 @@ export interface Sp500Concentration {
   EW_VS_CW: GrowthPoint[];
   /** A few decade month-ends → that month's top-10 holdings by weight. */
   TOP10_SNAPSHOTS: Record<string, Holding[]>;
+  /** Year-end month → top-30 holdings + an "other" tile, for the treemap scrubber. */
+  TREEMAP_SNAPSHOTS: Record<string, TreemapSnapshot>;
+}
+
+export interface TreemapSnapshot {
+  /** Priced index members that month. */
+  n: number;
+  /** Combined weight of every stock outside the top 30 (one "other" tile). */
+  other: number;
+  /** Top-30 holdings by weight. */
+  holdings: Holding[];
 }
 
 const data: Sp500Concentration = ${JSON.stringify(o, null, 2)};
@@ -397,6 +434,7 @@ export const {
   CONCENTRATION,
   EW_VS_CW,
   TOP10_SNAPSHOTS,
+  TREEMAP_SNAPSHOTS,
 } = data;
 
 export default data;

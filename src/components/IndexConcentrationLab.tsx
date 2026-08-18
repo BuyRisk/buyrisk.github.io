@@ -1,6 +1,7 @@
 import { useId, useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
+import ConcentrationTreemap from "./ConcentrationTreemap";
 import {
   CONCENTRATION,
   EW_VS_CW,
@@ -29,7 +30,7 @@ const yearOf = (date: string) => date.slice(0, 4);
 const SNAP_KEYS = Object.keys(TOP10_SNAPSHOTS).sort();
 const byDate = new Map(CONCENTRATION.map((d) => [d.date, d]));
 
-type ChartView = "concentration" | "growth";
+type ChartView = "concentration" | "treemap" | "growth";
 
 export default function IndexConcentrationLab() {
   const [sel, setSel] = useState(SNAP_KEYS.length - 1); // default: today (Mag-7)
@@ -117,14 +118,17 @@ export default function IndexConcentrationLab() {
       <div className="wl-stage">
         <div className="wl-frontier">
           <div className="ic-chart-head">
-            <h3>{view === "concentration" ? "A “500-stock” index, dominated by a few" : "Equal weight vs cap weight"}</h3>
+            <h3>{view === "concentration" ? "A “500-stock” index, dominated by a few" : view === "treemap" ? "The index as a map — every tile a stock" : "Equal weight vs cap weight"}</h3>
             <div className="wl-simmode ic-viewtabs" role="group" aria-label="Chart view">
               <button type="button" className={view === "concentration" ? "active" : ""} aria-pressed={view === "concentration"} onClick={() => setView("concentration")}>Concentration</button>
+              <button type="button" className={view === "treemap" ? "active" : ""} aria-pressed={view === "treemap"} onClick={() => setView("treemap")}>Treemap</button>
               <button type="button" className={view === "growth" ? "active" : ""} aria-pressed={view === "growth"} onClick={() => setView("growth")}>Equal vs cap weight</button>
             </div>
           </div>
 
-          {view === "concentration" ? (
+          {view === "treemap" ? (
+            <ConcentrationTreemap />
+          ) : view === "concentration" ? (
             <>
               <ConcentrationChart data={CONCENTRATION} selDate={selDate} clipId={clipId} />
               <p className="wl-fnote">

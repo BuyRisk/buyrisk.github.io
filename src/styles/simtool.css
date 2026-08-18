@@ -2700,6 +2700,37 @@
   .ic-viewtabs {
     flex: none;
   }
+  /* Concentration treemap controls (play button + year scrubber). */
+  .ic-tm-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  .ic-tm-controls input[type="range"] {
+    flex: 1;
+  }
+  .ic-tm-play {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .ic-tm-play:hover {
+    filter: brightness(1.05);
+  }
+  .ic-tm-year {
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    min-width: 3.2rem;
+    text-align: right;
+  }
   .ic-hold-title {
     margin: 0 0 var(--space-sm);
   }

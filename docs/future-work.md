@@ -24,12 +24,12 @@ Keep adding heavy viz libs per-flagship, not site-wide (see strategy note below)
 
 **NEXT — three advanced-viz flagships (build-ready specs):**
 
-1. **Concentration treemap** — in `IndexConcentrationLab` (Diversification → "How top-heavy
-   is the market?"). Extend `reduce-sp500-concentration.mjs` to emit `treemapSnapshots`: for a
-   handful of years, the top ~30 constituents `{ticker, weight}` + an "other" aggregate (we only
-   ship TOP10 today). New `ConcentrationTreemap.tsx` with a year scrubber; tiles sized by weight,
-   Mag-7 highlighted, hover = ticker+weight; animate tiles across years (CSS transition on x/y/w/h,
-   or Framer Motion). Lib: `d3-hierarchy` (tiny) for squarified layout — or hand-roll (~40 lines).
+1. ✅ **Concentration treemap** — SHIPPED. `TREEMAP_SNAPSHOTS` in the reducer (99 year-ends
+   1928→2026, top-30 + "other"; blank early-era tickers backfilled from each permno's
+   latest-known symbol — 1950 shows GM 13.6%, XOM 9.3%). `ConcentrationTreemap.tsx`: hand-rolled
+   squarified layout (no dep), HTML tiles with CSS transitions, year scrubber + play button,
+   hover, color-mix() tint off theme tokens (dark-mode verified). Third view ("Treemap") inside
+   IndexConcentrationLab.
 
 2. **Bessembinder dot-canvas** — in `StockPickingModule`/`SuperstockLab`. LICENSE-SAFE approach:
    do NOT ship per-permno rows. Instead sample ~3,000 dots client-side FROM the existing shipped

@@ -51,6 +51,17 @@ export interface Sp500Concentration {
   EW_VS_CW: GrowthPoint[];
   /** A few decade month-ends → that month's top-10 holdings by weight. */
   TOP10_SNAPSHOTS: Record<string, Holding[]>;
+  /** Year-end month → top-30 holdings + an "other" tile, for the treemap scrubber. */
+  TREEMAP_SNAPSHOTS: Record<string, TreemapSnapshot>;
+}
+
+export interface TreemapSnapshot {
+  /** Priced index members that month. */
+  n: number;
+  /** Combined weight of every stock outside the top 30 (one "other" tile). */
+  other: number;
+  /** Top-30 holdings by weight. */
+  holdings: Holding[];
 }
 
 const data: Sp500Concentration = {
@@ -16523,169 +16534,169 @@ const data: Sp500Concentration = {
   "TOP10_SNAPSHOTS": {
     "1930-12": [
       {
-        "ticker": "",
+        "ticker": "GM",
         "weight": 0.0695
       },
       {
-        "ticker": "",
+        "ticker": "GE",
         "weight": 0.0568
       },
       {
-        "ticker": "",
+        "ticker": "MRO",
         "weight": 0.0546
       },
       {
-        "ticker": "",
+        "ticker": "XOM",
         "weight": 0.0543
       },
       {
-        "ticker": "",
+        "ticker": "ED",
         "weight": 0.0435
       },
       {
-        "ticker": "",
+        "ticker": "PC",
         "weight": 0.0331
       },
       {
-        "ticker": "",
+        "ticker": "—",
         "weight": 0.0294
       },
       {
-        "ticker": "",
+        "ticker": "CVX",
         "weight": 0.0269
       },
       {
-        "ticker": "",
+        "ticker": "CN",
         "weight": 0.0258
       },
       {
-        "ticker": "",
+        "ticker": "FL",
         "weight": 0.0244
       }
     ],
     "1940-12": [
       {
-        "ticker": "",
+        "ticker": "GM",
         "weight": 0.14
       },
       {
-        "ticker": "",
+        "ticker": "GE",
         "weight": 0.0634
       },
       {
-        "ticker": "",
+        "ticker": "XOM",
         "weight": 0.0616
       },
       {
-        "ticker": "",
+        "ticker": "UK",
         "weight": 0.0437
       },
       {
-        "ticker": "",
+        "ticker": "MRO",
         "weight": 0.041
       },
       {
-        "ticker": "",
+        "ticker": "S",
         "weight": 0.0298
       },
       {
-        "ticker": "",
+        "ticker": "TX",
         "weight": 0.0294
       },
       {
-        "ticker": "",
+        "ticker": "KN",
         "weight": 0.0273
       },
       {
-        "ticker": "",
+        "ticker": "HON",
         "weight": 0.0242
       },
       {
-        "ticker": "",
+        "ticker": "N",
         "weight": 0.0239
       }
     ],
     "1950-12": [
       {
-        "ticker": "",
+        "ticker": "GM",
         "weight": 0.136
       },
       {
-        "ticker": "",
+        "ticker": "XOM",
         "weight": 0.0933
       },
       {
-        "ticker": "",
+        "ticker": "UK",
         "weight": 0.0533
       },
       {
-        "ticker": "",
+        "ticker": "CVX",
         "weight": 0.0442
       },
       {
-        "ticker": "",
+        "ticker": "S",
         "weight": 0.0417
       },
       {
-        "ticker": "",
+        "ticker": "TX",
         "weight": 0.038
       },
       {
-        "ticker": "",
+        "ticker": "MRO",
         "weight": 0.0369
       },
       {
-        "ticker": "",
+        "ticker": "KN",
         "weight": 0.0273
       },
       {
-        "ticker": "",
+        "ticker": "EK",
         "weight": 0.0232
       },
       {
-        "ticker": "",
+        "ticker": "C",
         "weight": 0.0201
       }
     ],
     "1960-12": [
       {
-        "ticker": "",
+        "ticker": "T",
         "weight": 0.0944
       },
       {
-        "ticker": "",
+        "ticker": "GM",
         "weight": 0.0453
       },
       {
-        "ticker": "",
+        "ticker": "IBM",
         "weight": 0.0428
       },
       {
-        "ticker": "",
+        "ticker": "XOM",
         "weight": 0.0351
       },
       {
-        "ticker": "",
+        "ticker": "DD",
         "weight": 0.0339
       },
       {
-        "ticker": "",
+        "ticker": "GE",
         "weight": 0.026
       },
       {
-        "ticker": "",
+        "ticker": "TX",
         "weight": 0.0208
       },
       {
-        "ticker": "",
+        "ticker": "EK",
         "weight": 0.0169
       },
       {
-        "ticker": "",
+        "ticker": "S",
         "weight": 0.0168
       },
       {
-        "ticker": "",
+        "ticker": "MRO",
         "weight": 0.0161
       }
     ],
@@ -16983,6 +16994,12482 @@ const data: Sp500Concentration = {
         "weight": 0.0185
       }
     ]
+  },
+  "TREEMAP_SNAPSHOTS": {
+    "1928-12": {
+      "n": 88,
+      "other": 0.2756,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1083
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0488
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0426
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0411
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.035
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0346
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0282
+        },
+        {
+          "ticker": "CN",
+          "weight": 0.0266
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0262
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0256
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0235
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0217
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "SX",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "CG",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "SB",
+          "weight": 0.0114
+        }
+      ]
+    },
+    "1929-12": {
+      "n": 89,
+      "other": 0.2858,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.0576
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0574
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0549
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0461
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0375
+        },
+        {
+          "ticker": "CN",
+          "weight": 0.0278
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0277
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0257
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0247
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0225
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "CG",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0189
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "SX",
+          "weight": 0.0151
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "ITT",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "SB",
+          "weight": 0.0112
+        }
+      ]
+    },
+    "1930-12": {
+      "n": 87,
+      "other": 0.2522,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.0695
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0568
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0546
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0543
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0435
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0331
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0269
+        },
+        {
+          "ticker": "CN",
+          "weight": 0.0258
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0244
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0237
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0195
+        },
+        {
+          "ticker": "CG",
+          "weight": 0.0183
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0182
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "SX",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.014
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "A",
+          "weight": 0.012
+        },
+        {
+          "ticker": "DTE",
+          "weight": 0.0105
+        }
+      ]
+    },
+    "1931-12": {
+      "n": 89,
+      "other": 0.2115,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.0859
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0629
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0626
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0602
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0375
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.034
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0309
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0293
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0286
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0261
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0242
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.022
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0197
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0188
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.018
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "SB",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "CG",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.013
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.013
+        },
+        {
+          "ticker": "CN",
+          "weight": 0.0126
+        }
+      ]
+    },
+    "1932-12": {
+      "n": 89,
+      "other": 0.1966,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0799
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0693
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0586
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0477
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0451
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0355
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0329
+        },
+        {
+          "ticker": "—",
+          "weight": 0.03
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0281
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.025
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0245
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.024
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0226
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0212
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0203
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "SB",
+          "weight": 0.0195
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0192
+        },
+        {
+          "ticker": "CG",
+          "weight": 0.0189
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.01
+        }
+      ]
+    },
+    "1933-12": {
+      "n": 89,
+      "other": 0.2244,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.106
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0811
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0392
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0374
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0309
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0307
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0298
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.029
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0275
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0243
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0229
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0217
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "SB",
+          "weight": 0.0192
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.016
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "PU",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.012
+        },
+        {
+          "ticker": "—",
+          "weight": 0.012
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0118
+        }
+      ]
+    },
+    "1934-12": {
+      "n": 90,
+      "other": 0.2149,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1081
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0829
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0476
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.039
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0374
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0316
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0315
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0258
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0252
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.025
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0226
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.021
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0192
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "SB",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "PU",
+          "weight": 0.012
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "AST",
+          "weight": 0.0115
+        }
+      ]
+    },
+    "1935-12": {
+      "n": 90,
+      "other": 0.2224,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1289
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.071
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0585
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0352
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0343
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0296
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0288
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.028
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0219
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0219
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0212
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0193
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "AST",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.011
+        }
+      ]
+    },
+    "1936-12": {
+      "n": 90,
+      "other": 0.2258,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1117
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0753
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.065
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0384
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0382
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0279
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0268
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0253
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0239
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.023
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.022
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0211
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.021
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0206
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0188
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0155
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "AST",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0099
+        }
+      ]
+    },
+    "1937-12": {
+      "n": 90,
+      "other": 0.1962,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.0881
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.081
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0795
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0445
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0435
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0316
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0292
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0287
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0256
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0256
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0243
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0242
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0239
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "—",
+          "weight": 0.012
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0113
+        }
+      ]
+    },
+    "1938-12": {
+      "n": 90,
+      "other": 0.1958,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1163
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0767
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.068
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0444
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0441
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0327
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0283
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0265
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0257
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0242
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0226
+        },
+        {
+          "ticker": "S",
+          "weight": 0.022
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0196
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0195
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0103
+        }
+      ]
+    },
+    "1939-12": {
+      "n": 90,
+      "other": 0.1776,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1344
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0668
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0668
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0462
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0331
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0307
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0278
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0273
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0227
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0202
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0194
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0128
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0122
+        }
+      ]
+    },
+    "1940-12": {
+      "n": 90,
+      "other": 0.1725,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.14
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0634
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0616
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0437
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.041
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0298
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0273
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0242
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0239
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0233
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0223
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0214
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0212
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0203
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0155
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0116
+        }
+      ]
+    },
+    "1941-12": {
+      "n": 90,
+      "other": 0.17,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1063
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0884
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0613
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0548
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0371
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0343
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.032
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0313
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0273
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0255
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0225
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0209
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.02
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0198
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0196
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.019
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0189
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.011
+        },
+        {
+          "ticker": "KM",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0092
+        }
+      ]
+    },
+    "1942-12": {
+      "n": 90,
+      "other": 0.1737,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1356
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0863
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.062
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.053
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0319
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0299
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.029
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0268
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0261
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0252
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0227
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0222
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0211
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.019
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.016
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "A",
+          "weight": 0.015
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.009
+        }
+      ]
+    },
+    "1943-12": {
+      "n": 90,
+      "other": 0.1909,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1355
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.086
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0627
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.044
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0319
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0306
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0288
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0264
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0233
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.021
+        },
+        {
+          "ticker": "C",
+          "weight": 0.021
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0196
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0195
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0188
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0182
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0155
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0153
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0128
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0087
+        }
+      ]
+    },
+    "1944-12": {
+      "n": 88,
+      "other": 0.2168,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1454
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0768
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0584
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0381
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0316
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0284
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.027
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0255
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0229
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0227
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.021
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0198
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0189
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "NFK",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.01
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0088
+        }
+      ]
+    },
+    "1945-12": {
+      "n": 89,
+      "other": 0.2468,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1312
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0719
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0543
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.037
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0337
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0278
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.027
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0243
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0225
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0221
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0219
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "SH",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "AAL",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0103
+        }
+      ]
+    },
+    "1946-12": {
+      "n": 90,
+      "other": 0.2387,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1046
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0855
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0467
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0414
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0409
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0339
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0304
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0282
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0258
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0251
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0234
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0209
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "C",
+          "weight": 0.018
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "—",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.011
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0102
+        }
+      ]
+    },
+    "1947-12": {
+      "n": 90,
+      "other": 0.2225,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1153
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0975
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0463
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0433
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0402
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0367
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0364
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0305
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0249
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0249
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0237
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.02
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0188
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.017
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "NS",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.009
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0089
+        }
+      ]
+    },
+    "1948-12": {
+      "n": 90,
+      "other": 0.22,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1169
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0915
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0536
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0507
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0419
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0396
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0325
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0275
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0272
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0246
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0198
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0198
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "A",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.011
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.011
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "NS",
+          "weight": 0.01
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0091
+        }
+      ]
+    },
+    "1949-12": {
+      "n": 90,
+      "other": 0.225,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1284
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0821
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0524
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0495
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0425
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0362
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.034
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0283
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0248
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0239
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0193
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.011
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "NAB",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "A",
+          "weight": 0.01
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.01
+        },
+        {
+          "ticker": "NS",
+          "weight": 0.0093
+        }
+      ]
+    },
+    "1950-12": {
+      "n": 90,
+      "other": 0.2266,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.136
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0933
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0533
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0442
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0417
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.038
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0369
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0273
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.014
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "KRA",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.01
+        },
+        {
+          "ticker": "PC",
+          "weight": 0.01
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "CZ",
+          "weight": 0.0093
+        }
+      ]
+    },
+    "1951-12": {
+      "n": 90,
+      "other": 0.2301,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.129
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.1282
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0517
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0436
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0412
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0374
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0262
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0214
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0189
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.013
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "KRA",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0088
+        }
+      ]
+    },
+    "1952-12": {
+      "n": 90,
+      "other": 0.2323,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.149
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.1164
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0512
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0421
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0394
+        },
+        {
+          "ticker": "S",
+          "weight": 0.036
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0274
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0211
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.012
+        },
+        {
+          "ticker": "CP",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "SX",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0097
+        }
+      ]
+    },
+    "1953-12": {
+      "n": 90,
+      "other": 0.2273,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1387
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.1156
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0572
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0421
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0403
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0399
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0274
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0216
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "KRA",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "EXC",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "UGC",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0096
+        }
+      ]
+    },
+    "1954-12": {
+      "n": 91,
+      "other": 0.215,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1527
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.1287
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0445
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0421
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0413
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0346
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0334
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0234
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.019
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0153
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "C",
+          "weight": 0.011
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "KRA",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "FL",
+          "weight": 0.009
+        },
+        {
+          "ticker": "GT",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "SX",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0087
+        }
+      ]
+    },
+    "1955-12": {
+      "n": 91,
+      "other": 0.1859,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.179
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.1372
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0467
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.045
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0435
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0403
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0373
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.022
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.0155
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.014
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.01
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "GT",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "KRA",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "PA",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "SX",
+          "weight": 0.0071
+        }
+      ]
+    },
+    "1956-12": {
+      "n": 91,
+      "other": 0.1785,
+      "holdings": [
+        {
+          "ticker": "GM",
+          "weight": 0.1652
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.1561
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0534
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0471
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0445
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0421
+        },
+        {
+          "ticker": "S",
+          "weight": 0.029
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0271
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0228
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0225
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0209
+        },
+        {
+          "ticker": "KN",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "HON",
+          "weight": 0.013
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.013
+        },
+        {
+          "ticker": "GT",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "PHA",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "UCM",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "UP",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "SF",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "NAV",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "KRA",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "CO",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "BEAM",
+          "weight": 0.0065
+        }
+      ]
+    },
+    "1957-12": {
+      "n": 496,
+      "other": 0.4443,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.067
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0626
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0578
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0497
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0331
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0223
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0216
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.01
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "HWM",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.007
+        },
+        {
+          "ticker": "NL",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "ACY",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "GT",
+          "weight": 0.0055
+        }
+      ]
+    },
+    "1958-12": {
+      "n": 499,
+      "other": 0.4645,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0685
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.06
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0533
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0422
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0295
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0281
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0216
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.012
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "HWM",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "GT",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "NL",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0054
+        },
+        {
+          "ticker": "CLL",
+          "weight": 0.0054
+        }
+      ]
+    },
+    "1959-12": {
+      "n": 499,
+      "other": 0.4613,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0668
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.06
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0472
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0418
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.034
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0313
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0202
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "HWM",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "IP",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "GT",
+          "weight": 0.006
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0058
+        }
+      ]
+    },
+    "1960-12": {
+      "n": 498,
+      "other": 0.4701,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0944
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0453
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0428
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0351
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0339
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.026
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.015
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.012
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "CBS",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "HWM",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "WYE",
+          "weight": 0.0055
+        }
+      ]
+    },
+    "1961-12": {
+      "n": 499,
+      "other": 0.4638,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.1012
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0509
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0503
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0353
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0344
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0223
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0211
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "MRO",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.013
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "BS",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "F",
+          "weight": 0.006
+        },
+        {
+          "ticker": "WYE",
+          "weight": 0.0058
+        }
+      ]
+    },
+    "1962-12": {
+      "n": 499,
+      "other": 0.4516,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.1028
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0598
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0467
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0399
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0391
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0285
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0249
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0211
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0151
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.015
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.011
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "SOM",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.01
+        },
+        {
+          "ticker": "X",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "CWE",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "P",
+          "weight": 0.006
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.006
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "MTC",
+          "weight": 0.0052
+        },
+        {
+          "ticker": "ED",
+          "weight": 0.0049
+        }
+      ]
+    },
+    "1963-12": {
+      "n": 499,
+      "other": 0.4483,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.1035
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.068
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0497
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0428
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0335
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.027
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0226
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.011
+        },
+        {
+          "ticker": "SOM",
+          "weight": 0.011
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "X",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "CWE",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "MTC",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0055
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0054
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0051
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.005
+        }
+      ]
+    },
+    "1964-12": {
+      "n": 500,
+      "other": 0.4548,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0933
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0731
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0509
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0376
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.031
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.029
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0257
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0221
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "SOM",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.01
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "X",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "MTC",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "CWE",
+          "weight": 0.006
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "CTR",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "GF",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "AEP",
+          "weight": 0.0052
+        }
+      ]
+    },
+    "1965-12": {
+      "n": 499,
+      "other": 0.4782,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.076
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0698
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0415
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0409
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.026
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0257
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0253
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0223
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "SOM",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "X",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "CTR",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "MTC",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0055
+        },
+        {
+          "ticker": "WX",
+          "weight": 0.0054
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0054
+        }
+      ]
+    },
+    "1966-12": {
+      "n": 500,
+      "other": 0.4877,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0797
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0543
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0505
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0366
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0277
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.026
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0183
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.013
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.007
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "PRD",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "CWE",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "GLW",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "PCG",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "X",
+          "weight": 0.0054
+        },
+        {
+          "ticker": "CTR",
+          "weight": 0.0053
+        }
+      ]
+    },
+    "1967-12": {
+      "n": 500,
+      "other": 0.4927,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0767
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0594
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0511
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0317
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0262
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0245
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.019
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.016
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "AVP",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "PRD",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "IIN",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.006
+        },
+        {
+          "ticker": "WX",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0057
+        }
+      ]
+    },
+    "1968-12": {
+      "n": 499,
+      "other": 0.5154,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0711
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0582
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0452
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0338
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0237
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0227
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0153
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.012
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "AFI",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "PRD",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "AVP",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "IIN",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "RCA",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0055
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0055
+        }
+      ]
+    },
+    "1969-12": {
+      "n": 498,
+      "other": 0.4891,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0915
+        },
+        {
+          "ticker": "T",
+          "weight": 0.059
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0436
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0293
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "AVP",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "PRD",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.009
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "IIN",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.007
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "BGH",
+          "weight": 0.006
+        },
+        {
+          "ticker": "JCP",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "CTR",
+          "weight": 0.0053
+        }
+      ]
+    },
+    "1970-12": {
+      "n": 498,
+      "other": 0.4884,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0777
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0576
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0494
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0352
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0262
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0252
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0183
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "AVP",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "WY",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "IIN",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "N",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "GEN",
+          "weight": 0.007
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "JCP",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "GP",
+          "weight": 0.0059
+        }
+      ]
+    },
+    "1971-12": {
+      "n": 499,
+      "other": 0.4917,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0735
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0467
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0438
+        },
+        {
+          "ticker": "J",
+          "weight": 0.0314
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0301
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0298
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0217
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.013
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "AVP",
+          "weight": 0.011
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "F",
+          "weight": 0.01
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "IIN",
+          "weight": 0.008
+        },
+        {
+          "ticker": "JCP",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "WX",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "KG",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.006
+        }
+      ]
+    },
+    "1972-12": {
+      "n": 500,
+      "other": 0.4777,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0745
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0466
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0382
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.037
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0313
+        },
+        {
+          "ticker": "S",
+          "weight": 0.029
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0212
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "AVP",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.012
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "KG",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "IIN",
+          "weight": 0.009
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "JCP",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "PRD",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "BGH",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "WX",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.006
+        }
+      ]
+    },
+    "1973-12": {
+      "n": 500,
+      "other": 0.471,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0681
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0529
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.04
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0356
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.025
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0239
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.012
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.012
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.01
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "WY",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "JCP",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "BGH",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "KG",
+          "weight": 0.0073
+        }
+      ]
+    },
+    "1974-12": {
+      "n": 499,
+      "other": 0.4844,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0664
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0649
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0385
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.027
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0234
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0202
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0151
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.011
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.01
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "WY",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "GET",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "BGH",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.0074
+        }
+      ]
+    },
+    "1975-12": {
+      "n": 498,
+      "other": 0.5102,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0653
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0566
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0389
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0336
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0324
+        },
+        {
+          "ticker": "S",
+          "weight": 0.02
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.012
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "WY",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "KG",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "UK",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.007
+        }
+      ]
+    },
+    "1976-12": {
+      "n": 500,
+      "other": 0.5431,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0642
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0586
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0367
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0343
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0212
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0192
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.01
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.01
+        },
+        {
+          "ticker": "WY",
+          "weight": 0.009
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "KG",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "BAM",
+          "weight": 0.0064
+        }
+      ]
+    },
+    "1977-12": {
+      "n": 500,
+      "other": 0.5491,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0678
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0659
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0362
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0302
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "S",
+          "weight": 0.015
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.009
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "F",
+          "weight": 0.008
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.008
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "HAL",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0062
+        }
+      ]
+    },
+    "1978-12": {
+      "n": 499,
+      "other": 0.5501,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0707
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0658
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0354
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0249
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.013
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.013
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.012
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "HAL",
+          "weight": 0.0063
+        }
+      ]
+    },
+    "1979-12": {
+      "n": 500,
+      "other": 0.582,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0531
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0517
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0342
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.011
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "GET",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "XRX",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "CLL",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "HAL",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.006
+        }
+      ]
+    },
+    "1980-12": {
+      "n": 500,
+      "other": 0.5729,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0431
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0393
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0379
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0254
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0243
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0196
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.014
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "HAL",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "UCL",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "UNP",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "GET",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "CLL",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "TGT",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "SUN",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0059
+        }
+      ]
+    },
+    "1981-12": {
+      "n": 500,
+      "other": 0.6013,
+      "holdings": [
+        {
+          "ticker": "T",
+          "weight": 0.0563
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0396
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0319
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.019
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.018
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.016
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.01
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "UCL",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "P",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "HAL",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "SKL",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "SUN",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "GET",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "UNP",
+          "weight": 0.0059
+        }
+      ]
+    },
+    "1982-12": {
+      "n": 500,
+      "other": 0.6087,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0576
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0529
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0256
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0194
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.008
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.007
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "AXP",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "SKB",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "DEC",
+          "weight": 0.0055
+        },
+        {
+          "ticker": "UNP",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0053
+        }
+      ]
+    },
+    "1983-12": {
+      "n": 492,
+      "other": 0.6185,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.062
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0495
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0263
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0222
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0195
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "S",
+          "weight": 0.011
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "SD",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.009
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.009
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "GET",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "GO",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "AXP",
+          "weight": 0.0058
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0054
+        }
+      ]
+    },
+    "1984-12": {
+      "n": 499,
+      "other": 0.6465,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.063
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0215
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0206
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "SUO",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "SN",
+          "weight": 0.012
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.008
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "AXP",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "TX",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "NYN",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.006
+        }
+      ]
+    },
+    "1985-12": {
+      "n": 500,
+      "other": 0.6607,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0646
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0275
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.015
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.011
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.01
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "AXP",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.007
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "NYN",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0061
+        }
+      ]
+    },
+    "1986-12": {
+      "n": 499,
+      "other": 0.6617,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0434
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0301
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0234
+        },
+        {
+          "ticker": "T",
+          "weight": 0.016
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.012
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.011
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.01
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "DEC",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.008
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.008
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "NYN",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "AXP",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "SRD",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0068
+        }
+      ]
+    },
+    "1987-12": {
+      "n": 500,
+      "other": 0.6517,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0408
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0318
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0236
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "DEC",
+          "weight": 0.01
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "NYN",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.007
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0067
+        }
+      ]
+    },
+    "1988-12": {
+      "n": 500,
+      "other": 0.6584,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0385
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0307
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0216
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "RJR",
+          "weight": 0.011
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.01
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.01
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "S",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "EK",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.007
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.007
+        },
+        {
+          "ticker": "NYN",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0068
+        }
+      ]
+    },
+    "1989-12": {
+      "n": 500,
+      "other": 0.6448,
+      "holdings": [
+        {
+          "ticker": "XON",
+          "weight": 0.0268
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.025
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0234
+        },
+        {
+          "ticker": "T",
+          "weight": 0.021
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.012
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.012
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.011
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "DOW",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.008
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "NYN",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0072
+        }
+      ]
+    },
+    "1990-12": {
+      "n": 500,
+      "other": 0.6117,
+      "holdings": [
+        {
+          "ticker": "IBM",
+          "weight": 0.0299
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0299
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0233
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0222
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "ARC",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "WMX",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0076
+        }
+      ]
+    },
+    "1991-12": {
+      "n": 500,
+      "other": 0.6158,
+      "holdings": [
+        {
+          "ticker": "XON",
+          "weight": 0.0271
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0265
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0242
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0231
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0183
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0182
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.011
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.009
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "WMX",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.0064
+        }
+      ]
+    },
+    "1992-12": {
+      "n": 500,
+      "other": 0.6437,
+      "holdings": [
+        {
+          "ticker": "XON",
+          "weight": 0.0254
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0246
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0245
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0232
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0228
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.008
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "F",
+          "weight": 0.007
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.007
+        }
+      ]
+    },
+    "1993-12": {
+      "n": 500,
+      "other": 0.6603,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0275
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0241
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0178
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.015
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.012
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.01
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.01
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.01
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.008
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "MOT",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "MMM",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "PAC",
+          "weight": 0.007
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.007
+        }
+      ]
+    },
+    "1994-12": {
+      "n": 500,
+      "other": 0.6512,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0264
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0228
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.015
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "MOT",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.009
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.008
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.008
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "RD",
+          "weight": 0.007
+        }
+      ]
+    },
+    "1995-12": {
+      "n": 500,
+      "other": 0.6506,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0266
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0228
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0223
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0206
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "MOT",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "AIT",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "MCD",
+          "weight": 0.007
+        }
+      ]
+    },
+    "1996-12": {
+      "n": 500,
+      "other": 0.6442,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0236
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0219
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0194
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "CCI",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "GTE",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "CHV",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "GM",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "AN",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0071
+        }
+      ]
+    },
+    "1997-12": {
+      "n": 500,
+      "other": 0.6308,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0323
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0222
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.021
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0203
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.013
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "DD",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.009
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.009
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "TRV",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "CCI",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "MOB",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "G",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "F",
+          "weight": 0.0074
+        }
+      ]
+    },
+    "1998-12": {
+      "n": 500,
+      "other": 0.576,
+      "holdings": [
+        {
+          "ticker": "MSFT",
+          "weight": 0.0349
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0341
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0202
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "XON",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "LU",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "WCOM",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.01
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "DELL",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "SGP",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0076
+        }
+      ]
+    },
+    "1999-12": {
+      "n": 500,
+      "other": 0.5197,
+      "holdings": [
+        {
+          "ticker": "MSFT",
+          "weight": 0.0495
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0417
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0288
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0253
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0229
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0226
+        },
+        {
+          "ticker": "LU",
+          "weight": 0.0193
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.016
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "AOL",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.013
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "WCOM",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "NT",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "DELL",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "SUNW",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "HWP",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "YHOO",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "EMC",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "BEL",
+          "weight": 0.0079
+        }
+      ]
+    },
+    "2000-12": {
+      "n": 500,
+      "other": 0.5636,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0411
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0261
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0251
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0222
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.02
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0197
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.014
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.014
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "EMC",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "NT",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "TYC",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "SUNW",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "MWD",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "SGP",
+          "weight": 0.0072
+        }
+      ]
+    },
+    "2001-12": {
+      "n": 500,
+      "other": 0.5477,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0385
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0346
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.026
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0251
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0248
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0242
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.02
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "AOL",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0128
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "TYC",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "BMY",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "AHP",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0071
+        }
+      ]
+    },
+    "2002-12": {
+      "n": 500,
+      "other": 0.5623,
+      "holdings": [
+        {
+          "ticker": "MSFT",
+          "weight": 0.0346
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0303
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0279
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0235
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0222
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0199
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0189
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.014
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.013
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "DELL",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "VIA",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.008
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "AMGN",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "AOL",
+          "weight": 0.007
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.007
+        }
+      ]
+    },
+    "2003-12": {
+      "n": 500,
+      "other": 0.5836,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0306
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0291
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0267
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0265
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0247
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0226
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.017
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0151
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0128
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "DELL",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.008
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "AMGN",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "TWX",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "FNM",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "VIA",
+          "weight": 0.0071
+        }
+      ]
+    },
+    "2004-12": {
+      "n": 500,
+      "other": 0.6046,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0345
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0296
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.026
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.02
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0181
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.017
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0153
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.01
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.01
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "DELL",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.009
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "TWX",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "SBC",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "WB",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "AMGN",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "EBAY",
+          "weight": 0.007
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "TYC",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0064
+        }
+      ]
+    },
+    "2005-12": {
+      "n": 500,
+      "other": 0.6212,
+      "holdings": [
+        {
+          "ticker": "GE",
+          "weight": 0.0321
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0303
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0234
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0172
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0163
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0128
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.012
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.011
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "AMGN",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "WB",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "HPQ",
+          "weight": 0.007
+        },
+        {
+          "ticker": "TWX",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "DELL",
+          "weight": 0.0061
+        }
+      ]
+    },
+    "2006-12": {
+      "n": 500,
+      "other": 0.6159,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0343
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0224
+        },
+        {
+          "ticker": "C",
+          "weight": 0.021
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.009
+        },
+        {
+          "ticker": "WB",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "HPQ",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.008
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "TWX",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "BLS",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "MS",
+          "weight": 0.0066
+        }
+      ]
+    },
+    "2007-12": {
+      "n": 500,
+      "other": 0.5968,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0388
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0284
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0252
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0191
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "MO",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "AIG",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "HPQ",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "GS",
+          "weight": 0.0065
+        }
+      ]
+    },
+    "2008-12": {
+      "n": 500,
+      "other": 0.567,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0501
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0271
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0228
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.021
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0205
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.011
+        },
+        {
+          "ticker": "PM",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "HPQ",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "MCD",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "AMGN",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "UTX",
+          "weight": 0.0063
+        }
+      ]
+    },
+    "2009-12": {
+      "n": 500,
+      "other": 0.5868,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0315
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0262
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0199
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0173
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0168
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0151
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.012
+        },
+        {
+          "ticker": "HPQ",
+          "weight": 0.0119
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.011
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "PM",
+          "weight": 0.009
+        },
+        {
+          "ticker": "GS",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0074
+        }
+      ]
+    },
+    "2010-12": {
+      "n": 500,
+      "other": 0.6079,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0316
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0254
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0201
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0156
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0145
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0142
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0139
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.012
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "PM",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "HPQ",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "GS",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0069
+        }
+      ]
+    },
+    "2011-12": {
+      "n": 500,
+      "other": 0.6004,
+      "holdings": [
+        {
+          "ticker": "XOM",
+          "weight": 0.0349
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0324
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0182
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0176
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0162
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "PM",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "MCD",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "COP",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.007
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0066
+        }
+      ]
+    },
+    "2012-12": {
+      "n": 500,
+      "other": 0.6078,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.038
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.03
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.017
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0165
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0161
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.014
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0137
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0127
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.012
+        },
+        {
+          "ticker": "PM",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "ABT",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.007
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.007
+        }
+      ]
+    },
+    "2013-12": {
+      "n": 500,
+      "other": 0.6381,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0259
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0184
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0182
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0152
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.014
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.013
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.012
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "PM",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "QCOM",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.007
+        },
+        {
+          "ticker": "SLB",
+          "weight": 0.007
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0068
+        }
+      ]
+    },
+    "2014-12": {
+      "n": 502,
+      "other": 0.6518,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0341
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0208
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0203
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0155
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0151
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0147
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.01
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "GILD",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0073
+        }
+      ]
+    },
+    "2015-12": {
+      "n": 504,
+      "other": 0.6371,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0313
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0236
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0171
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0153
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0129
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0122
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.01
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.009
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "GILD",
+          "weight": 0.0077
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0074
+        }
+      ]
+    },
+    "2016-12": {
+      "n": 505,
+      "other": 0.6332,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0304
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.024
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0187
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.014
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0134
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0109
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "CMCSA",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "IBM",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0076
+        }
+      ]
+    },
+    "2017-12": {
+      "n": 504,
+      "other": 0.6231,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0364
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0278
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0238
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0179
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0154
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.015
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.013
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0126
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.01
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.009
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "C",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.008
+        },
+        {
+          "ticker": "CMCSA",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "BA",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "DWDP",
+          "weight": 0.007
+        }
+      ]
+    },
+    "2018-12": {
+      "n": 505,
+      "other": 0.6023,
+      "holdings": [
+        {
+          "ticker": "MSFT",
+          "weight": 0.0358
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0342
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0337
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0166
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0149
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0143
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0132
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0128
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0124
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.011
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0089
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0088
+        },
+        {
+          "ticker": "BA",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0071
+        }
+      ]
+    },
+    "2019-12": {
+      "n": 505,
+      "other": 0.5954,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0462
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0431
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.033
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0177
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0164
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0121
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0115
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.01
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "WFC",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "CMCSA",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0068
+        },
+        {
+          "ticker": "BA",
+          "weight": 0.0066
+        }
+      ]
+    },
+    "2020-12": {
+      "n": 505,
+      "other": 0.5594,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0674
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0506
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0494
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.0204
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0198
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0174
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0159
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0123
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0106
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.01
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "NVDA",
+          "weight": 0.0098
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "PYPL",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "VZ",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "ADBE",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "CMCSA",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "NFLX",
+          "weight": 0.0072
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0071
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "T",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "CRM",
+          "weight": 0.0061
+        }
+      ]
+    },
+    "2021-12": {
+      "n": 505,
+      "other": 0.5512,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.069
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.06
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0404
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.026
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0218
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0207
+        },
+        {
+          "ticker": "FB",
+          "weight": 0.0186
+        },
+        {
+          "ticker": "NVDA",
+          "weight": 0.0175
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0111
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0103
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0094
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0093
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0087
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "DIS",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "AVGO",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "ACN",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "ADBE",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "NFLX",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "TMO",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "COST",
+          "weight": 0.006
+        }
+      ]
+    },
+    "2022-12": {
+      "n": 503,
+      "other": 0.5834,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0615
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0534
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0257
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0158
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0157
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.0148
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0138
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0136
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.012
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0114
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0108
+        },
+        {
+          "ticker": "NVDA",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0107
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0101
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "PFE",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "ABBV",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0084
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "META",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0079
+        },
+        {
+          "ticker": "PEP",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "AVGO",
+          "weight": 0.007
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "TMO",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "COST",
+          "weight": 0.0061
+        }
+      ]
+    },
+    "2023-12": {
+      "n": 503,
+      "other": 0.5279,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0714
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0671
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0373
+        },
+        {
+          "ticker": "NVDA",
+          "weight": 0.0294
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0198
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0192
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.019
+        },
+        {
+          "ticker": "META",
+          "weight": 0.0188
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0133
+        },
+        {
+          "ticker": "AVGO",
+          "weight": 0.0125
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0118
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.0117
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0112
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0102
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0099
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0096
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0095
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "COST",
+          "weight": 0.007
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.007
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "ABBV",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "ADBE",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0064
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "CRM",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "AMD",
+          "weight": 0.0057
+        }
+      ]
+    },
+    "2024-12": {
+      "n": 503,
+      "other": 0.4711,
+      "holdings": [
+        {
+          "ticker": "AAPL",
+          "weight": 0.0726
+        },
+        {
+          "ticker": "NVDA",
+          "weight": 0.0634
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0604
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0448
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.0251
+        },
+        {
+          "ticker": "META",
+          "weight": 0.0247
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0213
+        },
+        {
+          "ticker": "AVGO",
+          "weight": 0.021
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0203
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.014
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.013
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0116
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.009
+        },
+        {
+          "ticker": "UNH",
+          "weight": 0.009
+        },
+        {
+          "ticker": "COST",
+          "weight": 0.0078
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0076
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0075
+        },
+        {
+          "ticker": "NFLX",
+          "weight": 0.0074
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "CRM",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "ABBV",
+          "weight": 0.0061
+        },
+        {
+          "ticker": "KO",
+          "weight": 0.0052
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.005
+        },
+        {
+          "ticker": "TMUS",
+          "weight": 0.0049
+        },
+        {
+          "ticker": "MRK",
+          "weight": 0.0049
+        }
+      ]
+    },
+    "2025-12": {
+      "n": 503,
+      "other": 0.4535,
+      "holdings": [
+        {
+          "ticker": "NVDA",
+          "weight": 0.0744
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0656
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0589
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0406
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0299
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.028
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.0277
+        },
+        {
+          "ticker": "AVGO",
+          "weight": 0.0269
+        },
+        {
+          "ticker": "META",
+          "weight": 0.0237
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0167
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0146
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0144
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0113
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0097
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0092
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0083
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0082
+        },
+        {
+          "ticker": "PLTR",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "ABBV",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "NFLX",
+          "weight": 0.0065
+        },
+        {
+          "ticker": "COST",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "AMD",
+          "weight": 0.0057
+        },
+        {
+          "ticker": "HD",
+          "weight": 0.0056
+        },
+        {
+          "ticker": "PG",
+          "weight": 0.0055
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "MU",
+          "weight": 0.0053
+        },
+        {
+          "ticker": "CVX",
+          "weight": 0.005
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.005
+        }
+      ]
+    },
+    "2026-06": {
+      "n": 503,
+      "other": 0.4573,
+      "holdings": [
+        {
+          "ticker": "NVDA",
+          "weight": 0.0723
+        },
+        {
+          "ticker": "AAPL",
+          "weight": 0.0634
+        },
+        {
+          "ticker": "MSFT",
+          "weight": 0.0414
+        },
+        {
+          "ticker": "AMZN",
+          "weight": 0.0383
+        },
+        {
+          "ticker": "GOOGL",
+          "weight": 0.0311
+        },
+        {
+          "ticker": "GOOG",
+          "weight": 0.0288
+        },
+        {
+          "ticker": "AVGO",
+          "weight": 0.0268
+        },
+        {
+          "ticker": "TSLA",
+          "weight": 0.0236
+        },
+        {
+          "ticker": "MU",
+          "weight": 0.0195
+        },
+        {
+          "ticker": "META",
+          "weight": 0.0185
+        },
+        {
+          "ticker": "LLY",
+          "weight": 0.0169
+        },
+        {
+          "ticker": "AMD",
+          "weight": 0.0141
+        },
+        {
+          "ticker": "WMT",
+          "weight": 0.0135
+        },
+        {
+          "ticker": "JPM",
+          "weight": 0.0131
+        },
+        {
+          "ticker": "INTC",
+          "weight": 0.0105
+        },
+        {
+          "ticker": "BRK",
+          "weight": 0.0104
+        },
+        {
+          "ticker": "JNJ",
+          "weight": 0.0091
+        },
+        {
+          "ticker": "AMAT",
+          "weight": 0.0086
+        },
+        {
+          "ticker": "V",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "XOM",
+          "weight": 0.0085
+        },
+        {
+          "ticker": "LRCX",
+          "weight": 0.0081
+        },
+        {
+          "ticker": "CAT",
+          "weight": 0.0073
+        },
+        {
+          "ticker": "CSCO",
+          "weight": 0.0069
+        },
+        {
+          "ticker": "MA",
+          "weight": 0.0067
+        },
+        {
+          "ticker": "ABBV",
+          "weight": 0.0066
+        },
+        {
+          "ticker": "ORCL",
+          "weight": 0.0063
+        },
+        {
+          "ticker": "COST",
+          "weight": 0.0062
+        },
+        {
+          "ticker": "BAC",
+          "weight": 0.006
+        },
+        {
+          "ticker": "KLAC",
+          "weight": 0.0059
+        },
+        {
+          "ticker": "GE",
+          "weight": 0.0058
+        }
+      ]
+    }
   }
 };
 
@@ -16995,6 +29482,7 @@ export const {
   CONCENTRATION,
   EW_VS_CW,
   TOP10_SNAPSHOTS,
+  TREEMAP_SNAPSHOTS,
 } = data;
 
 export default data;
