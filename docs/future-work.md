@@ -39,14 +39,16 @@ Keep adding heavy viz libs per-flagship, not site-wide (see strategy note below)
    market's 650× average is carried by gold dots you missed"). Theme-aware via CSS tokens read at
    draw time + a data-theme MutationObserver. The ensemble MC histogram below is unchanged.
 
-3. **Retirement Monte-Carlo fan chart** — in `BurnRateLab` (fixed-strategy stress test). No new
-   data: BurnRateLab already runs the survival MC. New `McFanChart.tsx`: percentile bands
-   (10/25/50/75/90) of wealth paths per year as shaded SVG polygons over a canvas path underlay;
-   scrubber highlights one path; a "play" button draws paths in via requestAnimationFrame. Teaches
-   sequence-of-returns risk. Lib: native Canvas, no dep. (Pairs with the "sequence-of-returns"
-   flagship idea below.)
+3. ✅ **Retirement MC fan chart** — SHIPPED. The stress-test FanChart (both fixed and guardrails
+   views) now carries an animated canvas "spaghetti" overlay: ~140 sampled histories (strided
+   across the sorted-by-ending spectrum) draw in left-to-right over ~2.6s, failures turning red
+   as they die at $0; "▶ Replay 140 lives" button. rAF with a setTimeout fallback so hidden tabs
+   still get the finished frame. `StressResult.samplePaths` feeds it (balances under fixed,
+   spending under guardrails).
 
-Each ~1 day. Order by wow: treemap and dot-canvas are the biggest "how is this free?" moments.
+**Mind-the-Gap batch complete (2026-08-19):** all three flagships + the two behavior-gap
+extensions shipped. Next candidates: the remaining data-tool backlog (survivorship/persistence,
+loads & 12b-1, fund overlap) or more polish-stack items below.
 
 ## New tools — from datasets already pulled (in the shared library)
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
@@ -51,6 +51,9 @@ interface StressResult {
   bands: { p: number; series: number[] }[]; // portfolio balance over time
   // Guardrails strategy only: spending flexes, so the story shifts to income.
   spendBands?: { p: number; series: number[] }[]; // total annual spending over time
+  /** ~140 individual histories (balances; spending under guardrails), spread across
+   *  the outcome spectrum — the animated "spaghetti" behind the fan chart. */
+  samplePaths?: number[][];
   avgRate?: number; // mean realized withdrawal rate across all histories
   startRate?: number; // initial withdrawal rate
   medianSpend?: number; // median per-history average annual spending
@@ -166,6 +169,19 @@ export default function BurnRateLab() {
       if (!failed) successes++;
     }
     const bands = bandsOverTime(balances, [0.1, 0.25, 0.5, 0.75, 0.9]);
+    // Sample ~140 whole histories, strided across the sorted-by-ending spectrum so
+    // the spaghetti shows the full range from busted to jackpot, not a random blob.
+    const samplePathsFrom = (all: number[][]): number[][] => {
+      const order = all
+        .map((row, i) => [row[row.length - 1], i] as const)
+        .sort((a, b) => a[0] - b[0])
+        .map(([, i]) => i);
+      const k = 140;
+      const step = Math.max(1, Math.floor(order.length / k));
+      const out: number[][] = [];
+      for (let i = 0; i < order.length && out.length < k; i += step) out.push(all[order[i]]);
+      return out;
+    };
     const result: StressResult = {
       successRate: successes / PATHS,
       failRate: 1 - successes / PATHS,
@@ -175,6 +191,9 @@ export default function BurnRateLab() {
       p90Terminal: quantile(terminal, 0.9),
       medianDepletion: depletionYears.length ? quantile(depletionYears, 0.5) : null,
       bands,
+      // Spaghetti sample matches whichever series each view fans out:
+      // balances for the fixed strategy, spending under guardrails.
+      samplePaths: guard && spendPaths ? samplePathsFrom(spendPaths) : samplePathsFrom(balances),
     };
     if (guard && spendPaths) {
       result.spendBands = bandsOverTime(spendPaths, [0.1, 0.25, 0.5, 0.75, 0.9]);
@@ -484,7 +503,7 @@ function StressView({
             {pctText(sim.successRate)}
           </span>
         </div>
-        <FanChart bands={sim.bands} horizon={horizon} start={portfolio} />
+        <FanChart bands={sim.bands} horizon={horizon} start={portfolio} paths={sim.samplePaths} />
         {noDraw ? (
           <p className="wl-fnote">
             Your guaranteed income covers <strong>all</strong> of your spending, so the portfolio is never drawn down. It
@@ -562,6 +581,7 @@ function GuardrailsView({ sim, horizon, firstYearSpend }: { sim: StressResult; h
           bands={sim.spendBands!}
           horizon={horizon}
           start={firstYearSpend}
+          paths={sim.samplePaths}
           color="var(--color-link)"
           ariaLabel="Range of annual retirement spending over time across simulated histories"
         />
@@ -606,12 +626,14 @@ function GuardrailsView({ sim, horizon, firstYearSpend }: { sim: StressResult; h
   );
 }
 
-function FanChart({ bands, horizon, start, ariaLabel = "Range of retirement balances over time across simulated histories", color = "var(--color-accent)" }: { bands: { p: number; series: number[] }[]; horizon: number; start: number; ariaLabel?: string; color?: string }) {
+function FanChart({ bands, horizon, start, paths, ariaLabel = "Range of retirement balances over time across simulated histories", color = "var(--color-accent)" }: { bands: { p: number; series: number[] }[]; horizon: number; start: number; paths?: number[][]; ariaLabel?: string; color?: string }) {
   const width = 560;
   const height = 260;
   const pad = { top: 14, right: 14, bottom: 28, left: 58 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [replay, setReplay] = useState(0);
 
   const byP = (p: number) => bands.find((b) => Math.abs(b.p - p) < 1e-9)!.series;
   const b10 = byP(0.1), b25 = byP(0.25), b50 = byP(0.5), b75 = byP(0.75), b90 = byP(0.9);
@@ -619,6 +641,70 @@ function FanChart({ bands, horizon, start, ariaLabel = "Range of retirement bala
 
   const x = (t: number) => pad.left + (t / horizon) * plotW;
   const y = (v: number) => height - pad.bottom - (Math.max(0, v) / yMax) * plotH;
+
+  // Animated "spaghetti": each sampled history draws in left-to-right, so the
+  // reader watches identical plans peel apart year by year — sequence-of-returns
+  // risk as motion, with the failures dying visibly at the $0 line.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !paths || paths.length === 0) return;
+    const cssW = canvas.clientWidth || width;
+    const scale = cssW / width;
+    const dpr = Math.min(2.5, window.devicePixelRatio || 1);
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssW * (height / width) * dpr);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.scale(dpr * scale, dpr * scale);
+
+    const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#888";
+    const cAlive = css("--color-accent");
+    const cDead = css("--color-error");
+    // Death year per path (first year the series is ~0 and stays there).
+    const death = paths.map((row) => {
+      for (let t = 1; t < row.length; t++) if (row[t] <= 0) return t;
+      return Infinity;
+    });
+
+    const DUR = 2600;
+    const drawAt = (f: number) => {
+      const front = f * horizon;
+      ctx.clearRect(0, 0, width, height);
+      ctx.lineWidth = 1;
+      for (let p = 0; p < paths.length; p++) {
+        const row = paths[p];
+        const dead = death[p] <= front;
+        ctx.strokeStyle = dead ? cDead : cAlive;
+        ctx.globalAlpha = dead ? 0.45 : 0.16;
+        ctx.beginPath();
+        ctx.moveTo(x(0), y(row[0]));
+        const last = Math.min(Math.floor(front), row.length - 1);
+        for (let t = 1; t <= last; t++) ctx.lineTo(x(t), y(row[t]));
+        // fractional tip so the front advances smoothly between year marks
+        if (last < row.length - 1 && front > last) {
+          const frac = front - last;
+          const v = row[last] + (row[last + 1] - row[last]) * frac;
+          ctx.lineTo(x(front), y(v));
+        }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+    let raf = 0;
+    let done = false;
+    const t0 = performance.now();
+    const frame = (now: number) => {
+      const f = Math.min(1, (now - t0) / DUR);
+      drawAt(f);
+      if (f < 1) raf = requestAnimationFrame(frame);
+      else done = true;
+    };
+    raf = requestAnimationFrame(frame);
+    // rAF doesn't fire in hidden/background tabs — guarantee the finished frame.
+    const fallback = window.setTimeout(() => { if (!done) { done = true; drawAt(1); } }, DUR + 150);
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(fallback); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paths, replay, yMax, horizon]);
 
   const band = (lo: number[], hi: number[]) =>
     "M" + hi.map((v, t) => `${x(t)},${y(v)}`).join(" L") + " L" +
@@ -629,19 +715,39 @@ function FanChart({ bands, horizon, start, ariaLabel = "Range of retirement bala
   const fmt = (v: number) => formatMoney(v, { compact: true });
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label={ariaLabel}>
-      {[0, 0.25, 0.5, 0.75, 1].map((f) => (
-        <g key={f}>
-          <line x1={pad.left} x2={width - pad.right} y1={y(yMax * f)} y2={y(yMax * f)} stroke="var(--color-border)" />
-          <text x={pad.left - 6} y={y(yMax * f) + 4} textAnchor="end" style={axisText}>{fmt(yMax * f)}</text>
-        </g>
-      ))}
-      <path d={band(b10, b90)} fill={color} opacity={0.16} />
-      <path d={band(b25, b75)} fill={color} opacity={0.28} />
-      <path d={median} fill="none" stroke={color} strokeWidth={2.5} />
-      {[0, Math.round(horizon / 2), horizon].map((t) => (
-        <text key={t} x={x(t)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{t === 0 ? "retire" : `yr ${t}`}</text>
-      ))}
-    </svg>
+    <div style={{ position: "relative" }}>
+      <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label={ariaLabel}>
+        {[0, 0.25, 0.5, 0.75, 1].map((f) => (
+          <g key={f}>
+            <line x1={pad.left} x2={width - pad.right} y1={y(yMax * f)} y2={y(yMax * f)} stroke="var(--color-border)" />
+            <text x={pad.left - 6} y={y(yMax * f) + 4} textAnchor="end" style={axisText}>{fmt(yMax * f)}</text>
+          </g>
+        ))}
+        <path d={band(b10, b90)} fill={color} opacity={0.16} />
+        <path d={band(b25, b75)} fill={color} opacity={0.28} />
+        <path d={median} fill="none" stroke={color} strokeWidth={2.5} />
+        {[0, Math.round(horizon / 2), horizon].map((t) => (
+          <text key={t} x={x(t)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{t === 0 ? "retire" : `yr ${t}`}</text>
+        ))}
+      </svg>
+      {paths && paths.length > 0 && (
+        <>
+          <canvas
+            ref={canvasRef}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+            aria-hidden="true"
+          />
+          <button
+            type="button"
+            className="wl-btn"
+            onClick={() => setReplay((r) => r + 1)}
+            style={{ position: "absolute", top: 2, right: 2, fontSize: "0.72rem", padding: "0.1rem 0.55rem", opacity: 0.85 }}
+            aria-label={`Replay ${paths.length} simulated histories`}
+          >
+            ▶ Replay {paths.length} lives
+          </button>
+        </>
+      )}
+    </div>
   );
 }
