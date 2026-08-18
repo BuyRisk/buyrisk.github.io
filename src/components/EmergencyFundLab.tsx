@@ -49,12 +49,19 @@ export default function EmergencyFundLab() {
     setAdvanced(false); setHealth("low"); setHousing("rent"); setPets(0); setOtherRisk(0);
   };
 
+  // Months of essentials to hold: start at the common 3-month floor and add for
+  // each risk factor. The bump sizes are judgment calls in the spirit of standard
+  // guidance (3–6 months typical, more for volatile income), capped at 12 —
+  // beyond a year, extra cash usually costs more in lost growth than it protects.
   const months = Math.min(12, Math.max(3,
     3 + ({ riskless: 0, steady: 1, variable: 2.5, veryVariable: 4 }[stability])
       + (earners === "one" ? 1.5 : 0)
       + (deps === "yes" ? 1.5 : 0)));
   const baseFund = months * essentials;
 
+  // Lumpy-risk buffers are rough US-typical orders of magnitude, not quotes:
+  // health ≈ a deductible / out-of-pocket max, home ≈ one major repair,
+  // pets ≈ one emergency vet visit each. The InfoTips say so to the reader.
   const healthBuf = advanced ? ({ low: 2500, hdhp: 6000, high: 12000 }[health]) : 0;
   const homeBuf = advanced && housing === "own" ? 5000 : 0;
   const petBuf = advanced ? pets * 1500 : 0;

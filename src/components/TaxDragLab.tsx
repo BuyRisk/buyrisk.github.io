@@ -36,11 +36,18 @@ function simulate(P: number, r: number, divY: number, fund: { turnover: number; 
   for (let y = 0; y < n; y++) {
     const div = V * divY;
     const priceApp = V * (r - divY);
+    // Model of forced distributions: the fund realizes (and passes to you) a
+    // slice of its unrealized gains proportional to its turnover. Short-term
+    // slices are taxed at your ordinary rate, long-term at the capital-gains
+    // rate; qualified dividends also get the capital-gains rate.
     const unreal = Math.max(0, V - B + priceApp);
     const cgDist = fund.turnover * unreal;
     const divTax = div * cg;
     const distTax = cgDist * fund.stFrac * ord + cgDist * (1 - fund.stFrac) * cg;
     V = V * (1 + r) - divTax - distTax;
+    // Cost basis rises with reinvested (after-tax) dividends and with the
+    // distributed gains — you already paid tax on those, so they aren't taxed
+    // again at sale. Capped at V so basis can never exceed the account value.
     B = Math.min(V, B + (div - divTax) + cgDist);
     taxDiv += divTax;
     taxDist += distTax;

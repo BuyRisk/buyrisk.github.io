@@ -76,6 +76,8 @@ export default function RiskToleranceLab() {
     const combined = 0.65 * blend + 0.35 * binding;
     const equity = Math.round((20 + combined * 75) / 5) * 5; // 20–95, to nearest 5
     const stats = mixStats(equity / 100);
+    // Flag when ability and willingness disagree by a third of the scale or
+    // more — big enough that the reader should hear about the tension.
     const mismatch = Math.abs(abilityP - willP) >= 0.34;
     const lower = abilityP < willP ? "ability" : "willingness";
     return { equity, abilityP, willP, needP, stats, mismatch, lower };

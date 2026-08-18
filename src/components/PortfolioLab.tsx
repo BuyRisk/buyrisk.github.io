@@ -25,14 +25,28 @@ import { assetStats } from "../data/generated/asset-stats";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
+/**
+ * The Portfolio Lab — the playground's centrepiece. Mix up to five asset
+ * classes, set weights, and see (a) an animated simulated wealth path with an
+ * optional fan of alternate futures, (b) the risk-return cloud with the
+ * efficient frontier, and (c) the distribution of ending wealth over many runs.
+ * "Historical" mode locks each asset's return/volatility/correlations to the
+ * real Damodaran-derived stats (src/data/generated/asset-stats); "Custom" mode
+ * frees the dials. All portfolio math lives in src/lib/portfolio. Simulations
+ * are seeded so a given setup replays identically. Educational only, not advice.
+ */
+
+// Weekly simulation steps: fine enough that paths look like markets, coarse
+// enough to stay fast. Seeds are arbitrary fixed values (date-stamp / 42s) so
+// the cloud and outcome histogram are stable across renders and visitors.
 const STEPS_PER_YEAR = 52;
 const CLOUD_SEED = 20260726;
 const DIST_SEED = 424242;
 const CLOUD_COUNT = 5000;
 const MAX_ASSETS = 5;
 const MIN_ASSETS = 2;
-const FAN_RUNS = 12;
-const OUTCOME_RUNS = 400;
+const FAN_RUNS = 12; // alternate futures drawn in the fan view
+const OUTCOME_RUNS = 400; // runs behind the ending-wealth distribution
 
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
 

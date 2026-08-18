@@ -21,6 +21,9 @@ export default function SavingsGoalLab() {
   const { required, history, contributed, growth } = useMemo(() => {
     const rm = ret / 100 / 12;
     const n = months;
+    // Solve the future-value formula for the payment: what you already have
+    // grows to fvCurrent; each monthly deposit grows by the annuity factor
+    // ((1+r)^n − 1)/r; the required deposit covers whatever gap remains.
     const fvCurrent = current * Math.pow(1 + rm, n);
     const factor = rm === 0 ? n : (Math.pow(1 + rm, n) - 1) / rm;
     const req = Math.max(0, (goal - fvCurrent) / factor);

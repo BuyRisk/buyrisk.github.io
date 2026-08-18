@@ -54,6 +54,8 @@ export default function NetWorthLab() {
   const rm = ret / 100 / 12;
   const nMonths = years * 12;
   const invFuture = assets.investments * Math.pow(1 + rm, nMonths);
+  // Future value of a level monthly contribution (annuity formula):
+  // monthly × ((1+r)^n − 1)/r — each deposit compounds for its remaining months.
   const contribFuture = rm === 0 ? monthly * nMonths : monthly * ((Math.pow(1 + rm, nMonths) - 1) / rm);
   const futureNet = net - assets.investments + invFuture + contribFuture;
 

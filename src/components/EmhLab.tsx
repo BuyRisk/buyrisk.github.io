@@ -10,7 +10,9 @@ import { mulberry32, makeNormal } from "../lib/portfolio";
  * just holding, because you sit out unpredictable jumps.
  */
 
-const N = 24;
+const N = 24; // steps per game — enough to feel a pattern that isn't there
+// Per-step drift and volatility roughly like a month of US stocks: +0.6% average
+// (≈7%/yr) with 5% swings — so "up" is slightly more likely, but far from sure.
 const DRIFT = 0.006;
 const SIGMA = 0.05;
 const START = 100;
