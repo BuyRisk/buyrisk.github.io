@@ -1693,6 +1693,27 @@
   .sk-reseed {
     width: 100%;
   }
+  /* The one-draw "lottery" row under the dot canvas. */
+  .sk-lottery {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    margin-top: var(--space-sm);
+  }
+  .sk-lottery .wl-btn {
+    flex: none;
+    white-space: nowrap;
+  }
+  .sk-lottery-verdict {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .sk-lottery-verdict strong {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
   .sk-ustats {
     display: flex;
     flex-wrap: wrap;

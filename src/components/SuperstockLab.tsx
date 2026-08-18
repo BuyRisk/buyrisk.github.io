@@ -3,6 +3,7 @@ import { mulberry32, percentile } from "../lib/portfolio";
 import { crspSuperstock } from "../data/generated/crsp-superstock";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
+import SuperstockDots from "./SuperstockDots";
 
 /**
  * Bessembinder's skewness, made interactive. Individual stock lifetime returns
@@ -160,8 +161,28 @@ function portfolioMultiples(universe: number[], n: number, seed: number): number
 export default function SuperstockLab() {
   const [n, setN] = useState(5);
   const [seed, setSeed] = useState(1);
+  const [pickSeed, setPickSeed] = useState(1); // the reader's single "lottery" draw
 
   const universe = useMemo(() => makeUniverse(seed), [seed]);
+
+  // One concrete draw of n distinct stocks — the ringed dots in the canvas. The
+  // Monte Carlo below shows the ensemble; this shows the reader THEIR ticket.
+  const picks = useMemo(() => {
+    const rng = mulberry32(pickSeed * 7919 + n);
+    const set = new Set<number>();
+    while (set.size < Math.min(n, M)) set.add((rng() * M) | 0);
+    return [...set];
+  }, [pickSeed, n]);
+
+  const basket = useMemo(() => {
+    const ms = picks.map((i) => universe[i]);
+    const avg = ms.reduce((s, x) => s + x, 0) / ms.length;
+    return {
+      avg,
+      lost: ms.filter((m) => m < 1).length,
+      supers: ms.filter((m) => m >= 200).length,
+    };
+  }, [picks, universe]);
 
   const uStats = useMemo(() => {
     const sorted = [...universe].sort((a, b) => a - b);
@@ -184,7 +205,7 @@ export default function SuperstockLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton onReset={() => { setN(5); setSeed(1); }} />
+        <ResetButton onReset={() => { setN(5); setSeed(1); setPickSeed(1); }} />
         <label className="wl-slider">
           <span>
             Stocks you hand-pick
@@ -213,8 +234,21 @@ export default function SuperstockLab() {
 
       <div className="wl-stage">
         <div className="wl-frontier">
-          <h3>The universe of stocks</h3>
-          <UniverseHistogram universe={universe} stats={uStats} />
+          <h3>The universe of stocks — every dot is one</h3>
+          <SuperstockDots universe={universe} picks={picks} tbill={TBILL} mean={uStats.mean} />
+          <div className="sk-lottery">
+            <button type="button" className="wl-btn" onClick={() => setPickSeed((s) => s + 1)}>
+              🎲 Draw {n} stock{n === 1 ? "" : "s"} again
+            </button>
+            <span className="sk-lottery-verdict">
+              Your ringed pick{n === 1 ? "" : "s"}: averaged <strong>{mult(basket.avg)}</strong>
+              {" · "}{basket.lost} of {n} lost money
+              {" · "}
+              {basket.supers > 0
+                ? <strong style={{ color: "#e3a72f" }}>caught {basket.supers} superstock{basket.supers === 1 ? "" : "s"}! 🎉</strong>
+                : <>no superstocks — the market's {mult(uStats.mean)} average is carried by gold dots you missed</>}
+            </span>
+          </div>
           <div className="sk-ustats">
             <span><strong>{pctText(uStats.lost)}</strong> lost money</span>
             <span><strong>{pctText(1 - uStats.beatTbill)}</strong> trailed T-bills</span>
@@ -306,74 +340,6 @@ function RealRecord() {
         drawn from. {d.source}
       </p>
     </div>
-  );
-}
-
-function UniverseHistogram({
-  universe,
-  stats,
-}: {
-  universe: number[];
-  stats: { mean: number; median: number };
-}) {
-  const width = 720;
-  const height = 220;
-  const pad = { top: 14, right: 14, bottom: 34, left: 14 };
-  const LOG_MIN = Math.log10(0.02); // ≈ -1.7: show the near-total-loss mass
-  const LOG_MAX = Math.log10(3000); // ≈ 3.48: room for the ~650× mean + the tail
-  const BINS = 44;
-  const plotW = width - pad.left - pad.right;
-
-  const tOf = (m: number) =>
-    (Math.log10(Math.min(2999, Math.max(0.02, m))) - LOG_MIN) / (LOG_MAX - LOG_MIN);
-  const x = (m: number) => pad.left + tOf(m) * plotW;
-
-  const counts = new Array(BINS).fill(0);
-  for (const m of universe) {
-    const b = Math.min(BINS - 1, Math.max(0, Math.floor(tOf(m) * BINS)));
-    counts[b]++;
-  }
-  const maxC = Math.max(...counts, 1);
-  const baseY = height - pad.bottom;
-  const barH = (c: number) => (c / maxC) * (height - pad.top - pad.bottom);
-  const breakEvenT = tOf(1);
-  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Histogram of individual stock lifetime returns, heavily right-skewed">
-      {counts.map((c, i) => {
-        const bx = pad.left + (i / BINS) * plotW;
-        const loss = i / BINS < breakEvenT;
-        return (
-          <rect
-            key={i}
-            x={bx + 1}
-            y={baseY - barH(c)}
-            width={plotW / BINS - 1.5}
-            height={barH(c)}
-            fill={loss ? "var(--color-error)" : "var(--color-accent)"}
-            opacity={0.8}
-          />
-        );
-      })}
-      {/* reference lines */}
-      {[
-        { m: 1, label: "break-even", color: "var(--color-muted)" },
-        { m: TBILL, label: "T-bills", color: "var(--color-warn)" },
-        { m: stats.mean, label: "market avg", color: "var(--color-text)" },
-      ].map((r) => (
-        <g key={r.label}>
-          <line x1={x(r.m)} x2={x(r.m)} y1={pad.top} y2={baseY} stroke={r.color} strokeWidth={1.5} strokeDasharray="4 3" />
-          <text x={x(r.m)} y={pad.top - 2} textAnchor="middle" style={{ ...axisText, fill: r.color }}>{r.label}</text>
-        </g>
-      ))}
-      {[0.1, 1, 10, 100, 1000].map((m) => (
-        <text key={m} x={x(m)} y={baseY + 16} textAnchor="middle" style={axisText}>{mult(m)}</text>
-      ))}
-      <text x={width / 2} y={height - 2} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Lifetime return (log scale): red = lost money
-      </text>
-    </svg>
   );
 }
 

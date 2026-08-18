@@ -31,12 +31,13 @@ Keep adding heavy viz libs per-flagship, not site-wide (see strategy note below)
    hover, color-mix() tint off theme tokens (dark-mode verified). Third view ("Treemap") inside
    IndexConcentrationLab.
 
-2. **Bessembinder dot-canvas** — in `StockPickingModule`/`SuperstockLab`. LICENSE-SAFE approach:
-   do NOT ship per-permno rows. Instead sample ~3,000 dots client-side FROM the existing shipped
-   log-multiple histogram in `crsp-superstock.ts` (each dot = a stock, colored by lifetime-return
-   bucket). New `SuperstockDots.tsx`: canvas beeswarm/grid; the top ~1–4% "superstars" glow; a
-   "pick N stocks" lottery that samples N dots and shows the basket's fate (mostly lose to T-bills,
-   rarely a superstar). Lib: native Canvas (SVG chokes past ~2k dots), optional regl for 20k.
+2. ✅ **Bessembinder dot-canvas** — SHIPPED. `SuperstockDots.tsx` (canvas, no dep) replaces the
+   universe bar-histogram in SuperstockLab: each of the 3,000 inverse-CDF-sampled stocks is a dot
+   (red lost money / grey trailed T-bills / green beat / gold glow ≥200× superstocks), stacked into
+   a dot-mountain on the log axis with break-even/T-bill/market-avg reference lines. New "🎲 Draw n
+   stocks again" lottery rings the reader's picks and gives a basket verdict ("no superstocks — the
+   market's 650× average is carried by gold dots you missed"). Theme-aware via CSS tokens read at
+   draw time + a data-theme MutationObserver. The ensemble MC histogram below is unchanged.
 
 3. **Retirement Monte-Carlo fan chart** — in `BurnRateLab` (fixed-strategy stress test). No new
    data: BurnRateLab already runs the survival MC. New `McFanChart.tsx`: percentile bands
