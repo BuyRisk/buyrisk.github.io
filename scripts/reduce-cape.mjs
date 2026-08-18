@@ -33,6 +33,9 @@ function main() {
     const cape = r?.[COL_CAPE];
     if (typeof dateCell !== "number" || dateCell < 1870 || dateCell > 2100) continue;
     if (typeof cape !== "number" || cape <= 0 || !isFinite(cape)) continue;
+    // Shiller encodes dates as YYYY.MM decimals (1881.01 = Jan 1881, 1881.1 =
+    // Oct 1881): month = fractional part × 100. The +1e-6 guards against float
+    // representation error (e.g. 1881.9999…) flooring to the wrong year.
     const year = Math.floor(dateCell + 1e-6);
     const month = Math.round((dateCell - year) * 100);
     if (month < 1 || month > 12) continue;

@@ -164,6 +164,8 @@ function processFund(mon, mtna, mret, info, agg, funds) {
   cf[M - 1] += tna[M - 1];
   meanTna /= M;
   const dw = annualizedIrr(cf);
+  // Sanity filter: an annualized return beyond ±60% over 5+ years almost always
+  // means a data glitch (bad TNA month, IRR blow-up), not a real fund. Drop it.
   if (dw == null || Math.abs(tw) > 0.6 || Math.abs(dw) > 0.6) return;
   funds.push({
     name: meta.name || `Fund ${mon.fundno}`,
