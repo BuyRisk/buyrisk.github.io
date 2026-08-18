@@ -78,11 +78,21 @@ function classifyFunds() {
       const policy = (c[H.policy] ?? "").trim();
       const name = (c[H.fund_name] ?? "").trim();
       const isEq = obj.startsWith("E") || (obj === "" && policy === "CS");
+      // Category group from the CRSP objective code (ED=equity domestic,
+      // EDS=domestic sector, EF=equity foreign, I=fixed income). Used only for
+      // the "gap by fund type" breakdown; the headline still uses all equity.
+      const group = obj.startsWith("EDS") ? "Sector equity"
+        : /^ED[YC]/.test(obj) ? "US equity"
+        : obj.startsWith("EF") ? "International"
+        : obj.startsWith("I") ? "Bond"
+        : isEq ? "US equity" // equity with an odd/blank code → treat as US equity
+        : null; // money-market ("M"), other ("O"), etc. → excluded
       const prev = info.get(fundno);
-      if (!prev) info.set(fundno, { equity: isEq, name });
+      if (!prev) info.set(fundno, { equity: isEq, name, group });
       else {
         if (isEq) prev.equity = true; // ever-equity ⇒ equity
         if (name) prev.name = name; // last non-blank name
+        if (group) prev.group = group; // last non-blank category
       }
     });
     rl.on("close", () => resolve(info));
@@ -120,7 +130,7 @@ function annualizedIrr(cf) {
  */
 function processFund(mon, mtna, mret, info, agg, funds) {
   const meta = info.get(mon.fundno);
-  if (!meta || !meta.equity) return;
+  if (!meta || !meta.group) return; // process any categorized fund (equity or bond)
 
   // Keep only the reliable window with a real reported TNA; align returns.
   const idx = [], tna = [], ret = [];
@@ -134,23 +144,27 @@ function processFund(mon, mtna, mret, info, agg, funds) {
   const M = idx.length;
   if (M < MIN_MONTHS) return;
 
-  // (a) Pooled industry stream + asset-weighted monthly return. A flow between
-  // consecutive months is only meaningful when the months are adjacent.
-  agg.cf.set(idx[0], (agg.cf.get(idx[0]) ?? 0) - tna[0]); // initial stake in
-  for (let t = 1; t < M; t++) {
-    if (idx[t] !== idx[t - 1] + 1) continue; // gap — don't fabricate a flow/return
-    const flow = tna[t] - tna[t - 1] * (1 + ret[t]); // investor net cash flow
-    agg.cf.set(idx[t], (agg.cf.get(idx[t]) ?? 0) - flow);
-    let a = agg.mo.get(idx[t]);
-    if (!a) { a = { retNum: 0, retDen: 0, flowNum: 0, flowDen: 0, n: 0 }; agg.mo.set(idx[t], a); }
-    a.retNum += tna[t - 1] * ret[t];
-    a.retDen += tna[t - 1];
-    a.flowNum += flow;
-    a.flowDen += tna[t - 1];
-    a.n++;
+  // (a) Pooled industry stream + asset-weighted monthly return. EQUITY ONLY, so
+  // the "flows chase returns" chart and headline stats are unchanged by adding
+  // bond funds for the by-category breakdown. A flow between consecutive months
+  // is only meaningful when the months are adjacent.
+  if (meta.equity) {
+    agg.cf.set(idx[0], (agg.cf.get(idx[0]) ?? 0) - tna[0]); // initial stake in
+    for (let t = 1; t < M; t++) {
+      if (idx[t] !== idx[t - 1] + 1) continue; // gap — don't fabricate a flow/return
+      const flow = tna[t] - tna[t - 1] * (1 + ret[t]); // investor net cash flow
+      agg.cf.set(idx[t], (agg.cf.get(idx[t]) ?? 0) - flow);
+      let a = agg.mo.get(idx[t]);
+      if (!a) { a = { retNum: 0, retDen: 0, flowNum: 0, flowDen: 0, n: 0 }; agg.mo.set(idx[t], a); }
+      a.retNum += tna[t - 1] * ret[t];
+      a.retDen += tna[t - 1];
+      a.flowNum += flow;
+      a.flowDen += tna[t - 1];
+      a.n++;
+    }
+    agg.cf.set(idx[M - 1], (agg.cf.get(idx[M - 1]) ?? 0) + tna[M - 1]); // terminal value out
+    agg.nFunds++;
   }
-  agg.cf.set(idx[M - 1], (agg.cf.get(idx[M - 1]) ?? 0) + tna[M - 1]); // terminal value out
-  agg.nFunds++;
 
   // (b) This fund's own TW vs DW, for the `cases` picker only.
   let grow = 1;
@@ -169,6 +183,7 @@ function processFund(mon, mtna, mret, info, agg, funds) {
   if (dw == null || Math.abs(tw) > 0.6 || Math.abs(dw) > 0.6) return;
   funds.push({
     name: meta.name || `Fund ${mon.fundno}`,
+    equity: meta.equity, group: meta.group,
     tw, dw, gap: tw - dw, w: meanTna, months: M,
     startY: Math.floor(idx[0] / 12), endY: Math.floor(idx[M - 1] / 12),
   });
@@ -221,15 +236,29 @@ async function main() {
   // Headline = per-fund gap, asset-weighted by mean TNA (Morningstar/Dichev method).
   // Aggregating fund-level gaps — not raw industry flows — avoids the share-class
   // birth/death churn that makes a pooled IRR meaningless.
+  const equityFunds = funds.filter((f) => f.equity); // headline stats = equity only (unchanged)
   let wSum = 0, twW = 0, dwW = 0, gapEqual = 0, nPos = 0;
-  for (const f of funds) { wSum += f.w; twW += f.w * f.tw; dwW += f.w * f.dw; gapEqual += f.gap; if (f.gap > 0) nPos++; }
+  for (const f of equityFunds) { wSum += f.w; twW += f.w * f.tw; dwW += f.w * f.dw; gapEqual += f.gap; if (f.gap > 0) nPos++; }
   const tw = twW / wSum;
   const dw = dwW / wSum;
-  const gapsSorted = funds.map((f) => f.gap).sort((a, b) => a - b);
+  const gapsSorted = equityFunds.map((f) => f.gap).sort((a, b) => a - b);
   const medGap = gapsSorted.length ? gapsSorted[gapsSorted.length >> 1] : NaN;
   console.error(
-    `  DIAG: asset-wtd gap ${((tw - dw) * 100).toFixed(2)}pp | equal-wtd ${((gapEqual / funds.length) * 100).toFixed(2)}pp | median ${(medGap * 100).toFixed(2)}pp | ${((nPos / funds.length) * 100).toFixed(0)}% of funds positive`,
+    `  DIAG: asset-wtd gap ${((tw - dw) * 100).toFixed(2)}pp | equal-wtd ${((gapEqual / equityFunds.length) * 100).toFixed(2)}pp | median ${(medGap * 100).toFixed(2)}pp | ${((nPos / equityFunds.length) * 100).toFixed(0)}% of funds positive`,
   );
+
+  // Gap by fund type: median per-fund gap within each category group. This is the
+  // "diversified US equity is best-behaved; niche/volatile funds are chased hardest"
+  // lesson (mirrors Morningstar's Mind the Gap by-category exhibit), from our data.
+  const median = (arr) => (arr.length ? arr.slice().sort((a, b) => a - b)[arr.length >> 1] : NaN);
+  const byCategory = ["US equity", "International", "Sector equity", "Bond"]
+    .map((g) => {
+      const gs = funds.filter((f) => f.group === g);
+      if (gs.length < 100) return null; // need a stable sample
+      console.error(`    [${g}] n=${gs.length}  e.g. "${gs[0].name.slice(0, 42)}"`);
+      return { group: g, medianGapPP: round(median(gs.map((f) => f.gap)), 4), n: gs.length };
+    })
+    .filter(Boolean);
 
   // "Flows chase returns" series (asset-weighted return vs organic net flow%).
   const flows = [];
@@ -249,7 +278,7 @@ async function main() {
   // Dedupe share classes (A/B/C of one fund) by the name before the ";".
   const seen = new Set();
   const cases = [];
-  for (const f of funds.filter((f) => f.months >= 120 && f.w >= 200 && f.gap > 0 && /[a-z]/i.test(f.name)).sort((a, b) => b.gap - a.gap)) {
+  for (const f of equityFunds.filter((f) => f.months >= 120 && f.w >= 200 && f.gap > 0 && /[a-z]/i.test(f.name)).sort((a, b) => b.gap - a.gap)) {
     const display = f.name.split(";")[0].trim();
     const key = display.toLowerCase();
     if (seen.has(key)) continue;
@@ -262,13 +291,15 @@ async function main() {
     window: startY && endY ? `${startY}–${endY}` : "n/a",
     // CRSP crsp_fundno identifies a share CLASS (A/B/C/I), not a distinct fund.
     category: "US-domiciled equity mutual-fund share classes",
-    // Count the ANALYZED set (funds.length), so nFunds and pctPositive share a denominator.
-    nFunds: funds.length,
+    // Count the ANALYZED equity set, so nFunds and pctPositive share a denominator.
+    nFunds: equityFunds.length,
     // Headline: the TYPICAL fund. Median is outlier-robust; pctPositive shows how
     // common the gap is; meanGapPP is the equal-weighted average across funds.
     medianGapPP: round(medGap, 4),
-    meanGapPP: round(gapEqual / funds.length, 4),
-    pctPositive: round(nPos / funds.length, 3),
+    meanGapPP: round(gapEqual / equityFunds.length, 4),
+    pctPositive: round(nPos / equityFunds.length, 3),
+    // Median per-fund gap by category group (equity sub-types + bond).
+    byCategory,
     // Asset-weighted (by mean TNA) — near zero because huge steady core/index
     // funds dominate the dollars AND our 1991 start left-censors their pre-1991
     // mistiming. Kept for transparency; the gap concentrates in volatile funds.
@@ -311,10 +342,20 @@ export interface BehaviorGapFlow {
   /** Investor net flow as a share of prior-month assets (organic growth). */
   flowPct: number;
 }
+export interface BehaviorGapCategory {
+  /** Fund category group, e.g. "US equity", "Sector equity", "Bond". */
+  group: string;
+  /** Median per-fund gap in that group (points/yr). */
+  medianGapPP: number;
+  /** Number of funds in the group. */
+  n: number;
+}
 export interface BehaviorGap {
   window: string;
   category: string;
   nFunds: number;
+  /** Median per-fund gap by category group (the "diversified = best-behaved" chart). */
+  byCategory: BehaviorGapCategory[];
   /** Median per-fund gap (points/yr) — the typical fund. */
   medianGapPP: number;
   /** Equal-weighted mean per-fund gap (points/yr). */

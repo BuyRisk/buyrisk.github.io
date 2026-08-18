@@ -4,6 +4,49 @@ Potential tools and polish upgrades, logged 2026-08-18. North star: so
 effective and polished that people are amazed it's free. Not a commitment
 list — pull from it as tools progress.
 
+## Active builds — Mind-the-Gap batch (started 2026-08-19)
+
+Cross-workstation note: generated `src/data/generated/*.ts` are committed, so the
+site builds on either machine without re-running reducers. To RE-RUN a reducer
+(e.g. after changing it), set the shared data library first:
+`$env:DATA_LIB = "E:\Finance\data\sources"` (per-machine path) then `npm run data:<name>`.
+Keep adding heavy viz libs per-flagship, not site-wide (see strategy note below).
+
+**DONE (this batch):**
+- ✅ **Behavior-gap ↔ Morningstar citation.** Added `morningstarMindTheGap2026` to
+  `src/data/citations.ts` + the behavioral-finance Sources; the "In real funds" tab now
+  notes our CRSP US-equity gap (~0.5pp) matches Mind the Gap 2026 (~1.2pp across all types).
+- ✅ **Native "gap by fund type" chart.** `reduce-behavior-gap.mjs` now tags each fund by
+  CRSP objective code (ED[YC]=US equity, EDS=sector, EF=international, I=bond) and emits
+  `byCategory` (median per-fund gap per group). `GapByTypeChart` in `BehavioralLab.tsx` renders
+  it under "The gap depends on what you own." Verified: Bond 0.14 < US equity 0.33 <
+  International 0.95 < Sector equity 1.14 pp/yr. Headline stats unchanged (equity-only subset).
+
+**NEXT — three advanced-viz flagships (build-ready specs):**
+
+1. **Concentration treemap** — in `IndexConcentrationLab` (Diversification → "How top-heavy
+   is the market?"). Extend `reduce-sp500-concentration.mjs` to emit `treemapSnapshots`: for a
+   handful of years, the top ~30 constituents `{ticker, weight}` + an "other" aggregate (we only
+   ship TOP10 today). New `ConcentrationTreemap.tsx` with a year scrubber; tiles sized by weight,
+   Mag-7 highlighted, hover = ticker+weight; animate tiles across years (CSS transition on x/y/w/h,
+   or Framer Motion). Lib: `d3-hierarchy` (tiny) for squarified layout — or hand-roll (~40 lines).
+
+2. **Bessembinder dot-canvas** — in `StockPickingModule`/`SuperstockLab`. LICENSE-SAFE approach:
+   do NOT ship per-permno rows. Instead sample ~3,000 dots client-side FROM the existing shipped
+   log-multiple histogram in `crsp-superstock.ts` (each dot = a stock, colored by lifetime-return
+   bucket). New `SuperstockDots.tsx`: canvas beeswarm/grid; the top ~1–4% "superstars" glow; a
+   "pick N stocks" lottery that samples N dots and shows the basket's fate (mostly lose to T-bills,
+   rarely a superstar). Lib: native Canvas (SVG chokes past ~2k dots), optional regl for 20k.
+
+3. **Retirement Monte-Carlo fan chart** — in `BurnRateLab` (fixed-strategy stress test). No new
+   data: BurnRateLab already runs the survival MC. New `McFanChart.tsx`: percentile bands
+   (10/25/50/75/90) of wealth paths per year as shaded SVG polygons over a canvas path underlay;
+   scrubber highlights one path; a "play" button draws paths in via requestAnimationFrame. Teaches
+   sequence-of-returns risk. Lib: native Canvas, no dep. (Pairs with the "sequence-of-returns"
+   flagship idea below.)
+
+Each ~1 day. Order by wow: treemap and dot-canvas are the biggest "how is this free?" moments.
+
 ## New tools — from datasets already pulled (in the shared library)
 
 | Idea | Data | Why |

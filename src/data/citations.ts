@@ -288,6 +288,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Market efficiency & active management",
     note: "The more households traded, the worse they did: the most active fifth trailed the market by about 6.5 points a year, mostly from trading costs.",
   },
+  morningstarMindTheGap2026: {
+    authors: "Ptak, J.",
+    year: 2026,
+    title: "Mind the Gap 2026: US stock fund investors made history; crypto mavens stumbled",
+    venue: "Morningstar Portfolio and Planning Research",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "The authoritative investor-return-gap study. Over the 10 years to Dec. 2025, the average dollar earned 8.7%/yr vs. funds' 9.9% total return — a ~1.2pp gap; the US-equity gap was just ~0.5pp, matching this tool's CRSP figure. The gap widens with category volatility (sector and alternative funds worst).",
+  },
   cremersPetajisto2009: {
     authors: "Cremers, M., & Petajisto, A.",
     year: 2009,
@@ -684,7 +693,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["damodaran"],
   },
   "behavioral-finance": {
-    studies: ["kahnemanTversky1979", "barberOdean2000"],
+    studies: ["kahnemanTversky1979", "barberOdean2000", "morningstarMindTheGap2026"],
     datasets: ["french", "crspMf"],
   },
   "next-dollar": {

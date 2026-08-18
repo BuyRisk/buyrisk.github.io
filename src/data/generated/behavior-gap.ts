@@ -23,10 +23,20 @@ export interface BehaviorGapFlow {
   /** Investor net flow as a share of prior-month assets (organic growth). */
   flowPct: number;
 }
+export interface BehaviorGapCategory {
+  /** Fund category group, e.g. "US equity", "Sector equity", "Bond". */
+  group: string;
+  /** Median per-fund gap in that group (points/yr). */
+  medianGapPP: number;
+  /** Number of funds in the group. */
+  n: number;
+}
 export interface BehaviorGap {
   window: string;
   category: string;
   nFunds: number;
+  /** Median per-fund gap by category group (the "diversified = best-behaved" chart). */
+  byCategory: BehaviorGapCategory[];
   /** Median per-fund gap (points/yr) — the typical fund. */
   medianGapPP: number;
   /** Equal-weighted mean per-fund gap (points/yr). */
@@ -47,6 +57,28 @@ export const behaviorGap: BehaviorGap = {
   "medianGapPP": 0.0051,
   "meanGapPP": 0.0085,
   "pctPositive": 0.589,
+  "byCategory": [
+    {
+      "group": "US equity",
+      "medianGapPP": 0.0033,
+      "n": 17225
+    },
+    {
+      "group": "International",
+      "medianGapPP": 0.0095,
+      "n": 6515
+    },
+    {
+      "group": "Sector equity",
+      "medianGapPP": 0.0114,
+      "n": 1915
+    },
+    {
+      "group": "Bond",
+      "medianGapPP": 0.0014,
+      "n": 11841
+    }
+  ],
   "assetWeighted": {
     "timeWeighted": 0.0977,
     "dollarWeighted": 0.0983,

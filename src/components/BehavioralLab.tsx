@@ -249,6 +249,14 @@ export default function BehavioralLab() {
                 new money investors added the next month. The better the recent past, the harder the money chases — which
                 is exactly how the average dollar keeps arriving late.
               </p>
+              <h3 style={{ marginTop: "var(--space-md)" }}>The gap depends on what you own</h3>
+              <GapByTypeChart />
+              <p className="wl-fnote">
+                Median gap by fund type, across every fund in the CRSP database. Diversified, steady funds are barely
+                mistimed; the more volatile and performance-chased the category, the wider the gap. Morningstar's{" "}
+                <em>Mind the Gap 2026</em> finds the same shape — a US-equity investor gap of about 0.5pp/yr, versus
+                ~1.2pp across all fund types.
+              </p>
             </div>
             <div className="wl-lower">
               <div className="wl-readout">
@@ -293,6 +301,31 @@ export default function BehavioralLab() {
         )}
       </div>
     </div>
+  );
+}
+
+/** Median behavior gap by fund category — diversified funds barely mistimed, niche funds chased hard. */
+function GapByTypeChart() {
+  const rows = [...GAP.byCategory].sort((a, b) => a.medianGapPP - b.medianGapPP);
+  const width = 760, rowH = 34, height = rows.length * rowH + 8;
+  const pad = { left: 116, right: 60, top: 4 };
+  const plotW = width - pad.left - pad.right;
+  const maxG = Math.max(...rows.map((r) => r.medianGapPP)) * 1.12 || 0.01;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Median behavior gap by fund category">
+      {rows.map((r, i) => {
+        const y = pad.top + i * rowH;
+        const w = Math.max(2, (r.medianGapPP / maxG) * plotW);
+        return (
+          <g key={r.group}>
+            <text x={pad.left - 8} y={y + rowH / 2 + 4} textAnchor="end" style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}>{r.group}</text>
+            <rect x={pad.left} y={y + 6} width={w} height={rowH - 14} rx={3} fill="var(--color-warn)" opacity={0.42 + 0.16 * i} />
+            <text x={pad.left + w + 6} y={y + rowH / 2 + 4} style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}>{(r.medianGapPP * 100).toFixed(2)}pp/yr</text>
+          </g>
+        );
+      })}
+    </svg>
   );
 }
 
