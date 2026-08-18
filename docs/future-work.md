@@ -47,8 +47,19 @@ Keep adding heavy viz libs per-flagship, not site-wide (see strategy note below)
    spending under guardrails).
 
 **Mind-the-Gap batch complete (2026-08-19):** all three flagships + the two behavior-gap
-extensions shipped. Next candidates: the remaining data-tool backlog (survivorship/persistence,
-loads & 12b-1, fund overlap) or more polish-stack items below.
+extensions shipped.
+
+4. ✅ **Survivorship + persistence** — SHIPPED 2026-08-19. SpivaLab now has three modes:
+   "The scorecard" (SPIVA, unchanged) / "The graveyard" / "Do winners repeat?".
+   `reduce-fund-survivorship.mjs` (`data:fund-survivorship`) streams crsp_mf: **54% of 39k
+   equity share classes since 1991 are dead**; survivors 8.8%/yr vs all 5.8%/yr = **+3.0pp
+   survivorship mirage**; survival curve 76/56/45/35% at 5/10/15/20y. Persistence (SPIVA
+   Persistence method, 6 five-year window pairs, 41,670 fund-windows, non-index only):
+   top-quartile repeats **29%** (chance 25%), falls to the bottom 24%, bottom-quartile
+   disappears 39%. Survival staircase + 4×5 transition heat-grid.
+
+Next candidates: remaining data-tool backlog (loads & 12b-1 → Fees tab; fund overlap →
+Closet indexing tab) or more polish-stack items below.
 
 ## New tools — from datasets already pulled (in the shared library)
 

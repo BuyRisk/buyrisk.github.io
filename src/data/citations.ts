@@ -673,8 +673,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "barberOdean2000",
       "cremersPetajisto2009",
       "petajisto2013",
+      "carhart1997",
     ],
-    datasets: ["french", "shiller", "spiva", "petajisto"],
+    datasets: ["french", "shiller", "spiva", "petajisto", "crspMf"],
   },
   retirement: {
     studies: ["bengen1994", "cooley1998", "guytonKlinger2006"],

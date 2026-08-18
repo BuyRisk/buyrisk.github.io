@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { spiva } from "../data/generated/spiva";
+import { fundSurvivorship } from "../data/generated/fund-survivorship";
 
 /**
  * "Can Active Managers Beat the Market?": the SPIVA scorecard made interactive.
@@ -63,7 +64,27 @@ function extendedStair(cat: Cat): { h: number; rate: number; extrapolated: boole
   return [...reported, ...extra];
 }
 
+type SpivaMode = "scorecard" | "graveyard" | "repeat";
+
+function ModeTabs({ mode, setMode }: { mode: SpivaMode; setMode: (m: SpivaMode) => void }) {
+  const tabs: [SpivaMode, string][] = [
+    ["scorecard", "The scorecard"],
+    ["graveyard", "The graveyard"],
+    ["repeat", "Do winners repeat?"],
+  ];
+  return (
+    <div className="wl-simmode wl-simmode--wrap" role="group" aria-label="View" style={{ marginBottom: "var(--space-sm)" }}>
+      {tabs.map(([m, label]) => (
+        <button key={m} type="button" className={mode === m ? "active" : ""} aria-pressed={mode === m} onClick={() => setMode(m)}>
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function SpivaLab() {
+  const [mode, setMode] = useState<SpivaMode>("scorecard");
   const [catId, setCatId] = useState(DEFAULT_CAT);
   const [horizon, setHorizon] = useState(DEFAULT_HORIZON);
 
@@ -86,10 +107,14 @@ export default function SpivaLab() {
 
   const extrap = isExtrapolated(horizon);
 
+  if (mode === "graveyard") return <GraveyardView mode={mode} setMode={setMode} />;
+  if (mode === "repeat") return <RepeatView mode={mode} setMode={setMode} />;
+
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton onReset={() => { setCatId(DEFAULT_CAT); setHorizon(DEFAULT_HORIZON); }} />
+        <ResetButton onReset={() => { setMode("scorecard"); setCatId(DEFAULT_CAT); setHorizon(DEFAULT_HORIZON); }} />
+        <ModeTabs mode={mode} setMode={setMode} />
 
         <label className="wl-slider" style={{ gap: "0.4rem" }}>
           <span>
@@ -262,6 +287,209 @@ function HorizonChart({ stair, horizon, color }: { stair: { h: number; rate: num
       <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
         Percent of active funds that underperformed · *30y+ extrapolated
       </text>
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The graveyard: survivorship bias, measured from CRSP (dead funds included).
+// ---------------------------------------------------------------------------
+
+const FS = fundSurvivorship;
+const pct0 = (x: number) => `${Math.round(x * 100)}%`;
+const pp2 = (x: number) => `${(x * 100).toFixed(1)}pp`;
+const pctAnn = (x: number) => `${(x * 100).toFixed(1)}%/yr`;
+
+function GraveyardView({ mode, setMode }: { mode: SpivaMode; setMode: (m: SpivaMode) => void }) {
+  const g = FS.graveyard;
+  const over = g.meanAnnSurvivors - g.meanAnnAll;
+  return (
+    <div className="wl">
+      <div className="wl-controls">
+        <ModeTabs mode={mode} setMode={setMode} />
+        <div className="ss-headline">
+          <span className="ss-headline-label">Of {g.nAll.toLocaleString()} US equity fund share classes since 1991,</span>
+          <span className="ss-headline-value" style={{ color: "var(--color-error)" }}>{pct0(g.pctDead)} are dead</span>
+          <span className="ss-headline-sub">closed or quietly merged away — and it's mostly the losers that die.</span>
+        </div>
+        <dl className="sk-stats" style={{ marginTop: "var(--space-sm)" }}>
+          <div><dt>All funds, dead included</dt><dd>{pctAnn(g.meanAnnAll)}</dd></div>
+          <div><dt>Survivors only</dt><dd>{pctAnn(g.meanAnnSurvivors)}</dd></div>
+          <div><dt>The survivorship mirage</dt><dd>+{pp2(over)}/yr</dd></div>
+          <div><dt>Median fund (all vs survivors)</dt><dd>{pctAnn(g.medianAnnAll)} vs {pctAnn(g.medianAnnSurvivors)}</dd></div>
+        </dl>
+        <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+          <strong>Method:</strong> equal-weighted annualized lifetime return per share class, {FS.window},
+          CRSP survivor-bias-free database (the rare dataset that keeps the corpses). "Survivor" = not flagged
+          dead by CRSP. Educational only, not advice.
+        </p>
+      </div>
+
+      <div className="wl-stage">
+        <div className="wl-frontier">
+          <h3>How long does a fund actually live?</h3>
+          <SurvivalChart points={g.survivalByHorizon} />
+          <p className="wl-fnote">
+            Each bar: of the fund share classes old enough to have had the chance, the share that actually
+            survived that many years. Two-thirds don't make it to 20. A fund list from any given year quietly
+            loses its weakest names — which is exactly why the "average fund" you're shown looks better than
+            the average fund that existed.
+          </p>
+        </div>
+        <div className="wl-lower">
+          <div className="wl-readout">
+            <p className="wl-saved">
+              This is <strong>survivorship bias</strong>: average only today's funds and you get{" "}
+              <strong>{pctAnn(g.meanAnnSurvivors)}</strong> — but the average fund <em>ever offered</em> earned{" "}
+              <strong>{pctAnn(g.meanAnnAll)}</strong>, because the {pct0(g.pctDead)} that died took their bad
+              records with them. That +{pp2(over)}/yr mirage inflates fund ads, backtests, and "top funds"
+              lists alike. The SPIVA scorecard (first tab) corrects for it — one reason its failure rates look
+              so much harsher than fund marketing. Educational only, not advice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SurvivalChart({ points }: { points: { h: number; n: number; pctSurvived: number }[] }) {
+  const width = 760, height = 300;
+  const pad = { top: 24, right: 18, bottom: 46, left: 46 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const y = (v: number) => pad.top + plotH - v * plotH;
+  const bandW = plotW / points.length;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Share of funds surviving 5, 10, 15 and 20 years">
+      {[0, 0.25, 0.5, 0.75, 1].map((v) => (
+        <g key={v}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" strokeDasharray={v === 0.5 ? "5 4" : undefined} />
+          <text x={pad.left - 6} y={y(v) + 4} textAnchor="end" style={axisText}>{Math.round(v * 100)}%</text>
+        </g>
+      ))}
+      {points.map((p, i) => {
+        const x0 = pad.left + i * bandW + bandW * 0.22;
+        const w = bandW * 0.56;
+        return (
+          <g key={p.h}>
+            <rect x={x0} y={y(p.pctSurvived)} width={w} height={y(0) - y(p.pctSurvived)} rx={4} fill="var(--color-accent)" opacity={0.9 - i * 0.14} />
+            <rect x={x0} y={y(1)} width={w} height={y(p.pctSurvived) - y(1)} rx={4} fill="var(--color-error)" opacity={0.25} />
+            <text x={x0 + w / 2} y={y(p.pctSurvived) - 7} textAnchor="middle" style={{ ...axisText, fill: "var(--color-text)", fontWeight: 700, fontSize: 13 }}>{Math.round(p.pctSurvived * 100)}%</text>
+            <text x={x0 + w / 2} y={height - pad.bottom + 17} textAnchor="middle" style={axisText}>{p.h} years</text>
+          </g>
+        );
+      })}
+      <text x={pad.left + plotW / 2} y={height - 6} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        Share of fund share classes still alive (red = the graveyard)
+      </text>
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Do winners repeat? Quartile-to-quartile transitions, SPIVA persistence style.
+// ---------------------------------------------------------------------------
+
+function RepeatView({ mode, setMode }: { mode: SpivaMode; setMode: (m: SpivaMode) => void }) {
+  const p = FS.persistence;
+  const top = p.rows[0];
+  const topRepeat = top.to[0] ?? 0;
+  const topToBottom = top.to[3] ?? 0;
+  const bottomGone = p.rows[3].to[4] ?? 0;
+  return (
+    <div className="wl">
+      <div className="wl-controls">
+        <ModeTabs mode={mode} setMode={setMode} />
+        <div className="ss-headline">
+          <span className="ss-headline-label">Top-quartile funds stayed top-quartile the next 5 years just</span>
+          <span className="ss-headline-value">{pct0(topRepeat)}</span>
+          <span className="ss-headline-sub">of the time — barely above the {pct0(p.chanceLevel)} a coin flip would deliver.</span>
+        </div>
+        <dl className="sk-stats" style={{ marginTop: "var(--space-sm)" }}>
+          <div><dt>Winners falling to the bottom</dt><dd>{pct0(topToBottom)}</dd></div>
+          <div><dt>Losers that disappeared</dt><dd>{pct0(bottomGone)}</dd></div>
+          <div><dt>Fund-windows ranked</dt><dd>{p.nRanked.toLocaleString()}</dd></div>
+          <div><dt>Window pairs</dt><dd>{p.windows.length}</dd></div>
+        </dl>
+        <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+          <strong>Method:</strong> active (non-index) US equity share classes ranked into quartiles by one
+          5-year window's annualized return, then re-ranked in the next window ({FS.window}, ≥54 of 60 months
+          to qualify; the SPIVA Persistence Scorecard design). "Gone" = closed, merged, or without a full
+          record. Educational only, not advice.
+        </p>
+      </div>
+
+      <div className="wl-stage">
+        <div className="wl-frontier">
+          <h3>Where last window's quartiles landed next</h3>
+          <TransitionGrid rows={p.rows} />
+          <p className="wl-fnote">
+            If skill drove fund rankings, the top-left cell would dominate its row. Instead every row smears
+            across all five outcomes: a past top-quartile fund was almost as likely to fall to the{" "}
+            <em>bottom</em> quartile ({pct0(topToBottom)}) as to repeat ({pct0(topRepeat)}). Past performance
+            really doesn't predict future results.
+          </p>
+        </div>
+        <div className="wl-lower">
+          <div className="wl-readout">
+            <p className="wl-saved">
+              This is why chasing last year's winner fails: the ranking you're chasing is mostly{" "}
+              <strong>luck, and luck doesn't repeat</strong>. It also compounds the other two tabs — the
+              scorecard shows most active funds lose to the index, and the graveyard shows the losers get
+              deleted. Together they close the case: you can't pick the future winners from the past ones,
+              so <a href="/tools/behavioral-finance">buying them after the fact</a> just buys the reversion.
+              Educational only, not advice.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TransitionGrid({ rows }: { rows: { from: string; n: number; to: (number | null)[] }[] }) {
+  const COLS = ["Q1 (top)", "Q2", "Q3", "Q4", "Gone"];
+  const width = 760, height = 320;
+  const pad = { top: 34, right: 18, bottom: 14, left: 86 };
+  const gridW = width - pad.left - pad.right;
+  const gridH = height - pad.top - pad.bottom;
+  const cw = gridW / 5, ch = gridH / 4;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const maxV = Math.max(...rows.flatMap((r) => r.to.map((v) => v ?? 0)));
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Transition matrix: starting quartile versus next-window outcome">
+      {COLS.map((c, j) => (
+        <text key={c} x={pad.left + j * cw + cw / 2} y={pad.top - 10} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: j === 4 ? "var(--color-error)" : "var(--color-text-soft)" }}>{c}</text>
+      ))}
+      {rows.map((r, i) => (
+        <g key={r.from}>
+          <text x={pad.left - 8} y={pad.top + i * ch + ch / 2 + 4} textAnchor="end" style={{ ...axisText, fontWeight: 700, fill: "var(--color-text-soft)" }}>
+            {r.from === "Q1" ? "was Q1 (top)" : `was ${r.from}`}
+          </text>
+          {r.to.map((v, j) => {
+            const frac = v ?? 0;
+            const gone = j === 4;
+            return (
+              <g key={j}>
+                <rect
+                  x={pad.left + j * cw + 2}
+                  y={pad.top + i * ch + 2}
+                  width={cw - 4}
+                  height={ch - 4}
+                  rx={5}
+                  fill={gone ? "var(--color-error)" : "var(--color-accent)"}
+                  opacity={0.12 + 0.75 * (frac / maxV)}
+                />
+                <text x={pad.left + j * cw + cw / 2} y={pad.top + i * ch + ch / 2 + 4} textAnchor="middle" style={{ ...axisText, fill: "var(--color-text)", fontWeight: i === 0 && (j === 0 || j === 3) ? 700 : 500, fontSize: 12.5 }}>
+                  {Math.round(frac * 100)}%
+                </text>
+              </g>
+            );
+          })}
+        </g>
+      ))}
     </svg>
   );
 }

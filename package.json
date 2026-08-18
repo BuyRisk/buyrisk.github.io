@@ -23,6 +23,7 @@
     "data:fees": "node scripts/reduce-fees.mjs",
     "data:spiva": "node scripts/reduce-spiva.mjs",
     "data:behavior-gap": "node scripts/reduce-behavior-gap.mjs",
+    "data:fund-survivorship": "node scripts/reduce-fund-survivorship.mjs",
     "data:housing": "node scripts/reduce-housing.mjs",
     "data:debt": "node scripts/reduce-debt.mjs",
     "data:shiller-monthly": "node scripts/reduce-shiller-monthly.mjs",
