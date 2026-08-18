@@ -1,4 +1,6 @@
 ---
+// Dynamic route: one page per non-draft post in src/content/blog (file name =
+// URL slug). The _blog underscore keeps the blog out of the build for now.
 import { getCollection, render } from "astro:content";
 import BlogPost from "../../layouts/BlogPost.astro";
 import type { GetStaticPaths } from "astro";

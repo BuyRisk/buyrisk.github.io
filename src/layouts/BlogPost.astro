@@ -1,4 +1,7 @@
 ---
+// Article layout for blog posts: header (title, lede, author, dates, tags)
+// above the rendered Markdown body. Takes the whole content-collection entry
+// so the frontmatter drives everything; wraps BaseLayout for the site shell.
 import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import type { CollectionEntry } from "astro:content";
