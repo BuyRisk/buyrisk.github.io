@@ -120,10 +120,13 @@ export function parseDta(path) {
       }
       case T_FLOAT: {
         const v = f32(o);
+        // Stata's float missing codes (. and .a–.z) all sit above ~1.701e38;
+        // 1e37 is a safe cutoff well above any real JST value.
         return !Number.isFinite(v) || v > 1e37 ? null : v;
       }
       case T_DOUBLE: {
         const v = f64(o);
+        // Same idea for doubles: missing codes start at +8.988e307.
         return !Number.isFinite(v) || v >= 8.9e307 ? null : v;
       }
       default:

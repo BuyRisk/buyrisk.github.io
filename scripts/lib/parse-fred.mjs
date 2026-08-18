@@ -20,6 +20,7 @@ export function parseFred(pathOrText, isText = false) {
     const [date, raw] = lines[i].split(",");
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())) continue;
     const t = (raw ?? "").trim();
+    // FRED marks a missing observation as "." (older exports) or an empty cell.
     const value = t === "" || t === "." ? null : Number(t);
     rows.push({ date: date.trim(), value: Number.isFinite(value) ? value : null });
   }
