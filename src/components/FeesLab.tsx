@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { fees } from "../data/generated/fees";
+import { fundLoads } from "../data/generated/fund-loads";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
@@ -47,7 +48,7 @@ const PRESETS = [
 
 export default function FeesLab() {
   useCurrencyCode(); // re-render when the header currency picker changes
-  const [mode, setMode] = useState<"cost" | "trends">("cost");
+  const [mode, setMode] = useState<"cost" | "trends" | "hidden">("cost");
   const [amount, setAmount] = useState(DEFAULTS.amount);
   const [contribution, setContribution] = useState(DEFAULTS.contribution);
   const [years, setYears] = useState(DEFAULTS.years);
@@ -89,6 +90,9 @@ export default function FeesLab() {
           </button>
           <button type="button" className={mode === "trends" ? "active" : ""} aria-pressed={mode === "trends"} onClick={() => setMode("trends")}>
             Real fee trends
+          </button>
+          <button type="button" className={mode === "hidden" ? "active" : ""} aria-pressed={mode === "hidden"} onClick={() => setMode("hidden")}>
+            The fees you don't see
           </button>
         </div>
 
@@ -159,7 +163,7 @@ export default function FeesLab() {
               </span>
             </div>
           </>
-        ) : (
+        ) : mode === "trends" ? (
           <p className="wl-note">
             The chart on the right is the real history of what fund investors actually paid,
             plotted <strong>directly</strong> from the Investment Company Institute's annual
@@ -169,14 +173,42 @@ export default function FeesLab() {
             small fraction of what active funds charge. Switch back to the calculator to see
             what a gap like that does to a lifetime of saving.
           </p>
+        ) : (
+          <>
+            <p className="wl-note" style={{ fontStyle: "normal", color: "var(--color-text-soft)" }}>
+              The expense ratio isn't the whole bill. Three charges hide outside the sliders:
+            </p>
+            <dl className="ss-stats" style={{ marginTop: "0.5rem" }}>
+              <div>
+                <dt>Front load<InfoTip text="A sales commission taken BEFORE your money is invested — the classic 'A-share' charged up to 5.75%. Put in $10,000 and only $9,425 goes to work." /></dt>
+                <dd>$10,000 → $9,425</dd>
+              </div>
+              <div>
+                <dt>Back-end load (CDSC)<InfoTip text="A charge when you SELL, typically starting near 5% and declining the longer you hold — the 'B-share' design, built to be invisible at purchase." /></dt>
+                <dd>up to ~5% to leave</dd>
+              </div>
+              <div>
+                <dt>12b-1 fee<InfoTip text="An annual marketing-and-distribution fee inside the expense ratio, capped at 1%/yr: you pay the fund to advertise itself to other people." /></dt>
+                <dd>up to 1%/yr</dd>
+              </div>
+            </dl>
+            <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+              The chart shows how common they've really been across US equity fund share classes
+              ({fundLoads.window}, CRSP). The good news: all three are dying — killed by the same
+              index-fund fee war as the expense ratios in the trends view. The catch: the funds
+              still charging them are exactly the ones a salesperson is paid to show you.
+            </p>
+          </>
         )}
       </div>
 
       <div className="wl-stage">
         {mode === "cost" ? (
           <CostView view={view} years={years} yourFee={yourFee} indexFee={indexFee} />
-        ) : (
+        ) : mode === "trends" ? (
           <TrendsView />
+        ) : (
+          <HiddenFeesView />
         )}
       </div>
     </div>
@@ -400,6 +432,97 @@ function TrendChart({ series }: { series: (typeof fees.series) }) {
       ))}
       <text x={pad.left + plotW / 2} y={height - 3} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
         Asset-weighted average expense ratio · lower is cheaper
+      </text>
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The fees you don't see: 12b-1 and back-end loads, rise and fall (CRSP).
+// ---------------------------------------------------------------------------
+
+function HiddenFeesView() {
+  const S = fundLoads.series;
+  const peak = S.reduce((a, b) => (b.pct12b1 > a.pct12b1 ? b : a));
+  const first = S[0];
+  const last = S[S.length - 1];
+  const rearPeak = S.reduce((a, b) => (b.pctRearLoad > a.pctRearLoad ? b : a));
+  return (
+    <>
+      <div className="wl-frontier">
+        <h3>The rise and fall of the hidden fees</h3>
+        <HiddenFeesChart series={S} />
+        <p className="wl-fnote">
+          Share of US equity fund share classes charging each fee. At the {peak.year} peak,{" "}
+          <strong>{Math.round(peak.pct12b1 * 100)}%</strong> carried a 12b-1 marketing fee (median{" "}
+          {((peak.med12b1 ?? 0) * 100).toFixed(2)}%/yr) and at theirs, {Math.round(rearPeak.pctRearLoad * 100)}%
+          had a back-end load (median {((rearPeak.medRearLoad ?? 0) * 100).toFixed(0)}% to exit in year one).
+          By {last.year} those had fallen to {Math.round(last.pct12b1 * 100)}% and{" "}
+          {Math.round(last.pctRearLoad * 100)}%.
+        </p>
+      </div>
+
+      <div className="wl-lower">
+        <div className="wl-readout">
+          <dl className="ss-stats">
+            <div><dt>12b-1 at the {peak.year} peak</dt><dd>{Math.round(peak.pct12b1 * 100)}% of classes</dd></div>
+            <div><dt>12b-1 in {last.year}</dt><dd>{Math.round(last.pct12b1 * 100)}% (median {((last.med12b1 ?? 0) * 100).toFixed(2)}%/yr)</dd></div>
+            <div><dt>Back-end loads, {first.year}</dt><dd>{Math.round(first.pctRearLoad * 100)}% of classes</dd></div>
+            <div><dt>Back-end loads, {last.year}</dt><dd>{Math.round(last.pctRearLoad * 100)}%</dd></div>
+          </dl>
+          <p className="wl-saved">
+            These fees were never about managing your money — they paid for <strong>selling</strong> it:
+            the front load was the broker's commission, the back-end load its exit-door twin, and the
+            12b-1 a standing levy on your balance to market the fund to the next customer. None of them
+            buys performance. They collapsed because investors walked to no-load index funds — proof that
+            the one reliable fee-reduction strategy is simply refusing to pay. Before buying any fund,
+            check all three in the prospectus's fee table, not just the expense ratio.{" "}
+            <strong>Method:</strong> CRSP mutual-fund database, {fundLoads.window}; share classes charging
+            actual 12b-1 &gt; 0, and deferred-sales-charge schedules in force (worst first-year rate).
+            Educational only, not advice.
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function HiddenFeesChart({ series }: { series: (typeof fundLoads.series) }) {
+  const width = 760;
+  const height = 360;
+  const pad = { top: 18, right: 118, bottom: 34, left: 46 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const y0 = series[0].year;
+  const y1 = series[series.length - 1].year;
+  const maxV = Math.max(...series.map((s) => s.pct12b1)) * 1.12;
+  const x = (yr: number) => pad.left + ((yr - y0) / (y1 - y0)) * plotW;
+  const y = (v: number) => pad.top + plotH - (v / maxV) * plotH;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const line = (key: "pct12b1" | "pctRearLoad") =>
+    series.map((s, i) => `${i === 0 ? "M" : "L"}${x(s.year).toFixed(1)},${y(s[key]).toFixed(1)}`).join(" ");
+  const last = series[series.length - 1];
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Share of equity fund share classes charging 12b-1 fees and back-end loads over time">
+      {[0, 0.2, 0.4, 0.6].filter((v) => v <= maxV).map((v) => (
+        <g key={v}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(v)} y2={y(v)} stroke="var(--color-border)" />
+          <text x={pad.left - 6} y={y(v) + 4} textAnchor="end" style={axisText}>{Math.round(v * 100)}%</text>
+        </g>
+      ))}
+      {[y0, Math.round((y0 + y1) / 2), y1].map((yr) => (
+        <text key={yr} x={x(yr)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{yr}</text>
+      ))}
+      <path d={line("pct12b1")} fill="none" stroke="var(--pl-c3)" strokeWidth={2.6} strokeLinejoin="round" />
+      <path d={line("pctRearLoad")} fill="none" stroke="var(--color-link)" strokeWidth={2.4} strokeLinejoin="round" />
+      <text x={width - pad.right + 6} y={y(last.pct12b1) + 4} style={{ ...axisText, fill: "var(--pl-c3)", fontWeight: 600, fontSize: 10.5 }}>
+        12b-1 {Math.round(last.pct12b1 * 100)}%
+      </text>
+      <text x={width - pad.right + 6} y={y(last.pctRearLoad) + 4} style={{ ...axisText, fill: "var(--color-link)", fontWeight: 600, fontSize: 10.5 }}>
+        back-end {Math.round(last.pctRearLoad * 100)}%
+      </text>
+      <text x={pad.left + plotW / 2} y={height - 3} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        Share of US equity fund share classes charging the fee
       </text>
     </svg>
   );

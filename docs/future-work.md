@@ -58,8 +58,18 @@ extensions shipped.
    top-quartile repeats **29%** (chance 25%), falls to the bottom 24%, bottom-quartile
    disappears 39%. Survival staircase + 4×5 transition heat-grid.
 
-Next candidates: remaining data-tool backlog (loads & 12b-1 → Fees tab; fund overlap →
-Closet indexing tab) or more polish-stack items below.
+5. ✅ **Loads & 12b-1** — SHIPPED 2026-08-19. FeesLab's third mode "The fees you don't see":
+   `reduce-fund-loads.mjs` (`data:fund-loads`) streams crsp_mf Fund Summary (actual_12b1,
+   unit-normalized fraction/percent/bps) + Rear Loads schedules (types C/D, worst first-year
+   CDSC). Findings (US equity share classes, 1992–2022): 12b-1 peaked 2005 at **62% of classes
+   (median 0.65%/yr)** → 33% (0.25%) by 2022; back-end loads 30%→6%. Series trimmed to
+   1992–2022 (12b-1 reporting starts ~1992; 2023+ panel/schedule truncation artifacts).
+   **⚠ Front Loads.csv in the library is a 2004–2012 PARTIAL pull (12k rows)** — front-load
+   time series deferred until re-pulled (Rear Loads is complete, 1961→2026); the front load
+   appears as the canonical $10,000→$9,425 worked example meanwhile.
+
+Next candidates: fund overlap → Closet indexing tab (thomson_s12 now complete type1–4);
+front-load series once re-pulled; or more polish-stack items below.
 
 ## New tools — from datasets already pulled (in the shared library)
 
