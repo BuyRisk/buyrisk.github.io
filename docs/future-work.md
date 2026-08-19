@@ -68,8 +68,20 @@ extensions shipped.
    time series deferred until re-pulled (Rear Loads is complete, 1961→2026); the front load
    appears as the canonical $10,000→$9,425 worked example meanwhile.
 
-Next candidates: fund overlap → Closet indexing tab (thomson_s12 now complete type1–4);
-front-load series once re-pulled; or more polish-stack items below.
+6. ✅ **Fund overlap X-ray** — SHIPPED 2026-08-19. ClosetIndexingLab now has two modes:
+   "The fee X-ray" (existing Petajisto fee-on-active-share math) / "The overlap X-ray".
+   `reduce-fund-overlap.mjs` (`data:fund-overlap`) pipelines Thomson s12: type1 picks the 12
+   largest active US equity funds at the latest rdate (2025-12-31; index vehicles excluded by
+   name incl. Thomson truncations "…IND"/"…IN"), type3 (9GB streamed) their holdings, type2
+   quarter-end prices → weights; CRSP S&P 500 constituent caps same day → index weights
+   (CUSIP-8 join). Overlap(i,j)=Σmin(wᵢ,wⱼ). Findings: **median pairwise overlap 34%, max
+   65%; S&P overlap 17–55%**. UI: fund dropdown → bar list vs the other 11 + pinned S&P row;
+   copy: "one bet wearing two names", averaging managers = an expensive index fund. Only
+   names + summary stats ship (Thomson licence).
+
+Next candidates: front-load series once Front Loads.csv is re-pulled; the s34 13F data
+(institutional-ownership angles) and N-PORT once parsed; or polish-stack items below.
+**The original 10-idea data-tool backlog is now fully built or resolved.**
 
 ## New tools — from datasets already pulled (in the shared library)
 

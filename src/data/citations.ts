@@ -514,6 +514,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.crsp.org/",
     note: "Used under license. The behavior gap is computed from fund monthly returns and net assets; only universe-level aggregates and a few illustrative fund figures are published — no full per-fund panel is redistributed.",
   },
+  thomsonS12: {
+    name: "Thomson Reuters Mutual Fund Holdings (s12)",
+    publisher: "LSEG / Refinitiv, via WRDS",
+    url: "https://wrds-www.wharton.upenn.edu/",
+    note: "Used under license. Fund portfolio overlap is computed from quarterly holdings filings; only fund names and summary overlap statistics are published — no positions are redistributed.",
+  },
   shiller: {
     name: "U.S. Stock Markets 1871–Present and CAPE Ratio",
     publisher: "Robert J. Shiller, Yale University",
@@ -675,7 +681,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "petajisto2013",
       "carhart1997",
     ],
-    datasets: ["french", "shiller", "spiva", "petajisto", "crspMf"],
+    datasets: ["french", "shiller", "spiva", "petajisto", "crspMf", "thomsonS12", "crspSp500"],
   },
   retirement: {
     studies: ["bengen1994", "cooley1998", "guytonKlinger2006"],

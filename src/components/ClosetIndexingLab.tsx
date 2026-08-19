@@ -3,6 +3,7 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
 import { activeShare } from "../data/generated/active-share";
+import { fundOverlap } from "../data/generated/fund-overlap";
 
 /**
  * "Closet Indexing: Are You Overpaying?" — a fund's Active Share is the fraction
@@ -38,8 +39,24 @@ function categorize(asFrac: number): Category {
     note: "Genuinely different from the benchmark. Whether it's worth it is the active-vs-passive question, but at least you're paying for real bets." };
 }
 
+type CiMode = "fee" | "overlap";
+
+function CiModeTabs({ mode, setMode }: { mode: CiMode; setMode: (m: CiMode) => void }) {
+  return (
+    <div className="wl-simmode" role="group" aria-label="View" style={{ marginBottom: "var(--space-sm)" }}>
+      <button type="button" className={mode === "fee" ? "active" : ""} aria-pressed={mode === "fee"} onClick={() => setMode("fee")}>
+        The fee X-ray
+      </button>
+      <button type="button" className={mode === "overlap" ? "active" : ""} aria-pressed={mode === "overlap"} onClick={() => setMode("overlap")}>
+        The overlap X-ray
+      </button>
+    </div>
+  );
+}
+
 export default function ClosetIndexingLab() {
   useCurrencyCode(); // re-render when the header currency picker changes
+  const [mode, setMode] = useState<CiMode>("fee");
   const [expense, setExpense] = useState(DEFAULTS.expense);
   const [active, setActive] = useState(DEFAULTS.active);
   const [indexCost, setIndexCost] = useState(DEFAULTS.indexCost);
@@ -68,10 +85,13 @@ export default function ClosetIndexingLab() {
   const asPct = Math.round(calc.asFrac * 100);
   const clonePct = 100 - asPct;
 
+  if (mode === "overlap") return <OverlapView mode={mode} setMode={setMode} />;
+
   return (
     <div className="wl">
       <div className="wl-controls">
         <ResetButton onReset={reset} />
+        <CiModeTabs mode={mode} setMode={setMode} />
 
         <label className="wl-slider">
           <span>
@@ -238,6 +258,106 @@ function EvidencePanel() {
       <p className="wl-note" style={{ marginTop: "0.5rem" }}>
         Source: {activeShare.source} Index funds excluded. {activeShare.citation}
       </p>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The overlap X-ray: how much of two "different" funds is the same portfolio.
+// ---------------------------------------------------------------------------
+
+const FO = fundOverlap;
+const pc0 = (x: number | null) => `${Math.round((x ?? 0) * 100)}%`;
+
+function OverlapView({ mode, setMode }: { mode: CiMode; setMode: (m: CiMode) => void }) {
+  const [sel, setSel] = useState(0);
+  const me = FO.funds[sel];
+  const others = FO.funds
+    .map((f, i) => ({ ...f, i, overlap: FO.matrix[sel][i] ?? 0 }))
+    .filter((f) => f.i !== sel)
+    .sort((a, b) => b.overlap - a.overlap);
+  const top = others[0];
+
+  return (
+    <div className="wl">
+      <div className="wl-controls">
+        <CiModeTabs mode={mode} setMode={setMode} />
+        <label className="wl-slider" style={{ gap: "0.4rem" }}>
+          <span>
+            Your fund
+            <InfoTip text="The twelve largest actively managed US equity mutual funds by reported assets. Pick the one you (hypothetically) own." />
+          </span>
+          <select className="wl-select" value={sel} onChange={(e) => setSel(+e.target.value)}>
+            {FO.funds.map((f, i) => (
+              <option key={f.name} value={i}>{f.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
+          <span className="ss-headline-label">Add {top.name} as your "second" fund and</span>
+          <span className="ss-headline-value">{pc0(top.overlap)}</span>
+          <span className="ss-headline-sub">
+            of the two portfolios is the <strong>same stocks at the same weights</strong> — one bet wearing two names.
+          </span>
+        </div>
+
+        <dl className="ss-stats" style={{ marginTop: "var(--space-sm)" }}>
+          <div><dt>{me.name}'s holdings</dt><dd>{me.nHoldings} stocks</dd></div>
+          <div><dt>Its overlap with the S&amp;P 500</dt><dd>{pc0(me.spOverlap)}</dd></div>
+          <div><dt>Median overlap, any two of the 12</dt><dd>{pc0(FO.medianPairOverlap)}</dd></div>
+          <div><dt>Most-similar pair overall</dt><dd>{pc0(FO.maxPairOverlap)}</dd></div>
+        </dl>
+
+        <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+          <strong>Method:</strong> overlap = Σ min(wᵢ, wⱼ) across every stock — the share of two portfolios
+          invested identically. Holdings: Thomson s12 quarterly filings, {FO.asOf}; S&amp;P 500 weights from CRSP
+          constituents the same day. Educational only, not advice.
+        </p>
+      </div>
+
+      <div className="wl-stage">
+        <div className="wl-frontier">
+          <h3>How much of each big fund is your fund?</h3>
+          <div className="spv-rank">
+            {others.map((f) => (
+              <div key={f.name} className="spv-row" style={{ cursor: "default" }}>
+                <span className="spv-row-name">{f.name}</span>
+                <span className="spv-row-track">
+                  <span className="spv-row-fill" style={{ width: `${(f.overlap / 0.8) * 100}%`, background: "var(--color-accent)", opacity: 0.4 + 0.6 * (f.overlap / (FO.maxPairOverlap ?? 1)) }} />
+                </span>
+                <span className="spv-row-val">{pc0(f.overlap)}</span>
+              </div>
+            ))}
+            <div className="spv-row" style={{ cursor: "default" }}>
+              <span className="spv-row-name" style={{ fontWeight: 700 }}>S&amp;P 500 index</span>
+              <span className="spv-row-track">
+                <span className="spv-row-fill" style={{ width: `${((me.spOverlap ?? 0) / 0.8) * 100}%`, background: "var(--color-link)" }} />
+              </span>
+              <span className="spv-row-val">{pc0(me.spOverlap)}</span>
+            </div>
+          </div>
+          <p className="wl-fnote">
+            Each bar: the share of {me.name} and that fund that is the <em>same portfolio</em>. The blue bar
+            is its overlap with the plain S&amp;P 500 — the part you could own for ~0.03%/yr.
+          </p>
+        </div>
+
+        <div className="wl-lower">
+          <div className="wl-readout">
+            <p className="wl-saved">
+              Buying a second (or third) big active fund feels like diversifying, but any two of these twelve
+              giants typically hold <strong>{pc0(FO.medianPairOverlap)}</strong> of the same portfolio — they all
+              fish in the same large-cap pond. Owning several doesn't add new bets; it <strong>averages the
+              managers into an expensive index fund</strong>, which is the closet-indexing trap the fee X-ray
+              prices out. If two funds overlap {pc0(FO.maxPairOverlap)}, the "diversification" between them is
+              mostly an illusion — real diversification comes from owning <em>different things</em> (small caps,
+              international, bonds), not different names for the same stocks.{" "}
+              <a href="/tools/diversification">See what actually diversifies →</a> Educational only, not advice.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
