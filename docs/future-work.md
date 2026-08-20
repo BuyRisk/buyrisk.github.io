@@ -104,6 +104,71 @@ Next candidates: front-load series once Front Loads.csv is re-pulled; the s34 13
 | Leverage / volatility drag — why 2x funds don't 2x returns | French daily (have) | Common real-world trap |
 | "What's a fair price?" — DCF slider, tiny assumption changes swing value | none | Pairs with CAPE tool |
 
+## Candidate flagship — Workplace plan simulator ("Sort by Fees, Not Performance")
+
+Logged 2026-08-20. From the in-progress research paper of the same name
+(capitulation project). Lets someone experience the choice their 401(k)/403(b)
+screen actually presents, then shows what each sorting rule would have done over
+a career. Educational only, never personalized advice.
+
+**⚠️ LICENSING — non-negotiable.** All evidence derives from **CRSP** (licensed,
+local-only). Ship **derived aggregates only** — quantiles, win rates, decay-curve
+tables, dispersion series. Never fund-level rows, never anything from which a
+fund's CRSP record could be reconstructed. Same rule the existing labs follow
+(reducers read DATA_LIB → `src/data/generated/*.ts`). See [[data-lib-path-this-machine]]
+convention and the CRSP firewall in `data/sources/crsp/README.md`.
+
+**Evidence (research repo, NOT in this repo):**
+- `E:\Finance\Capitulation\pilot\output\` — `s41_A_fee_dispersion.csv`,
+  `s41_B_fee_decile_gradient.csv`, `s47_ties_and_skewness.csv` (win rates, ties,
+  mean/median/skew, quartiles by menu size & horizon), `s48_breakeven.csv`
+  (gross edge vs fee penalty), `s49_decay_curve.csv` (decay to 20y, two reinvest
+  rules). Sim draws: `pilot\cache\s45_menu_draws.parquet`, `s49_long_horizon.parquet`.
+- Plan menu specimen: `E:\Finance\research-agenda\plan_menu_2026-08-19.csv`
+  (a real US university 403(b) equity lineup).
+- Paper docs live in the claude.ai project "Active share/closet indexing/
+  capitulation study".
+
+**Provisional findings (do NOT publish numbers until caveats clear):**
+Simulated ~125k realistic menus from the survivor-bias-free CRSP mutual-fund
+universe (1990–2025), 3/5/10 funds/category asset-weighted; rules = pick cheapest
+vs pick best trailing-12m return.
+1. Sorting by recent return raises the *mean* outcome but lowers the *typical*
+   one — fee rule is higher at every quantile (menu 10, 5y: p25 +14.7/med +50.8/
+   p75 +91.8 vs +11.6/+48.6/+89.3), means near-identical (58.9 vs 58.6). The
+   return rule is a lottery: its mean lives past the 75th percentile.
+2. The hot fund's edge decays (~51bp/yr at 1y in a 3-fund menu → ~14bp at 5y →
+   ~0/negative in big menus); the fee penalty (49–65bp) is forever.
+3. Coin flip: hot pick beats cheapest *before fees* in only 51.5–53.6%.
+4. Bigger menus make chasing worse (hottest-of-ten is a more extreme/noisier draw).
+5. Fee dispersion has NOT compressed: within-category p90–p10 was 84bp (1990),
+   93bp (2025), even as median fee fell ~150→~90bp; specimen shows 55–77bp in 2026.
+6. In ~10–35% of menus both rules pick the SAME fund (more in small menus) — show
+   it honestly; it's why the difference isn't universal.
+
+**Caveats blocking publication:** raw (not risk-adjusted) returns — hot pick is
+high-beta/momentum, CAPM adjustment pending; Stage 49 (20y horizons) unread;
+mixed aggregation conventions (use **year-weighted**); 7.3% of forward windows
+incomplete (fix pending, helps the conclusion).
+
+**Design — three screens:**
+1. *"Your plan."* Reproduce the real interface incl. its tab order (Avg Annual
+   Total Returns | Cumulative | Daily Quotes | **Fees** | Restrictions — fees
+   fourth, behind daily NAV). Load the shipped specimen or type your own funds.
+   Let them choose without nagging.
+2. *"What you would have chosen."* Re-sort by fee; show what changes; report the
+   tie case honestly.
+3. *"Twenty years later."* Outcome distribution per rule (fan/histogram) with
+   p25/median/p75 marked and the **mean marked separately** so the divergence
+   shows — the mean belongs to someone else. Then the decay curve: gross edge
+   falling to the axis, fee line flat, area between shaded.
+
+**Build notes:** Astro 5 + React island, hand-rolled SVG. Ship precomputed
+aggregate tables; the browser interpolates, it does not simulate. Reuse the
+retirement Monte Carlo fan chart if it fits. Tone: no scolding — the screen is
+the problem, not the reader. Add standing disclaimer + link to the paper once it
+exists.
+
 ## Polish stack (memorability / "how is this free?")
 
 **Motion & feel (biggest wow-per-hour)**
