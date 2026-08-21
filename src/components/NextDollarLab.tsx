@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import ResetButton from "./ResetButton";
+import MarginalRateLab from "./MarginalRateLab";
 
 /**
  * "Your Next Dollar: Order of Operations" — the priority list for where each
@@ -46,6 +47,7 @@ const STEPS: Step[] = [
 ];
 
 export default function NextDollarLab() {
+  const [mode, setMode] = useState<"ladder" | "tax">("ladder");
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [noMatch, setNoMatch] = useState(false);
   const [noHsa, setNoHsa] = useState(false);
@@ -63,12 +65,26 @@ export default function NextDollarLab() {
 
   const current = STEPS.find((s) => s.id === currentId)!;
   const toggle = (id: string) => setDone((d) => ({ ...d, [id]: !d[id] }));
-  const reset = () => { setDone({}); setNoMatch(false); setNoHsa(false); };
+  const reset = () => { setMode("ladder"); setDone({}); setNoMatch(false); setNoHsa(false); };
+
+  const modeTabs = (
+    <div className="wl-simmode" role="group" aria-label="View" style={{ marginBottom: "var(--space-sm)" }}>
+      <button type="button" className={mode === "ladder" ? "active" : ""} aria-pressed={mode === "ladder"} onClick={() => setMode("ladder")}>
+        Where it should go
+      </button>
+      <button type="button" className={mode === "tax" ? "active" : ""} aria-pressed={mode === "tax"} onClick={() => setMode("tax")}>
+        How it's taxed
+      </button>
+    </div>
+  );
+
+  if (mode === "tax") return <MarginalRateLab header={modeTabs} />;
 
   return (
     <div className="wl">
       <div className="wl-controls">
         <ResetButton onReset={reset} />
+        {modeTabs}
         <p className="wl-note" style={{ fontStyle: "normal", color: "var(--color-text-soft)" }}>
           Check off what you've already handled. The ladder highlights the single next place your money should go — and why
           it beats the steps below it.

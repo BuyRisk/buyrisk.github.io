@@ -514,6 +514,12 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://www.crsp.org/",
     note: "Used under license. The behavior gap is computed from fund monthly returns and net assets; only universe-level aggregates and a few illustrative fund figures are published — no full per-fund panel is redistributed.",
   },
+  irsRevProc: {
+    name: "IRS Revenue Procedures (annual inflation adjustments) & H.R.1 (2025)",
+    publisher: "Internal Revenue Service / US Congress",
+    url: "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
+    note: "Federal brackets, standard deductions, and capital-gains thresholds by tax year. Collated via the community-maintained Case Study Spreadsheet (Mr. Money Mustache forums), whose marginal-rate analysis inspired this tool; our engine is validated against it.",
+  },
   thomsonS12: {
     name: "Thomson Reuters Mutual Fund Holdings (s12)",
     publisher: "LSEG / Refinitiv, via WRDS",
@@ -705,7 +711,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "next-dollar": {
     studies: [],
-    datasets: ["bogleheads"],
+    datasets: ["bogleheads", "irsRevProc"],
   },
   global: {
     studies: ["frenchPoterba1991", "peroldSchulman1988"],
