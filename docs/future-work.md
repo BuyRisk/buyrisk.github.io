@@ -94,6 +94,20 @@ Next candidates: front-load series once Front Loads.csv is re-pulled; the s34 13
 | Dow vs S&P: price-weighting distortions | djia | Small explainer |
 | Extend Closet Indexing with fuller Notre Dame panel | activeshare_nd | Easy win |
 
+## Ideas mined from the MMM Case Study Spreadsheet (reviewed 2026-08-21)
+
+Source: "CashFlow - 2023-2024-2025-2026.xls" (MMM forum Case Study Spreadsheet v26.11) —
+full 1040 engine w/ continuous tax formulas, all-state tax, AMT, 8606, SS benefit calc
+validated against SSA test cases, HDHP analysis, TGH-vs-Roth-conversion table. Keep the
+file as local reference only (informal forum licence; don't commit or port wholesale).
+
+| Idea | Borrowed concept | Why |
+|---|---|---|
+| **"Your next dollar" marginal-rate curve** | Its x-axis-sweep chart (pick a variable, plot marginal + cumulative tax) | THE gem. Nobody teaches marginal ≠ bracket: SS tax torpedo, LTCG stacking, credit phase-out cliffs all appear as spikes. Needs a simplified JS federal engine (brackets + std ded + LTCG stacking + SS taxability ≈ bounded). US-only → RegionNote. Flagship-quality. |
+| Tax-gain harvest vs Roth-convert | Its "0% LTCG or t→R" decision table | Compact, decision-relevant; fits RothLab or an Info entry. Matches the expert-feedback queued "tax timing" idea. |
+| Validate SS tool vs SSA test cases | Its SocialSecurity tab matches SSA anypia "Case B" test numbers | QA practice to adopt for our SocialSecurityLab (cheap, high-trust). |
+| (Skip) All-state tax, W-4 solver, HDHP | — | Annual-churn maintenance burden; against the site's sustainability posture. |
+
 ## New tools — no new data needed
 
 | Idea | Data | Why |
