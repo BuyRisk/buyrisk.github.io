@@ -196,7 +196,7 @@ export default function SavingsRateLab() {
                   {currency(400_000)} and the <strong>years barely change</strong>. A bigger paycheck makes every number
                   bigger (the savings, the spending, the target), but they scale together, so the <em>rate</em> is what
                   sets your timeline. It's the closest thing personal finance has to a law of conservation: what you don't
-                  spend is what funds your freedom, and how fast you get there is set by the fraction, not the size, of the
+                  spend is what funds your independence, and how fast you get there is set by the fraction, not the size, of the
                   flow. Educational only, not advice.
                 </>
               )}
