@@ -103,10 +103,71 @@ file as local reference only (informal forum licence; don't commit or port whole
 
 | Idea | Borrowed concept | Why |
 |---|---|---|
-| **"Your next dollar" marginal-rate curve** | Its x-axis-sweep chart (pick a variable, plot marginal + cumulative tax) | THE gem. Nobody teaches marginal ≠ bracket: SS tax torpedo, LTCG stacking, credit phase-out cliffs all appear as spikes. Needs a simplified JS federal engine (brackets + std ded + LTCG stacking + SS taxability ≈ bounded). US-only → RegionNote. Flagship-quality. |
+| **"Your next dollar" marginal-rate curve** | Its x-axis-sweep chart (pick a variable, plot marginal + cumulative tax) | THE gem — full build spec below. |
 | Tax-gain harvest vs Roth-convert | Its "0% LTCG or t→R" decision table | Compact, decision-relevant; fits RothLab or an Info entry. Matches the expert-feedback queued "tax timing" idea. |
 | Validate SS tool vs SSA test cases | Its SocialSecurity tab matches SSA anypia "Case B" test numbers | QA practice to adopt for our SocialSecurityLab (cheap, high-trust). |
 | (Skip) All-state tax, W-4 solver, HDHP | — | Annual-churn maintenance burden; against the site's sustainability posture. |
+
+### BUILD SPEC — "Your Next Dollar" (US marginal-rate explorer)
+
+**Lesson.** The tax on your *next* dollar is often nothing like "your bracket." A retiree in the
+"12% bracket" can face a 22.2%–40.85% marginal rate through the Social Security tax torpedo; a
+dollar of ordinary income can push a qualified-dividend dollar out of the 0% LTCG zone (a
+phantom ~27% rate); NIIT quietly adds 3.8% past $200k/$250k. The tool sweeps one variable and
+plots the marginal + average rate curve so the spikes become visible — and actionable (size
+Roth conversions to bracket/zone tops; harvest gains inside the 0% zone).
+
+**Placement.** Personal Finance section (stateless calculator; the section's convention).
+Page `src/pages/personal-finance/next-dollar-tax.astro` (register per the section's list in
+`src/data/personal-finance.ts`), island `NextDollarLab.tsx` — NOTE a `NextDollarLab.tsx`
+already exists (used by the PF section); check whether to extend or name the new one
+`MarginalRateLab.tsx`. `RegionNote` (US-only, tax year 2026 default).
+
+**Engine — deliberately simplified, documented on-page** (`src/lib/usTax.ts`, pure fns):
+- Filing status S / MFJ; standard deduction only (+ age-65 additional). No itemizing, no
+  state, no AMT, no credits, no payroll/SE tax in v1 (each excluded explicitly in the copy).
+- Ordinary brackets (7 rates) → tax on ordinary taxable income.
+- LTCG/qualified-dividend STACKING: 0/15/20 thresholds applied to ordinary-income-first
+  ordering (this creates the phantom bump).
+- Social Security taxability: provisional income vs the 25k/32k & 34k/44k thresholds
+  (fixed by statute, not indexed — hardcode with comment), up to 85% taxable → the torpedo.
+- NIIT: 3.8% on net investment income above 200k/250k MAGI (fixed thresholds).
+- `marginalRate(household, sweepVar) = (tax(x+Δ) − tax(x))/Δ`, Δ=$10 (engine is piecewise
+  linear; exact). All params year-keyed.
+
+**Params data** (`scripts/reduce-tax-params.mjs` → `src/data/generated/tax-params.ts`):
+extract from the CSS reference workbook `E:\Finance\data\sources\cashflow\CashFlow - 2026.xls`
+('Tax Code' tab; label-anchored rows × year columns B–E = 2023–2026, verified layout:
+bracket rates rows 12–18, Single brackets 19–25, MFJ 26–32, LTCG 15%/20% thresholds 40–47;
+std deduction + 65+ adder located by label). Read via `scripts/lib/read-xlsx.mjs`. Annual
+refresh = drop the new CSS in `cashflow/` and re-run. Emit source note crediting the IRS
+rev-procs the CSS itself links (values are public law; the CSS is the convenient collation —
+credit it as inspiration in the tool Sources, MMM forum "Case Study Spreadsheet").
+
+**UI.**
+- Controls: filing status; two age-65 checkboxes (MFJ); sliders for base wages/pension,
+  SS benefits, qualified div + LTCG; sweep picker: "your next dollar is… ordinary income
+  (wages / tIRA withdrawal / Roth conversion)" vs "realized capital gains"; year select.
+- Stage: hand-rolled SVG step chart, x = extra dollars swept ($0→$150k), y = marginal rate
+  on that dollar, with the average-rate line beneath; auto-annotate rate-change breakpoints
+  (label the torpedo zone, LTCG bump, NIIT start, bracket edges). Scrub marker with headline:
+  "You'd guess {bracket}%. Your next dollar is actually taxed at {marginal}%."
+- Presets that showcase the phenomena: "Retiree with SS + tIRA" (torpedo), "Early retiree
+  harvesting gains" (0% LTCG edge), "High earner" (NIIT). Educational-only framing + strong
+  "simplified model, not tax advice; real returns have credits/state/itemizing" note.
+
+**Verification.**
+1. Unit-test `usTax.ts` against hand-computed cases (bracket edges, torpedo entry/exit,
+   LTCG boundary, NIIT threshold), 2025 and 2026 params.
+2. Oracle check vs the CSS itself: PowerShell Excel COM sets the CSS green cells (status,
+   wages B3, tIRA w/d B34, SS B41, LTCG D30, year R2) for ~6 scenarios and reads D66
+   (federal tax); compare within $2 (CSS uses continuous formulas — set its R83="N" for
+   exact-dollar mode). One-time script `scripts/verify-tax-engine.ps1`, run locally.
+3. Browser verify: torpedo spike visible on the retiree preset; console clean; both themes.
+
+**Effort ~1.5 days.** v2 candidates (each adds a dramatic spike; keep out of v1): saver's
+credit + EIC phase-outs (CSS rows 50–75 have full EIC tables), IRMAA cliff overlay (CSS rows
+200–218, incl. tier factors/adders), OBBBA senior-deduction phase-out.
 
 ## New tools — no new data needed
 
