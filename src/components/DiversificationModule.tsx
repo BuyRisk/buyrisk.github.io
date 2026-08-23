@@ -3,6 +3,7 @@ import WaveformLab from "./WaveformLab";
 import CorrelationSpikeLab from "./CorrelationSpikeLab";
 import RandomnessLab from "./RandomnessLab";
 import IndexConcentrationLab from "./IndexConcentrationLab";
+import PriceWeightLab from "./PriceWeightLab";
 
 /**
  * Diversification module: four views of one idea.
@@ -24,6 +25,7 @@ export default function DiversificationModule() {
         { id: "correlation", label: "Shifting correlations", render: () => <CorrelationSpikeLab /> },
         { id: "noise", label: "Messy reality", render: () => <RandomnessLab /> },
         { id: "concentration", label: "How top-heavy is the market?", render: () => <IndexConcentrationLab /> },
+        { id: "weighting", label: "What's in an index weight?", render: () => <PriceWeightLab /> },
       ]}
     />
   );
