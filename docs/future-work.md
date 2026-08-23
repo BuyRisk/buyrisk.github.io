@@ -272,6 +272,35 @@ retirement Monte Carlo fan chart if it fits. Tone: no scolding — the screen is
 the problem, not the reader. Add standing disclaimer + link to the paper once it
 exists.
 
+## Consolidation & Bias Arcade (2026-08-23, same overnight session)
+
+**Consolidation shipped:** Personal Finance went 9 flat pages → 5 (budget/emergency-fund/
+savings-goal/net-worth/debt-payoff merged into `/personal-finance/money-basics`; their
+lab CSS moved from per-page `is:global` blocks into simtool.css); Options folded into
+Stock-Picking as "Options: the house edge". `ModuleTabs` gained **hash deep-linking**
+(`#tab-id`; retired URLs redirect to `module#tab`) and **per-tab code-splitting**
+(`load: () => import(...)`; only each module's default tab is eagerly bundled/SSR'd —
+25 of 34 module tabs now lazy). Site: 38 → 33 pages. **Standing conventions:** new
+sub-tools join an existing module as a tab (redirects keep old URLs; flat pages are the
+exception, not the rule); new charts use `src/lib/chart.ts` primitives, old labs migrate
+when next touched (TwinLivesLab is the exemplar). ⚠ Lesson learned: never round-trip
+source files through PowerShell `Get-Content | Set-Content` (PS 5.1 mangles UTF-8 — it
+corrupted behavioral-finance.astro's em-dashes; use the Edit tooling).
+
+**Bias Arcade shipped** (`/tools/behavioral-finance` → BehavioralModule, arcade tab
+code-split at `src/components/arcade/`): eight play-first experiments — calibration
+(Alpert–Raiffa 90% CIs with answers computed from our own Damodaran data), anchoring
+wheel (T&K 1974), loss-aversion titration staircase (λ measured; verified against a
+simulated λ-2.5 player), disposition-effect selling game (Odean), real-vs-random charts,
+and a shared vignette engine for framing / sunk cost / outcome bias — plus a
+localStorage bias-profile radar. Design rules that matter: **no bias names before
+play** (spoilers ruin measurement), single-player anchoring uses within-subject
+paired questions, and every reveal cites the classic study + links the site tool
+that's the remedy. **v2 candidates:** herding/social-proof game (needs a fake
+"other players chose" panel), endowment (WTA/WTP), hindsight ("what did you predict?"
+with stored predictions), shareable profile card (html-to-image), and a "bias field
+guide" cross-link pass from each game to the existing Why-we-do-it list.
+
 ## Polish stack (memorability / "how is this free?")
 
 **Motion & feel (biggest wow-per-hour)**
