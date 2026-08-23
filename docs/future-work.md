@@ -296,10 +296,17 @@ and a shared vignette engine for framing / sunk cost / outcome bias — plus a
 localStorage bias-profile radar. Design rules that matter: **no bias names before
 play** (spoilers ruin measurement), single-player anchoring uses within-subject
 paired questions, and every reveal cites the classic study + links the site tool
-that's the remedy. **v2 candidates:** herding/social-proof game (needs a fake
-"other players chose" panel), endowment (WTA/WTP), hindsight ("what did you predict?"
-with stored predictions), shareable profile card (html-to-image), and a "bias field
-guide" cross-link pass from each game to the existing Why-we-do-it list.
+that's the remedy. **✅ v2 SHIPPED same day:** herding ("The crowd", Asch-style
+first-instinct-then-fake-consensus with pull-fraction scoring), endowment ("Yours to
+sell", EV-normalized WTA/WTP on matched lottery tickets), hindsight ("You knew it all
+along", Fischhoff matched-pairs with/without outcome), and the shareable profile card
+(hand-rolled canvas PNG + copy-text; no html-to-image dependency needed). Arcade = 11
+games. Homepage also rebuilt as the curriculum: three ordered learning paths + the
+arcade as the featured spotlight. **v3 candidates:** a "bias field guide" cross-link
+pass tying each Why-we-do-it list entry to its game; per-game population percentiles
+once there's any way to aggregate (privacy-first, maybe just published-study baselines
+drawn on the radar); a guided "arcade tour" mode that plays all 11 in sequence with a
+final report.
 
 ## Polish stack (memorability / "how is this free?")
 
