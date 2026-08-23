@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { HISTORY } from "../lib/bootstrap";
+import { axisText, captionText, linePath } from "../lib/chart";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
@@ -164,9 +165,8 @@ function TwinPathsChart({ A, B, career, contributed, monthly }: { A: Cohort; B: 
   const yMax = Math.max(A.ending, B.ending, ...A.balances, ...B.balances) * 1.05;
   const x = (yr: number) => pad.left + (yr / career) * plotW;
   const y = (v: number) => pad.top + plotH - (Math.min(v, yMax) / yMax) * plotH;
-  const path = (c: Cohort) => c.balances.map((v, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(v)}`).join(" ");
-  const contribPath = Array.from({ length: career + 1 }, (_, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(monthly * 12 * i)}`).join(" ");
-  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const path = (c: Cohort) => linePath(c.balances, (_, i) => x(i), (v) => y(v));
+  const contribPath = linePath(Array.from({ length: career + 1 }, (_, i) => i), (i) => x(i), (i) => y(monthly * 12 * i));
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Balance over two identical careers with different start years">
@@ -188,7 +188,7 @@ function TwinPathsChart({ A, B, career, contributed, monthly }: { A: Cohort; B: 
       {[0, Math.round(career / 2), career].map((yr) => (
         <text key={yr} x={x(yr)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>year {yr}</text>
       ))}
-      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={captionText}>
         career year → · dotted = total contributed ({currency(contributed)} by the end)
       </text>
     </svg>
@@ -205,8 +205,7 @@ function CohortChart({ cohorts, A, B, best, worst, contributed }: { cohorts: Coh
   const yMax = best.ending * 1.06;
   const x = (s: number) => pad.left + ((s - s0) / Math.max(1, s1 - s0)) * plotW;
   const y = (v: number) => pad.top + plotH - (Math.min(v, yMax) / yMax) * plotH;
-  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const line = cohorts.map((c, i) => `${i === 0 ? "M" : "L"}${x(c.start)},${y(c.ending)}`).join(" ");
+  const line = linePath(cohorts, (c) => x(c.start), (c) => y(c.ending));
   const area = `${line} L${x(s1)},${y(0)} L${x(s0)},${y(0)} Z`;
   const decades = [];
   for (let d = Math.ceil(s0 / 10) * 10; d <= s1; d += 10) decades.push(d);
@@ -232,7 +231,7 @@ function CohortChart({ cohorts, A, B, best, worst, contributed }: { cohorts: Coh
       {decades.map((d) => (
         <text key={d} x={x(d)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>{d}</text>
       ))}
-      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={captionText}>
         career start year → · ending wealth in today's dollars, identical saver every time
       </text>
     </svg>
