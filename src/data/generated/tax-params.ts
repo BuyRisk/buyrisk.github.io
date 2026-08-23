@@ -22,6 +22,32 @@ export interface TaxYearParams {
   seniorDeduction: number;
   seniorPhaseoutRate: number;
   seniorPhaseoutStart: { single: number; mfj: number };
+  /** Earned Income Credit; arrays indexed by qualifying children 0/1/2/3+. */
+  eic: {
+    phaseInRate: number[];
+    phaseOutRate: number[];
+    /** Earned income at which the credit plateaus. */
+    earnedMax: number[];
+    maxCredit: number[];
+    /** AGI (or earned income, if greater) where the phase-out begins. */
+    phaseOutStart: { single: number[]; mfj: number[] };
+    /** Investment income above this DISQUALIFIES the credit entirely. */
+    investmentIncomeCap: number;
+  };
+  /** Saver's credit AGI limits for the 50%/20%/10% tiers (0% above the last). */
+  saverTiers: { single: number[]; mfj: number[] };
+  /** Medicare IRMAA: monthly $ per person; MAGI tiers are single-filer
+   *  (MFJ = 2× tiers 1–4, tier5Mfj for the top). Factors multiply the base
+   *  Part B premium; adders are the Part D monthly surcharges. */
+  irmaa: {
+    basePartB: number;
+    tiersSingle: number[];
+    tier5Mfj: number;
+    partBFactor: number[];
+    partDAdder: number[];
+  };
+  /** Child Tax Credit: per-child maximum and the refundable (ACTC) cap. */
+  ctc: { maxPerChild: number; maxRefundable: number };
 }
 
 export interface TaxParams { source: string; years: TaxYearParams[]; }
@@ -81,6 +107,88 @@ export const taxParams: TaxParams = {
       "seniorPhaseoutStart": {
         "single": 0,
         "mfj": 0
+      },
+      "eic": {
+        "phaseInRate": [
+          0.0765,
+          0.34,
+          0.4,
+          0.45
+        ],
+        "phaseOutRate": [
+          0.0765,
+          0.1598,
+          0.2106,
+          0.2106
+        ],
+        "earnedMax": [
+          7840,
+          11750,
+          16510,
+          16510
+        ],
+        "maxCredit": [
+          600,
+          3995,
+          6604,
+          7430
+        ],
+        "phaseOutStart": {
+          "single": [
+            9800,
+            21560,
+            21560,
+            21560
+          ],
+          "mfj": [
+            16370,
+            28120,
+            28120,
+            28120
+          ]
+        },
+        "investmentIncomeCap": 11000
+      },
+      "saverTiers": {
+        "single": [
+          21750,
+          23750,
+          36500
+        ],
+        "mfj": [
+          43500,
+          47500,
+          73000
+        ]
+      },
+      "irmaa": {
+        "basePartB": 185,
+        "tiersSingle": [
+          106000,
+          133000,
+          167000,
+          200000,
+          499999.99
+        ],
+        "tier5Mfj": 750000,
+        "partBFactor": [
+          1.4,
+          2,
+          2.6,
+          3.2,
+          3.4
+        ],
+        "partDAdder": [
+          13.7,
+          35.3,
+          57,
+          78.6,
+          85.8
+        ]
+      },
+      "ctc": {
+        "maxPerChild": 2000,
+        "maxRefundable": 1600
       }
     },
     {
@@ -135,6 +243,88 @@ export const taxParams: TaxParams = {
       "seniorPhaseoutStart": {
         "single": 0,
         "mfj": 0
+      },
+      "eic": {
+        "phaseInRate": [
+          0.0765,
+          0.34,
+          0.4,
+          0.45
+        ],
+        "phaseOutRate": [
+          0.0765,
+          0.1598,
+          0.2106,
+          0.2106
+        ],
+        "earnedMax": [
+          8260,
+          12390,
+          17400,
+          17400
+        ],
+        "maxCredit": [
+          632,
+          4213,
+          6960,
+          7830
+        ],
+        "phaseOutStart": {
+          "single": [
+            10330,
+            22720,
+            22720,
+            22720
+          ],
+          "mfj": [
+            17250,
+            29640,
+            29640,
+            29640
+          ]
+        },
+        "investmentIncomeCap": 11600
+      },
+      "saverTiers": {
+        "single": [
+          23000,
+          25000,
+          38250
+        ],
+        "mfj": [
+          46000,
+          50000,
+          76500
+        ]
+      },
+      "irmaa": {
+        "basePartB": 202.9,
+        "tiersSingle": [
+          109000,
+          137000,
+          171000,
+          205000,
+          499999.98
+        ],
+        "tier5Mfj": 750000,
+        "partBFactor": [
+          1.4,
+          2,
+          2.6,
+          3.2,
+          3.4
+        ],
+        "partDAdder": [
+          14.499999999999998,
+          37.5,
+          60.4,
+          83.3,
+          91
+        ]
+      },
+      "ctc": {
+        "maxPerChild": 2000,
+        "maxRefundable": 1700
       }
     },
     {
@@ -189,6 +379,88 @@ export const taxParams: TaxParams = {
       "seniorPhaseoutStart": {
         "single": 75000,
         "mfj": 150000
+      },
+      "eic": {
+        "phaseInRate": [
+          0.0765,
+          0.34,
+          0.4,
+          0.45
+        ],
+        "phaseOutRate": [
+          0.0765,
+          0.1598,
+          0.2106,
+          0.2106
+        ],
+        "earnedMax": [
+          8490,
+          12730,
+          17880,
+          17880
+        ],
+        "maxCredit": [
+          649,
+          4328,
+          7152,
+          8046
+        ],
+        "phaseOutStart": {
+          "single": [
+            10620,
+            23350,
+            23350,
+            23350
+          ],
+          "mfj": [
+            17730,
+            30470,
+            30470,
+            30470
+          ]
+        },
+        "investmentIncomeCap": 11950
+      },
+      "saverTiers": {
+        "single": [
+          23750,
+          25500,
+          39500
+        ],
+        "mfj": [
+          47500,
+          51000,
+          79000
+        ]
+      },
+      "irmaa": {
+        "basePartB": 220.8,
+        "tiersSingle": [
+          111000,
+          140000,
+          175000,
+          209000,
+          499999.97
+        ],
+        "tier5Mfj": 750000,
+        "partBFactor": [
+          1.4,
+          2,
+          2.6,
+          3.2,
+          3.4
+        ],
+        "partDAdder": [
+          15.299999999999997,
+          39.7,
+          63.8,
+          88,
+          96.2
+        ]
+      },
+      "ctc": {
+        "maxPerChild": 2200,
+        "maxRefundable": 1700
       }
     },
     {
@@ -243,6 +515,88 @@ export const taxParams: TaxParams = {
       "seniorPhaseoutStart": {
         "single": 75000,
         "mfj": 150000
+      },
+      "eic": {
+        "phaseInRate": [
+          0.0765,
+          0.34,
+          0.4,
+          0.45
+        ],
+        "phaseOutRate": [
+          0.0765,
+          0.1598,
+          0.2106,
+          0.2106
+        ],
+        "earnedMax": [
+          8680,
+          13020,
+          18290,
+          18290
+        ],
+        "maxCredit": [
+          664,
+          4427,
+          7316,
+          8231
+        ],
+        "phaseOutStart": {
+          "single": [
+            10860,
+            23890,
+            23890,
+            23890
+          ],
+          "mfj": [
+            18140,
+            31160,
+            31160,
+            31160
+          ]
+        },
+        "investmentIncomeCap": 12200
+      },
+      "saverTiers": {
+        "single": [
+          24250,
+          26250,
+          40250
+        ],
+        "mfj": [
+          48500,
+          52500,
+          80500
+        ]
+      },
+      "irmaa": {
+        "basePartB": 238.70000000000002,
+        "tiersSingle": [
+          113000,
+          143000,
+          179000,
+          213000,
+          499999.95999999996
+        ],
+        "tier5Mfj": 750000,
+        "partBFactor": [
+          1.4,
+          2,
+          2.6,
+          3.2,
+          3.4
+        ],
+        "partDAdder": [
+          16.099999999999994,
+          41.900000000000006,
+          67.19999999999999,
+          92.7,
+          101.4
+        ]
+      },
+      "ctc": {
+        "maxPerChild": 2200,
+        "maxRefundable": 1700
       }
     }
   ]

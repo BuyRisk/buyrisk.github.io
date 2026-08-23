@@ -518,7 +518,7 @@ export const DATASETS: Record<string, Dataset> = {
     name: "IRS Revenue Procedures (annual inflation adjustments) & H.R.1 (2025)",
     publisher: "Internal Revenue Service / US Congress",
     url: "https://www.irs.gov/pub/irs-drop/rp-25-32.pdf",
-    note: "Federal brackets, standard deductions, and capital-gains thresholds by tax year. Collated via the community-maintained Case Study Spreadsheet (Mr. Money Mustache forums), whose marginal-rate analysis inspired this tool; our engine is validated against it.",
+    note: "Federal brackets, standard deductions, capital-gains thresholds, EIC and Child Tax Credit parameters, and saver's-credit tiers by tax year, plus Medicare IRMAA tiers (CMS). Collated via the community-maintained Case Study Spreadsheet (Mr. Money Mustache forums), whose marginal-rate analysis inspired this tool; our engine is validated against it.",
   },
   thomsonS12: {
     name: "Thomson Reuters Mutual Fund Holdings (s12)",

@@ -11,8 +11,16 @@
  *   12–18  ordinary bracket rates (10..37)
  *   19–25  Single bracket floors      26–32 MFJ bracket floors
  *   42–44  LTCG 15% thresholds (S/MFJ/HOH)   45–47 LTCG 20% thresholds
+ *   "Earned Income Credit" block — earned-income plateau ("Min/Max"), max
+ *     credit (col F = phase-in rates), S/MFJ phase-out starts + ends (col F on
+ *     the ends = phase-out rates), and the investment-income cap ("Max
+ *     unearned"); 4 rows each = 0/1/2/3+ qualifying children.
  *   112–116 standard deduction (S/MFJ/HOH) + age-65/blind adders
  *   117–120 OBBBA senior deduction ($6k, 6% phaseout, start S/MFJ; 2025+)
+ *   "Savers credit tiers" — AGI limits for the 50/20/10% tiers (MFJ/HOH/S).
+ *   "IRMAA" block — base Part B monthly premium, MAGI tiers 1–5 (single;
+ *     MFJ = 2× except tier 5), Part B factors and Part D adders per tier.
+ *   "Child Tax Credit" — max per child + max refundable (ACTC).
  * Rows are located BY LABEL (column A), not by index, so a re-arranged future
  * version fails loudly instead of silently mis-reading.
  *
@@ -78,6 +86,22 @@ const cgRow = findRow("Capital Gain");
 const cgS15 = findRow("S", cgRow);
 const cgS20 = findRow("S", cgS15 + 1);
 
+// Earned Income Credit: 4 rows per block = 0/1/2/3+ qualifying children.
+// Phase-in rates sit in the column after the last year on the Max Credit rows;
+// phase-out rates likewise on the "ph/o end" rows.
+const eicRow = findRow("Earned Income Credit");
+const eicEarnedMaxRow = findRow("Min/Max", eicRow);
+const eicMaxCreditRow = findRow("Max. Credit", eicRow);
+const eicPoStartSRow = findRow("S ph/o start", eicRow);
+const eicPoEndSRow = findRow("S ph/o end", eicRow);
+const eicPoStartMRow = findRow("MFJ ph/o start", eicRow);
+const eicPoEndMRow = findRow("MFJ ph/o end", eicRow);
+const eicInvCapRow = findRow("Max unearned", eicRow);
+const rateCol = COLS[COLS.length - 1] + 1;
+const four = (startRow, col) => [0, 1, 2, 3].map((i) => num(rows[startRow + i][col]));
+const EIC_PHASE_IN = four(eicMaxCreditRow, rateCol);
+const EIC_PHASE_OUT = four(eicPoEndSRow, rateCol);
+
 // Standard deductions.
 const sdRow = findRow("Standard Deductions");
 const sdSingle = findRow("Single", sdRow);
@@ -88,6 +112,26 @@ const srExtra = findRow("Age S extra", sdRow);
 const srRate = findRow("Phaseout rate", sdRow);
 const srStartS = findRow("Phaseout start S", sdRow);
 const srStartM = findRow("Phaseout start M", sdRow);
+
+// Saver's credit AGI tier limits (50/20/10%), per status.
+const svRow = findRow("Savers credit tiers");
+const svM50 = findRow("MFJ - 50%", svRow);
+const svS50 = findRow("S - 50%", svRow);
+
+// IRMAA: base Part B monthly premium, MAGI tier thresholds (single; MFJ = 2×
+// except tier 5), Part B multiplier factors, Part D monthly adders.
+const irRow = findRow("IRMAA");
+const irBase = findRow("Base part B", irRow);
+const irT1 = findRow("Tier 1", irRow);
+const irT5M = findRow("Tier 5 MFJ", irRow);
+const irF2 = findRow("Tier 2 factor", irRow);
+const irA2 = findRow("Tier 2 adder", irRow);
+const five = (startRow, col) => [0, 1, 2, 3, 4].map((i) => num(rows[startRow + i][col]));
+
+// Child Tax Credit.
+const ctcRow = findRow("Child Tax Credit");
+const ctcRefund = findRow("Max. refundable", ctcRow);
+const ctcPerChild = findRow("Max. per child", ctcRow);
 
 const years = YEARS.map((year, k) => {
   const c = COLS[k];
@@ -109,14 +153,52 @@ const years = YEARS.map((year, k) => {
     seniorDeduction: num(rows[srExtra][c]),
     seniorPhaseoutRate: num(rows[srRate][c]) > 1 ? num(rows[srRate][c]) / 100 : num(rows[srRate][c]),
     seniorPhaseoutStart: { single: num(rows[srStartS][c]), mfj: num(rows[srStartM][c]) },
+    // EIC, indexed by qualifying children 0/1/2/3+.
+    eic: {
+      phaseInRate: EIC_PHASE_IN,
+      phaseOutRate: EIC_PHASE_OUT,
+      earnedMax: four(eicEarnedMaxRow, c),
+      maxCredit: four(eicMaxCreditRow, c),
+      phaseOutStart: { single: four(eicPoStartSRow, c), mfj: four(eicPoStartMRow, c) },
+      investmentIncomeCap: num(rows[eicInvCapRow][c]),
+    },
+    // Saver's credit AGI limits for the 50%/20%/10% tiers.
+    saverTiers: { single: [0, 1, 2].map((i) => num(rows[svS50 + i][c])), mfj: [0, 1, 2].map((i) => num(rows[svM50 + i][c])) },
+    // IRMAA (this year's MAGI sets premiums two years later; CSS projects the
+    // corresponding thresholds). Monthly dollars; tiers are single-filer MAGI.
+    irmaa: {
+      basePartB: num(rows[irBase][c]),
+      tiersSingle: five(irT1, c),
+      tier5Mfj: num(rows[irT5M][c]),
+      partBFactor: five(irF2, c),
+      partDAdder: five(irA2, c),
+    },
+    ctc: { maxPerChild: num(rows[ctcPerChild][c]), maxRefundable: num(rows[ctcRefund][c]) },
   };
 });
+
+// Cross-check the EIC arithmetic against the sheet's own phase-out END columns:
+// start + maxCredit/phaseOutRate should land on the printed end (± rounding).
+for (const [k, y] of years.entries()) {
+  const c = COLS[k];
+  for (const [status, endRow] of [["single", eicPoEndSRow], ["mfj", eicPoEndMRow]]) {
+    for (let i = 0; i < 4; i++) {
+      const derived = y.eic.phaseOutStart[status][i] + y.eic.maxCredit[i] / y.eic.phaseOutRate[i];
+      const printed = num(rows[endRow + i][c]);
+      if (Math.abs(derived - printed) > 10) {
+        throw new Error(`EIC cross-check failed ${y.year} ${status} kids=${i}: derived end ${derived.toFixed(0)} vs sheet ${printed}`);
+      }
+    }
+  }
+}
 
 for (const y of years) {
   console.error(
     `  ${y.year}: 22% starts @ ${y.bracketFloors.single[2].toLocaleString()} (S) | ` +
       `LTCG 15% @ ${y.ltcg15Start.single.toLocaleString()} | std ded ${y.stdDeduction.single.toLocaleString()} | ` +
-      `senior ${y.seniorDeduction}`,
+      `senior ${y.seniorDeduction} | EIC max(3) ${y.eic.maxCredit[3].toLocaleString()} ` +
+      `inv-cap ${y.eic.investmentIncomeCap.toLocaleString()} | saver 50% ≤ ${y.saverTiers.single[0].toLocaleString()} (S) | ` +
+      `IRMAA T1 @ ${y.irmaa.tiersSingle[0].toLocaleString()} base $${y.irmaa.basePartB} | CTC ${y.ctc.maxPerChild}`,
   );
 }
 
@@ -151,6 +233,32 @@ export interface TaxYearParams {
   seniorDeduction: number;
   seniorPhaseoutRate: number;
   seniorPhaseoutStart: { single: number; mfj: number };
+  /** Earned Income Credit; arrays indexed by qualifying children 0/1/2/3+. */
+  eic: {
+    phaseInRate: number[];
+    phaseOutRate: number[];
+    /** Earned income at which the credit plateaus. */
+    earnedMax: number[];
+    maxCredit: number[];
+    /** AGI (or earned income, if greater) where the phase-out begins. */
+    phaseOutStart: { single: number[]; mfj: number[] };
+    /** Investment income above this DISQUALIFIES the credit entirely. */
+    investmentIncomeCap: number;
+  };
+  /** Saver's credit AGI limits for the 50%/20%/10% tiers (0% above the last). */
+  saverTiers: { single: number[]; mfj: number[] };
+  /** Medicare IRMAA: monthly $ per person; MAGI tiers are single-filer
+   *  (MFJ = 2× tiers 1–4, tier5Mfj for the top). Factors multiply the base
+   *  Part B premium; adders are the Part D monthly surcharges. */
+  irmaa: {
+    basePartB: number;
+    tiersSingle: number[];
+    tier5Mfj: number;
+    partBFactor: number[];
+    partDAdder: number[];
+  };
+  /** Child Tax Credit: per-child maximum and the refundable (ACTC) cap. */
+  ctc: { maxPerChild: number; maxRefundable: number };
 }
 
 export interface TaxParams { source: string; years: TaxYearParams[]; }
