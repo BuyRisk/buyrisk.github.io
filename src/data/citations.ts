@@ -649,7 +649,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["damodaran", "crspSp500"],
   },
   "stock-picking": {
-    studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987", "bessembinder2018", "bessembinder2023"],
+    studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987", "bessembinder2018", "bessembinder2023", "black1973", "merton1973"],
     datasets: ["crsp"],
   },
   portfolio: {

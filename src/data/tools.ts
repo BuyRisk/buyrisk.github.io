@@ -35,23 +35,16 @@ export const TOOLS: Tool[] = [
       "The only free lunch in investing: how mixing assets that don't move together lowers risk. From pure out-of-phase waves to messy, real returns.",
   },
   {
-    title: "Stock-Picking: How Many, and Why a Few Win",
+    title: "Stock-Picking: How Many, Why a Few Win & What's Fair",
     href: "/tools/stock-picking",
     blurb:
-      "Two hard truths about owning individual stocks: diversifying cuts risk only to a floor, and most stocks lose to T-bills while a tiny few create all the wealth.",
+      "Hard truths about owning individual stocks: diversifying cuts risk only to a floor, most stocks lose to T-bills while a tiny few create all the wealth, a fair price swings wildly on tiny assumption changes — and options, the speculation end of the spectrum, priced so the intuition finally clicks.",
   },
   {
     title: "Portfolio, Allocation & Bonds",
     href: "/tools/portfolio",
     blurb:
       "Build the actual portfolio: mix assets to find the efficient frontier, dial the all-important stock/bond split, and see why the 'safe' bond sleeve still moves with interest rates.",
-  },
-  {
-    title: "Options Pricing, Demystified",
-    href: "/tools/options",
-    blurb:
-      "What is an option actually worth? Drag the strike, time to expiry, and volatility and watch the Black–Scholes price and payoff diagram respond, until calls, puts, intrinsic value, and time value finally click.",
-    tag: "New",
   },
   {
     title: "Risk & Return: CAPM & Factors",

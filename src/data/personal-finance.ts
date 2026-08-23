@@ -12,22 +12,10 @@ import type { Tool } from "./tools";
 /** Live Personal Finance tools, in learning order (foundations first). */
 export const PF_TOOLS: Tool[] = [
   {
-    title: "The 50/30/20 Budget",
-    href: "/personal-finance/budget",
+    title: "Money Basics: Budget, Buffer, Goals, Net Worth & Debt",
+    href: "/personal-finance/money-basics",
     blurb:
-      "See how your take-home pay splits across needs, wants, and saving — and how it compares to the 50/30/20 guideline. The last slice is what becomes invested.",
-  },
-  {
-    title: "Emergency Fund Sizer",
-    href: "/personal-finance/emergency-fund",
-    blurb:
-      "How many months of expenses to keep in cash, based on how steady your income is — then how long to fund it. The buffer that keeps a surprise from becoming debt.",
-  },
-  {
-    title: "Debt Payoff: Avalanche vs. Snowball",
-    href: "/personal-finance/debt-payoff",
-    blurb:
-      "Compare the two payoff strategies on your own debts — highest-rate-first vs. smallest-balance-first — and see months to debt-free, total interest, and whether a rate is high enough to refinance.",
+      "The five foundations in one place, in learning order: the 50/30/20 budget, sizing an emergency fund, planning a savings goal, tracking net worth, and paying off debt (avalanche vs. snowball, with a refinance flag). Everything that comes before investing.",
   },
   {
     title: "Your Next Dollar: Order of Operations",
@@ -36,28 +24,16 @@ export const PF_TOOLS: Tool[] = [
       "Match, debt, Roth, or brokerage? The order you fund things in beats almost any single investment choice. Check off what you've handled and see the one next step in the priority ladder — and the logic that ranks it there. (US accounts.)",
   },
   {
-    title: "Savings Goal Planner",
-    href: "/personal-finance/savings-goal",
-    blurb:
-      "Put a number and a date on a goal and find the monthly amount that gets you there, with investment growth carrying part of the load.",
-  },
-  {
-    title: "Net Worth Tracker",
-    href: "/personal-finance/net-worth",
-    blurb:
-      "Add up what you own, subtract what you owe, and see the one number that captures your whole financial picture — plus where consistent investing takes it.",
-  },
-  {
     title: "Risk Tolerance Questionnaire",
     href: "/personal-finance/risk-tolerance",
     blurb:
       "Six quick questions place you on the risk/return spectrum and suggest a stock/bond starting point — scored across your ability, willingness, and need to take risk, with the honest reminder that the lowest of the three is the one that binds.",
   },
   {
-    title: "Retirement Accounts: Social Security & Roth",
+    title: "Retirement Accounts: Social Security, Roth & Cheap Tax Years",
     href: "/personal-finance/retirement-accounts",
     blurb:
-      "The two big US retirement-account decisions: when to claim Social Security (guaranteed, inflation-adjusted income you can't outlive) and whether to save Roth or Traditional — starting with the employer match you should never leave behind.",
+      "The big US retirement-account decisions: when to claim Social Security (guaranteed, inflation-adjusted income you can't outlive), whether to save Roth or Traditional — starting with the employer match — and how to spend a low-income year's cheap tax space: harvest gains at 0% or convert to Roth.",
   },
   {
     title: "Rent or Buy?",

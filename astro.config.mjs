@@ -45,6 +45,15 @@ export default defineConfig({
     '/tools/rent-vs-buy': '/personal-finance/rent-vs-buy',
     '/tools/next-dollar': '/personal-finance/next-dollar',
     '/tools/risk-tolerance': '/personal-finance/risk-tolerance',
+    // The five foundation calculators merged into the Money Basics module;
+    // the #hash selects the right tab (ModuleTabs deep-linking).
+    '/personal-finance/budget': '/personal-finance/money-basics#budget',
+    '/personal-finance/emergency-fund': '/personal-finance/money-basics#emergency',
+    '/personal-finance/savings-goal': '/personal-finance/money-basics#goal',
+    '/personal-finance/net-worth': '/personal-finance/money-basics#net-worth',
+    '/personal-finance/debt-payoff': '/personal-finance/money-basics#debt',
+    // Options folded into the Stock-Picking module.
+    '/tools/options': '/tools/stock-picking#options',
   },
   markdown: {
     shikiConfig: {

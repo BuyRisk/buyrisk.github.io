@@ -1,7 +1,5 @@
 import ModuleTabs from "./ModuleTabs";
 import StockCountLab from "./StockCountLab";
-import SuperstockLab from "./SuperstockLab";
-import FairPriceLab from "./FairPriceLab";
 
 /**
  * Stock-picking module: the hard truths about owning individual stocks.
@@ -9,7 +7,9 @@ import FairPriceLab from "./FairPriceLab";
  *  • Why a few win: most stocks lose to T-bills; a tiny few create all the wealth.
  *  • What's a fair price? A DCF with the knobs exposed — tiny assumption
  *    changes swing "fair value" violently, so humility beats conviction.
+ *  • Options: the speculation end of the spectrum, and the house's edge.
  * Together: owning them all beats trying to pick the winners.
+ * Non-default tabs are code-split (fetched on first open).
  */
 export default function StockPickingModule() {
   return (
@@ -17,8 +17,9 @@ export default function StockPickingModule() {
       label="Hard truths about picking stocks"
       tabs={[
         { id: "count", label: "How many is enough?", render: () => <StockCountLab /> },
-        { id: "super", label: "Why a few win", render: () => <SuperstockLab /> },
-        { id: "price", label: "What's a fair price?", render: () => <FairPriceLab /> },
+        { id: "super", label: "Why a few win", load: () => import("./SuperstockLab") },
+        { id: "price", label: "What's a fair price?", load: () => import("./FairPriceLab") },
+        { id: "options", label: "Options: the house edge", load: () => import("./OptionsLab") },
       ]}
     />
   );
