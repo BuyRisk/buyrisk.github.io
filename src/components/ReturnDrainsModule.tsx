@@ -3,6 +3,7 @@ import FeesLab from "./FeesLab";
 import InflationLab from "./InflationLab";
 import TaxDragLab from "./TaxDragLab";
 import AssetLocationLab from "./AssetLocationLab";
+import LeverageLab from "./LeverageLab";
 
 /**
  * "What Eats Your Returns" module: the drains that quietly erode wealth.
@@ -21,6 +22,7 @@ export default function ReturnDrainsModule() {
         { id: "inflation", label: "Inflation: the invisible tax", render: () => <InflationLab /> },
         { id: "tax-drag", label: "The tax drag", render: () => <TaxDragLab /> },
         { id: "asset-location", label: "Asset location", render: () => <AssetLocationLab /> },
+        { id: "leverage", label: "Volatility drag: the 2× trap", render: () => <LeverageLab /> },
       ]}
     />
   );

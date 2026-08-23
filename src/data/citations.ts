@@ -638,7 +638,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   fees: {
     studies: ["sharpe1991", "malkiel1973", "dammonSpattZhang2004", "dicksonShoven1995"],
-    datasets: ["ici", "fred", "crspMf"],
+    datasets: ["ici", "fred", "crspMf", "french"],
   },
   "rent-vs-buy": {
     studies: [],
