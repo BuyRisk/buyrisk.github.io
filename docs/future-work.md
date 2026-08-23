@@ -91,7 +91,7 @@ Next candidates: front-load series once Front Loads.csv is re-pulled; the s34 13
 | Liquidity factor lens for Factor Lab | pastor-stambaugh | Cost of trading illiquid assets |
 | 12b-1 fee archaeology — where hidden fund fees go | nsar (SEC filings) | Deepens Fees tool |
 | Index reconstitution effects (adds/drops, front-running) | Russell | Why indexing quietly leaks |
-| Dow vs S&P: price-weighting distortions | djia | Small explainer |
+| ~~Dow vs S&P: price-weighting distortions~~ | ~~djia~~ | ✅ Built data-free as PriceWeightLab (2026-08-23) |
 | Extend Closet Indexing with fuller Notre Dame panel | activeshare_nd | Easy win |
 
 ## Ideas mined from the MMM Case Study Spreadsheet (reviewed 2026-08-21)
@@ -188,13 +188,24 @@ premium tax credit (the biggest remaining phase-out; CSS rows 69–81).
 
 ## New tools — no new data needed
 
-| Idea | Data | Why |
-|---|---|---|
-| **Sequence-of-returns risk** — same avg return, different order, wildly different retirements | Shiller/French (have) | Core curriculum gap; flagship candidate |
-| Monte Carlo "twin lives" — identical savers, different start decades | Shiller (have) | Visceral luck-vs-skill lesson |
-| Correlation breakdown — diversification failing in 2008/2020 | French daily (have) | Honest caveat to diversification story |
-| Leverage / volatility drag — why 2x funds don't 2x returns | French daily (have) | Common real-world trap |
-| "What's a fair price?" — DCF slider, tiny assumption changes swing value | none | Pairs with CAPE tool |
+**✅ ALL BUILT (overnight batch, 2026-08-23):**
+
+| Idea | Where it landed |
+|---|---|
+| ✅ **Sequence-of-returns risk** | "Same returns, shuffled" mode in BurnRateLab (/tools/retirement): one real window (default the 1965 cohort) replayed as-happened / best-first / worst-first / 40 shuffles; the withdrawals-off toggle collapses every ordering to one number. The scroll-driven D3 flagship treatment remains open (strategy note below). |
+| ✅ Twin lives | TwinLivesLab tab in GrowthModule (/tools/compound-growth): identical savers, every start year since 1928, 2.8× best-to-worst cohort spread. |
+| ✅ Correlation breakdown | Already shipped earlier as "Shifting correlations" (CorrelationSpikeLab). |
+| ✅ Leverage / volatility drag | LeverageLab tab in ReturnDrainsModule (/tools/fees): daily-reset L× fund on real French daily data; lost decade −44% vs the naive −8%; drag ≈ ½L(L−1)σ². |
+| ✅ "What's a fair price?" | FairPriceLab tab in StockPickingModule: two-stage DCF, 5×5 sensitivity grid ("25 defensible opinions"), implied-growth inverse solve. |
+
+**Also built the same night:** the MMM tax-gain-harvest-vs-Roth-convert idea as
+HarvestConvertLab (Retirement Accounts module) — a greedy dollar-by-dollar optimizer on
+the validated usTax engine (both moves compete for one stacking ladder); the SSA
+validation item as `src/lib/ssaPia.ts` + `scripts/verify-ssa-pia.mjs` (matches SSA's
+official 2026 Case A/B examples exactly: AIMEs 5,825/11,463, PIAs 2,609.80/4,152.40) with
+a salary-based PIA estimator in SocialSecurityLab; and the Dow-vs-S&P idea as
+PriceWeightLab (Diversification module) — a data-free five-stock split-simulator toy, so
+the stale 1896–2007 djia CSV wasn't needed.
 
 ## Candidate flagship — Workplace plan simulator ("Sort by Fees, Not Performance")
 
