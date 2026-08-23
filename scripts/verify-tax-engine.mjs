@@ -30,7 +30,7 @@ await build({
   outfile: bundlePath,
   logLevel: "silent",
 });
-const { federalTax, marginalRate, taxableSocialSecurity, irmaa, findCliffs } = await import(
+const { federalTax, marginalRate, taxableSocialSecurity, irmaa, findCliffs, totalCost } = await import(
   pathToFileURL(bundlePath).href
 );
 
@@ -225,6 +225,45 @@ near(federalTax(H({ wages: 8_000, age65: 1 })).eic, 0, 0.01, "childless EIC ends
 
 // 17. No Medicare, no IRMAA: under-65 high earner pays zero surcharge.
 near(irmaa(H({ wages: 300_000 })).annualSurcharge, 0, 0.001, "no IRMAA before 65");
+
+// 18. Continuity fuzz (seeded): across random households, every $1 step of
+//     totalCost either moves by a smooth rate (within −0.6…+1.2) or sits
+//     within $2 of a cliff findCliffs reported. Catches any discontinuity the
+//     detector would miss — the failure mode that silently corrupts the chart.
+{
+  let s = 0xc0ffee;
+  const rnd = () => { s |= 0; s = (s + 0x6d2b79f5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const ri = (lo, hi) => lo + Math.floor(rnd() * (hi - lo + 1));
+  const pick = (a) => a[Math.floor(rnd() * a.length)];
+  let bad = 0, probes = 0;
+  for (let i = 0; i < 40; i++) {
+    const status = pick(["single", "mfj"]);
+    const age65 = pick([0, 0, status === "single" ? 1 : 2]);
+    const h = H({
+      status, age65,
+      wages: age65 ? 0 : ri(0, 120) * 1_000,
+      otherOrdinary: ri(0, 120) * 1_000,
+      ssBenefit: age65 ? ri(0, 50) * 1_000 : 0,
+      qdivLtcg: ri(0, 80) * 1_000,
+      kids: age65 ? 0 : ri(0, 3),
+      saverContrib: ri(0, 16) * 500,
+      year: pick([2024, 2025, 2026]),
+    });
+    const sweep = pick(["wages", "otherOrdinary", "qdivLtcg"]);
+    const withIrmaa = age65 > 0 && rnd() < 0.5;
+    const cliffs = findCliffs(h, sweep, 120_000, withIrmaa);
+    for (let j = 0; j < 60; j++) {
+      const x = ri(0, 119_999);
+      const d = totalCost({ ...h, [sweep]: h[sweep] + x + 1 }, withIrmaa) - totalCost({ ...h, [sweep]: h[sweep] + x }, withIrmaa);
+      probes++;
+      if ((d < -0.61 || d > 1.21) && !cliffs.some((c) => Math.abs(c.x - (x + 1)) <= 2)) {
+        bad++;
+        if (bad <= 3) console.log(`  continuity breach: ${JSON.stringify({ ...h, sweep, withIrmaa, x, d: +d.toFixed(2) })}`);
+      }
+    }
+  }
+  near(bad, 0, 0, `continuity fuzz (${probes} probes): unexplained jumps`);
+}
 
 console.log(fails === 0 ? "\nALL PASS" : `\n${fails} FAILURES`);
 process.exit(fails === 0 ? 0 : 1);

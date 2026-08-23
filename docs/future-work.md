@@ -169,6 +169,23 @@ credit it as inspiration in the tool Sources, MMM forum "Case Study Spreadsheet"
 credit + EIC phase-outs (CSS rows 50–75 have full EIC tables), IRMAA cliff overlay (CSS rows
 200–218, incl. tier factors/adders), OBBBA senior-deduction phase-out.
 
+**✅ v2 SHIPPED 2026-08-23:** EIC (incl. the investment-income disqualification cliff),
+CTC + ACTC, saver's credit tiers, and the IRMAA premium overlay, with exact cliff
+detection (`findCliffs`: $16-window scan + bisection; cliffs render as red markers, not
+fake 6,000% rates) and an earned-vs-unearned income split so phase-ins bind correctly.
+Verification found and fixed a **v1 bug**: the OBBBA senior-deduction phase-out is per
+qualifying person (couple = 12%/dollar, gone at $250k MAGI). Three-layer verification now
+standard for this tool: (1) hand-computed unit checks + a seeded 2,400-probe continuity
+fuzz in `scripts/verify-tax-engine.mjs`; (2) Excel-COM oracle vs the CSS itself — fixed
+scenarios plus a 30-household randomized fuzz, every component (1040 tax, EIC, CTC, ACTC,
+saver's, NIIT) matching within IRS $50-bucket rounding (oracle scripts are scratchpad-only,
+not committed; CSS input cells: status G2, kids G4/G6, ages G8/H8, gross wages B3/C3 —
+401k B13/C13 reduces Box 1 — LTCG D30, tIRA B34, SS B41, year R2, smoothing R83; outputs
+G11/G17/G20/G24/G28/G29/G30/G32/G33). Known CSS quirk: it disqualifies EIC at exactly the
+investment cap; we follow Pub 596's "$X or less". v3 candidates: IRMAA 2-year lag framing,
+saver's-credit "distributions reduce basis" rule, EIC for 25–64 childless age window,
+premium tax credit (the biggest remaining phase-out; CSS rows 69–81).
+
 ## New tools — no new data needed
 
 | Idea | Data | Why |
