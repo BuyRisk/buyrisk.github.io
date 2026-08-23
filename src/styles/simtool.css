@@ -428,6 +428,49 @@
 .dp-strat dt { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-muted); }
 .dp-strat dd { margin: 0; font-family: var(--font-sans); font-weight: 700; font-size: var(--step--1); font-variant-numeric: tabular-nums; }
 
+/* ---- Bias Arcade ---- */
+.ba { display: flex; flex-direction: column; gap: var(--space-sm); }
+.ba-intro { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); line-height: 1.55; max-width: var(--measure-wide); margin: 0; }
+.ba-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: var(--space-sm); }
+.ba-card { display: flex; flex-direction: column; gap: 0.35rem; text-align: left; padding: var(--space-sm); border: var(--border); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); cursor: pointer; transition: border-color var(--transition), transform var(--transition); }
+.ba-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+.ba-card--played { background: var(--color-accent-soft); border-color: var(--color-accent); }
+.ba-cardtitle { font-family: var(--font-sans); font-weight: 700; font-size: var(--step-0); }
+.ba-cardteaser { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); line-height: 1.45; flex: 1; }
+.ba-cardmeta { font-family: var(--font-sans); font-size: var(--step--2); color: var(--color-muted); }
+.ba-topbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.ba-gametitle { font-family: var(--font-sans); font-weight: 700; }
+.ba-play, .ba-reveal { display: flex; flex-direction: column; gap: 0.7rem; max-width: var(--measure-wide); background: var(--color-surface-alt); border-radius: var(--radius); padding: var(--space-md); }
+.ba-progress { font-family: var(--font-sans); font-size: var(--step--2); color: var(--color-muted); margin: 0; text-transform: uppercase; letter-spacing: 0.03em; }
+.ba-question { font-family: var(--font-sans); font-size: var(--step-1); line-height: 1.45; margin: 0; font-weight: 600; }
+.ba-instruction { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); margin: 0; }
+.ba-rangerow { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; font-family: var(--font-sans); font-size: var(--step--1); }
+.ba-rangerow label { display: inline-flex; align-items: center; gap: 0.4rem; }
+.ba-rangerow input { width: 7.5rem; font-family: var(--font-sans); font-size: var(--step-0); padding: 0.4rem 0.5rem; border: var(--border); border-radius: 7px; background: var(--color-surface); color: var(--color-text); }
+.ba-rangerow input:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.ba-unit { color: var(--color-muted); }
+.ba-choicerow { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.ba-choicecol { display: flex; flex-direction: column; gap: 0.5rem; align-items: stretch; }
+.ba-choicecol .wl-btn { text-align: left; }
+.ba-wheel { font-family: var(--font-sans); font-size: var(--step-1); padding: 0.6rem 0.9rem; border-radius: var(--radius); background: var(--color-surface); border: var(--border); align-self: flex-start; }
+.ba-verdict { font-family: var(--font-sans); font-size: var(--step-1); line-height: 1.45; margin: 0; }
+.ba-reveal p { font-family: var(--font-sans); font-size: var(--step--1); line-height: 1.6; color: var(--color-text-soft); margin: 0; }
+.ba-reveal p.ba-verdict { color: var(--color-text); }
+.ba-answers summary { font-family: var(--font-sans); font-size: var(--step--1); cursor: pointer; color: var(--color-link); }
+.ba-answers ol { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); line-height: 1.6; margin: 0.4rem 0 0; padding-left: 1.3rem; }
+.ba-positions { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.6rem; }
+.ba-position { display: grid; gap: 0.15rem; text-align: left; padding: 0.7rem 0.8rem; border: var(--border); border-radius: var(--radius); background: var(--color-surface); color: var(--color-text); cursor: pointer; transition: border-color var(--transition); }
+.ba-position:hover { border-color: var(--color-warn); }
+.ba-posname { font-family: var(--font-sans); font-weight: 700; font-size: var(--step--1); }
+.ba-posbasis { font-family: var(--font-sans); font-size: var(--step--2); color: var(--color-muted); }
+.ba-posprice { font-family: var(--font-sans); font-size: var(--step-1); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ba-posret { font-family: var(--font-sans); font-size: var(--step--1); font-weight: 700; font-variant-numeric: tabular-nums; }
+.ba-posret--up { color: var(--color-accent); }
+.ba-posret--down { color: var(--color-error); }
+.ba-profile { border-top: var(--border); padding-top: var(--space-md); }
+.ba-profile h3 { font-family: var(--font-sans); margin: 0 0 var(--space-sm); }
+.ba-profilenote { font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-text-soft); line-height: 1.6; max-width: var(--measure-wide); }
+
 /* Harvest-vs-convert tranche table (same visual family as .mmm-table). */
 .hc-table {
   width: 100%;

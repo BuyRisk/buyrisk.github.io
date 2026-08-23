@@ -1,8 +1,8 @@
 ---
-// Page shell for /tools/behavioral-finance: intro + the BehavioralLab island
-// (behavior gap and bias explorer) + sources and next-tool link.
+// Page shell for /tools/behavioral-finance: intro + the BehavioralModule
+// island (behavior gap & bias explorer + the Bias Arcade) + sources.
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import BehavioralLab from "../../components/BehavioralLab.tsx";
+import BehavioralModule from "../../components/BehavioralModule.tsx";
 import NextTool from "../../components/NextTool.astro";
 import Sources from "../../components/Sources.astro";
 import RegionNote from "../../components/RegionNote.astro";
@@ -11,7 +11,7 @@ import "../../styles/simtool.css";
 
 <BaseLayout
   title="Behavioral Finance: Your Own Worst Enemy"
-  description="The market doesn't lose you money — your reactions to it do. See the behavior gap between what investments earn and what investors keep, run over real market history, and the biases that cause it."
+  description="The market doesn't lose you money — your reactions to it do. See the behavior gap between what investments earn and what investors keep, run over real market history — then test your own biases in the Bias Arcade: eight short experiments (anchoring, loss aversion, overconfidence, the disposition effect, framing, sunk costs, outcome bias, pattern-seeking) adapted from the classic studies."
 >
   <section class="container wl-intro">
     <p class="eyebrow">Interactive Tool</p>
@@ -20,7 +20,9 @@ import "../../styles/simtool.css";
       The other tools show that timing the market doesn't work. This one shows
       <em>why we keep trying</em> — and what it costs. The biggest threat to your
       returns usually isn't a crash; it's how you react to one. Meet the behavior
-      gap, and the wiring behind it.
+      gap and the wiring behind it — then step into the <strong>Bias Arcade</strong>
+      and let eight short experiments, adapted from the classic studies, measure
+      that wiring in <em>you</em>.
     </p>
   </section>
 
@@ -34,7 +36,7 @@ import "../../styles/simtool.css";
   </section>
 
   <section class="container wl-host">
-    <BehavioralLab client:load />
+    <BehavioralModule client:load />
   </section>
 
   <section class="container wl-explainer">

@@ -62,7 +62,7 @@ export const TOOLS: Tool[] = [
     title: "Behavioral Finance: Your Own Worst Enemy",
     href: "/tools/behavioral-finance",
     blurb:
-      "The market doesn't lose you money — your reactions to it do. Watch the behavior gap open up between a buy-and-hold investor and a panic-seller over real market history, then meet the biases (loss aversion, recency, herding) that make selling low feel smart.",
+      "The market doesn't lose you money — your reactions to it do. Watch the behavior gap open up between a buy-and-hold investor and a panic-seller over real market history — then step into the Bias Arcade: eight two-minute experiments, adapted from the classic studies, that measure YOUR anchoring, loss aversion, overconfidence, and more before naming them. Play first; diagnosis after.",
     tag: "New",
   },
   {
