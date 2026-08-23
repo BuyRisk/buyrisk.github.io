@@ -17,6 +17,7 @@ import {
 } from "../lib/socialSecurity";
 import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
 import { IRMAA, type FilingStatus } from "../data/tax-irmaa";
+import { estimatePiaToday, TAXABLE_MAX } from "../lib/ssaPia";
 
 /**
  * A survival-weighted Social Security claiming optimizer, our take on Mike
@@ -173,11 +174,14 @@ export default function SocialSecurityLab() {
             </label>
           </>
         ) : mode === "single" ? (
-          <PersonFields
-            pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
-            sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
-            condition={condition} setCondition={setCondition}
-          />
+          <>
+            <PersonFields
+              pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
+              sex={sex} setSex={setSex} smoking={smoking} setSmoking={setSmoking} exercise={exercise} setExercise={setExercise}
+              condition={condition} setCondition={setCondition}
+            />
+            <PiaEstimator onApply={setPia} />
+          </>
         ) : (
           <>
             <PersonFields title="You" pia={pia} setPia={setPia} birthYear={birthYear} setBirthYear={setBirthYear} age={currentAge} setAge={setCurrentAge}
@@ -723,5 +727,55 @@ function ValueChart({ result }: { result: OptimizeResult }) {
 
       <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>Claiming age →</text>
     </svg>
+  );
+}
+
+/**
+ * Compact PIA estimator for people who don't know their benefit: a steady-
+ * earner approximation on the real SSA formula (AWI-relative earnings, top-35
+ * averaging, current bend points), in today's dollars. The underlying engine
+ * (src/lib/ssaPia.ts) is validated against SSA's published Case A/B examples;
+ * the approximation here is the steady-career assumption, not the formula.
+ */
+function PiaEstimator({ onApply }: { onApply: (pia: number) => void }) {
+  const [open, setOpen] = useState(false);
+  const [salary, setSalary] = useState(65_000);
+  const [years, setYears] = useState(40);
+  const est = estimatePiaToday(salary, years);
+  return (
+    <div style={{ margin: "0.4rem 0 0.2rem", padding: "0.55rem 0.7rem", border: "var(--border)", borderRadius: "var(--radius)", background: "var(--color-surface-alt)" }}>
+      <button type="button" className="wl-chip" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        {open ? "▾" : "▸"} Don't know your monthly benefit? Estimate it
+      </button>
+      {open && (
+        <div style={{ marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+          <label className="wl-slider">
+            <span>
+              Salary today
+              <InfoTip text={`Your current annual pay. Earnings above the Social Security taxable maximum (${currency(TAXABLE_MAX)}) don't raise the benefit.`} />{" "}
+              <strong>{currency(salary)}</strong>
+            </span>
+            <input type="range" min={20_000} max={200_000} step={2_500} value={salary} onChange={(e) => setSalary(+e.target.value)} />
+          </label>
+          <label className="wl-slider">
+            <span>
+              Working years by 62
+              <InfoTip text="The benefit averages your best 35 years, so shorter careers average in zeros. More than 35 years doesn't help in this steady-earnings approximation." />{" "}
+              <strong>{years}</strong>
+            </span>
+            <input type="range" min={10} max={45} step={1} value={years} onChange={(e) => setYears(+e.target.value)} />
+          </label>
+          <button type="button" className="wl-btn" style={{ alignSelf: "flex-start" }} onClick={() => onApply(Math.round(est.pia))}>
+            Use ≈{currency(Math.round(est.pia))}/mo
+          </button>
+          <p className="wl-note" style={{ margin: 0 }}>
+            Real SSA formula (top-35 average, 90/32/15 bend points — validated against SSA's own
+            worked examples), assuming your pay keeps its position relative to the national average
+            wage. Steady careers land within ~10%; for the real number use{" "}
+            <a href="https://www.ssa.gov/myaccount/" target="_blank" rel="noopener noreferrer">ssa.gov/myaccount</a>.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
