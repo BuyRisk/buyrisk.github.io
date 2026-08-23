@@ -369,6 +369,36 @@
   color: var(--color-accent);
 }
 
+/* Harvest-vs-convert tranche table (same visual family as .mmm-table). */
+.hc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+}
+.hc-table th {
+  text-align: left;
+  font-size: var(--step--2);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 600;
+  padding: 0.3rem 0.5rem;
+  border-bottom: var(--border);
+}
+.hc-table td {
+  padding: 0.3rem 0.5rem;
+  color: var(--color-text-soft);
+}
+.hc-table th:not(:first-child),
+.hc-table td:not(:first-child) {
+  text-align: right;
+}
+.hc-table tbody tr:nth-child(odd) {
+  background: var(--color-surface-alt);
+}
+
 /* Real-data anchor — CRSP-derived aggregates shown beside the live simulation. */
 .rd-callout {
   background: var(--color-surface);
