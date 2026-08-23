@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { bootstrapReturns, bandsOverTime, quantile, mean, HISTORY } from "../lib/bootstrap";
+import { mulberry32 } from "../lib/portfolio";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
 
 /**
@@ -63,9 +64,56 @@ interface StressResult {
 
 type Strategy = "fixed" | "guardrails";
 
+// --- "Same returns, shuffled" (pure sequence-of-returns demo) --------------
+
+interface OrderPath {
+  balances: number[]; // year 0..n
+  ending: number;
+  failYear: number | null; // 1-based year the money ran out, if it did
+}
+
+interface OrderSim {
+  window: number[]; // the real annual returns, as they happened
+  years: [number, number];
+  meanReturn: number; // arithmetic mean — identical across every ordering
+  cagr: number; // geometric — also identical
+  asIs: OrderPath;
+  bestFirst: OrderPath;
+  worstFirst: OrderPath;
+  shuffles: OrderPath[];
+  shuffleFails: number;
+  noWithdrawEnding: number; // the single ending EVERY ordering shares at $0 draw
+}
+
+/** Real portfolio return for one historical year at a stock/bond mix. */
+const realReturn = (y: (typeof HISTORY.series)[number], stockPct: number) => {
+  const nominal = stockPct * y.stocks + (1 - stockPct) * y.tbonds;
+  return (1 + nominal) / (1 + y.inflation) - 1;
+};
+
+/** Withdraw-then-grow, constant real spending; the standard sequence sim. */
+function runOrder(returns: number[], start: number, spend: number): OrderPath {
+  const balances = [start];
+  let bal = start;
+  let failYear: number | null = null;
+  for (let i = 0; i < returns.length; i++) {
+    if (failYear === null) {
+      bal -= spend;
+      if (bal <= 0) {
+        bal = 0;
+        failYear = i + 1;
+      } else {
+        bal *= 1 + returns[i];
+      }
+    }
+    balances.push(bal);
+  }
+  return { balances, ending: bal, failYear };
+}
+
 export default function BurnRateLab() {
   useCurrencyCode(); // re-render when the header currency picker changes
-  const [mode, setMode] = useState<"plan" | "stress">("plan");
+  const [mode, setMode] = useState<"plan" | "stress" | "order">("plan");
   const [strategy, setStrategy] = useState<Strategy>("fixed");
   const [cats, setCats] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
@@ -75,6 +123,11 @@ export default function BurnRateLab() {
   const [horizon, setHorizon] = useState(30);
   const [guardWidth, setGuardWidth] = useState(20); // guardrail band, ± % of the start rate
   const [guardAdjust, setGuardAdjust] = useState(10); // spending cut/raise when a rail is hit, %
+  // "Same returns, shuffled" mode
+  const [retireYear, setRetireYear] = useState(1965); // the classic worst 4%-rule cohort
+  const [orderSpend, setOrderSpend] = useState(40_000); // annual real withdrawal
+  const [orderNoDraw, setOrderNoDraw] = useState(false);
+  const [shuffleSeed, setShuffleSeed] = useState(1);
 
   const monthlyTotal = cats.reduce((s, c) => s + c.amount, 0);
   const annualTotal = monthlyTotal * 12;
@@ -206,6 +259,40 @@ export default function BurnRateLab() {
     return result;
   }, [mode, horizon, stockPct, portfolio, portfolioDrawAnnual, guaranteedAnnual, strategy, guardWidth, guardAdjust]);
 
+  // --- Same returns, shuffled (one real window, every ordering) ------------
+  const firstYear = HISTORY.series[0].year;
+  const lastRetireYear = HISTORY.series[HISTORY.series.length - 1].year - horizon + 1;
+  const retireYearClamped = Math.min(retireYear, lastRetireYear);
+  const orderSim = useMemo<OrderSim | null>(() => {
+    if (mode !== "order") return null;
+    const i0 = retireYearClamped - firstYear;
+    const window = HISTORY.series.slice(i0, i0 + horizon).map((y) => realReturn(y, stockPct / 100));
+    const spend = orderNoDraw ? 0 : orderSpend;
+    const growth = window.reduce((g, r) => g * (1 + r), 1);
+    const shuffles: OrderPath[] = [];
+    const rng = mulberry32(shuffleSeed * 7919 + 17);
+    for (let s = 0; s < 40; s++) {
+      const arr = [...window];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = (rng() * (i + 1)) | 0;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      shuffles.push(runOrder(arr, portfolio, spend));
+    }
+    return {
+      window,
+      years: [retireYearClamped, retireYearClamped + horizon - 1],
+      meanReturn: mean(window),
+      cagr: Math.pow(growth, 1 / window.length) - 1,
+      asIs: runOrder(window, portfolio, spend),
+      bestFirst: runOrder([...window].sort((a, b) => b - a), portfolio, spend),
+      worstFirst: runOrder([...window].sort((a, b) => a - b), portfolio, spend),
+      shuffles,
+      shuffleFails: shuffles.filter((p) => p.failYear !== null).length,
+      noWithdrawEnding: portfolio * growth,
+    };
+  }, [mode, retireYearClamped, horizon, stockPct, portfolio, orderSpend, orderNoDraw, shuffleSeed, firstYear]);
+
   return (
     <div className="wl">
       <div className="wl-controls">
@@ -214,6 +301,7 @@ export default function BurnRateLab() {
             setMode("plan"); setStrategy("fixed"); setCats(DEFAULT_CATEGORIES); setWithdrawalRate(4);
             setPortfolio(1_000_000); setGuaranteed(0); setStockPct(60); setHorizon(30);
             setGuardWidth(20); setGuardAdjust(10);
+            setRetireYear(1965); setOrderSpend(40_000); setOrderNoDraw(false); setShuffleSeed(1);
           }}
         />
         <div className="wl-simmode" role="group" aria-label="Mode">
@@ -229,8 +317,73 @@ export default function BurnRateLab() {
           >
             Historical stress test
           </button>
+          <button
+            type="button"
+            className={mode === "order" ? "active" : ""}
+            aria-pressed={mode === "order"}
+            onClick={() => setMode("order")}
+            title="One real stretch of market history, replayed in every order: as it happened, best years first, worst years first, and 40 random shuffles. Same average — wildly different retirements."
+          >
+            Same returns, shuffled
+          </button>
         </div>
 
+        {mode === "order" ? (
+          <>
+            <p className="br-group">The experiment</p>
+            <label className="wl-slider">
+              <span>
+                Nest egg at retirement
+                <InfoTip text="The starting portfolio. Every ordering starts from the same pile." /> <strong>{currency(portfolio)}</strong>
+              </span>
+              <input type="range" min={100_000} max={5_000_000} step={25_000} value={portfolio} onChange={(e) => setPortfolio(Number(e.target.value))} />
+            </label>
+            <label className="wl-slider">
+              <span>
+                Annual spending (today's dollars)
+                <InfoTip text="Withdrawn at the start of each year, constant in real terms — the Bengen setup. Set it to zero (or flip the switch below) and watch order stop mattering." />{" "}
+                <strong>{currency(orderSpend)}</strong>
+              </span>
+              <input type="range" min={0} max={150_000} step={2_500} value={orderSpend} onChange={(e) => setOrderSpend(Number(e.target.value))} />
+            </label>
+            <label className="wl-slider">
+              <span>
+                Retire in
+                <InfoTip text="Picks the real historical window the returns come from. 1965–66 are the classic worst cohorts of the past century: mediocre returns up front, inflation on top." />{" "}
+                <strong>{retireYearClamped}</strong>
+              </span>
+              <input type="range" min={firstYear} max={lastRetireYear} step={1} value={retireYearClamped} onChange={(e) => setRetireYear(Number(e.target.value))} />
+            </label>
+            <label className="wl-slider">
+              <span>
+                Stocks in portfolio <strong>{stockPct}%</strong>
+              </span>
+              <input type="range" min={0} max={100} step={5} value={stockPct} onChange={(e) => setStockPct(Number(e.target.value))} />
+            </label>
+            <label className="wl-slider">
+              <span>
+                Years in retirement <strong>{horizon}</strong>
+              </span>
+              <input type="range" min={10} max={50} step={1} value={horizon} onChange={(e) => setHorizon(Number(e.target.value))} />
+            </label>
+            <label className="wl-check" style={{ display: "flex", gap: "0.5rem", alignItems: "baseline", fontFamily: "var(--font-sans)", fontSize: "var(--step--1)" }}>
+              <input type="checkbox" checked={orderNoDraw} onChange={(e) => setOrderNoDraw(e.target.checked)} />
+              <span>
+                Turn withdrawals off
+                <InfoTip text="With no money moving out, ending balance = start × (1+r₁) × (1+r₂) × … — and multiplication doesn't care about order. Every shuffle lands on exactly the same number. Sequence risk is created by the withdrawals." />
+              </span>
+            </label>
+            <button type="button" className="wl-chip" style={{ alignSelf: "flex-start" }} onClick={() => setShuffleSeed((s) => s + 1)}>
+              🎲 Shuffle the years again
+            </button>
+            <p className="wl-note" style={{ marginTop: "0.4rem" }}>
+              One real window of US market history ({retireYearClamped}–{retireYearClamped + horizon - 1},
+              inflation-adjusted, {stockPct}% stocks / {100 - stockPct}% 10-yr Treasuries) — replayed in
+              every order. Every line uses exactly the same {horizon} annual returns.
+            </p>
+          </>
+        ) : (
+          <>
         <p className="br-group">Monthly costs in retirement</p>
         {cats.map((c, i) => (
           <label className="wl-slider" key={c.key}>
@@ -331,9 +484,12 @@ export default function BurnRateLab() {
             </p>
           </>
         )}
+          </>
+        )}
       </div>
 
       <div className="wl-stage">
+        {mode !== "order" && (
         <div className="wl-readout">
           <div className="br-stats">
             <div>
@@ -353,8 +509,11 @@ export default function BurnRateLab() {
             )}
           </div>
         </div>
+        )}
 
-        {mode === "plan" ? (
+        {mode === "order" ? (
+          orderSim && <OrderView sim={orderSim} portfolio={portfolio} spend={orderNoDraw ? 0 : orderSpend} horizon={horizon} />
+        ) : mode === "plan" ? (
           <PlanView
             withdrawalRate={withdrawalRate}
             nestEgg={nestEgg}
@@ -389,7 +548,9 @@ export default function BurnRateLab() {
         <p className="wl-note">
           {mode === "plan"
             ? "A rough planning sketch: costs are steady in today's dollars and the withdrawal rate is a historical rule of thumb, not a guarantee. Guaranteed income is assumed to rise with inflation."
-            : "History is one sample of how markets can behave, not a promise. Taxes, fees, changing spending, and longevity are left out; guaranteed income is treated as inflation-adjusted. Data: Aswath Damodaran, historical US returns."}
+            : mode === "stress"
+              ? "History is one sample of how markets can behave, not a promise. Taxes, fees, changing spending, and longevity are left out; guaranteed income is treated as inflation-adjusted. Data: Aswath Damodaran, historical US returns."
+              : "A controlled experiment, not a forecast: the returns are real history, the reorderings are not. Taxes, fees, and changing spending are left out. Data: Aswath Damodaran, historical US returns."}
         </p>
       </div>
     </div>
@@ -749,5 +910,109 @@ function FanChart({ bands, horizon, start, paths, ariaLabel = "Range of retireme
         </>
       )}
     </div>
+  );
+}
+
+// --- Same returns, shuffled ------------------------------------------------
+
+function OrderView({ sim, portfolio, spend, horizon }: { sim: OrderSim; portfolio: number; spend: number; horizon: number }) {
+  const fmtEnd = (p: OrderPath) =>
+    p.failYear !== null ? `ran out in year ${p.failYear}` : currency(p.ending);
+  const spread =
+    sim.bestFirst.ending > 0 && sim.worstFirst.ending > 0
+      ? `${(sim.bestFirst.ending / sim.worstFirst.ending).toFixed(1)}×`
+      : null;
+
+  return (
+    <div className="wl-frontier">
+      <h3>One history, every order</h3>
+
+      <div className="ss-headline" style={{ marginBottom: "var(--space-xs)" }}>
+        {spend > 0 ? (
+          <>
+            <span className="ss-headline-label">
+              Same {horizon} years, same {(sim.meanReturn * 100).toFixed(1)}% average real return — reordered, the endings span
+            </span>
+            <span className="ss-headline-value">
+              {sim.worstFirst.failYear !== null ? "ruin" : currency(sim.worstFirst.ending)} → {currency(sim.bestFirst.ending)}
+            </span>
+            <span className="ss-headline-sub">
+              {sim.worstFirst.failYear !== null
+                ? `Bad years first: broke in year ${sim.worstFirst.failYear}. Good years first: ${currency(sim.bestFirst.ending)}. The only difference is the order.`
+                : spread
+                  ? `A ${spread} gap between the luckiest and unluckiest ordering — from order alone.`
+                  : "The only difference between the lines is the order the years arrive in."}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="ss-headline-label">With no withdrawals, every ordering of those {horizon} years ends at exactly</span>
+            <span className="ss-headline-value" style={{ color: "var(--color-accent)" }}>{currency(sim.noWithdrawEnding)}</span>
+            <span className="ss-headline-sub">
+              Multiplication doesn't care about order. Sequence risk isn't in the market — it's created the moment money starts moving out (or in).
+            </span>
+          </>
+        )}
+      </div>
+
+      <OrderChart sim={sim} portfolio={portfolio} horizon={horizon} />
+
+      <dl className="ss-stats" style={{ marginTop: "var(--space-sm)" }}>
+        <div><dt>As it happened ({sim.years[0]}–{sim.years[1]})</dt><dd>{fmtEnd(sim.asIs)}</dd></div>
+        <div><dt>Best years first</dt><dd>{fmtEnd(sim.bestFirst)}</dd></div>
+        <div><dt>Worst years first</dt><dd>{fmtEnd(sim.worstFirst)}</dd></div>
+        <div><dt>40 random shuffles</dt><dd>{spend > 0 ? `${sim.shuffleFails} went broke` : "all identical"}</dd></div>
+      </dl>
+
+      <p className="wl-fnote">
+        Every line spends the same, holds the same portfolio, and earns the same {horizon} annual
+        returns ({(sim.cagr * 100).toFixed(1)}%/yr compounded); only the order differs. Early losses do
+        lasting damage because each withdrawal sells more of the portfolio at the bottom — dollars that
+        never recover. That's why the first decade of retirement carries most of the risk, and why
+        flexible spending (see the stress test's guardrails) is such a powerful defense.
+      </p>
+    </div>
+  );
+}
+
+function OrderChart({ sim, portfolio, horizon }: { sim: OrderSim; portfolio: number; horizon: number }) {
+  const width = 760, height = 380;
+  const pad = { top: 14, right: 18, bottom: 40, left: 56 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const yMax = Math.max(sim.bestFirst.ending, portfolio, ...sim.asIs.balances, ...sim.shuffles.map((s) => s.ending)) * 1.05;
+  const x = (yr: number) => pad.left + (yr / horizon) * plotW;
+  const y = (b: number) => pad.top + plotH - (Math.min(b, yMax) / yMax) * plotH;
+  const path = (p: OrderPath) => p.balances.map((b, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(b)}`).join(" ");
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const gridB: number[] = [];
+  for (let g = 0; g <= 4; g++) gridB.push((yMax / 4) * g);
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Portfolio balance over retirement for the same returns in different orders">
+      {gridB.map((b) => (
+        <g key={b}>
+          <line x1={pad.left} x2={width - pad.right} y1={y(b)} y2={y(b)} stroke="var(--color-border)" />
+          <text x={pad.left - 6} y={y(b) + 4} textAnchor="end" style={axisText}>{currency(b)}</text>
+        </g>
+      ))}
+      {sim.shuffles.map((s, i) => (
+        <path key={i} d={path(s)} fill="none" stroke="var(--color-muted)" strokeWidth={0.8} opacity={0.28} />
+      ))}
+      <path d={path(sim.bestFirst)} fill="none" stroke="var(--color-link)" strokeWidth={2.2} strokeDasharray="6 4" />
+      <path d={path(sim.worstFirst)} fill="none" stroke="var(--color-error)" strokeWidth={2.2} strokeDasharray="6 4" />
+      <path d={path(sim.asIs)} fill="none" stroke="var(--color-accent)" strokeWidth={2.8} />
+      {sim.worstFirst.failYear !== null && (
+        <text x={x(sim.worstFirst.failYear)} y={y(0) - 6} textAnchor="middle" style={{ ...axisText, fill: "var(--color-error)", fontWeight: 700 }}>
+          ✝ broke, year {sim.worstFirst.failYear}
+        </text>
+      )}
+      {[0, Math.round(horizon / 2), horizon].map((yr) => (
+        <text key={yr} x={x(yr)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>year {yr}</text>
+      ))}
+      <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        solid = as history happened · dashed blue = best years first · dashed red = worst years first · grey = 40 shuffles
+      </text>
+    </svg>
   );
 }
