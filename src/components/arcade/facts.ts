@@ -23,7 +23,7 @@ const first = S[0].year;
 const last = S[S.length - 1].year;
 const pct = (x: number) => x * 100;
 
-function build(): { calibration: Fact[]; anchoring: Fact[] } {
+function build(): { calibration: Fact[]; anchoring: Fact[]; herding: Fact[] } {
   const best = S.reduce((a, y) => (y.stocks > a.stocks ? y : a));
   const worst = S.reduce((a, y) => (y.stocks < a.stocks ? y : a));
   const downYears = S.filter((y) => y.stocks < 0).length;
@@ -57,6 +57,11 @@ function build(): { calibration: Fact[]; anchoring: Fact[] } {
       { id: "stock-mult", question: `$1 in US stocks in ${first}, dividends reinvested, grew to how many dollars by ${last} (nominal)?`, unit: "$", truth: stockMult, dp: 0, note: `About $${Math.round(stockMult).toLocaleString()}. Compounding at full horizon beats any intuition. ${src}` },
       { id: "best-bill", question: `The best single year for CASH (T-bills) since ${first} paid what, in percent?`, unit: "%", truth: pct(bestBill.tbills), dp: 1, note: `${bestBill.year}: ${pct(bestBill.tbills).toFixed(1)}% — the Volcker era. ${src}` },
       { id: "cpi-mult", question: `What cost $1 in ${first} costs how many dollars today?`, unit: "$", truth: cpiMult, dp: 0, note: `About $${cpiMult.toFixed(0)} — inflation's quiet compounding. ${src}` },
+    ],
+    herding: [
+      { id: "up10", question: `Out of the ${S.length} calendar years since ${first}, how many saw US stocks gain more than 10%?`, unit: "years", truth: S.filter((y) => y.stocks > 0.1).length, dp: 0, note: `${S.filter((y) => y.stocks > 0.1).length} of ${S.length} years. ${src}` },
+      { id: "infl-beat", question: `In how many calendar years since ${first} did inflation outrun the stock market?`, unit: "years", truth: S.filter((y) => y.inflation > y.stocks).length, dp: 0, note: `${S.filter((y) => y.inflation > y.stocks).length} of ${S.length} years. ${src}` },
+      { id: "bill-mult", question: `$1 kept in CASH (T-bills) since ${first} grew to how many dollars (nominal)?`, unit: "$", truth: S.reduce((m, y) => m * (1 + y.tbills), 1), dp: 0, note: `About $${S.reduce((m, y) => m * (1 + y.tbills), 1).toFixed(0)} — versus roughly $${Math.round(S.reduce((m, y) => m * (1 + y.stocks), 1)).toLocaleString()} in stocks. ${src}` },
     ],
     anchoring: [
       { id: "up20", question: `How many calendar years since ${first} did US stocks gain more than 20%?`, unit: "years", truth: up20, dp: 0, note: `${up20} of ${S.length} years — big up-years are common. ${src}` },

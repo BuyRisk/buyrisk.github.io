@@ -79,6 +79,13 @@ export const GAMES: GameMeta[] = [
     minutes: 2,
   },
   {
+    id: "endowment",
+    title: "Yours to sell",
+    teaser: "Some lottery tickets to price — a couple you own, a couple you don't. Surely that doesn't matter.",
+    bias: "The endowment effect",
+    minutes: 2,
+  },
+  {
     id: "disposition",
     title: "Sell something",
     teaser: "You need cash, and something in the portfolio has to go. Six rounds. Choose.",
@@ -91,6 +98,13 @@ export const GAMES: GameMeta[] = [
     teaser: "Some of these charts are the actual US market. Some are coin flips. Tell them apart.",
     bias: "Pattern-seeking (hot hand & gambler's fallacy)",
     minutes: 3,
+  },
+  {
+    id: "herding",
+    title: "The crowd",
+    teaser: "Answer a few questions — then see what a thousand other players said. Stand firm, or reconsider?",
+    bias: "Herding (social proof)",
+    minutes: 2,
   },
   {
     id: "framing",
@@ -112,5 +126,12 @@ export const GAMES: GameMeta[] = [
     teaser: "Judge four investors' decisions. You'll only get part of the story — like real life.",
     bias: "Outcome bias",
     minutes: 2,
+  },
+  {
+    id: "hindsight",
+    title: "You knew it all along",
+    teaser: "Four real market episodes. How predictable were they, really? Careful — this one plays dirty.",
+    bias: "Hindsight bias",
+    minutes: 3,
   },
 ];

@@ -5,8 +5,12 @@ import AnchorGame from "./AnchorGame";
 import LossAversionGame from "./LossAversionGame";
 import DispositionGame from "./DispositionGame";
 import RealOrRandomGame from "./RealOrRandomGame";
+import HerdingGame from "./HerdingGame";
+import EndowmentGame from "./EndowmentGame";
+import HindsightGame from "./HindsightGame";
 import VignetteGame from "./VignetteGame";
 import { FRAMING, OUTCOME, SUNK_COST } from "./vignettes";
+import ProfileCard from "./ProfileCard";
 
 /**
  * The Bias Arcade: eight short experiments that run the classic studies on
@@ -32,6 +36,9 @@ export default function BiasArcade() {
       case "loss": return <LossAversionGame key={nonce} onDone={done} />;
       case "disposition": return <DispositionGame key={nonce} onDone={done} />;
       case "patterns": return <RealOrRandomGame key={nonce} onDone={done} />;
+      case "herding": return <HerdingGame key={nonce} onDone={done} />;
+      case "endowment": return <EndowmentGame key={nonce} onDone={done} />;
+      case "hindsight": return <HindsightGame key={nonce} onDone={done} />;
       case "framing": return <VignetteGame key={nonce} config={FRAMING} onDone={done} />;
       case "sunk": return <VignetteGame key={nonce} config={SUNK_COST} onDone={done} />;
       case "outcome": return <VignetteGame key={nonce} config={OUTCOME} onDone={done} />;
@@ -95,7 +102,8 @@ export default function BiasArcade() {
             and pattern-seeking, written rules against framing and sunk costs, checking less against
             loss aversion, and a "would I buy it today?" habit against the disposition effect.
           </p>
-          <button type="button" className="wl-chip" onClick={() => { clearResults(); setResults({}); }}>
+          <ProfileCard results={results} />
+          <button type="button" className="wl-chip" style={{ marginTop: "0.5rem" }} onClick={() => { clearResults(); setResults({}); }}>
             Clear my results
           </button>
         </div>
