@@ -212,10 +212,10 @@ export default function SuperstockLab() {
             <InfoTip text="How many stocks you'd hold, chosen at random from the universe. The fewer you pick, the more likely you miss the rare superstocks." />{" "}
             <strong>{n}</strong>
           </span>
-          <input type="range" min={1} max={200} step={1} value={n} onChange={(e) => setN(Number(e.target.value))} />
+          <input type="range" min={1} max={500} step={1} value={n} onChange={(e) => setN(Number(e.target.value))} />
         </label>
         <div className="sk-quicks">
-          {[1, 5, 20, 100].map((q) => (
+          {[1, 5, 20, 100, 500].map((q) => (
             <button key={q} type="button" className="wl-btn" onClick={() => setN(q)}>
               {q}
             </button>
