@@ -1,6 +1,7 @@
 ---
-// Homepage: hero, the site's three core principles, a featured-tool spotlight,
-// and entry points into the Portfolio Playground and About.
+// Homepage: hero, the site's three core principles, three learning PATHS
+// (the curriculum, not a catalog), a featured-tool spotlight, and links to
+// the full tool/reference indexes.
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const principles = [
@@ -15,6 +16,44 @@ const principles = [
   {
     title: "Diversify what you can",
     body: "Some risks are compensated. Some aren't. Learn to shed the risk you aren't paid to hold.",
+  },
+];
+
+const paths = [
+  {
+    eyebrow: "Path 1",
+    title: "Get your footing",
+    blurb: "Everything that comes before the first invested dollar — in order.",
+    steps: [
+      { label: "Money basics: budget, buffer, goals & debt", href: "/personal-finance/money-basics" },
+      { label: "Your next dollar: where it goes & how it's taxed", href: "/personal-finance/next-dollar" },
+      { label: "Compound growth: why any of this matters", href: "/tools/compound-growth" },
+      { label: "Risk tolerance: how much risk is yours to take", href: "/personal-finance/risk-tolerance" },
+    ],
+  },
+  {
+    eyebrow: "Path 2",
+    title: "How markets pay you",
+    blurb: "The evidence-based core: what return is, what erodes it, and who's really in the mirror.",
+    steps: [
+      { label: "Risk & return: CAPM and the factors", href: "/tools/factors" },
+      { label: "Diversification: the only free lunch", href: "/tools/diversification" },
+      { label: "What eats your returns: fees, inflation & taxes", href: "/tools/fees" },
+      { label: "Can you outsmart the market?", href: "/tools/beat-the-market" },
+      { label: "Your own worst enemy — and the Bias Arcade", href: "/tools/behavioral-finance" },
+    ],
+  },
+  {
+    eyebrow: "Path 3",
+    title: "Build it, live with it",
+    blurb: "From ideas to an actual portfolio — and the decades after.",
+    steps: [
+      { label: "Stock-picking: the hard truths", href: "/tools/stock-picking" },
+      { label: "Portfolio, allocation & bonds", href: "/tools/portfolio" },
+      { label: "Global investing: own the whole world", href: "/tools/global" },
+      { label: "Retirement accounts: Social Security, Roth & cheap tax years", href: "/personal-finance/retirement-accounts" },
+      { label: "Will your money last?", href: "/tools/retirement" },
+    ],
   },
 ];
 ---
@@ -55,33 +94,59 @@ const principles = [
     </ul>
   </section>
 
+  <section class="container paths">
+    <h2 class="paths-heading">Pick a path</h2>
+    <p class="paths-lede">
+      The tools build on each other. Follow a path in order, or jump straight to
+      whatever question brought you here.
+    </p>
+    <div class="grid grid--3 path-grid">
+      {
+        paths.map((p) => (
+          <div class="card path">
+            <p class="eyebrow">{p.eyebrow}</p>
+            <h3>{p.title}</h3>
+            <p class="path-blurb">{p.blurb}</p>
+            <ol class="path-steps">
+              {p.steps.map((s) => (
+                <li>
+                  <a href={s.href}>{s.label}</a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))
+      }
+    </div>
+    <p class="paths-more">
+      Prefer to browse? The full catalogs: <a href="/tools">interactive tools</a> ·{" "}
+      <a href="/personal-finance">personal finance</a> · <a href="/info">reference &amp; live data</a> ·{" "}
+      <a href="/blog">essays</a>
+    </p>
+  </section>
+
   <section class="container spotlight">
     <div class="spotlight-inner card">
       <div>
-        <p class="eyebrow">Featured tool</p>
-        <h2>Watch your money compound</h2>
+        <p class="eyebrow">Featured: the Bias Arcade</p>
+        <h2>Test your own biases</h2>
         <p>
-          Drag a few sliders and see how a starting balance, regular
-          contributions, and time combine into something surprisingly large.
-          It's the clearest way to understand why investors talk about
-          compounding like it's magic.
+          Eleven two-minute experiments, adapted from the classic studies of
+          behavioral economics, that measure your anchoring, loss aversion,
+          overconfidence, herding, and more — before telling you what they were
+          measuring. Play first; diagnosis after. Then watch your bias profile
+          take shape.
         </p>
-        <a href="/tools/compound-growth" class="btn btn--primary">Open the explorer</a>
+        <a href="/tools/behavioral-finance#arcade" class="btn btn--primary">Enter the arcade</a>
       </div>
       <div class="spotlight-visual" aria-hidden="true">
-        <svg viewBox="0 0 200 120" role="presentation">
-          <path
-            d="M4 112 C 60 108, 120 92, 196 12"
-            fill="none"
-            stroke="var(--color-accent)"
-            stroke-width="3"
-            stroke-linecap="round"
-          ></path>
-          <path
-            d="M4 112 C 60 108, 120 92, 196 12 L196 116 L4 116 Z"
-            fill="var(--color-accent-soft)"
-            opacity="0.7"
-          ></path>
+        <svg viewBox="0 0 200 160" role="presentation">
+          <polygon points="100,14 168,45 185,110 140,152 60,152 15,110 32,45" fill="none" stroke="var(--color-border)" stroke-width="1.5"></polygon>
+          <polygon points="100,49 141,68 151,107 124,132 76,132 49,107 59,68" fill="none" stroke="var(--color-border)" stroke-width="1"></polygon>
+          <polygon points="100,30 152,62 148,118 100,140 58,124 42,80 70,48" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2.5" opacity="0.9"></polygon>
+          <circle cx="100" cy="30" r="4" fill="var(--color-accent)"></circle>
+          <circle cx="152" cy="62" r="4" fill="var(--color-accent)"></circle>
+          <circle cx="58" cy="124" r="4" fill="var(--color-accent)"></circle>
         </svg>
       </div>
     </div>
@@ -138,6 +203,58 @@ const principles = [
     margin: 0;
   }
 
+  .paths {
+    margin-top: var(--space-xl);
+  }
+  .paths-heading {
+    font-size: var(--step-2);
+    margin: 0 0 0.3rem;
+  }
+  .paths-lede {
+    color: var(--color-text-soft);
+    margin: 0 0 var(--space-md);
+    max-width: 46rem;
+  }
+  .path-grid > .path {
+    display: flex;
+    flex-direction: column;
+  }
+  .path h3 {
+    font-size: var(--step-1);
+    margin: 0.2rem 0 0.3rem;
+  }
+  .path-blurb {
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
+    margin: 0 0 var(--space-sm);
+  }
+  .path-steps {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.45;
+  }
+  .path-steps li::marker {
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+  .path-steps a {
+    text-decoration: none;
+  }
+  .path-steps a:hover {
+    text-decoration: underline;
+  }
+  .paths-more {
+    margin-top: var(--space-md);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+
   .spotlight {
     margin-top: var(--space-lg);
   }
@@ -161,6 +278,9 @@ const principles = [
   }
   .spotlight-visual svg {
     width: 100%;
+    max-width: 260px;
     height: auto;
+    margin-inline: auto;
+    display: block;
   }
 </style>
