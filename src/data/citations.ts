@@ -14,6 +14,7 @@ export type StudyCategory =
   | "Asset pricing & the CAPM"
   | "Factor models"
   | "Market efficiency & active management"
+  | "Behavioral finance"
   | "Diversification & return concentration"
   | "Valuation & long-run returns"
   | "Retirement & withdrawal";
@@ -24,6 +25,7 @@ export const STUDY_CATEGORY_ORDER: StudyCategory[] = [
   "Asset pricing & the CAPM",
   "Factor models",
   "Market efficiency & active management",
+  "Behavioral finance",
   "Diversification & return concentration",
   "Valuation & long-run returns",
   "Retirement & withdrawal",
@@ -211,14 +213,14 @@ export const STUDIES: Record<string, Study> = {
     note: "Adds momentum as a fourth factor.",
   },
 
-  // --- Market efficiency & active management ------------------------------
+  // --- Behavioral finance --------------------------------------------------
   kahnemanTversky1979: {
     authors: "Kahneman, D., & Tversky, A.",
     year: 1979,
     title: "Prospect Theory: An Analysis of Decision under Risk",
     venue: "Econometrica 47(2): 263–291",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "The foundation of behavioral finance; losses loom larger than equivalent gains.",
   },
   tverskyKahneman1974: {
@@ -227,7 +229,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Judgment under Uncertainty: Heuristics and Biases",
     venue: "Science 185(4157): 1124–1131",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "Anchoring, availability, and representativeness — including the wheel-of-fortune anchoring experiment the arcade's 'wheel' game recreates.",
   },
   tverskyKahneman1981: {
@@ -236,7 +238,7 @@ export const STUDIES: Record<string, Study> = {
     title: "The Framing of Decisions and the Psychology of Choice",
     venue: "Science 211(4481): 453–458",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "Identical outcomes, opposite choices when worded as gains vs losses — the design behind the arcade's framing game.",
   },
   shefrinStatman1985: {
@@ -245,7 +247,7 @@ export const STUDIES: Record<string, Study> = {
     title: "The Disposition to Sell Winners Too Early and Ride Losers Too Long: Theory and Evidence",
     venue: "Journal of Finance 40(3): 777–790",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "Named the disposition effect the arcade's 'Sell something' game measures.",
   },
   odean1998: {
@@ -254,7 +256,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Are Investors Reluctant to Realize Their Losses?",
     venue: "Journal of Finance 53(5): 1775–1798",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "10,000 brokerage accounts: investors realize gains far more readily than losses, and the winners they sell go on to beat the losers they keep.",
   },
   arkesBlumer1985: {
@@ -263,7 +265,7 @@ export const STUDIES: Record<string, Study> = {
     title: "The Psychology of Sunk Cost",
     venue: "Organizational Behavior and Human Decision Processes 35(1): 124–140",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "Money already spent keeps voting on decisions it can't affect — the arcade's sunk-cost vignettes.",
   },
   baronHershey1988: {
@@ -272,7 +274,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Outcome Bias in Decision Evaluation",
     venue: "Journal of Personality and Social Psychology 54(4): 569–579",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "Identical decisions judged differently by how the dice landed — the arcade's 'Good call?' game.",
   },
   alpertRaiffa1982: {
@@ -281,7 +283,7 @@ export const STUDIES: Record<string, Study> = {
     title: "A Progress Report on the Training of Probability Assessors",
     venue: "in Kahneman, Slovic & Tversky (eds.), Judgment under Uncertainty",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "The 90%-confidence-interval calibration test (first circulated 1969): people's '90% sure' ranges trap the truth less than half the time.",
   },
   asch1955: {
@@ -290,7 +292,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Opinions and Social Pressure",
     venue: "Scientific American 193(5): 31–35",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "The line-length conformity experiments: 75% of subjects denied their own eyes at least once to agree with a group — the arcade's 'crowd' game.",
   },
   bikhchandaniHirshleiferWelch1992: {
@@ -299,7 +301,7 @@ export const STUDIES: Record<string, Study> = {
     title: "A Theory of Fads, Fashion, Custom, and Cultural Change as Informational Cascades",
     venue: "Journal of Political Economy 100(5): 992–1026",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "How rational copying snowballs into cascades and manias.",
   },
   kahnemanKnetschThaler1990: {
@@ -308,7 +310,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Experimental Tests of the Endowment Effect and the Coase Theorem",
     venue: "Journal of Political Economy 98(6): 1325–1348",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "The coffee-mug experiments: owners demand about twice what buyers will pay for the identical item — the arcade's 'Yours to sell' game.",
   },
   fischhoff1975: {
@@ -317,9 +319,10 @@ export const STUDIES: Record<string, Study> = {
     title: "Hindsight ≠ Foresight: The Effect of Outcome Knowledge on Judgment under Uncertainty",
     venue: "Journal of Experimental Psychology: Human Perception and Performance 1(3): 288–299",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "Creeping determinism: knowing an outcome inflates how predictable it feels — the arcade's 'You knew it all along' game.",
   },
+  // --- Market efficiency & active management ------------------------------
   dicksonShoven1995: {
     authors: "Dickson, J. M., & Shoven, J. B.",
     year: 1995,
@@ -384,7 +387,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Trading Is Hazardous to Your Wealth: The Common Stock Investment Performance of Individual Investors",
     venue: "The Journal of Finance 55(2): 773–806",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "The more households traded, the worse they did: the most active fifth trailed the market by about 6.5 points a year, mostly from trading costs.",
   },
   morningstarMindTheGap2026: {
@@ -393,7 +396,7 @@ export const STUDIES: Record<string, Study> = {
     title: "Mind the Gap 2026: US stock fund investors made history; crypto mavens stumbled",
     venue: "Morningstar Portfolio and Planning Research",
     kind: "paper",
-    category: "Market efficiency & active management",
+    category: "Behavioral finance",
     note: "The authoritative investor-return-gap study. Over the 10 years to Dec. 2025, the average dollar earned 8.7%/yr vs. funds' 9.9% total return — a ~1.2pp gap; the US-equity gap was just ~0.5pp, matching this tool's CRSP figure. The gap widens with category volatility (sector and alternative funds worst).",
   },
   cremersPetajisto2009: {

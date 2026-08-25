@@ -118,7 +118,8 @@ export default function DcaLab() {
           <span className="ss-headline-value">{Math.round(view.winRate * 100)}% of the time</span>
           <span className="ss-headline-sub">
             across every start month, {view.firstStart}–{view.lastStart}, beating {spread}-month
-            averaging by a median of {pct(view.medianOutperf * 100)}
+            averaging by a median of {pct(view.medianOutperf * 100)} — on {dollars(amount)}, that's{" "}
+            <strong>{dollars(amount * (view.meanLs - view.meanDca))}</strong> more on average
           </span>
         </div>
 

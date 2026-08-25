@@ -1,23 +1,9 @@
 ---
-// Homepage: hero, the site's three core principles, three learning PATHS
+// Homepage: hero, a live tool preview (the site thesis in one slider), three
 // (the curriculum, not a catalog), a featured-tool spotlight, and links to
 // the full tool/reference indexes.
 import BaseLayout from "../layouts/BaseLayout.astro";
-
-const principles = [
-  {
-    title: "Risk and return are linked",
-    body: "You are paid to bear uncertainty. We show you how that trade actually works: no jargon, no hype.",
-  },
-  {
-    title: "Time is the real advantage",
-    body: "Compounding rewards patience. The earlier and longer you invest, the more the math tilts in your favor.",
-  },
-  {
-    title: "Diversify what you can",
-    body: "Some risks are compensated. Some aren't. Learn to shed the risk you aren't paid to hold.",
-  },
-];
+import HeroRiskReturn from "../components/HeroRiskReturn.tsx";
 
 const paths = [
   {
@@ -81,17 +67,17 @@ const paths = [
     </div>
   </section>
 
-  <section class="container principles">
-    <ul class="grid grid--3 principle-grid">
-      {
-        principles.map((p) => (
-          <li class="card principle">
-            <h2>{p.title}</h2>
-            <p>{p.body}</p>
-          </li>
-        ))
-      }
-    </ul>
+  <section class="container demo">
+    <h2 class="demo-heading">See it in ten seconds</h2>
+    <p class="demo-lede">
+      Every tool here works like this one: real data, one thing to drag, and the
+      idea underneath made visible. Try it.
+    </p>
+    <div class="card demo-card">
+      {/* client:load, not client:visible — this is the homepage's "what is this
+          site?" demo, so it must be draggable the moment it is on screen. */}
+      <HeroRiskReturn client:load />
+    </div>
   </section>
 
   <section class="container paths">
@@ -186,21 +172,68 @@ const paths = [
     margin-top: var(--space-md);
   }
 
-  .principles {
+  /* Live tool preview: the first thing below the hero, so a visitor sees what
+     this site actually is before navigating anywhere. */
+  .demo {
     margin-top: var(--space-lg);
   }
-  .principle-grid {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .demo-heading {
+    font-size: var(--step-2);
+    margin: 0 0 0.3rem;
   }
-  .principle h2 {
-    font-size: var(--step-1);
-    margin: 0 0 0.4rem;
-  }
-  .principle p {
+  .demo-lede {
     color: var(--color-text-soft);
-    margin: 0;
+    margin: 0 0 var(--space-md);
+    max-width: 46rem;
+  }
+  .demo-card {
+    padding: var(--space-md);
+  }
+  /* Chart left, control + readout right; stacks on narrow screens. */
+  .demo-card :global(.hrr) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--space-md);
+    align-items: center;
+  }
+  @media (max-width: 720px) {
+    .demo-card :global(.hrr) {
+      grid-template-columns: 1fr;
+    }
+  }
+  .demo-card :global(.hrr-chart) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .demo-card :global(.hrr-slider) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .demo-card :global(.hrr-slider strong) {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-card :global(.hrr-slider input) {
+    width: 100%;
+  }
+  .demo-card :global(.hrr-readout) {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+  .demo-card :global(.hrr-readout strong) {
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-card :global(.hrr-note) {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
   }
 
   .paths {

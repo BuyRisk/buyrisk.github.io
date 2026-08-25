@@ -981,18 +981,6 @@ export default function PortfolioLab() {
           />
         </label>
 
-        <label className="pl-horizon">
-          <span>Risk-free rate:<InfoTip text="The return on cash/Treasuries. It anchors the capital market line and determines the tangency (max-Sharpe) portfolio." /> <strong>{pct(riskFree, 1)}</strong></span>
-          <input
-            type="range"
-            min={0}
-            max={0.08}
-            step={0.0025}
-            value={riskFree}
-            onChange={(e) => setRiskFree(Number(e.target.value))}
-          />
-        </label>
-
         <div className="pl-scenarios">
           <span className="pl-scenarios-title">Guided scenarios</span>
           <div className="pl-scenario-btns">
@@ -1080,6 +1068,25 @@ export default function PortfolioLab() {
           <div className="pl-panel">
             <div className="pl-panel-head">
               <h3>Efficient frontier</h3>
+              {/* Inline, because the risk-free rate moves THIS panel (the capital
+                  market line, the tangency point, the Sharpe tinting) and nothing
+                  in the simulation panel above it. */}
+              <label className="pl-inline-slider">
+                <span>
+                  Risk-free rate
+                  <InfoTip text="The return on cash/Treasuries. It anchors the capital market line and determines the tangency (max-Sharpe) portfolio." />{" "}
+                  <strong>{pct(riskFree, 1)}</strong>
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={0.08}
+                  step={0.0025}
+                  value={riskFree}
+                  aria-label="Risk-free rate"
+                  onChange={(e) => setRiskFree(Number(e.target.value))}
+                />
+              </label>
             </div>
             <FrontierChart
               cloud={cloud}
