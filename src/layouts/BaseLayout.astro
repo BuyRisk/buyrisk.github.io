@@ -53,12 +53,28 @@ const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
     <Header />
+    <p class="site-disclaimer">
+      Educational content only — not financial, tax, or investment advice.
+    </p>
     <main id="main">
       <slot />
     </main>
     <Footer />
 
     <style>
+      /* Persistent, site-wide disclaimer: sits directly under the header on
+         every page so the framing is visible above the fold, not only in the
+         footer. Deliberately quiet — informative, not a nag bar. */
+      .site-disclaimer {
+        margin: 0;
+        padding: 0.3rem 1rem;
+        border-bottom: var(--border);
+        background: var(--color-surface);
+        color: var(--color-text-soft);
+        font-family: var(--font-sans);
+        font-size: var(--step--1);
+        text-align: center;
+      }
       .skip-link {
         position: absolute;
         left: -999px;

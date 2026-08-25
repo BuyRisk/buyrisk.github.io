@@ -2878,6 +2878,16 @@
   .ic-tm-play:hover {
     filter: brightness(1.05);
   }
+  /* The lab-side play button, beside the year scrubber it shares state with. */
+  .ic-playbtn {
+    width: 100%;
+    margin-top: 0.4rem;
+  }
+  .ic-playbtn[aria-pressed="true"] {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
   .ic-tm-year {
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;

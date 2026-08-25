@@ -178,6 +178,24 @@ export default function RiskReturnLab() {
       </div>
 
       <div className="wl-stage">
+        {/* The risk/return scatter comes FIRST because it is what the volatility
+            slider (top of the controls column) actually moves — keeping a control
+            and the figure it drives within sight of each other. The growth chart
+            below carries its own Simplified/Historical toggle inline. */}
+        <div className="wl-frontier">
+          <h3>More risk, more reward — the century-long pattern</h3>
+          <RiskReturnChart risk={risk} expected={expected} showParadox={showParadox} />
+          <div className="wl-flegend">
+            <span><span className="wl-fdot" style={{ background: "var(--color-accent)" }} /> Asset classes</span>
+            <span><span className="wl-fdot" style={{ background: "var(--color-text)" }} /> Risk/return line</span>
+            {showParadox && <span><span className="wl-fdot" style={{ background: "var(--color-warn)" }} /> Off the line (paradox)</span>}
+          </div>
+          <p className="wl-fnote">
+            From cash at the bottom-left to small-cap value at the top-right, more volatility came with more return. The
+            open marker is where your chosen risk level lands on that line.
+          </p>
+        </div>
+
         <div className="wl-frontier">
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "0.5rem" }}>
             <h3 style={{ margin: 0 }}>Watch it play out: the growth of $1 over a lifetime</h3>
@@ -214,20 +232,6 @@ export default function RiskReturnLab() {
             have historically trailed even T-bills, with a handful of winners carrying the whole market. This describes the
             <em> basket</em>, not the ticket. (See <a href="/tools/stock-picking">Stock-Picking</a>.)
           </div>
-        </div>
-
-        <div className="wl-frontier">
-          <h3>More risk, more reward — the century-long pattern</h3>
-          <RiskReturnChart risk={risk} expected={expected} showParadox={showParadox} />
-          <div className="wl-flegend">
-            <span><span className="wl-fdot" style={{ background: "var(--color-accent)" }} /> Asset classes</span>
-            <span><span className="wl-fdot" style={{ background: "var(--color-text)" }} /> Risk/return line</span>
-            {showParadox && <span><span className="wl-fdot" style={{ background: "var(--color-warn)" }} /> Off the line (paradox)</span>}
-          </div>
-          <p className="wl-fnote">
-            From cash at the bottom-left to small-cap value at the top-right, more volatility came with more return. The
-            open marker is where your chosen risk level lands on that line.
-          </p>
         </div>
 
         <div className="wl-lower">

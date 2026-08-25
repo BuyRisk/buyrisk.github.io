@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import ConcentrationTreemap from "./ConcentrationTreemap";
@@ -6,6 +6,7 @@ import {
   CONCENTRATION,
   EW_VS_CW,
   TOP10_SNAPSHOTS,
+  TREEMAP_SNAPSHOTS,
   crossCheck,
   type ConcentrationPoint,
 } from "../data/generated/sp500-concentration";
@@ -26,21 +27,47 @@ const pct0 = (x: number) => `${(x * 100).toFixed(0)}%`;
 const pct1 = (x: number) => `${(x * 100).toFixed(1)}%`;
 const yearOf = (date: string) => date.slice(0, 4);
 
-// Snapshot month-ends whose full top-10 holdings shipped (the scrubber stops).
-const SNAP_KEYS = Object.keys(TOP10_SNAPSHOTS).sort();
+// One shared timeline for the whole lab: every year-end we shipped holdings for.
+// The scrubber, the treemap (including its play button), the headline stats and
+// the holdings list all read this single index, so every control moves together.
+const YEAR_KEYS = Object.keys(TREEMAP_SNAPSHOTS).sort();
+// Decade shortcuts under the slider, mapped onto the annual timeline.
+const DECADE_TICKS = Object.keys(TOP10_SNAPSHOTS)
+  .sort()
+  .map((k) => ({ key: k, i: YEAR_KEYS.indexOf(k) }))
+  .filter((t) => t.i >= 0);
 const byDate = new Map(CONCENTRATION.map((d) => [d.date, d]));
 
 type ChartView = "concentration" | "treemap" | "growth";
 
 export default function IndexConcentrationLab() {
-  const [sel, setSel] = useState(SNAP_KEYS.length - 1); // default: today (Mag-7)
+  const [sel, setSel] = useState(YEAR_KEYS.length - 1); // default: today (Mag-7)
+  const [playing, setPlaying] = useState(false);
   const [view, setView] = useState<ChartView>("concentration");
   const clipId = useId();
 
-  const selDate = SNAP_KEYS[sel];
+  const selDate = YEAR_KEYS[sel];
   const selYear = yearOf(selDate);
   const point = byDate.get(selDate) ?? CONCENTRATION[CONCENTRATION.length - 1];
-  const holdings = TOP10_SNAPSHOTS[selDate] ?? [];
+  // Top 10 for any year, from the treemap's top-30 snapshot.
+  const holdings = (TREEMAP_SNAPSHOTS[selDate]?.holdings ?? TOP10_SNAPSHOTS[selDate] ?? []).slice(0, 10);
+
+  // Play: advance a year at a time; stop at the end of the record.
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => setSel((i) => Math.min(i + 1, YEAR_KEYS.length - 1)), 550);
+    return () => clearInterval(id);
+  }, [playing]);
+  useEffect(() => {
+    if (playing && sel >= YEAR_KEYS.length - 1) setPlaying(false);
+  }, [playing, sel]);
+
+  /** Any manual scrub takes over from the animation. */
+  const scrubTo = (i: number) => { setPlaying(false); setSel(i); };
+  const togglePlay = () => {
+    if (!playing && sel >= YEAR_KEYS.length - 1) setSel(0); // replay from the start
+    setPlaying((p) => !p);
+  };
 
   // Peak, trough and latest concentration across the whole record, for context.
   const { peak, trough, recent } = useMemo(() => {
@@ -56,37 +83,41 @@ export default function IndexConcentrationLab() {
   return (
     <div className="wl">
       <div className="wl-controls">
-        <ResetButton onReset={() => { setSel(SNAP_KEYS.length - 1); setView("concentration"); }} />
+        <ResetButton onReset={() => { setSel(YEAR_KEYS.length - 1); setPlaying(false); setView("concentration"); }} />
 
         <label className="wl-slider ic-scrub">
           <span>
-            Jump to a decade
-            <InfoTip text="Slide through the decades to see how top-heavy the S&P 500 was at each point, and which giants sat at the top." />{" "}
+            Scrub the years
+            <InfoTip text="Slide through the years to see how top-heavy the S&P 500 was at each point, and which giants sat at the top. Every view on this page — the chart, the treemap, and the holdings list — follows this year." />{" "}
             <strong>{selYear}</strong>
           </span>
           <input
             type="range"
             min={0}
-            max={SNAP_KEYS.length - 1}
+            max={YEAR_KEYS.length - 1}
             step={1}
             value={sel}
-            aria-label="Decade"
-            onChange={(e) => setSel(Number(e.target.value))}
+            aria-label="Year"
+            onChange={(e) => scrubTo(Number(e.target.value))}
           />
           <span className="ic-scrub-ticks" aria-hidden="true">
-            {SNAP_KEYS.map((k, i) => (
+            {DECADE_TICKS.map((t) => (
               <button
-                key={k}
+                key={t.key}
                 type="button"
-                className={i === sel ? "active" : ""}
-                onClick={() => setSel(i)}
+                className={t.i === sel ? "active" : ""}
+                onClick={() => scrubTo(t.i)}
                 tabIndex={-1}
               >
-                {`'${yearOf(k).slice(2)}`}
+                {`'${yearOf(t.key).slice(2)}`}
               </button>
             ))}
           </span>
         </label>
+
+        <button type="button" className="wl-btn ic-playbtn" onClick={togglePlay} aria-pressed={playing}>
+          {playing ? "⏸ Pause" : "▶ Play the years"}
+        </button>
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
           <span className="ss-headline-label">In {selYear}, the S&amp;P 500's top 10 stocks were</span>
@@ -127,7 +158,7 @@ export default function IndexConcentrationLab() {
           </div>
 
           {view === "treemap" ? (
-            <ConcentrationTreemap />
+            <ConcentrationTreemap yi={sel} onScrub={scrubTo} playing={playing} onTogglePlay={togglePlay} />
           ) : view === "concentration" ? (
             <>
               <ConcentrationChart data={CONCENTRATION} selDate={selDate} clipId={clipId} />

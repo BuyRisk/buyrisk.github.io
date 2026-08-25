@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { TREEMAP_SNAPSHOTS, CONCENTRATION } from "../data/generated/sp500-concentration";
 
 /**
@@ -72,20 +72,24 @@ function squarify(items: Tile[]): Placed[] {
 const pct1 = (x: number) => `${(x * 100).toFixed(1)}%`;
 const pct0 = (x: number) => `${(x * 100).toFixed(0)}%`;
 
-export default function ConcentrationTreemap() {
-  const [yi, setYi] = useState(KEYS.length - 1); // default: latest (Mag-7)
-  const [playing, setPlaying] = useState(false);
+/**
+ * Controlled: the year index and the play/pause state live in
+ * IndexConcentrationLab, so this scrubber, the lab's own year slider, and the
+ * play button are three handles on ONE timeline — move any of them and the
+ * treemap, the line chart, the headline stats and the holdings list all follow.
+ */
+export default function ConcentrationTreemap({
+  yi,
+  onScrub,
+  playing,
+  onTogglePlay,
+}: {
+  yi: number;
+  onScrub: (i: number) => void;
+  playing: boolean;
+  onTogglePlay: () => void;
+}) {
   const [hover, setHover] = useState<string | null>(null);
-
-  // Play: advance one year every ~550ms; stop at the end.
-  useEffect(() => {
-    if (!playing) return;
-    const id = setInterval(() => setYi((i) => Math.min(i + 1, KEYS.length - 1)), 550);
-    return () => clearInterval(id);
-  }, [playing]);
-  useEffect(() => {
-    if (playing && yi >= KEYS.length - 1) setPlaying(false);
-  }, [playing, yi]);
 
   const key = KEYS[yi];
   const year = key.slice(0, 4);
@@ -105,11 +109,6 @@ export default function ConcentrationTreemap() {
   const top10 = snap.holdings.slice(0, 10).reduce((a, h) => a + h.weight, 0);
   const effN = CONC.get(key)?.effN;
 
-  const togglePlay = () => {
-    if (!playing && yi >= KEYS.length - 1) setYi(0); // restart from the start
-    setPlaying((p) => !p);
-  };
-
   const tint = (t: Placed) =>
     t.other
       ? "var(--color-border)"
@@ -118,7 +117,7 @@ export default function ConcentrationTreemap() {
   return (
     <div className="ic-tm">
       <div className="ic-tm-controls">
-        <button type="button" className="ic-tm-play" onClick={togglePlay} aria-label={playing ? "Pause" : "Play through the years"}>
+        <button type="button" className="ic-tm-play" onClick={onTogglePlay} aria-label={playing ? "Pause" : "Play through the years"}>
           {playing ? "⏸" : "▶"} <span>{playing ? "Pause" : "Play"}</span>
         </button>
         <input
@@ -128,7 +127,7 @@ export default function ConcentrationTreemap() {
           step={1}
           value={yi}
           aria-label="Year"
-          onChange={(e) => { setPlaying(false); setYi(Number(e.target.value)); }}
+          onChange={(e) => onScrub(Number(e.target.value))}
         />
         <strong className="ic-tm-year">{year}</strong>
       </div>
