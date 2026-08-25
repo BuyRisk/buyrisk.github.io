@@ -83,7 +83,7 @@ export const STUDIES: Record<string, Study> = {
     venue: "Financial Analysts Journal 44(1): 16–27",
     kind: "paper",
     category: "Portfolio theory",
-    note: "The classic analysis of buy-and-hold vs. rebalancing (constant-mix): rebalancing trades a little return for lower, steadier risk.",
+    note: "The classic taxonomy of buy-and-hold, constant-mix (rebalancing) and portfolio-insurance strategies. Rebalancing is concave: it does best in volatile but trendless markets and lags in trending ones — and because it buys more as prices fall, it offers less downside protection than buy-and-hold, not more.",
   },
   peroldSchulman1988: {
     authors: "Perold, A. F., & Schulman, E. C.",
@@ -242,7 +242,7 @@ export const STUDIES: Record<string, Study> = {
   shefrinStatman1985: {
     authors: "Shefrin, H., & Statman, M.",
     year: 1985,
-    title: "The Disposition to Sell Winners Too Early and Ride Losers Too Long",
+    title: "The Disposition to Sell Winners Too Early and Ride Losers Too Long: Theory and Evidence",
     venue: "Journal of Finance 40(3): 777–790",
     kind: "paper",
     category: "Market efficiency & active management",
@@ -667,7 +667,7 @@ export const DATASETS: Record<string, Dataset> = {
   irsRetirementLimits: {
     name: "2026 Retirement Plan Contribution Limits (COLA)",
     publisher: "Internal Revenue Service",
-    url: "https://www.irs.gov/retirement-plans/cost-of-living-adjustments-for-retirement-items",
+    url: "https://www.irs.gov/retirement-plans/cola-increases-for-dollar-limitations-on-benefits-and-contributions",
     note: "Elective deferral, catch-up, and IRA limits and phase-outs, indexed annually.",
   },
   irsHsaLimits: {
@@ -685,7 +685,7 @@ export const DATASETS: Record<string, Dataset> = {
   cmsIrmaa: {
     name: "2026 Medicare Parts B & D Premiums (IRMAA)",
     publisher: "Centers for Medicare & Medicaid Services",
-    url: "https://www.cms.gov/newsroom/fact-sheets",
+    url: "https://www.medicare.gov/basics/costs/medicare-costs",
     note: "Income-related monthly adjustment amounts and tiers, based on MAGI from two years prior.",
   },
   bogleheads: {
