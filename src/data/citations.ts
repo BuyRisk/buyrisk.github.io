@@ -730,35 +730,66 @@ export const DATASETS: Record<string, Dataset> = {
 export interface ToolSources {
   studies: string[];
   datasets: string[];
+  /**
+   * Plain-language note on HOW this tool is built and which of the linked
+   * sources actually feed it — including when the answer is "none, this is a
+   * model". Rendered by <Sources> above the reference lists. Keep it concrete
+   * and honest: name the real series, and say plainly when something is
+   * synthetic, illustrative, or an editorial judgement rather than a
+   * calculation.
+   */
+  method?: string;
 }
 
 /** Keyed by the tool's slug (the last segment of its /tools/<slug> href). */
 export const TOOL_SOURCES: Record<string, ToolSources> = {
+  // No studies or datasets: these five calculators are arithmetic on user
+  // input. The method note is the whole point of the entry.
+  "money-basics": {
+    studies: [],
+    datasets: [],
+    method:
+      "Pure arithmetic on the numbers you type, computed in your browser and never sent anywhere. These five tools use no market data, no forecasts, and no historical returns — the only rate involved is the growth assumption you set yourself on the savings-goal and net-worth tabs.",
+  },
   "compound-growth": {
+    method:
+      "Computed live in your browser from the numbers you enter. The historical modes use real annual US stock, bond, and inflation returns (Damodaran, 1928–present): resampled in five-year blocks for the Monte Carlo runs, and replayed year by year in Twin Lives. Default borrowing rates in the debt tab come from the FRED consumer-rate series.",
     studies: ["bengen1994", "cooley1998"],
     datasets: ["shiller", "damodaran", "fred"],
   },
   fees: {
+    method:
+      "Fee, tax, and inflation drag are arithmetic on your inputs, run in the browser. The real-world anchors are ICI's industry expense-ratio series, hidden 12b-1 and load figures computed from CRSP mutual-fund records, the CPI series for inflation, and actual daily US market returns (Fama–French, 1990–present) for the volatility-drag tab.",
     studies: ["sharpe1991", "malkiel1973", "dammonSpattZhang2004", "dicksonShoven1995"],
     datasets: ["ici", "fred", "crspMf", "french"],
   },
   "rent-vs-buy": {
+    method:
+      "A live comparison computed from the numbers you enter. Its defaults and its uncertainty figures come from real series via FRED — the 30-year mortgage rate and the S&P/Case-Shiller US National Home Price Index, which also supply the worst historical drawdown and the rolling-return range.",
     studies: [],
     datasets: ["fred"],
   },
   diversification: {
+    method:
+      "Mostly deliberate simulation: the waves, shifting-correlation, and messy-reality tabs generate synthetic return series so the mechanism is visible without real-world noise, and the index-weighting tab is an invented five-stock market. Only “How top-heavy is the market?” uses real data — S&P 500 constituent weights and concentration derived from CRSP records, 1928–present.",
     studies: ["markowitz1952", "samuelson1965"],
     datasets: ["damodaran", "crspSp500"],
   },
   "stock-picking": {
+    method:
+      "Two halves. The diversification curve and the lifetime-return distribution behind “why a few win” are computed from real CRSP US common-stock records and shipped as aggregate tables. The fair-price and options tabs use no market data at all: they are a textbook two-stage DCF and the Black–Scholes formula, evaluated live on assumptions you choose.",
     studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987", "bessembinder2018", "bessembinder2023", "black1973", "merton1973"],
     datasets: ["crsp"],
   },
   portfolio: {
+    method:
+      "The frontier and allocation maths run live in your browser. Asset risk, return, and correlation inputs are estimated from long-run historical series (Damodaran, Fama–French, Shiller); the stock/bond and rebalancing tabs replay real annual US returns since 1928; and the bond tab uses Treasury yield data from FRED.",
     studies: ["markowitz1952", "tobin1958", "sharpe1966", "peroldSharpe1988"],
     datasets: ["damodaran", "fred"],
   },
   factors: {
+    method:
+      "Nothing here is assumed — every plotted figure is estimated from real data: asset-class risk and return from long-run historical series, the security market line from realised betas and returns, and the size, value, profitability, and investment premia from the Fama–French factor library. Your sliders re-run the models against those estimates in the browser.",
     studies: [
       "treynor1962",
       "sharpe1964",
@@ -774,6 +805,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["french", "aqr", "pastorStambaugh"],
   },
   "beat-the-market": {
+    method:
+      "Mixed by design. The “predict the next move” game is synthetic — real charts shown against generated random walks. The rest is real: missing-the-best-days uses actual daily US market returns (Fama–French, 1990–present), lump-sum-vs-averaging uses Shiller's monthly series, the active-fund scorecard combines SPIVA with CRSP survivorship records, and closet indexing uses CRSP and Thomson holdings data.",
     studies: [
       "samuelson1965",
       "fama1970",
@@ -792,22 +825,26 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["french", "shiller", "spiva", "petajisto", "crspMf", "thomsonS12", "crspSp500"],
   },
   retirement: {
+    method:
+      "A live simulator driven by the spending, portfolio, and horizon you set. The stress test resamples real annual US stock, bond, and inflation returns (Damodaran, 1928–present) in five-year blocks to build 1,500 alternate retirements; “Same returns, shuffled” replays one real historical window in different orders.",
     studies: ["bengen1994", "cooley1998", "guytonKlinger2006"],
     datasets: ["damodaran", "shiller"],
   },
   "retirement-accounts": {
+    method:
+      "Benefit calculations use the Social Security Administration's own published data — the national wage index, PIA bend points, COLAs, and the period life table — and reproduce the SSA's published worked examples exactly. The Roth and harvest-or-convert tabs run current IRS parameters (brackets, deductions, credit thresholds) against the figures you enter.",
     studies: ["shovenSlavov2014"],
     datasets: ["ssa", "irsPub915", "cmsIrmaa"],
   },
-  options: {
-    studies: ["black1973", "merton1973"],
-    datasets: [],
-  },
   "risk-tolerance": {
+    method:
+      "The questionnaire scoring is our own rubric — a teaching device, not a validated psychometric instrument. The portfolio consequences it shows you are real, though: the best and worst years and the typical range are computed from actual annual US returns since 1928.",
     studies: ["markowitz1952"],
     datasets: ["damodaran"],
   },
   "behavioral-finance": {
+    method:
+      "The behaviour-gap simulation runs on real daily US market returns (Fama–French, 1990–present), and the fund-level gaps are computed from CRSP mutual-fund records. In the arcade, “real or random” shows genuine market history against volatility-matched coin flips, and the quiz answers are computed from the historical return data rather than written by hand; the vignettes are adapted from the published experiments cited above.",
     studies: [
       "kahnemanTversky1979", "barberOdean2000", "morningstarMindTheGap2026",
       "tverskyKahneman1974", "tverskyKahneman1981", "shefrinStatman1985",
@@ -817,10 +854,14 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     datasets: ["french", "crspMf", "damodaran"],
   },
   "next-dollar": {
+    method:
+      "The priority ladder is editorial judgement about ordering, not a calculation. The marginal-rate tab is a deliberately simplified federal tax engine run live on your inputs, using current IRS revenue-procedure parameters — brackets, standard deduction, capital-gains thresholds, EIC and child-credit tables, saver's-credit tiers — plus CMS's Medicare IRMAA tiers.",
     studies: [],
     datasets: ["bogleheads", "irsRevProc"],
   },
   global: {
+    method:
+      "Home-market weights come from published global market-capitalisation shares, and the US-vs-world cycle uses regional equity returns from the Fama–French regional factor files. The currency-hedging tab is a model: it illustrates the mechanics on assumptions you set rather than replaying any particular currency's history.",
     studies: ["frenchPoterba1991", "peroldSchulman1988"],
     datasets: ["ftseGlobalAllCap", "vanguardVT", "french"],
   },

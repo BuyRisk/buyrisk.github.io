@@ -21,14 +21,17 @@ interface Props {
   intro?: string;
   /** Group studies by category with sub-headings (used on the About page). */
   grouped?: boolean;
+  /** Override the tool's method note; omit to use the one in TOOL_SOURCES. */
+  method?: string;
 }
 
-const { tool, studies, datasets, title, intro, grouped = false } = Astro.props;
+const { tool, studies, datasets, title, intro, grouped = false, method } = Astro.props;
 
 const src = tool ? TOOL_SOURCES[tool] : undefined;
 const studyIds = studies ?? src?.studies ?? [];
 const datasetIds = datasets ?? src?.datasets ?? [];
 
+const methodNote = method ?? src?.method;
 const studyList = studyIds.map((id) => STUDIES[id]).filter(Boolean) as Study[];
 const dataList = datasetIds.map((id) => DATASETS[id]).filter(Boolean);
 
@@ -42,7 +45,7 @@ const groups: { category: StudyCategory; items: Study[] }[] = grouped
 
 const heading = title ?? "Sources & further reading";
 const showResearchLabel = !grouped && dataList.length > 0;
-const hasContent = studyList.length > 0 || dataList.length > 0;
+const hasContent = studyList.length > 0 || dataList.length > 0 || !!methodNote;
 
 /** True if a title already ends in terminal punctuation (avoid doubling it). */
 const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
@@ -53,6 +56,13 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
     <section class="container sources">
       <h2 id={grouped ? "research" : undefined}>{heading}</h2>
       {intro && <p class="src-intro">{intro}</p>}
+
+      {methodNote && (
+        <div class="src-method">
+          <h3>How this tool was made</h3>
+          <p>{methodNote}</p>
+        </div>
+      )}
 
       {studyList.length > 0 &&
         groups.map((g) => (
@@ -115,8 +125,9 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
       )}
 
       <p class="src-foot">
-        Educational use only, not financial advice. Figures are calculated from
-        the sources above; each tool's own notes describe its method.
+        Educational use only, not financial advice. Every figure traces back to
+        the sources above or to the inputs you set — the{" "}
+        <a href="/about#built">full method and the source code</a> are public.
       </p>
     </section>
   )
@@ -173,6 +184,31 @@ const endsPunct = (t: string) => /[.?!]$/.test(t.trim());
   }
   .src-note {
     color: var(--color-muted);
+  }
+  /* Per-tool provenance note: says plainly how the tool is built and which of
+     the linked sources actually feed it (including "none, this is a model"). */
+  .src-method {
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-left: 3px solid var(--color-accent);
+    background: var(--color-surface-alt);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .src-method h3 {
+    /* Match the sibling "Research" / "Data" headings, which are scoped to
+       .src-block and so do not reach in here. */
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 0.25rem;
+  }
+  .src-method p {
+    margin: 0;
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--color-text-soft);
+    max-width: var(--measure);
   }
   .src-foot {
     font-size: var(--step--1);

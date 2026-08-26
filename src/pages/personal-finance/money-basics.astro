@@ -5,6 +5,7 @@
 // Old URLs redirect here with a #tab hash (see astro.config.mjs).
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import MoneyBasicsModule from "../../components/MoneyBasicsModule.tsx";
+import Sources from "../../components/Sources.astro";
 import "../../styles/simtool.css";
 ---
 
@@ -72,6 +73,8 @@ import "../../styles/simtool.css";
       </p>
     </div>
   </section>
+
+  <Sources tool="money-basics" />
 
   <section class="container pf-related">
     <h2 class="pf-related-heading">Keep exploring</h2>
