@@ -71,12 +71,22 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
   const pad = { top: 16, right: 92, bottom: 26, left: 14 };
   const plotW = W - pad.left - pad.right;
   const plotH = H - pad.top - pad.bottom;
-  const k = Math.log(1 + mu) / 12; // monthly log drift from the ladder fit
   const sm = risk / Math.sqrt(12); // monthly volatility
+  /**
+   * Volatility drag. The ladder fit gives an ARITHMETIC average return, but a
+   * decade compounds, and compounding is driven by the log return — whose mean
+   * is lower by σ²/2. Subtracting it here makes the dashed center line the
+   * TYPICAL (median) decade and (1+mu)^10 the true average, instead of drawing
+   * the average and calling it typical. At cash-like risk the correction is
+   * invisible; at the top of the ladder it halves the typical ending, which is
+   * the honest other half of "more risk pays more."
+   */
+  const k = (Math.log(1 + mu) - (risk * risk) / 2) / 12; // monthly MEDIAN log drift
+  const drag = (sm * sm) / 2; // monthly gap between the average and the typical path
 
   // Fixed log-scale domain sized to the TOP of the ladder, so amplitude
   // changes stay visible instead of being renormalized away.
-  const yMin = -0.3, yMax = 2.95;
+  const yMin = -0.8, yMax = 2.4;
   const x = (m: number) => pad.left + (m / RIDE_MONTHS) * plotW;
   const y = (logW: number) => pad.top + plotH - ((Math.min(Math.max(logW, yMin), yMax) - yMin) / (yMax - yMin)) * plotH;
 
@@ -85,6 +95,29 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
   const months = Array.from({ length: RIDE_MONTHS + 1 }, (_, m) => m);
   const trendEnd = k * RIDE_MONTHS;
   const bandEnd = sm * Math.sqrt(RIDE_MONTHS);
+  const meanEnd = trendEnd + drag * RIDE_MONTHS; // === log(1 + mu) * 10
+  /**
+   * The average line fades in only once it has visibly separated from the
+   * typical one. Below ~20% volatility the two are within a few pixels, where a
+   * second label would be noise; a continuous fade avoids popping mid-drag.
+   */
+  const gapPx = drag * RIDE_MONTHS * (plotH / (yMax - yMin));
+  const meanFade = Math.max(0, Math.min(1, (gapPx - 7) / 9));
+
+  /**
+   * Label de-collision. At cash-like risk the three endings land within ~6px of
+   * each other — the correct *picture* (the endings agree) but unreadable text.
+   * Push each label away from the bold "typical" anchor to a legible gap,
+   * preserving order; at higher risk the real spacing already exceeds it and
+   * nothing moves.
+   */
+  const MIN_GAP = 12;
+  const away = (target: number, prev: number, dir: -1 | 1) =>
+    dir < 0 ? Math.min(target, prev - MIN_GAP) : Math.max(target, prev + MIN_GAP);
+  const yTypical = y(trendEnd);
+  const yAverage = away(y(meanEnd), yTypical, -1);
+  const yLucky = away(y(trendEnd + bandEnd), meanFade > 0 ? yAverage : yTypical, -1);
+  const yUnlucky = away(y(trendEnd - bandEnd), yTypical, 1);
   const cone =
     months.map((m) => `${x(m).toFixed(1)},${y(k * m + sm * Math.sqrt(m)).toFixed(1)}`).join(" ") +
     " " +
@@ -93,19 +126,29 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
   return (
     <div className="hrr-ride">
       <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }} role="img"
-        aria-label="Ten simulated years at the chosen risk level: the same sequence of luck, scaled to the chosen volatility, inside the one-standard-deviation cone of outcomes.">
+        aria-label="Ten simulated years at the chosen risk level: the same sequence of luck, scaled to the chosen volatility, inside the one-standard-deviation cone of outcomes. At higher volatility a second line separates, showing the average ending pulling above the typical one.">
         <polygon points={cone} fill="var(--color-accent)" opacity={0.13} />
         <path d={linePath(months, (m) => x(m), (m) => y(k * m))}
           fill="none" stroke="var(--color-text-soft)" strokeWidth={1.3} strokeDasharray="5 4" />
         <path d={linePath(months, (m) => x(m), (m) => y(path[m]))}
           fill="none" stroke="var(--color-warn)" strokeWidth={2} strokeLinejoin="round" />
-        <text x={x(RIDE_MONTHS) + 8} y={y(trendEnd + bandEnd) + 4} style={{ ...axisText, fill: "var(--color-muted)" }}>
+        {/* The average curve, pulling away from the typical one as risk rises. */}
+        {meanFade > 0 && (
+          <g opacity={meanFade}>
+            <path d={linePath(months, (m) => x(m), (m) => y(k * m + drag * m))}
+              fill="none" stroke="var(--color-text-soft)" strokeWidth={1.1} strokeDasharray="2 3" />
+            <text x={x(RIDE_MONTHS) + 8} y={yAverage + 4} style={{ ...axisText, fill: "var(--color-text-soft)" }}>
+              {mult(meanEnd)} average
+            </text>
+          </g>
+        )}
+        <text x={x(RIDE_MONTHS) + 8} y={yLucky + 4} style={{ ...axisText, fill: "var(--color-muted)" }}>
           {mult(trendEnd + bandEnd)} lucky
         </text>
-        <text x={x(RIDE_MONTHS) + 8} y={y(trendEnd) + 4} style={{ ...axisText, fontWeight: 700, fill: "var(--color-text)" }}>
-          {mult(trendEnd)} average
+        <text x={x(RIDE_MONTHS) + 8} y={yTypical + 4} style={{ ...axisText, fontWeight: 700, fill: "var(--color-text)" }}>
+          {mult(trendEnd)} typical
         </text>
-        <text x={x(RIDE_MONTHS) + 8} y={y(trendEnd - bandEnd) + 4} style={{ ...axisText, fill: "var(--color-muted)" }}>
+        <text x={x(RIDE_MONTHS) + 8} y={yUnlucky + 4} style={{ ...axisText, fill: "var(--color-muted)" }}>
           {mult(trendEnd - bandEnd)} unlucky
         </text>
         <text x={pad.left} y={H - 6} style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}>
@@ -116,7 +159,9 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
         Same sequence of luck at every setting — only your exposure to it changes. The solid line is
         one possible decade; the cone is the ±1σ range of destinations. Where the cone is a thread,
         the ride is smooth and the endings agree. Where it's a funnel, the slope is real but so is
-        the spread — an illustration, not a forecast.
+        the spread. Push the slider up and a second line splits off: volatility drags the{" "}
+        <strong>typical</strong> decade below the <strong>average</strong> one, because a big loss
+        needs a bigger gain to undo it. Both are true at once — an illustration, not a forecast.
       </p>
     </div>
   );
