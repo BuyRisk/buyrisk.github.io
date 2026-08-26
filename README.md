@@ -20,10 +20,9 @@ and take priority over new features: **buyriskHQ@gmail.com**.
 ## How it's written
 
 The tools and much of the writing are produced with heavy use of AI
-assistance, directed, reviewed, and verified by a human. On a project that
-asks readers to trust its numbers that seems worth stating plainly — and it is
-why the verification below exists and why this source is public. The claim
-isn't "trust us", it's "check us".
+assistance, directed, reviewed, and verified by a human. That is why the
+verification below exists and why this source is public. The claim isn't
+"trust us", it's "check us".
 
 ## Stack
 
