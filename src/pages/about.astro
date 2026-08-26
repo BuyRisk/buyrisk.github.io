@@ -52,6 +52,51 @@ const allDatasetIds = Object.keys(DATASETS);
         </li>
       </ul>
 
+      <h2 id="built">How this site is built</h2>
+      <p>
+        Buy Risk is a living project, not a finished textbook. Tools are added and
+        revised often, and the newest ones have had the least wear. If you're
+        citing or teaching from something here, it's worth confirming it still
+        says what you expect it to.
+      </p>
+      <p>
+        <strong>Where the numbers come from.</strong> Every simulation runs on real
+        data rather than invented figures: long-run US returns from Aswath
+        Damodaran, daily market and factor returns from the Kenneth French data
+        library, valuations from Robert Shiller, fund data from CRSP, benefit
+        formulas and life tables from the Social Security Administration, and tax
+        parameters from the IRS revenue procedures. Each source is turned into the
+        figures the site needs by a script kept in the repository, so any number
+        here traces back to a published dataset. Licensed data is used under
+        licence, and only derived aggregates are ever published.
+      </p>
+      <p>
+        <strong>How the calculations are checked.</strong> Wherever an authoritative
+        reference exists, the engines are tested against it. The Social Security
+        calculator reproduces the SSA's own published benefit examples to the dime.
+        The federal tax engine is checked against hand-computed cases and
+        cross-examined against an independent spreadsheet implementation of the
+        same law. Those tests live in the repository and are run before changes
+        ship. The simpler illustrative tools are ordinary arithmetic you can read
+        for yourself.
+      </p>
+      <p>
+        <strong>How it's written.</strong> The tools and much of the writing here are
+        produced with heavy use of AI assistance, directed, reviewed, and verified
+        by a human. On a site that asks you to trust its numbers, that seems worth
+        stating plainly rather than leaving you to wonder. It's also why the checks
+        above exist, and why the <a
+          href="https://github.com/BuyRisk/buyrisk.github.io"
+          target="_blank"
+          rel="noopener noreferrer">full source is public</a>: the claim isn't
+        "trust us," it's "check us."
+      </p>
+      <p>
+        <strong>Found a mistake?</strong> Please tell us. Corrections take priority
+        over new features, and if you're using this in a classroom we'd genuinely
+        like to know: <a href="mailto:buyriskHQ@gmail.com">buyriskHQ@gmail.com</a>.
+      </p>
+
       <h2>An important note</h2>
       <p>
         Everything on Buy Risk is educational. It is not personalized financial

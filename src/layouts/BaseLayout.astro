@@ -55,6 +55,8 @@ const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
     <Header />
     <p class="site-disclaimer">
       Educational content only — not financial, tax, or investment advice.
+      <span class="site-disclaimer-sep" aria-hidden="true">·</span>
+      <a href="/about#built">In active development — how it's built and checked</a>
     </p>
     <main id="main">
       <slot />
@@ -64,7 +66,10 @@ const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
     <style>
       /* Persistent, site-wide disclaimer: sits directly under the header on
          every page so the framing is visible above the fold, not only in the
-         footer. Deliberately quiet — informative, not a nag bar. */
+         footer. Deliberately quiet — informative, not a nag bar. Carries the
+         development-status note too, pointing at the About page's methods and
+         verification section, so a reader (or an instructor citing a tool)
+         can see how the numbers are produced before relying on them. */
       .site-disclaimer {
         margin: 0;
         padding: 0.3rem 1rem;
@@ -74,6 +79,20 @@ const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
         font-family: var(--font-sans);
         font-size: var(--step--1);
         text-align: center;
+        text-wrap: balance;
+      }
+      .site-disclaimer-sep {
+        margin-inline: 0.35rem;
+        opacity: 0.5;
+      }
+      .site-disclaimer a {
+        color: inherit;
+        text-decoration-color: var(--color-border);
+        text-underline-offset: 0.15em;
+      }
+      .site-disclaimer a:hover {
+        color: var(--color-accent);
+        text-decoration-color: currentColor;
       }
       .skip-link {
         position: absolute;
