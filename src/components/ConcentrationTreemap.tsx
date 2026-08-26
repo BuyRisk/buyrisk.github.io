@@ -183,7 +183,7 @@ export default function ConcentrationTreemap({
         <strong>{pct0(top10)}</strong> of the index
         {effN !== undefined && <> — so its {snap.n} stocks behaved like about <strong>{Math.round(effN)}</strong> equally-weighted ones</>}.
         {hover && hover !== "Other 470+" && <> Hovering <strong>{hover}</strong>.</>} Each tile is a stock, sized by its
-        share of the whole index; the grey tile is every stock outside the top 30. Hit <em>play</em> to watch the giants
+        share of the whole index; the gray tile is every stock outside the top 30. Hit <em>play</em> to watch the giants
         swell through the 1950s peak, the long broadening, and the recent Magnificent-Seven surge. (Early decades show
         each company's most recent ticker — 1950's "XOM" is Standard Oil of New Jersey, the company that became Exxon.)
       </p>

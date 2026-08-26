@@ -1011,7 +1011,7 @@ function OrderChart({ sim, portfolio, horizon }: { sim: OrderSim; portfolio: num
         <text key={yr} x={x(yr)} y={height - pad.bottom + 16} textAnchor="middle" style={axisText}>year {yr}</text>
       ))}
       <text x={pad.left + plotW / 2} y={height - 4} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        solid = as history happened · dashed blue = best years first · dashed red = worst years first · grey = 40 shuffles
+        solid = as history happened · dashed blue = best years first · dashed red = worst years first · gray = 40 shuffles
       </text>
     </svg>
   );

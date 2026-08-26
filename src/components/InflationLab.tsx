@@ -83,7 +83,7 @@ export default function InflationLab() {
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
           Overall prices rose about <strong>{(view.annualized * 100).toFixed(1)}%</strong> a
           year since {startYear}, but the average hides enormous spread. <strong>Method:</strong> the official
-          category price indexes, plotted directly and rebased to your chosen year (no modelling). Data: US
+          category price indexes, plotted directly and rebased to your chosen year (no modeling). Data: US
           BLS consumer price indexes via FRED.
         </p>
       </div>

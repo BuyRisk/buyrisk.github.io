@@ -735,7 +735,7 @@ export interface ToolSources {
    * sources actually feed it — including when the answer is "none, this is a
    * model". Rendered by <Sources> above the reference lists. Keep it concrete
    * and honest: name the real series, and say plainly when something is
-   * synthetic, illustrative, or an editorial judgement rather than a
+   * synthetic, illustrative, or an editorial judgment rather than a
    * calculation.
    */
   method?: string;
@@ -783,13 +783,13 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   portfolio: {
     method:
-      "The frontier and allocation maths run live in your browser. Asset risk, return, and correlation inputs are estimated from long-run historical series (Damodaran, Fama–French, Shiller); the stock/bond and rebalancing tabs replay real annual US returns since 1928; and the bond tab uses Treasury yield data from FRED.",
+      "The frontier and allocation math runs live in your browser. Asset risk, return, and correlation inputs are estimated from long-run historical series (Damodaran, Fama–French, Shiller); the stock/bond and rebalancing tabs replay real annual US returns since 1928; and the bond tab uses Treasury yield data from FRED.",
     studies: ["markowitz1952", "tobin1958", "sharpe1966", "peroldSharpe1988"],
     datasets: ["damodaran", "fred"],
   },
   factors: {
     method:
-      "Nothing here is assumed — every plotted figure is estimated from real data: asset-class risk and return from long-run historical series, the security market line from realised betas and returns, and the size, value, profitability, and investment premia from the Fama–French factor library. Your sliders re-run the models against those estimates in the browser.",
+      "Nothing here is assumed — every plotted figure is estimated from real data: asset-class risk and return from long-run historical series, the security market line from realized betas and returns, and the size, value, profitability, and investment premia from the Fama–French factor library. Your sliders re-run the models against those estimates in the browser.",
     studies: [
       "treynor1962",
       "sharpe1964",
@@ -844,7 +844,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "behavioral-finance": {
     method:
-      "The behaviour-gap simulation runs on real daily US market returns (Fama–French, 1990–present), and the fund-level gaps are computed from CRSP mutual-fund records. In the arcade, “real or random” shows genuine market history against volatility-matched coin flips, and the quiz answers are computed from the historical return data rather than written by hand; the vignettes are adapted from the published experiments cited above.",
+      "The behavior-gap simulation runs on real daily US market returns (Fama–French, 1990–present), and the fund-level gaps are computed from CRSP mutual-fund records. In the arcade, “real or random” shows genuine market history against volatility-matched coin flips, and the quiz answers are computed from the historical return data rather than written by hand; the vignettes are adapted from the published experiments cited above.",
     studies: [
       "kahnemanTversky1979", "barberOdean2000", "morningstarMindTheGap2026",
       "tverskyKahneman1974", "tverskyKahneman1981", "shefrinStatman1985",
@@ -855,13 +855,13 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "next-dollar": {
     method:
-      "The priority ladder is editorial judgement about ordering, not a calculation. The marginal-rate tab is a deliberately simplified federal tax engine run live on your inputs, using current IRS revenue-procedure parameters — brackets, standard deduction, capital-gains thresholds, EIC and child-credit tables, saver's-credit tiers — plus CMS's Medicare IRMAA tiers.",
+      "The priority ladder is editorial judgment about ordering, not a calculation. The marginal-rate tab is a deliberately simplified federal tax engine run live on your inputs, using current IRS revenue-procedure parameters — brackets, standard deduction, capital-gains thresholds, EIC and child-credit tables, saver's-credit tiers — plus CMS's Medicare IRMAA tiers.",
     studies: [],
     datasets: ["bogleheads", "irsRevProc"],
   },
   global: {
     method:
-      "Home-market weights come from published global market-capitalisation shares, and the US-vs-world cycle uses regional equity returns from the Fama–French regional factor files. The currency-hedging tab is a model: it illustrates the mechanics on assumptions you set rather than replaying any particular currency's history.",
+      "Home-market weights come from published global market-capitalization shares, and the US-vs-world cycle uses regional equity returns from the Fama–French regional factor files. The currency-hedging tab is a model: it illustrates the mechanics on assumptions you set rather than replaying any particular currency's history.",
     studies: ["frenchPoterba1991", "peroldSchulman1988"],
     datasets: ["ftseGlobalAllCap", "vanguardVT", "french"],
   },

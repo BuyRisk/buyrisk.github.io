@@ -183,7 +183,7 @@ export default function SpivaLab() {
             These are professional, full-time managers. The longer the clock runs, the more of
             them fall behind a simple index: the core reason low-cost index funds are so hard
             to beat. <strong>Method:</strong> the reported failure rates, transcribed directly (1–20-year
-            horizons); 30-year and beyond are extrapolated, and always labelled as such. Data: S&P Dow Jones
+            horizons); 30-year and beyond are extrapolated, and always labeled as such. Data: S&P Dow Jones
             Indices SPIVA U.S. Scorecard, {spiva.asOf}.
           </p>
         )}

@@ -5,7 +5,7 @@ Plain-language, evidence-based investing education with interactive tools —
 
 The name is the thesis: every real investment return is compensation for
 bearing risk. The site teaches the durable, well-supported findings of finance
-(risk and return, compounding, diversification, fees, inflation, behaviour) in
+(risk and return, compounding, diversification, fees, inflation, behavior) in
 plain language, paired with tools that let a reader manipulate the variables
 themselves. Everything is educational only — never personalised financial
 advice.
@@ -50,7 +50,7 @@ published dataset.
 | Aswath Damodaran (NYU Stern) | long-run US stock/bond/bill returns and inflation |
 | Kenneth R. French data library | daily market returns, factor premia |
 | Robert Shiller | CAPE, long monthly series |
-| CRSP (licensed) | fund survivorship, fees, concentration, behaviour gap |
+| CRSP (licensed) | fund survivorship, fees, concentration, behavior gap |
 | Thomson/Refinitiv s12 (licensed) | fund holdings overlap |
 | SSA, IRS, FRED, ICI, SPIVA | benefit formulas, tax parameters, yields, fees |
 
@@ -85,7 +85,7 @@ node scripts/verify-tax-engine.mjs   # hand-computed cases + continuity fuzz
 - **Written content** (prose, blog posts, tool copy) — © Buy Risk, all rights
   reserved for now; ask if you'd like to reuse it.
 - **Data** — third-party data retains its provider's terms and is *not*
-  relicensed here. Licensed sources (CRSP, Thomson) are used under licence and
+  relicensed here. Licensed sources (CRSP, Thomson) are used under license and
   only ever appear as derived aggregates, never as redistributable raw records;
   see `data/sources/crsp/README.md` for the firewall this project follows.
 
