@@ -189,6 +189,10 @@ const paths = [
   .demo-card {
     padding: var(--space-md);
   }
+  /* The ride inset spans the full card width under the chart+controls row. */
+  .demo-card :global(.hrr-ride) {
+    grid-column: 1 / -1;
+  }
   /* Chart left, control + readout right; stacks on narrow screens. */
   .demo-card :global(.hrr) {
     display: grid;

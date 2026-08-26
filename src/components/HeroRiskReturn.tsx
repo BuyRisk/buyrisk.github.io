@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { assetStats } from "../data/generated/asset-stats";
-import { axisText } from "../lib/chart";
+import { axisText, linePath } from "../lib/chart";
+import { mulberry32 } from "../lib/portfolio";
 
 /**
  * The homepage's five-second demo: the site's entire thesis in one control.
@@ -41,6 +42,85 @@ const FIT = (() => {
 })();
 
 const LO = 0.03, HI = 0.38; // spans cash → small-cap value, the real ladder
+
+/**
+ * The ride inset: ten simulated years at the chosen setting. One FIXED
+ * sequence of monthly luck (seeded standard normals via Box–Muller), so
+ * dragging the slider morphs the SAME decade — drift comes from the ladder
+ * fit, roughness from the chosen volatility. Deliberately a random path, not
+ * a periodic wave: markets don't oscillate on a schedule, and a rhythmic
+ * curve would imply the timeable cycles the Bias Arcade exists to debunk.
+ * Around it, the ±1σ cone of ten-year outcomes: a thread at cash-like risk,
+ * a funnel at the top of the ladder.
+ */
+const RIDE_MONTHS = 120;
+const RIDE_Z: number[] = (() => {
+  const rng = mulberry32(105); // seed chosen for a typical decade: mid-path slump, on-trend finish
+  const z: number[] = [];
+  while (z.length < RIDE_MONTHS) {
+    const u = Math.max(rng(), 1e-9), v = rng();
+    const r = Math.sqrt(-2 * Math.log(u));
+    z.push(r * Math.cos(2 * Math.PI * v), r * Math.sin(2 * Math.PI * v));
+  }
+  return z.slice(0, RIDE_MONTHS);
+})();
+const mult = (logW: number) => `×${Math.exp(logW) >= 10 ? Math.exp(logW).toFixed(0) : Math.exp(logW).toFixed(1)}`;
+
+function RideInset({ risk, mu }: { risk: number; mu: number }) {
+  const W = 760, H = 190;
+  const pad = { top: 16, right: 92, bottom: 26, left: 14 };
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+  const k = Math.log(1 + mu) / 12; // monthly log drift from the ladder fit
+  const sm = risk / Math.sqrt(12); // monthly volatility
+
+  // Fixed log-scale domain sized to the TOP of the ladder, so amplitude
+  // changes stay visible instead of being renormalized away.
+  const yMin = -0.3, yMax = 2.95;
+  const x = (m: number) => pad.left + (m / RIDE_MONTHS) * plotW;
+  const y = (logW: number) => pad.top + plotH - ((Math.min(Math.max(logW, yMin), yMax) - yMin) / (yMax - yMin)) * plotH;
+
+  let cum = 0;
+  const path = [0, ...RIDE_Z.map((z) => (cum += k + sm * z))];
+  const months = Array.from({ length: RIDE_MONTHS + 1 }, (_, m) => m);
+  const trendEnd = k * RIDE_MONTHS;
+  const bandEnd = sm * Math.sqrt(RIDE_MONTHS);
+  const cone =
+    months.map((m) => `${x(m).toFixed(1)},${y(k * m + sm * Math.sqrt(m)).toFixed(1)}`).join(" ") +
+    " " +
+    [...months].reverse().map((m) => `${x(m).toFixed(1)},${y(k * m - sm * Math.sqrt(m)).toFixed(1)}`).join(" ");
+
+  return (
+    <div className="hrr-ride">
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }} role="img"
+        aria-label="Ten simulated years at the chosen risk level: the same sequence of luck, scaled to the chosen volatility, inside the one-standard-deviation cone of outcomes.">
+        <polygon points={cone} fill="var(--color-accent)" opacity={0.13} />
+        <path d={linePath(months, (m) => x(m), (m) => y(k * m))}
+          fill="none" stroke="var(--color-text-soft)" strokeWidth={1.3} strokeDasharray="5 4" />
+        <path d={linePath(months, (m) => x(m), (m) => y(path[m]))}
+          fill="none" stroke="var(--color-warn)" strokeWidth={2} strokeLinejoin="round" />
+        <text x={x(RIDE_MONTHS) + 8} y={y(trendEnd + bandEnd) + 4} style={{ ...axisText, fill: "var(--color-muted)" }}>
+          {mult(trendEnd + bandEnd)} lucky
+        </text>
+        <text x={x(RIDE_MONTHS) + 8} y={y(trendEnd) + 4} style={{ ...axisText, fontWeight: 700, fill: "var(--color-text)" }}>
+          {mult(trendEnd)} average
+        </text>
+        <text x={x(RIDE_MONTHS) + 8} y={y(trendEnd - bandEnd) + 4} style={{ ...axisText, fill: "var(--color-muted)" }}>
+          {mult(trendEnd - bandEnd)} unlucky
+        </text>
+        <text x={pad.left} y={H - 6} style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}>
+          The ride behind that average: ten simulated years of $1 at your setting →
+        </text>
+      </svg>
+      <p className="hrr-note">
+        Same sequence of luck at every setting — only your exposure to it changes. The solid line is
+        one possible decade; the cone is the ±1σ range of destinations. Where the cone is a thread,
+        the ride is smooth and the endings agree. Where it's a funnel, the slope is real but so is
+        the spread — an illustration, not a forecast.
+      </p>
+    </div>
+  );
+}
 const pct = (x: number, dp = 0) => `${(x * 100).toFixed(dp)}%`;
 const SPAN = `${assetStats.span[0]}–${assetStats.span[1]}`;
 
@@ -126,6 +206,8 @@ export default function HeroRiskReturn() {
           <a href="/tools/factors">Open the full tool →</a>
         </p>
       </div>
+
+      <RideInset risk={risk} mu={expected} />
     </div>
   );
 }
