@@ -111,13 +111,19 @@ export default function HeroRiskReturn() {
             aria-label="Risk level" onChange={(e) => setRisk(+e.target.value)} />
         </label>
         <p className="hrr-readout">
-          History paid about <strong>{pct(expected, 1)}/yr</strong> for that much risk.
+          Over {SPAN}, that much risk averaged about{" "}
+          <strong>{pct(expected, 1)}/yr</strong> — through single years anywhere
+          from about <strong>{pct(expected - 2 * risk, 0)}</strong> to{" "}
+          <strong>+{pct(expected + 2 * risk, 0)}</strong>.
         </p>
         <p className="hrr-note">
           Real US asset classes, {SPAN}. Volatility is the <strong>standard
-          deviation</strong> of annual returns; return is their average. That
-          upward slope is the whole idea: returns are compensation for bearing
-          risk. <a href="/tools/factors">Open the full tool →</a>
+          deviation</strong> of annual returns; return is their average, and the
+          range above is the ride that average hides — the slope only pays if
+          you can sit through the left end of it. One more honesty note: this is
+          the US, the century's best-performing major market, so treat these as
+          upper bounds, <a href="/tools/global#us-vs-world">not entitlements</a>.{" "}
+          <a href="/tools/factors">Open the full tool →</a>
         </p>
       </div>
     </div>

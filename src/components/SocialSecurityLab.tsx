@@ -15,7 +15,7 @@ import {
   type CoupleResult,
   type WidowResult,
 } from "../lib/socialSecurity";
-import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
+import { formatUsd } from "../lib/currency";
 import { IRMAA, type FilingStatus } from "../data/tax-irmaa";
 import { estimatePiaToday, TAXABLE_MAX } from "../lib/ssaPia";
 
@@ -27,7 +27,7 @@ import { estimatePiaToday, TAXABLE_MAX } from "../lib/ssaPia";
  * a real filing strategy we point to Open Social Security.
  */
 
-const currency = (n: number) => formatMoney(n);
+const currency = (n: number) => formatUsd(n);
 
 function Segmented<T extends string>({
   label,
@@ -60,7 +60,8 @@ function Segmented<T extends string>({
 }
 
 export default function SocialSecurityLab() {
-  const symbol = currencySymbol(useCurrencyCode()); // re-render + dynamic symbol
+  // Benefits are US-law numbers: always dollars, whatever the header picker says.
+  const symbol = "$";
   const [mode, setMode] = useState<"single" | "couple" | "widow">("single");
   const [deceasedBenefit, setDeceasedBenefit] = useState(2200);
   // Person A (also "you" in single mode).
@@ -694,7 +695,7 @@ function ValueChart({ result }: { result: OptimizeResult }) {
   const baseY = pad.top + plotH;
   const y = (v: number) => pad.top + plotH - ((v - scale.floor) / (scale.ceil - scale.floor)) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const fmt = (v: number) => formatMoney(v, { compact: true });
+  const fmt = (v: number) => formatUsd(v, { compact: true });
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="Expected lifetime Social Security value by claiming age">

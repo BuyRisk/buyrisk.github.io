@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
-import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { formatUsd } from "../lib/currency";
 
 /**
  * "Roth or Traditional? (+ the employer match)": two of the most consequential,
@@ -19,7 +19,7 @@ import { formatMoney, useCurrencyCode } from "../lib/currency";
  * Educational only, not advice.
  */
 
-const currency = (n: number) => formatMoney(n);
+const currency = (n: number) => formatUsd(n);
 
 type FundType = "index" | "active" | "high";
 /** Typical profiles. Turnover drives how much gain a fund distributes (and taxes)
@@ -60,7 +60,6 @@ function taxableEnding(
 }
 
 export default function RothLab() {
-  useCurrencyCode(); // re-render when the header currency picker changes
   const [mode, setMode] = useState<"account" | "match">("account");
 
   // Roth vs Traditional
@@ -354,7 +353,7 @@ function AccountBars({ traditional, roth, taxable }: { traditional: number; roth
   const bandW = plotW / bars.length;
   const barW = Math.min(150, bandW * 0.5);
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const money = (v: number) => formatMoney(v, { compact: true });
+  const money = (v: number) => formatUsd(v, { compact: true });
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label="After-tax retirement wealth: Traditional, Roth, and Taxable">
       {[0, 0.25, 0.5, 0.75, 1].map((f) => (
@@ -391,7 +390,7 @@ function MatchBars({ yourContrib, employerAdds }: { yourContrib: number; employe
   const maxV = Math.max(total, 1) * 1.12;
   const y = (v: number) => pad.top + plotH - (v / maxV) * plotH;
   const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
-  const money = (v: number) => formatMoney(v);
+  const money = (v: number) => formatUsd(v);
   const cx = pad.left + plotW / 2;
   const barW = 150;
   return (

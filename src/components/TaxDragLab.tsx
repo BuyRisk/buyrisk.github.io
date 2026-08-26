@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
-import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { formatUsd } from "../lib/currency";
 
 /**
  * "The Tax Drag" — a single lump sum, held in a tax-sheltered account vs. a
@@ -16,8 +16,8 @@ import { formatMoney, useCurrencyCode } from "../lib/currency";
  * actually causes it. Educational only, not advice.
  */
 
-const money = (n: number) => formatMoney(n);
-const moneyC = (n: number) => formatMoney(n, { compact: true });
+const money = (n: number) => formatUsd(n);
+const moneyC = (n: number) => formatUsd(n, { compact: true });
 
 type FundType = "index" | "active" | "high";
 const FUNDS: Record<FundType, { label: string; turnover: number; stFrac: number }> = {
@@ -60,7 +60,6 @@ function simulate(P: number, r: number, divY: number, fund: { turnover: number; 
 }
 
 export default function TaxDragLab() {
-  useCurrencyCode();
   const [amount, setAmount] = useState(100_000);
   const [years, setYears] = useState(30);
   const [ret, setRet] = useState(7);

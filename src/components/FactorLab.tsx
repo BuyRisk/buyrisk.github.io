@@ -432,6 +432,10 @@ function BuildView() {
               <strong>factor exposure</strong> you could have targeted on purpose.
               (Because you're inventing this portfolio, there's no <em>t</em>-stat
               here; for measured alpha with a t-stat, use "Explain a portfolio".)
+              And one caution before any of these premia become a plan: they've
+              run materially smaller since the papers naming them were published,
+              and the long series is the US — the century's luckiest major
+              market. Historical premia are upper bounds, not entitlements.
             </p>
           </div>
 

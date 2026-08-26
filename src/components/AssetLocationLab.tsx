@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
-import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { formatUsd } from "../lib/currency";
 
 /**
  * "Asset Location" — same portfolio, same total tax rates, but WHERE you hold
@@ -18,8 +18,8 @@ import { formatMoney, useCurrencyCode } from "../lib/currency";
  * Educational only, not advice.
  */
 
-const money = (n: number) => formatMoney(n);
-const moneyC = (n: number) => formatMoney(n, { compact: true });
+const money = (n: number) => formatUsd(n);
+const moneyC = (n: number) => formatUsd(n, { compact: true });
 
 type Strat = "bonds" | "even" | "stocks";
 const STRATS: { key: Strat; label: string; short: string; color: string }[] = [
@@ -46,7 +46,6 @@ const taxableBond = (amt: number, r: number, ord: number, n: number) => amt * (1
 type ShelterType = "traditional" | "roth";
 
 export default function AssetLocationLab() {
-  useCurrencyCode();
   const [shelterType, setShelterType] = useState<ShelterType>("traditional");
   const [total, setTotal] = useState(400_000);
   const [stockPct, setStockPct] = useState(60);

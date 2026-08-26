@@ -79,6 +79,23 @@ export function formatMoney(n: number, opts: { compact?: boolean } = {}): string
   });
 }
 
+/**
+ * Format in US dollars regardless of the header picker. For tools whose
+ * numbers are creatures of US law — SSA benefits, IRS brackets and credits,
+ * US account types — showing them in £ or € would imply the framework
+ * transfers across borders. It doesn't; those labs pin to $.
+ */
+export function formatUsd(n: number, opts: { compact?: boolean } = {}): string {
+  const abs = Math.abs(n);
+  const notation = abs >= 1e15 ? "scientific" : opts.compact || abs >= 1e9 ? "compact" : "standard";
+  return n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation,
+    maximumFractionDigits: notation === "standard" ? 0 : 1,
+  });
+}
+
 function subscribe(cb: () => void): () => void {
   if (typeof window === "undefined") return () => {};
   window.addEventListener(EVENT, cb);

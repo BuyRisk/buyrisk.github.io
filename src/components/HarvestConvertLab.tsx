@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { federalTax, TAX_YEARS, type FilingStatus, type Household } from "../lib/usTax";
-import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { formatUsd } from "../lib/currency";
 
 /**
  * Tax-gain harvesting vs Roth conversion: two good uses for the same cheap
@@ -24,7 +24,7 @@ import { formatMoney, useCurrencyCode } from "../lib/currency";
  * Next Dollar tool. Educational only, never tax advice.
  */
 
-const currency = (n: number) => formatMoney(n);
+const currency = (n: number) => formatUsd(n);
 const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
 
 const STEP = 250;
@@ -40,7 +40,6 @@ interface Tranche {
 }
 
 export default function HarvestConvertLab() {
-  useCurrencyCode();
   const year = TAX_YEARS[TAX_YEARS.length - 1];
   const [status, setStatus] = useState<FilingStatus>("mfj");
   const [age65, setAge65] = useState(0);

@@ -203,6 +203,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Factor models",
     note: "Documents the momentum effect.",
   },
+  mcleanPontiff2016: {
+    authors: "McLean, R. D., & Pontiff, J.",
+    year: 2016,
+    title: "Does Academic Research Destroy Stock Return Predictability?",
+    venue: "The Journal of Finance 71(1): 5–32",
+    kind: "paper",
+    category: "Factor models",
+    note: "Across 97 published predictors, returns run ~26% lower out of sample and ~58% lower after publication — the reason historical factor premia are upper bounds, not entitlements.",
+  },
   carhart1997: {
     authors: "Carhart, M. M.",
     year: 1997,
@@ -789,7 +798,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   factors: {
     method:
-      "Nothing here is assumed — every plotted figure is estimated from real data: asset-class risk and return from long-run historical series, the security market line from realized betas and returns, and the size, value, profitability, and investment premia from the Fama–French factor library. Your sliders re-run the models against those estimates in the browser.",
+      "Nothing here is assumed — every plotted figure is estimated from real data: asset-class risk and return from long-run historical series, the security market line from realized betas and returns, and the size, value, profitability, and investment premia from the Fama–French factor library. Your sliders re-run the models against those estimates in the browser. Two honest caveats on the numbers themselves: premia have run materially smaller since their discovery (McLean–Pontiff), and the long series is US-only — the best-performing major market of the century (Dimson–Marsh–Staunton) — so treat historical premia as upper bounds.",
     studies: [
       "treynor1962",
       "sharpe1964",
@@ -801,6 +810,8 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "famaFrench2015",
       "jegadeeshTitman1993",
       "carhart1997",
+      "mcleanPontiff2016",
+      "dimsonMarshStaunton2002",
     ],
     datasets: ["french", "aqr", "pastorStambaugh"],
   },
@@ -862,7 +873,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   global: {
     method:
       "Home-market weights come from published global market-capitalization shares, and the US-vs-world cycle uses regional equity returns from the Fama–French regional factor files. The currency-hedging tab is a model: it illustrates the mechanics on assumptions you set rather than replaying any particular currency's history.",
-    studies: ["frenchPoterba1991", "peroldSchulman1988"],
+    studies: ["frenchPoterba1991", "peroldSchulman1988", "dimsonMarshStaunton2002"],
     datasets: ["ftseGlobalAllCap", "vanguardVT", "french"],
   },
 };
