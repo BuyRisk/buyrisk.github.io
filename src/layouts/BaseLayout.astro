@@ -21,7 +21,7 @@ const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,18 +34,23 @@ const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
 
-    {/* Apply theme before first paint to avoid a flash of the wrong theme. */}
+    {/*
+      Dark is the site's default: <html> ships with data-theme="dark", so the
+      right theme is painted even before this runs (and still applies if
+      scripting is off). This only needs to honour a *stored* choice from the
+      header toggle. The OS prefers-color-scheme setting is deliberately not
+      consulted — most systems report light, which would override the intended
+      default; readers who want light can toggle, and that choice sticks.
+    */}
     <script is:inline>
       (function () {
         try {
           var stored = localStorage.getItem("buy-risk-theme");
-          var prefersDark = window.matchMedia(
-            "(prefers-color-scheme: dark)"
-          ).matches;
-          var theme = stored || (prefersDark ? "dark" : "light");
-          document.documentElement.setAttribute("data-theme", theme);
+          if (stored === "light" || stored === "dark") {
+            document.documentElement.setAttribute("data-theme", stored);
+          }
         } catch (e) {
-          document.documentElement.setAttribute("data-theme", "light");
+          /* storage blocked — keep the dark default already on <html> */
         }
       })();
     </script>

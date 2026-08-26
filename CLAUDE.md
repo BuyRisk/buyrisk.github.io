@@ -73,10 +73,12 @@ npm run preview  # serve the production build locally
   `BaseLayout`. Use the CSS custom properties (`--color-*`, `--space-*`,
   `--step-*`, `--font-*`) instead of hard-coded values so both themes and the
   fluid type scale keep working.
-- Theming is driven by a `data-theme="light|dark"` attribute on `<html>`. It is
-  set **before first paint** by an inline script in `BaseLayout` (reads
-  `localStorage["buy-risk-theme"]`, falls back to `prefers-color-scheme`) to
-  avoid a flash of the wrong theme. The toggle lives in `ThemeToggle.astro`.
+- Theming is driven by a `data-theme="light|dark"` attribute on `<html>`.
+  **Dark is the default**: `BaseLayout` renders `<html data-theme="dark">`, so
+  the theme is correct before first paint and without JS. An inline script then
+  applies a stored choice (`localStorage["buy-risk-theme"]`) if the reader has
+  used the toggle. `prefers-color-scheme` is deliberately NOT consulted — most
+  systems report light, which would defeat the intended default. The toggle lives in `ThemeToggle.astro`.
   Never hard-code colors that won't adapt — always go through the tokens.
 - Component-scoped styles use Astro `<style>` blocks. For markup rendered by a
   React island, use `<style is:global>` on the host page (see `tools/index.astro`).
