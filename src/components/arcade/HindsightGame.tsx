@@ -23,7 +23,7 @@ const EPISODES: Episode[] = [
   {
     id: "1995",
     revealed: true,
-    setup: "January 1995. The Fed has just raised rates seven times in twelve months — the bond market's worst year in decades. Recession worries dominate the outlook pages.",
+    setup: "January 1995. The Fed has raised rates six times in the past year and isn't done — the bond market has just had its worst year in decades. Recession worries dominate the outlook pages.",
     outcome: "What happened: US stocks returned over +37% in 1995, one of the best years of the century.",
     ask: "Knowing that, how foreseeable was a +30%-or-better year for a well-informed investor in January 1995?",
   },
@@ -37,7 +37,7 @@ const EPISODES: Episode[] = [
   {
     id: "2008",
     revealed: true,
-    setup: "January 2008. US house prices have never fallen nationally in the post-war data. The Fed chair recently said housing weakness is 'likely to be contained.' Major banks report record profits.",
+    setup: "January 2008. US house prices have never fallen nationally in the post-war data. The Fed chair assured Congress the previous spring that subprime troubles were 'likely to be contained.' Major banks had just reported record profits.",
     outcome: "What happened: US stocks fell ~37% in 2008, and the global financial system nearly failed.",
     ask: "Knowing that, how foreseeable was a 30%-plus crash for a well-informed investor in January 2008?",
   },

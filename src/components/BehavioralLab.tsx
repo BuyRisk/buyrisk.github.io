@@ -254,8 +254,8 @@ export default function BehavioralLab() {
               <p className="wl-fnote">
                 Median gap by fund type, across every fund in the CRSP database. Diversified, steady funds are barely
                 mistimed; the more volatile and performance-chased the category, the wider the gap. Morningstar's{" "}
-                <em>Mind the Gap 2026</em> finds the same shape — a US-equity investor gap of about 0.5pp/yr, versus
-                ~1.2pp across all fund types.
+                <em>Mind the Gap 2026</em> finds the same shape — a US-equity investor gap of about 0.4pp/yr (ours,
+                from CRSP: ~0.5pp), versus ~1.2pp across all fund types.
               </p>
             </div>
             <div className="wl-lower">

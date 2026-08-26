@@ -55,7 +55,7 @@ export default function CalibrationGame({ onDone }: { onDone: (r: GameResult) =>
         </p>
         <p>
           This is the classic test of <strong>overconfidence</strong> (Alpert &amp; Raiffa, 1969):
-          when people say "90% sure," reality typically shows up inside their range less than half
+          when people say "90% sure," reality typically shows up inside their range only about half
           the time. It isn't about knowing market trivia — wide honest ranges would have trapped
           everything. It's that our sense of what we know runs ahead of what we know.
         </p>

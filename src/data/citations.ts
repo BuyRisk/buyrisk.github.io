@@ -293,7 +293,7 @@ export const STUDIES: Record<string, Study> = {
     venue: "in Kahneman, Slovic & Tversky (eds.), Judgment under Uncertainty",
     kind: "paper",
     category: "Behavioral finance",
-    note: "The 90%-confidence-interval calibration test (first circulated 1969): people's '90% sure' ranges trap the truth less than half the time.",
+    note: "The 90%-confidence-interval calibration test (first circulated 1969): people's '90% sure' ranges trap the truth only about half the time.",
   },
   asch1955: {
     authors: "Asch, S. E.",
@@ -406,7 +406,7 @@ export const STUDIES: Record<string, Study> = {
     venue: "Morningstar Portfolio and Planning Research",
     kind: "paper",
     category: "Behavioral finance",
-    note: "The authoritative investor-return-gap study. Over the 10 years to Dec. 2025, the average dollar earned 8.7%/yr vs. funds' 9.9% total return — a ~1.2pp gap; the US-equity gap was just ~0.5pp, matching this tool's CRSP figure. The gap widens with category volatility (sector and alternative funds worst).",
+    note: "The authoritative investor-return-gap study. Over the 10 years to Dec. 2025, the average dollar earned 8.7%/yr vs. funds' 9.9% total return — a ~1.2pp gap; the US-equity gap was the smallest of any category at ~0.4pp, close to this tool's independently computed ~0.5pp CRSP figure. The gap widens with category volatility (sector and alternative funds worst).",
   },
   cremersPetajisto2009: {
     authors: "Cremers, M., & Petajisto, A.",
