@@ -81,7 +81,8 @@ node scripts/verify-tax-engine.mjs   # hand-computed cases + continuity fuzz
 
 ## Licensing
 
-- **Source code** — MIT, see [LICENSE](LICENSE).
+- **Source code** — MIT, see [LICENSE](LICENSE). The grant covers the code in
+  this repository only, not the content or data below.
 - **Written content** (prose, blog posts, tool copy) — © Buy Risk, all rights
   reserved for now; ask if you'd like to reuse it.
 - **Data** — third-party data retains its provider's terms and is *not*
