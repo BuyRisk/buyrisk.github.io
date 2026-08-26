@@ -234,6 +234,35 @@ const paths = [
     color: var(--color-accent);
     font-variant-numeric: tabular-nums;
   }
+  /* Re-roll control under the ride inset. */
+  .demo-card :global(.hrr-roll) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+  }
+  .demo-card :global(.hrr-roll button) {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+  }
+  .demo-card :global(.hrr-roll button:hover) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .demo-card :global(.hrr-roll span) {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    font-variant-numeric: tabular-nums;
+  }
   .demo-card :global(.hrr-note) {
     margin: var(--space-sm) 0 0;
     font-size: var(--step--1);

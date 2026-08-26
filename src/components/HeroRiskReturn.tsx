@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { assetStats } from "../data/generated/asset-stats";
 import { axisText, linePath } from "../lib/chart";
 import { mulberry32 } from "../lib/portfolio";
@@ -44,18 +44,27 @@ const FIT = (() => {
 const LO = 0.03, HI = 0.38; // spans cash → small-cap value, the real ladder
 
 /**
- * The ride inset: ten simulated years at the chosen setting. One FIXED
- * sequence of monthly luck (seeded standard normals via Box–Muller), so
- * dragging the slider morphs the SAME decade — drift comes from the ladder
+ * The ride inset: ten simulated years at the chosen setting. One sequence of
+ * monthly luck (seeded standard normals via Box–Muller) held FIXED while you
+ * drag, so the slider morphs the SAME decade — drift comes from the ladder
  * fit, roughness from the chosen volatility. Deliberately a random path, not
  * a periodic wave: markets don't oscillate on a schedule, and a rhythmic
  * curve would imply the timeable cycles the Bias Arcade exists to debunk.
  * Around it, the ±1σ cone of ten-year outcomes: a thread at cash-like risk,
  * a funnel at the top of the ladder.
+ *
+ * "New decade" re-rolls the luck on demand. Keeping the two gestures separate
+ * is the whole point: drag = same history, different exposure; roll = same
+ * exposure, different history. A slider that reshuffled as you moved it would
+ * confound the two and read as a randomize button.
  */
 const RIDE_MONTHS = 120;
-const RIDE_Z: number[] = (() => {
-  const rng = mulberry32(105); // seed chosen for a typical decade: mid-path slump, on-trend finish
+/** Log-wealth domain, fixed so amplitude changes stay visible instead of being
+ *  renormalized away as the slider moves. */
+const RIDE_YMIN = -1.2, RIDE_YMAX = 3.0;
+
+function makeRide(seed: number): number[] {
+  const rng = mulberry32(seed);
   const z: number[] = [];
   while (z.length < RIDE_MONTHS) {
     const u = Math.max(rng(), 1e-9), v = rng();
@@ -63,10 +72,45 @@ const RIDE_Z: number[] = (() => {
     z.push(r * Math.cos(2 * Math.PI * v), r * Math.sin(2 * Math.PI * v));
   }
   return z.slice(0, RIDE_MONTHS);
-})();
+}
+
+/**
+ * A rolled decade has to stay on-canvas at EVERY slider position, not just the
+ * one showing when you rolled it — otherwise dragging afterwards would run the
+ * line into the frame and read as a bug. Checked across the ladder; the top is
+ * the binding case. This does clip the wildest ~1-in-8 decades, so the rolled
+ * sample is very slightly tamer than reality — a deliberate trade for a hero
+ * figure, and the reason the domain above is generous rather than snug.
+ */
+function fitsFrame(z: number[]): boolean {
+  for (const risk of [LO, 0.15, HI]) {
+    const mu = FIT.a + FIT.b * risk;
+    const k = (Math.log(1 + mu) - (risk * risk) / 2) / 12;
+    const sm = risk / Math.sqrt(12);
+    let cum = 0;
+    for (const zi of z) {
+      cum += k + sm * zi;
+      if (cum < RIDE_YMIN + 0.06 || cum > RIDE_YMAX - 0.06) return false;
+    }
+  }
+  return true;
+}
+
+/** Next usable seed after `from`. Sequential, so the roll order is repeatable. */
+function nextSeed(from: number): number {
+  for (let s = from + 1; s < from + 500; s++) if (fitsFrame(makeRide(s))) return s;
+  return from + 1;
+}
+
+const RIDE_SEED0 = 105; // a typical decade: mid-path slump, on-trend finish
 const mult = (logW: number) => `×${Math.exp(logW) >= 10 ? Math.exp(logW).toFixed(0) : Math.exp(logW).toFixed(1)}`;
 
 function RideInset({ risk, mu }: { risk: number; mu: number }) {
+  // Seeded (not Math.random) so the SSR pass and the first client render agree.
+  const [seed, setSeed] = useState(RIDE_SEED0);
+  const [rolls, setRolls] = useState(0);
+  const ride = useMemo(() => makeRide(seed), [seed]);
+
   const W = 760, H = 190;
   const pad = { top: 16, right: 92, bottom: 26, left: 14 };
   const plotW = W - pad.left - pad.right;
@@ -84,14 +128,12 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
   const k = (Math.log(1 + mu) - (risk * risk) / 2) / 12; // monthly MEDIAN log drift
   const drag = (sm * sm) / 2; // monthly gap between the average and the typical path
 
-  // Fixed log-scale domain sized to the TOP of the ladder, so amplitude
-  // changes stay visible instead of being renormalized away.
-  const yMin = -0.8, yMax = 2.4;
+  const yMin = RIDE_YMIN, yMax = RIDE_YMAX;
   const x = (m: number) => pad.left + (m / RIDE_MONTHS) * plotW;
   const y = (logW: number) => pad.top + plotH - ((Math.min(Math.max(logW, yMin), yMax) - yMin) / (yMax - yMin)) * plotH;
 
   let cum = 0;
-  const path = [0, ...RIDE_Z.map((z) => (cum += k + sm * z))];
+  const path = [0, ...ride.map((z) => (cum += k + sm * z))];
   const months = Array.from({ length: RIDE_MONTHS + 1 }, (_, m) => m);
   const trendEnd = k * RIDE_MONTHS;
   const bandEnd = sm * Math.sqrt(RIDE_MONTHS);
@@ -155,8 +197,20 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
           The ride behind that average: ten simulated years of $1 at your setting →
         </text>
       </svg>
+      <div className="hrr-roll">
+        {/* Functional updaters: React batches, so reading `seed` from the closure
+            would make two fast clicks land on the same decade. */}
+        <button type="button" onClick={() => { setSeed(nextSeed); setRolls((n) => n + 1); }}>
+          ↻ New decade
+        </button>
+        <span aria-live="polite">
+          {rolls === 0
+            ? "Same market, different luck."
+            : `Decade ${rolls + 1} — same market, different luck. Ending: ${mult(path[RIDE_MONTHS])}.`}
+        </span>
+      </div>
       <p className="hrr-note">
-        Same sequence of luck at every setting — only your exposure to it changes. The solid line is
+        The luck holds still while you drag, and only changes when you roll. The solid line is
         one possible decade; the cone is the ±1σ range of destinations. Where the cone is a thread,
         the ride is smooth and the endings agree. Where it's a funnel, the slope is real but so is
         the spread. Push the slider up and a second line splits off: volatility drags the{" "}
