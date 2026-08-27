@@ -24,3 +24,12 @@ a correlation, a volatility-vs-N curve), never a per-stock row, so they are safe
 to ship. Run `npm run data:crsp` to rebuild both at once. See
 [`data/sources/crsp/README.md`](../../../data/sources/crsp/README.md) for the
 licence firewall.
+
+## Licence
+
+These files are **not redistributable** — see [`LICENSE`](LICENSE) in this
+directory. They are derived from data held under licence, which permits
+publishing derived aggregates but not sublicensing them onward, so that right
+is not this project's to grant. Read them, audit the reducers, reproduce them
+from your own licensed pull — but a fork must delete this directory and
+regenerate it.

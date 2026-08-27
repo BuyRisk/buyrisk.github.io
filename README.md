@@ -80,14 +80,38 @@ node scripts/verify-tax-engine.mjs   # hand-computed cases + continuity fuzz
 
 ## Licensing
 
-- **Source code** — MIT, see [LICENSE](LICENSE). The grant covers the code in
-  this repository only, not the content or data below.
-- **Written content** (prose, blog posts, tool copy) — © Buy Risk, all rights
-  reserved for now; ask if you'd like to reuse it.
-- **Data** — third-party data retains its provider's terms and is *not*
-  relicensed here. Licensed sources (CRSP, Thomson) are used under license and
-  only ever appear as derived aggregates, never as redistributable raw records;
-  see `data/sources/crsp/README.md` for the firewall this project follows.
+Public so it can be audited; not licensed for commercial reuse. Three layers,
+each with its own file:
+
+| What | Licence |
+|---|---|
+| **Source code** — components, libs, reducers, build tooling | [PolyForm Noncommercial 1.0.0](LICENSE) |
+| **Written content** — prose, curriculum, tool copy, blog posts | [CC BY-NC-SA 4.0](CONTENT-LICENSE.md) |
+| **Generated datasets** — `src/data/generated/` | [Not redistributable](src/data/generated/LICENSE) |
+
+In practice: read it, run it, fork it, teach from it, check our arithmetic —
+all fine, and the reason the repo is public at all. Educational institutions
+are explicitly covered by both licences. Selling it, running it with ads, or
+putting it behind a paywall is not.
+
+The generated datasets are the one hard stop. They are aggregates derived from
+data held under licence (CRSP, Thomson/Refinitiv, Petajisto), which permits
+publishing derived summaries but not sublicensing them onward — so that right
+is not ours to grant. Read them and reproduce them from your own licensed
+pull; don't redistribute them. A fork should delete that directory and
+regenerate it.
+
+Third-party data always retains its provider's terms and is never relicensed
+here; licensed sources appear only as derived aggregates, never as raw records
+(see `data/sources/crsp/README.md` for the firewall).
+
+The name **Buy Risk**, the domain, and the visual identity are reserved and not
+licensed. A fork must not present itself as Buy Risk.
+
+Commercial licensing or anything the above doesn't cover: **buyriskHQ@gmail.com**.
+
+Repository releases made before 2026-08-26 were published under MIT; that grant
+is not revoked for the commits it covered.
 
 ## Contributing
 
