@@ -1,0 +1,408 @@
+---
+// Site header: brand, top navigation with dropdowns (tool/info/personal-
+// finance lists come from src/data), current-page highlighting, and the theme
+// and currency pickers. An inline script makes the dropdowns tap-toggleable
+// on touch screens, where hover doesn't exist.
+import ThemeToggle from "./ThemeToggle.astro";
+import CurrencySelect from "./CurrencySelect.astro";
+import { TOOLS, type Tool } from "../data/tools";
+import { INFO_PAGES } from "../data/info";
+import { PF_TOOLS } from "../data/personal-finance";
+
+type NavItem = { href: string; label: string; children?: Tool[] };
+
+const navItems: NavItem[] = [
+  { href: "/", label: "Home" },
+  { href: "/tools", label: "Portfolio Playground", children: TOOLS },
+  { href: "/personal-finance", label: "Personal Finance", children: PF_TOOLS },
+  { href: "/info", label: "Info", children: INFO_PAGES },
+  { href: "/about", label: "About" },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="Buy Risk home">
+      <span class="brand-mark" aria-hidden="true">△</span>
+      <span class="brand-name">Buy&nbsp;Risk</span>
+    </a>
+
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
+      {
+        navItems.map((item) =>
+          item.children ? (
+            <div class="nav-item nav-dropdown">
+              <a
+                href={item.href}
+                class:list={["nav-link", { active: isActive(item.href) }]}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {item.label}
+                <svg
+                  class="nav-caret"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </a>
+              <ul class="nav-menu">
+                {item.children.map((child) => (
+                  <li>
+                    <a
+                      href={child.href}
+                      class:list={["nav-menu-link", { active: isActive(child.href) }]}
+                      aria-current={isActive(child.href) ? "page" : undefined}
+                    >
+                      <span class="nav-menu-title">{child.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <a
+              href={item.href}
+              class:list={["nav-link", { active: isActive(item.href) }]}
+              aria-current={isActive(item.href) ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          )
+        )
+      }
+    </nav>
+
+    <div class="header-tools">
+      <CurrencySelect />
+      <ThemeToggle />
+      <button
+        class="nav-toggle"
+        type="button"
+        aria-label="Menu"
+        aria-controls="site-nav"
+        aria-expanded="false"
+      >
+        <svg class="nav-toggle-icon nav-toggle-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+        <svg class="nav-toggle-icon nav-toggle-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="5" y1="5" x2="19" y2="19" />
+          <line x1="19" y1="5" x2="5" y2="19" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    backdrop-filter: saturate(160%) blur(8px);
+    border-bottom: var(--border);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    min-height: 4rem;
+  }
+  .header-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+  /* Hamburger: hidden on desktop, shown at the mobile breakpoint below. */
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: var(--border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .nav-toggle:hover {
+    border-color: var(--color-accent);
+  }
+  .nav-toggle-close {
+    display: none;
+  }
+  .site-header.nav-open .nav-toggle-open {
+    display: none;
+  }
+  .site-header.nav-open .nav-toggle-close {
+    display: block;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .brand-mark {
+    color: var(--color-accent);
+    font-size: 0.9em;
+  }
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    color: var(--color-text-soft);
+    text-decoration: none;
+    padding: 0.35rem 0.6rem;
+    border-radius: 7px;
+    transition: color var(--transition), background var(--transition);
+  }
+  .nav-link:hover {
+    color: var(--color-text);
+    background: var(--color-surface-alt);
+  }
+  .nav-link.active {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Dropdown */
+  .nav-item {
+    position: relative;
+  }
+  .nav-caret {
+    transition: transform var(--transition);
+    opacity: 0.7;
+  }
+  .nav-dropdown.open .nav-caret {
+    transform: rotate(180deg);
+  }
+  .nav-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    z-index: 60;
+    min-width: 17rem;
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 5.5rem);
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.3rem;
+    list-style: none;
+    display: grid;
+    gap: 0.05rem;
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity var(--transition), transform var(--transition);
+  }
+  .nav-dropdown.open .nav-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Devices with a real pointer (desktop) get hover-to-open; touch devices use
+     a tap toggle wired up in the script below (the `.open` class). */
+  @media (hover: hover) {
+    .nav-dropdown:hover .nav-caret,
+    .nav-dropdown:focus-within .nav-caret {
+      transform: rotate(180deg);
+    }
+    /* Invisible bridge so the menu doesn't close when crossing the gap. */
+    .nav-dropdown:hover::after,
+    .nav-dropdown:focus-within::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 0.6rem;
+    }
+    .nav-dropdown:hover .nav-menu,
+    .nav-dropdown:focus-within .nav-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+  .nav-menu-link {
+    display: block;
+    padding: 0.35rem 0.6rem;
+    border-radius: 7px;
+    text-decoration: none;
+    color: var(--color-text);
+  }
+  .nav-menu-link:hover {
+    background: var(--color-surface-alt);
+  }
+  .nav-menu-link.active {
+    background: var(--color-accent-soft);
+  }
+  .nav-menu-title {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--step-0);
+  }
+  .nav-menu-link.active .nav-menu-title {
+    color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-menu {
+      transition: none;
+    }
+  }
+
+  /* ─── Mobile: collapse the row into a hamburger drawer ─── */
+  @media (max-width: 920px) {
+    .header-inner {
+      flex-wrap: wrap;
+    }
+    .nav-toggle {
+      display: inline-flex;
+    }
+    .header-tools {
+      margin-left: auto;
+    }
+
+    /* The nav becomes a full-width drawer on its own row, hidden until opened. */
+    .site-nav {
+      order: 5;
+      flex-basis: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.1rem;
+      margin: 0 0 var(--space-sm);
+      flex-wrap: nowrap;
+      display: none;
+    }
+    .site-header.nav-open .site-nav {
+      display: flex;
+    }
+
+    .site-nav .nav-item {
+      width: 100%;
+    }
+    .site-nav .nav-link {
+      justify-content: space-between;
+      padding: 0.7rem 0.6rem;
+      font-size: var(--step-1);
+    }
+
+    /* Sub-menus become inline accordions instead of floating popovers. */
+    .site-nav .nav-menu {
+      position: static;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      min-width: 0;
+      max-width: none;
+      max-height: none;
+      overflow: visible;
+      box-shadow: none;
+      border: none;
+      background: transparent;
+      padding: 0.1rem 0 0.4rem 0.9rem;
+      display: none;
+      transition: none;
+    }
+    .site-nav .nav-dropdown.open .nav-menu {
+      display: grid;
+    }
+    .site-nav .nav-menu-link {
+      padding: 0.5rem 0.6rem;
+    }
+  }
+</style>
+
+<script>
+  // ── Mobile hamburger: open/close the full-width nav drawer ──
+  const header = document.querySelector<HTMLElement>(".site-header");
+  const toggle = document.querySelector<HTMLButtonElement>(".nav-toggle");
+  if (header && toggle) {
+    const setNavOpen = (open: boolean) => {
+      header.classList.toggle("nav-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+    };
+    toggle.addEventListener("click", () =>
+      setNavOpen(!header.classList.contains("nav-open")),
+    );
+    // Close the drawer once a real navigation link (not a dropdown parent) is tapped.
+    header.querySelectorAll<HTMLAnchorElement>(".nav-menu-link, .nav-link:not([aria-haspopup])").forEach((link) =>
+      link.addEventListener("click", () => setNavOpen(false)),
+    );
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setNavOpen(false);
+    });
+    // Snap shut if the viewport grows back to the desktop layout.
+    window.matchMedia("(min-width: 921px)").addEventListener("change", (e) => {
+      if (e.matches) setNavOpen(false);
+    });
+  }
+
+  // Touch devices have no hover, so the CSS-only dropdown can't open on a tap.
+  // Wire up a tap toggle on the trigger for pointers that don't hover.
+  const noHover = () => window.matchMedia("(hover: none)").matches;
+  document.querySelectorAll<HTMLElement>(".nav-dropdown").forEach((drop) => {
+    const trigger = drop.querySelector<HTMLElement>(".nav-link");
+    if (!trigger) return;
+
+    const setOpen = (open: boolean) => {
+      drop.classList.toggle("open", open);
+      trigger.setAttribute("aria-expanded", String(open));
+    };
+
+    trigger.addEventListener("click", (e) => {
+      if (!noHover()) return; // desktop: let hover + the link's own navigation work
+      e.preventDefault();
+      setOpen(!drop.classList.contains("open"));
+    });
+
+    // Close when tapping outside the menu, or on Escape.
+    document.addEventListener("click", (e) => {
+      if (!drop.contains(e.target as Node)) setOpen(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+  });
+</script>

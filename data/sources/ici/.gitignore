@@ -1,0 +1,8 @@
+# ICI research data files — free for public use with attribution, but ICI's terms
+# restrict redistribution of the files. Like aqr/ and jst/, raw files are
+# git-ignored; only reduced, attributed aggregates ship. Re-downloadable from ici.org.
+*.xlsx
+*.xls
+!.gitignore
+!README.md
+!*.manifest.json

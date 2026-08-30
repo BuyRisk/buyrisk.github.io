@@ -1,0 +1,118 @@
+---
+// The site shell every page renders through: <head> metadata (title,
+// description, OpenGraph), the before-first-paint theme script, skip link,
+// Header, the page content in <main>, and Footer. Imports global.css once
+// for the whole site. Props: title (suffixed with "· Buy Risk"), description.
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = "Buy Risk: plain-language investing education. Learn how risk and return actually work.",
+} = Astro.props;
+
+const fullTitle = title === "Buy Risk" ? title : `${title} · Buy Risk`;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+
+    {/*
+      Dark is the site's default: <html> ships with data-theme="dark", so the
+      right theme is painted even before this runs (and still applies if
+      scripting is off). This only needs to honour a *stored* choice from the
+      header toggle. The OS prefers-color-scheme setting is deliberately not
+      consulted — most systems report light, which would override the intended
+      default; readers who want light can toggle, and that choice sticks.
+    */}
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("buy-risk-theme");
+          if (stored === "light" || stored === "dark") {
+            document.documentElement.setAttribute("data-theme", stored);
+          }
+        } catch (e) {
+          /* storage blocked — keep the dark default already on <html> */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header />
+    <p class="site-disclaimer">
+      Educational content only — not financial, tax, or investment advice.
+      <span class="site-disclaimer-sep" aria-hidden="true">·</span>
+      <a href="/about#built">In active development — how it's built and checked</a>
+    </p>
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <style>
+      /* Persistent, site-wide disclaimer: sits directly under the header on
+         every page so the framing is visible above the fold, not only in the
+         footer. Deliberately quiet — informative, not a nag bar. Carries the
+         development-status note too, pointing at the About page's methods and
+         verification section, so a reader (or an instructor citing a tool)
+         can see how the numbers are produced before relying on them. */
+      .site-disclaimer {
+        margin: 0;
+        padding: 0.3rem 1rem;
+        border-bottom: var(--border);
+        background: var(--color-surface);
+        color: var(--color-text-soft);
+        font-family: var(--font-sans);
+        font-size: var(--step--1);
+        text-align: center;
+        text-wrap: balance;
+      }
+      .site-disclaimer-sep {
+        margin-inline: 0.35rem;
+        opacity: 0.5;
+      }
+      .site-disclaimer a {
+        color: inherit;
+        text-decoration-color: var(--color-border);
+        text-underline-offset: 0.15em;
+      }
+      .site-disclaimer a:hover {
+        color: var(--color-accent);
+        text-decoration-color: currentColor;
+      }
+      .skip-link {
+        position: absolute;
+        left: -999px;
+        top: 0.5rem;
+        z-index: 100;
+        background: var(--color-accent);
+        color: var(--color-accent-contrast);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius);
+        font-family: var(--font-sans);
+      }
+      .skip-link:focus {
+        left: 0.5rem;
+      }
+    </style>
+  </body>
+</html>

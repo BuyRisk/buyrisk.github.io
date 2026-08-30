@@ -1,0 +1,149 @@
+---
+// Page shell for /tools/behavioral-finance: intro + the BehavioralModule
+// island (behavior gap & bias explorer + the Bias Arcade) + sources.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BehavioralModule from "../../components/BehavioralModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Behavioral Finance: Your Own Worst Enemy"
+  description="The market doesn't lose you money — your reactions to it do. See the behavior gap between what investments earn and what investors keep, run over real market history — then test your own biases in the Bias Arcade: eight short experiments (anchoring, loss aversion, overconfidence, the disposition effect, framing, sunk costs, outcome bias, pattern-seeking) adapted from the classic studies."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>The investor in the mirror</h1>
+    <p class="lede">
+      The other tools show that timing the market doesn't work. This one shows
+      <em>why we keep trying</em> — and what it costs. The biggest threat to your
+      returns usually isn't a crash; it's how you react to one. Meet the behavior
+      gap and the wiring behind it — then step into the <strong>Bias Arcade</strong>
+      and let eight short experiments, adapted from the classic studies, measure
+      that wiring in <em>you</em>.
+    </p>
+  </section>
+
+  <section class="container">
+    <RegionNote kind="data">
+      The biases are human, not national — but the data is American: the simulation
+      runs on US market history (1990–present), and the real-fund gap on US equity
+      mutual funds. The pattern holds in any market with booms and busts; only the
+      return data is American.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-host">
+    <BehavioralModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The gap between what you earn and what you keep</h2>
+      <ul>
+        <li>
+          <strong>Investments earn more than investors do.</strong> Fund returns
+          measure a dollar left alone. Investor returns measure the dollars people
+          actually add and pull out — and because we add after good runs and pull
+          out after crashes, the second number is reliably lower. That shortfall
+          is the behavior gap.
+        </li>
+        <li>
+          <strong>The worst moments feel the most rational.</strong> Selling in a
+          crash isn't stupidity; it's loss aversion, recency, and herding all
+          firing at once. The feeling that you must "do something" is exactly the
+          feeling to distrust.
+        </li>
+        <li>
+          <strong>The cure is a plan, not more willpower.</strong> You can't out-
+          discipline your own nervous system in the moment. You can decide your
+          allocation in calm times, automate it, and remove the decision — so a bad
+          week has nothing to act on.
+        </li>
+      </ul>
+      <p>
+        The simulation assumes idle cash earns nothing and ignores taxes, to keep
+        the mechanism clear; the exact number will vary, but the direction almost
+        never does. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="behavioral-finance" />
+
+  <NextTool current="/tools/behavioral-finance" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>
+
+<style is:global>
+  .bf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .bf-item {
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: 600;
+    padding: 0.6rem 0.8rem;
+    border: var(--border);
+    border-left: 3px solid transparent;
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-soft);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), color var(--transition);
+  }
+  .bf-item:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+  .bf-item.active {
+    border-color: var(--color-accent);
+    border-left-color: var(--color-accent);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+  .bf-gist {
+    font-family: var(--font-sans);
+    font-size: var(--step-1);
+    color: var(--color-text);
+    margin: 0 0 var(--space-md);
+    line-height: 1.45;
+  }
+  .bf-detail {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) {
+    .bf-detail { grid-template-columns: 1fr 1fr; }
+  }
+  .bf-cell {
+    padding: var(--space-md);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    border-top: 3px solid var(--color-border);
+  }
+  .bf-cell p { margin: 0.35rem 0 0; color: var(--color-text-soft); line-height: 1.5; }
+  .bf-cell--bad { border-top-color: var(--color-error); background: color-mix(in srgb, var(--color-error) 6%, var(--color-surface)); }
+  .bf-cell--good { border-top-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface)); }
+  .bf-cell-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+  }
+  .bf-cell--bad .bf-cell-label { color: var(--color-error); }
+  .bf-cell--good .bf-cell-label { color: var(--color-accent); }
+</style>

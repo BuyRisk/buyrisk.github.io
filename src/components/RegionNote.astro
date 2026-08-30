@@ -1,0 +1,55 @@
+---
+/**
+ * A small, consistent "this tool is US-specific" callout. The site has a global
+ * audience (currency picker + a planned global-investing push), so any tool that
+ * bakes in US tax rules or runs on US-only data should say so plainly.
+ *
+ * Usage:
+ *   <RegionNote>US-focused — assumes US account types… The ideas travel; the
+ *   specifics don't.</RegionNote>
+ *
+ * Pass `kind="data"` for tools that are only US by their dataset (the concept is
+ * universal), vs. the default `kind="rules"` for tools that encode US tax law.
+ */
+interface Props {
+  kind?: "rules" | "data";
+}
+const { kind = "rules" } = Astro.props;
+const badge = kind === "data" ? "🇺🇸 US data" : "🇺🇸 US-focused";
+---
+
+<aside class="region-note" role="note">
+  <span class="region-note-badge">{badge}</span>
+  <p class="region-note-text"><slot /></p>
+</aside>
+
+<style>
+  .region-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.7rem;
+    max-width: var(--measure-wide);
+    margin: 0 0 var(--space-md);
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-link);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--color-link) 8%, var(--color-surface));
+  }
+  .region-note-badge {
+    flex: none;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: var(--color-link);
+    white-space: nowrap;
+  }
+  .region-note-text {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--color-text-soft);
+  }
+</style>

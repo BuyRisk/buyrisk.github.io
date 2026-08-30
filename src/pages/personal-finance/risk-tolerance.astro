@@ -1,0 +1,218 @@
+---
+// Page shell for /personal-finance/risk-tolerance: intro + the
+// RiskToleranceLab island (ability/willingness/need questionnaire).
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RiskToleranceLab from "../../components/RiskToleranceLab.tsx";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Risk Tolerance Questionnaire"
+  description="Answer six short questions to see where you sit on the risk/return spectrum and a suggested stock/bond starting point — scored across your ability, willingness, and need to take risk."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
+    <h1>How much risk actually fits you?</h1>
+    <p class="lede">
+      The single biggest investing decision is how much to keep in stocks versus
+      bonds — and the right answer isn't just about nerve. It blends what you can
+      <em>afford</em> to lose, what you can <em>stomach</em>, and what your goal
+      truly <em>needs</em>. Six quick questions place you on the spectrum and
+      suggest a starting point.
+    </p>
+  </section>
+
+  <section class="container">
+    <RegionNote kind="data">
+      The questions and the three-dimension framing are universal, but the
+      best/worst-year outcome ranges use US market history (1928–present). Expect
+      similar shapes, not identical numbers, in other markets.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-host">
+    <RiskToleranceLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Three dimensions, and the one that binds</h2>
+      <ul>
+        <li>
+          <strong>Ability</strong> is your capacity to absorb a loss: a long
+          horizon, a stable income, and a healthy cash cushion all let you ride
+          out downturns without being forced to sell.
+        </li>
+        <li>
+          <strong>Willingness</strong> is your temperament: whether a 30% drop
+          makes you sell in a panic or shrug. The best portfolio is worthless if
+          you abandon it at the bottom.
+        </li>
+        <li>
+          <strong>Need</strong> is how much return the goal actually requires.
+          Taking more risk than you need to reach the goal adds danger without
+          purpose.
+        </li>
+      </ul>
+      <p>
+        When these disagree, the <strong>lower</strong> of ability and willingness
+        usually wins — there's no point taking risk you can't afford or can't sit
+        through. Treat the suggested allocation as a starting point for thought,
+        then explore the trade-off in the
+        <a href="/tools/portfolio">Asset Allocation tool</a>. This is educational
+        only and not personalized financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="risk-tolerance" />
+
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Put the allocation to work</h3>
+          <p>Take your stock/bond starting point into the Portfolio tool and see the risk/return trade-off it implies.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/personal-finance/money-basics#net-worth" class="card">
+          <h3>Know where you stand today</h3>
+          <p>Your ability to take risk starts with the full picture — what you own, what you owe, and the cushion in between.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
+</style>
+
+<style is:global>
+  .rt-controls { gap: var(--space-md); }
+  .rt-q {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .rt-q-label {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--step-0);
+    color: var(--color-text);
+    line-height: 1.35;
+  }
+  .rt-q-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-right: 0.25rem;
+    border-radius: 50%;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-size: var(--step--1);
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .rt-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .rt-opt {
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    padding: 0.5rem 0.7rem;
+    border: var(--border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text-soft);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), color var(--transition);
+  }
+  .rt-opt:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+  .rt-opt.active {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  /* Result spectrum */
+  .rt-spectrum {
+    position: relative;
+    height: 0.85rem;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--color-link), var(--color-accent), var(--color-warn));
+    opacity: 0.9;
+  }
+  .rt-spectrum-marker {
+    position: absolute;
+    top: 50%;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: var(--color-text);
+    border: 3px solid var(--color-surface);
+    box-shadow: var(--shadow);
+    transform: translate(-50%, -50%);
+  }
+  .rt-spectrum-ends {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.35rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+
+  .rt-flag {
+    margin: 0 0 var(--space-md);
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--color-warn);
+    border-left: 4px solid var(--color-warn);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--color-warn) 10%, var(--color-surface));
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .rt-flag strong { color: var(--color-text); }
+
+  .rt-placeholder {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .rt-progress {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-surface-alt);
+    overflow: hidden;
+  }
+  .rt-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--color-accent);
+    transition: width var(--transition);
+  }
+</style>

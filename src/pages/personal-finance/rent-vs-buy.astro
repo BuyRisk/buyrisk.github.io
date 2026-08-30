@@ -1,0 +1,185 @@
+---
+// Page shell for /personal-finance/rent-vs-buy: intro + the RentVsBuyLab
+// island (buyer vs. renter net-worth race).
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RentVsBuyLab from "../../components/RentVsBuyLab.tsx";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Rent or Buy?"
+  description="A fair, opportunity-cost-aware rent-vs-buy comparison: run a buyer and a renter side by side, invest the difference, and find the year buying breaks even, with real mortgage and home-price data."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
+    <h1>Rent or buy?</h1>
+    <p class="lede">
+      "Renting is throwing money away." You've heard it. But a mortgage payment
+      isn't the whole story, and neither is rent. The honest comparison treats both
+      as financial decisions: the renter invests the down payment they didn't spend,
+      and we track each person's <em>net worth</em> over time. Then the real question
+      isn't "rent or buy?" but "how long until buying wins?"
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <RentVsBuyLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>How this comparison works</h2>
+      <ul>
+        <li>
+          <strong>The down payment has a cost.</strong> The biggest hidden cost of
+          buying isn't the mortgage. It's the money tied up in the home that could
+          otherwise be invested. So the renter here keeps that cash in the market,
+          and both people spend the <em>same</em> amount each month; whoever's
+          housing is cheaper invests the difference. That's what makes it fair.
+        </li>
+        <li>
+          <strong>Buying has big one-time costs.</strong> Closing costs going in and
+          agent commissions coming out (often ~6% to sell) mean a home has to
+          appreciate for years just to recover them. That's why buying tends to lose
+          on short stays and win on long ones, and why the <em>break-even year</em>
+          is the number that matters.
+        </li>
+        <li>
+          <strong>Appreciation is a guess, and a risky one.</strong> The result
+          depends most on how fast the home grows in value. Nationally, prices rose
+          about 4.3% a year since 1987, but they fell 27% from 2007–2012, and a home
+          is a leveraged, undiversified bet on a single property in a single town.
+          Treat the appreciation slider as the uncertainty it is.
+        </li>
+      </ul>
+      <p>
+        There are good reasons to buy that this tool can't price: stability, control,
+        not having a landlord, forced saving. And good reasons to rent: flexibility,
+        diversification, less risk. This shows the money side clearly so the rest of
+        the decision is yours. Educational only, not advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="rent-vs-buy" />
+
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/personal-finance" class="card">
+          <h3>More personal-finance tools</h3>
+          <p>Budgeting, debt payoff, emergency funds, and savings goals.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/compound-growth" class="card">
+          <h3>Invest the difference</h3>
+          <p>
+            See what the money a renter invests instead of buying can grow into over
+            the years.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+  .pf-related {
+    margin-top: var(--space-xl);
+  }
+  .pf-related-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .pf-related-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .pf-related-grid a.card {
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .pf-related-grid h3 {
+    margin: 0 0 0.3rem;
+    font-size: var(--step-1);
+  }
+  .pf-related-grid p {
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
+  }
+</style>
+
+<style is:global>
+  .ss-headline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius);
+    background: var(--color-accent-soft);
+    border: 1px solid var(--color-accent);
+  }
+  .ss-headline-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-headline-value {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .ss-headline-sub {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .ss-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+  .ss-stats > div {
+    background: var(--color-surface-alt);
+    border-radius: var(--radius);
+    padding: var(--space-sm);
+  }
+  .ss-stats dt {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-bottom: 0.2rem;
+  }
+  .ss-stats dd {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-0);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

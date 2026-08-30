@@ -1,0 +1,26 @@
+# Dependabot keeps dependencies patched by opening PRs when updates ship.
+# Pairs with GitHub's Dependabot *alerts* (enable in Settings → Code security),
+# which flag known vulnerabilities; this file automates the update PRs.
+version: 2
+updates:
+  # Application dependencies (Astro, React, etc.).
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    # Bundle routine minor/patch bumps into one PR to cut noise; majors (which
+    # can be breaking, e.g. an Astro major) still come as their own PRs to review.
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # The actions used by the deploy workflow (checkout, setup-node, deploy-pages…),
+  # so a compromised or outdated action gets flagged and bumped too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

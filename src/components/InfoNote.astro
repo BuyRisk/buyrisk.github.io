@@ -1,0 +1,53 @@
+---
+/**
+ * Zero-JS hover/focus source note. Reuses the global `.infotip*` styles (the
+ * same ones InfoTip.tsx uses inside React islands), but renders as pure static
+ * markup so it ships no client JavaScript. Use it to attach "where this came
+ * from / when it was last updated" to a figure without cluttering the page:
+ *
+ *   62.2%<InfoNote text="FTSE Global All Cap, as of Jun 30 2026" />
+ *
+ * By default the trigger is a small circled "i". Pass `label` to use short
+ * visible text (e.g. "source") as the trigger instead.
+ */
+interface Props {
+  /** Tooltip text shown on hover/focus. */
+  text: string;
+  /** Optional visible trigger text instead of the ⓘ icon. */
+  label?: string;
+}
+const { text, label } = Astro.props;
+---
+
+<span class="infotip infonote" tabindex="0" role="note" aria-label={text}>
+  {
+    label ? (
+      <span class="infonote-label">{label}</span>
+    ) : (
+      <span class="infotip-icon" aria-hidden="true">i</span>
+    )
+  }
+  <span class="infotip-bubble" role="tooltip">{text}</span>
+</span>
+
+<style>
+  /* Widen the bubble a touch — source citations run longer than input hints. */
+  .infonote :global(.infotip-bubble) {
+    max-width: 18rem;
+    text-align: left;
+    white-space: normal;
+  }
+  .infonote-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-muted);
+    border-bottom: 1px dotted var(--color-muted);
+    transition: color var(--transition), border-color var(--transition);
+  }
+  .infotip:hover .infonote-label,
+  .infotip:focus .infonote-label {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+</style>

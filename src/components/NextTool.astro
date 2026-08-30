@@ -1,0 +1,76 @@
+---
+// "Next in the playground" card: given the current tool's href, links to the
+// following tool in the TOOLS list (or back to the index on the last one).
+import { TOOLS } from "../data/tools";
+
+interface Props {
+  current: string;
+}
+const { current } = Astro.props;
+const idx = TOOLS.findIndex((t) => t.href === current);
+const next = idx >= 0 && idx < TOOLS.length - 1 ? TOOLS[idx + 1] : null;
+---
+
+<section class="container next-tool">
+  {
+    next ? (
+      <a href={next.href} class="next-tool-card">
+        <span class="next-tool-eyebrow">Next in the playground →</span>
+        <span class="next-tool-title">{next.title}</span>
+        <span class="next-tool-blurb">{next.blurb}</span>
+      </a>
+    ) : (
+      <a href="/tools" class="next-tool-card next-tool-card--end">
+        <span class="next-tool-eyebrow">End of the trail, for now</span>
+        <span class="next-tool-title">Back to the Portfolio Playground</span>
+        <span class="next-tool-blurb">
+          Revisit any tool, or see what's coming next.
+        </span>
+      </a>
+    )
+  }
+</section>
+
+<style>
+  .next-tool {
+    margin-top: var(--space-xl);
+  }
+  .next-tool-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-width: var(--measure);
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-accent-soft)
+    );
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    transition: transform var(--transition), border-color var(--transition);
+  }
+  .next-tool-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+  }
+  .next-tool-eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+  }
+  .next-tool-title {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step-1);
+    color: var(--color-text);
+  }
+  .next-tool-blurb {
+    color: var(--color-text-soft);
+  }
+</style>

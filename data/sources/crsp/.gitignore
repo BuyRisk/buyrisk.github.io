@@ -1,0 +1,13 @@
+# CRSP raw pulls are LICENSED data (CRSP / WRDS subscription). They must NEVER be
+# committed or shipped to the browser — redistribution violates the WRDS license.
+#
+# Only three things from the CRSP pipeline are allowed into the repo:
+#   1. this folder's README.md and .gitignore          (docs, no data)
+#   2. *.manifest.json  — pull provenance (dates, row counts, filters), no rows
+#   3. the reduced AGGREGATE outputs in src/data/generated/crsp-*.ts
+#
+# Everything else here (the raw CSV/Parquet pulled from WRDS) stays local.
+*
+!.gitignore
+!README.md
+!*.manifest.json

@@ -1,0 +1,125 @@
+---
+// Page shell for /tools/fees: intro + the ReturnDrainsModule island (fees,
+// inflation, taxes) + sources and next-tool link.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ReturnDrainsModule from "../../components/ReturnDrainsModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="What Eats Your Returns: Fees, Inflation & Taxes"
+  description="Four quiet drains erode the wealth you build: fund fees, inflation, the tax drag on a taxable account, and holding the wrong asset in the wrong account. See how each one compounds against you — and how to blunt the ones you control."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>What quietly eats your returns</h1>
+    <p class="lede">
+      Building wealth is only half the job; keeping it is the other half. Several
+      forces work against every dollar you invest, and all of them act slowly enough
+      to miss. <strong>Fees</strong> are the drag you control; <strong>inflation</strong>
+      is the invisible tax on buying power; <strong>tax</strong> on a taxable account
+      is a leak that compounds; and <strong>where</strong> you hold each asset quietly
+      changes your after-tax wealth. See how each one works — and which you can blunt.
+    </p>
+  </section>
+
+  <section class="container">
+    <RegionNote>
+      The Fees and Inflation tabs apply anywhere. The <strong>Tax Drag</strong> and
+      <strong>Asset Location</strong> tabs are US-focused — they assume US tax
+      treatment (ordinary-income vs. long-term capital-gains rates) and US account
+      types (Roth / Traditional IRAs and 401(k)s). The mechanisms exist wherever
+      some accounts are taxed and others sheltered; the specific rates are American.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-host">
+    <ReturnDrainsModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Fees: why a small percent is a big deal</h2>
+      <ul>
+        <li>
+          <strong>Fees compound too.</strong> A 1% fee isn't 1% of your gains. It's
+          1% of your <em>entire balance</em>, taken every year, so it compounds
+          right alongside your returns, in the wrong direction. Over decades that
+          can consume a quarter or more of the wealth you'd otherwise keep.
+        </li>
+        <li>
+          <strong>It's guaranteed; the outperformance isn't.</strong> You pay the
+          fee whether or not the fund beats the market, and most active funds don't
+          over the long run. Cost is the rare thing you actually control: the average
+          active US equity fund charged 1.08% in 1996 and 0.64% in 2025, while index
+          equity funds charge about 0.05%.
+        </li>
+      </ul>
+
+      <h2>Inflation: the invisible tax on cash</h2>
+      <p>
+        No one sends you a bill for inflation, but it takes a cut of every dollar
+        you hold all the same. Cash sitting idle loses buying power year after
+        year. And the "rate" is really an average that hides very different stories:
+      </p>
+      <ul>
+        <li>
+          <strong>The headline is an average.</strong> CPI blends thousands of
+          prices. Two households can feel very different inflation depending on
+          whether they're paying tuition and medical bills or buying electronics
+          and clothes.
+        </li>
+        <li>
+          <strong>Services rose; many goods fell.</strong> Labor-heavy services
+          (education, healthcare) climb fastest (the <em>Baumol effect</em>), while
+          manufactured goods got cheaper. Your personal inflation is your own
+          basket, which is why outpacing it, not the headline, is what matters.
+        </li>
+      </ul>
+
+      <h2>Taxes: the drag, and where you hold what</h2>
+      <ul>
+        <li>
+          <strong>The tax drag compounds.</strong> Dividends and the gains a fund
+          distributes are taxed the year they happen, even if you reinvest — money
+          pulled out of the compounding machine for good. High-turnover funds are the
+          villain; deferral is the superpower, which is a big reason indexing wins
+          after tax.
+        </li>
+        <li>
+          <strong>Asset location is a free win.</strong> Same portfolio, same
+          allocation — but sheltering the tax-hungry asset and leaving the
+          tax-efficient one in the taxable account keeps more of your money, with no
+          extra risk. (US accounts.)
+        </li>
+      </ul>
+      <p>
+        Put them together and you get the point of investing: a low-cost, tax-aware
+        portfolio of productive assets is how you earn a <em>real</em> return that
+        stays ahead of every drain. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="fees" />
+
+  <NextTool current="/tools/fees" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>

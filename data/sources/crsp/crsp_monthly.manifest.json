@@ -1,0 +1,21 @@
+{
+  "pulled_at": "2026-07-28",
+  "pull_method": "WRDS web query builder (CRSP Stock - Version 2 (CIZ), Monthly), not scripts/pull/crsp-monthly.py",
+  "wrds_format": "ciz",
+  "wrds_table": "crsp.msf_v2 (a.k.a. CRSP Stock - Version 2, Monthly)",
+  "query": "SELECT permno, primaryexch, siccd, mthcaldt, mthprc, mthret, mthretx, shrout FROM crsp.msf_v2 WHERE sharetype = 'NS' AND securitytype = 'EQTY' AND securitysubtype = 'COM' AND usincflg = 'Y' AND (issuertype = 'ACOR' OR issuertype = 'CORP') AND (primaryexch = 'N' OR primaryexch = 'A' OR primaryexch = 'Q')",
+  "universe": "US common stock (CIZ NS/EQTY/COM, issuer ACOR/CORP, US-incorporated), NYSE/AMEX/NASDAQ (primaryexch N/A/Q). CIZ mthret is already delisting-adjusted; returns are decimal (0.0289 = +2.89%).",
+  "date_range_requested": ["1925-12-31", "2026-04-30"],
+  "columns": ["PERMNO", "PrimaryExch", "SICCD", "MthCalDt", "MthPrc", "MthRet", "MthRetx", "ShrOut"],
+  "post_download_cleanup": "Stripped identifier columns (HdrCUSIP, Ticker, PERMCO) and post-filter-constant descriptor columns (USIncFlg, IssuerType, SecurityType, SecuritySubType, ShareType) that the WRDS web export bundled in, to honor the permno-only design in README.md. No rows dropped.",
+  "rows": 3895535,
+  "permnos": 26946,
+  "date_span": ["1925-12-31", "2026-04-30"],
+  "missing_value_counts": {
+    "MthRet": 17316,
+    "MthPrc": 15410,
+    "ShrOut": 120
+  },
+  "raw_file": "crsp_monthly.csv",
+  "license": "CRSP via WRDS - raw file is git-ignored; ship only aggregates."
+}

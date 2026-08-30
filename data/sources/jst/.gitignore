@@ -1,0 +1,12 @@
+# The JST Macrohistory dataset is free but licensed CC BY-NC-SA 4.0 (attribution,
+# non-commercial, share-alike). It is freely re-downloadable by anyone from
+# macrohistory.net, so — to keep the repo free of share-alike entanglement — the
+# raw file is git-ignored and only the reduced, attributed aggregates ship.
+# (Flip this if you'd rather commit the raw file; CC BY-NC-SA permits it for
+# non-commercial use with attribution.)
+*.dta
+*.xlsx
+*.csv
+!.gitignore
+!README.md
+!*.manifest.json

@@ -1,0 +1,182 @@
+---
+// Info page: the Treasury yield curve and 10-year history, from
+// src/data/generated/bond-yields.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { bondYields } from "../../data/generated/bond-yields";
+import "../../styles/info.css";
+
+const curve = bondYields.curve;
+const maxY = Math.max(...curve.map((p) => p.yield)) * 1.1;
+const hist = bondYields.gs10History;
+const hi = hist.reduce((a, b) => (b.yield > a.yield ? b : a));
+const lo = hist.reduce((a, b) => (b.yield < a.yield ? b : a));
+const shape =
+  curve[curve.length - 1].yield > curve[0].yield ? "upward-sloping" : "inverted";
+
+const asOfLabel = new Date(bondYields.asOf + "T00:00:00Z").toLocaleDateString(
+  "en-US",
+  { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" },
+);
+const sourceNote = `${bondYields.source} A monthly snapshot of the US Treasury yield curve, not a live feed. As of ${asOfLabel}.`;
+const p = (x: number, dp = 2) => `${x.toFixed(dp)}%`;
+---
+
+<BaseLayout
+  title="Treasury Yields & the Yield Curve"
+  description="The current US Treasury yield curve from 3 months to 30 years, the 10-year yield split into real and inflation components, and 70+ years of history. A monthly snapshot from FRED."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>Treasury yields &amp; the yield curve</h1>
+    <p class="ref-lede">
+      US Treasury yields are the closest thing finance has to a risk-free
+      benchmark — the rate the government pays to borrow, and the yardstick
+      everything else is priced against. The <strong>yield curve</strong> lines
+      those rates up from months to decades. Right now it's
+      <strong>{shape}</strong>.
+    </p>
+    <p class="ref-asof">
+      Snapshot as of <strong>{asOfLabel}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p(bondYields.tenYear.nominal)}</span>
+        <span class="ref-stat-label">10-year Treasury — the headline benchmark yield</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p(bondYields.tenYear.real)}</span>
+        <span class="ref-stat-label"
+          >10-year <strong>real</strong> yield (TIPS) — the return above inflation</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p(bondYields.tenYear.breakeven)}</span>
+        <span class="ref-stat-label"
+          >10-year <strong>breakeven</strong> — the inflation the market is pricing in</span
+        >
+      </li>
+    </ul>
+    <p class="ref-caption">
+      Nominal ≈ real + expected inflation. The market's 10-year inflation
+      expectation is roughly the gap between the ordinary and inflation-protected
+      yields (the published series are sampled on slightly different dates, so they
+      won't subtract to the penny).
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>The current curve</h2>
+    <p class="ref-prose">
+      What the government pays to borrow at each maturity. An upward slope (longer =
+      higher) is normal; an inverted curve (short rates above long) has often
+      preceded recessions.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Maturity</th>
+            <th scope="col" class="num">Yield</th>
+            <th scope="col">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            curve.map((pt) => (
+              <tr>
+                <td class="strong">{pt.label}</td>
+                <td class="num">{p(pt.yield)}</td>
+                <td>
+                  <span class="ref-track" aria-hidden="true">
+                    <span
+                      class="ref-fill"
+                      style={`width:${(pt.yield / maxY) * 100}%;background:var(--pl-c3)`}
+                    />
+                  </span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="container ref-block">
+    <h2>The 10-year yield in the long run</h2>
+    <p class="ref-prose">
+      Today's rates only look high or low against history. The annual-average
+      10-year yield peaked at <strong>{p(hi.yield, 1)}</strong> in {hi.year}, during
+      the inflation of the early 1980s, and bottomed near
+      <strong>{p(lo.yield, 1)}</strong> in {lo.year}. Its {hist.length}-year path is
+      one of the great round trips in markets.
+    </p>
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p(hi.yield, 1)}</span>
+        <span class="ref-stat-label">peak annual 10-year yield ({hi.year})</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p(lo.yield, 1)}</span>
+        <span class="ref-stat-label">trough ({lo.year})</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{p(hist[hist.length - 1].yield, 1)}</span>
+        <span class="ref-stat-label">most recent annual average ({hist[hist.length - 1].year})</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <div class="ref-callout">
+      <p>
+        <strong>This is a monthly snapshot, not a live rate.</strong> It refreshes
+        when the underlying data is regenerated, so treat it as "roughly where
+        yields sit," not a real-time quote. For today's curve, see the
+        <a href="/info/live-rates">Live Treasury Rates</a> page, which fetches the
+        Treasury's daily feed in your browser.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["fred"]}
+      title="Sources &amp; method"
+      intro="Treasury yields from FRED (St. Louis Fed). Refresh with npm run data:bond-yields."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Why bond prices move</h3>
+          <p>
+            The Portfolio tool's bond section shows how a bond's price falls when
+            yields rise, and why duration decides by how much.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/historical-returns" class="card">
+          <h3>What bonds returned</h3>
+          <p>
+            See the long-run return and risk of Treasuries alongside stocks, cash,
+            and gold.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

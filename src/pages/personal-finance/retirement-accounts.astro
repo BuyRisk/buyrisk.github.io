@@ -1,0 +1,99 @@
+---
+// Page shell for /personal-finance/retirement-accounts: intro + the
+// RetirementAccountsModule island (Social Security & Roth), US-specific.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RetirementAccountsModule from "../../components/RetirementAccountsModule.tsx";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Retirement Accounts: Social Security, Roth & Cheap Tax Years"
+  description="The big US retirement-account decisions: when to claim Social Security (the guaranteed, inflation-adjusted income you can't outlive), whether to save in a Roth or Traditional account — starting with the employer match you should never leave behind — and how to spend a low-income year's cheap tax space: harvest gains at 0% or convert to Roth."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
+    <h1>Your retirement accounts</h1>
+    <p class="lede">
+      Two decisions shape how much of your retirement you actually keep. When you
+      claim Social Security sets a guaranteed, inflation-adjusted income for life —
+      and waiting means bigger checks. Roth versus Traditional comes down to your tax
+      rate now versus later. Both are worth getting right; neither needs a login.
+    </p>
+  </section>
+
+  <section class="container">
+    <RegionNote>
+      US-focused — these tools model US retirement accounts: Social Security claiming
+      ages and survivor benefits, and Roth vs. Traditional IRAs / 401(k)s with the
+      US split between ordinary-income and later tax rates. The trade-offs
+      (delayed guaranteed income; paying tax now vs. later) exist elsewhere, but the
+      rules and account names here are American. This is educational only, not
+      personalized advice — big claiming and conversion decisions are worth checking
+      with a professional.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-host">
+    <RetirementAccountsModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The two decisions</h2>
+      <ul>
+        <li>
+          <strong>When to claim Social Security.</strong> Claiming later means bigger
+          checks for the rest of your life — inflation-adjusted longevity insurance
+          you can't outlive. The breakeven age and a spouse's survivor benefit decide
+          whether waiting pays for your situation.
+        </li>
+        <li>
+          <strong>Roth or Traditional.</strong> Roth is taxed now, Traditional is
+          taxed later, so it turns on whether your tax rate is higher today or in
+          retirement. And whatever you choose, capture the full employer match first:
+          an instant, guaranteed return nothing else matches.
+        </li>
+      </ul>
+      <p>
+        These are the account decisions behind a retirement plan; for whether the pile
+        actually lasts once you're spending it, see the
+        <a href="/tools/retirement">Will Your Money Last? tool</a>. Educational only,
+        not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="retirement-accounts" />
+
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/tools/retirement" class="card">
+          <h3>Will your money last?</h3>
+          <p>Stress-test your spending against real market history and see sequence-of-returns risk — the drawdown half of retirement.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/personal-finance/next-dollar" class="card">
+          <h3>Fund it in the right order</h3>
+          <p>Match, debt, Roth, or brokerage? See the one next step in the priority ladder for every extra dollar.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
+</style>

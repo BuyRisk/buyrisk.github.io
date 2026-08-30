@@ -1,0 +1,10 @@
+# Buy Risk — security policy (RFC 9116)
+# Found a security issue? Please report it privately via GitHub Security
+# Advisories rather than a public issue, so it can be fixed before disclosure.
+# (Requires "Private vulnerability reporting" enabled in the repo's
+#  Settings → Code security.)
+
+Contact: https://github.com/BuyRisk/buyrisk.github.io/security/advisories/new
+Expires: 2027-08-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://buyrisk.github.io/.well-known/security.txt

@@ -1,0 +1,9 @@
+# AQR provides these datasets free for research/educational use, but their terms
+# restrict redistribution. So — like jst/ and crsp/ — the raw workbooks are
+# git-ignored and only reduced, attributed aggregates ship. Anyone can re-download
+# the originals from https://www.aqr.com/Insights/Datasets to reproduce.
+*.xlsx
+*.xls
+!.gitignore
+!README.md
+!*.manifest.json

@@ -1,0 +1,146 @@
+---
+// Info index: cards for the reference pages (from src/data/info).
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { INFO_PAGES, INFO_UPCOMING } from "../../data/info";
+---
+
+<BaseLayout
+  title="Info"
+  description="An ad-free, paywall-free reference desk for investing: the market-cap map of the world, and more of the numbers people usually have to dig around the web to find."
+>
+  <section class="container info-intro">
+    <p class="eyebrow">Info</p>
+    <h1>The reference desk</h1>
+    <p class="lede">
+      The numbers people usually have to dig around the web to find — the size of
+      each slice of the world's market, the rates that move your money, the limits
+      and definitions worth keeping straight — gathered in one place. No ads, no
+      paywalls, no login. Every figure says where it came from and when it was last
+      updated.
+    </p>
+  </section>
+
+  <section class="container">
+    <ul class="grid grid--2 info-grid">
+      {
+        INFO_PAGES.map((page) => (
+          <li>
+            <a href={page.href} class="card info-card">
+              <h2>{page.title}</h2>
+              <p>{page.blurb}</p>
+              <span class="info-cta">Open →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="container upcoming-section">
+    <h2 class="section-heading">On the way</h2>
+    <ul class="grid grid--2 upcoming-grid">
+      {
+        INFO_UPCOMING.map((page) => (
+          <li class="card upcoming-card">
+            <span class="badge">Coming soon</span>
+            <h3>{page.title}</h3>
+            <p>{page.blurb}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="container info-foot">
+    <p>
+      Everything here is educational only and never personalized financial advice.
+      Where a page names specific funds or figures, it's describing the market, not
+      recommending an action.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .info-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .info-grid,
+  .upcoming-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .info-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.4rem;
+    background: linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-accent-soft)
+    );
+  }
+  .info-card h2 {
+    margin: 0.3rem 0 0;
+    font-size: var(--step-1);
+  }
+  .info-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .info-cta {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-top: var(--space-xs);
+  }
+  .upcoming-section {
+    margin-top: var(--space-xl);
+  }
+  .section-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .upcoming-card {
+    height: 100%;
+  }
+  .upcoming-card h3 {
+    margin: 0.5rem 0 0.4rem;
+    font-size: var(--step-1);
+  }
+  .upcoming-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+  }
+  .badge {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+  }
+  .info-foot {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: var(--border);
+    color: var(--color-muted);
+    font-size: var(--step--1);
+    max-width: var(--measure);
+  }
+</style>

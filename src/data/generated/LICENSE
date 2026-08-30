@@ -1,0 +1,49 @@
+Generated datasets — no redistribution
+======================================
+
+Copyright 2026 Buy Risk (https://buyrisk.org)
+
+The files in this directory are NOT covered by the repository's software
+licence (../../../LICENSE) or its content licence (../../../CONTENT-LICENSE.md),
+and no licence to redistribute them is granted.
+
+Why
+---
+
+These are derived aggregates, computed by the reducers in /scripts from
+third-party datasets. Several of those datasets are held under licences that
+permit publishing derived summary statistics but do NOT permit sublicensing
+the results to anyone else. Buy Risk can publish these aggregates on its own
+site; Buy Risk cannot grant you the right to republish them, because Buy Risk
+does not hold that right to give.
+
+Affected in particular are everything derived from the licensed CRSP pull
+(fund survivorship, loads and 12b-1 fees, the behaviour gap, index
+concentration, diversification, superstocks) and from the licensed
+Thomson/Refinitiv s12 holdings pull (fund overlap), plus the Petajisto
+active-share panels. Aggregates from public sources (Damodaran, French,
+Shiller, SSA, IRS, FRED) carry their own providers' terms, which are generally
+permissive but are still the providers' to set, not ours.
+
+What you can do
+---------------
+
+- READ these files, and read the reducer that produced each one. That is the
+  point of publishing them: the arithmetic behind every figure on the site is
+  auditable, and each file's header names the reducer and the command that
+  regenerates it.
+- REPRODUCE them yourself. If you hold your own licence to the underlying
+  data, run the reducers against it and check that our numbers match. That is
+  the strongest form of verification available and it is welcome.
+- CITE the original sources, which every page and every file header names.
+
+What you cannot do
+------------------
+
+- Redistribute these files, or the numbers in them as a dataset, whether
+  standalone, inside a fork, or inside any other product.
+
+A fork of this repository must delete this directory, and regenerate it from
+data the fork is itself licensed to use.
+
+Questions: buyriskHQ@gmail.com

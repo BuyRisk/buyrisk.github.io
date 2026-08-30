@@ -1,0 +1,176 @@
+---
+// Page shell for /personal-finance/next-dollar: intro + the NextDollarLab
+// island (order-of-operations ladder, US-specific).
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NextDollarLab from "../../components/NextDollarLab.tsx";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Your Next Dollar: Where It Goes & How It's Taxed"
+  description="Two questions about your next dollar: where should it go (the priority ladder — match, debt, Roth, brokerage) and what's it actually taxed at (the marginal-rate explorer: the Social Security tax torpedo, the 0% capital-gains zone, EIC and child-credit phase-ins that push rates negative, saver's-credit and Medicare IRMAA cliffs, NIIT)."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Personal Finance · Interactive Tool</p>
+    <h1>Your next dollar</h1>
+    <p class="lede">
+      Two questions, one dollar. <strong>Where should it go?</strong> The funding
+      order — match, debt, Roth, brokerage — matters more than most investment
+      picks. And <strong>what's it actually taxed at?</strong> Often nothing like
+      "your bracket": Social Security's tax torpedo, the 0% capital-gains zone, and
+      other hidden mechanisms can double the rate on that dollar, zero it out — or
+      push it below zero. And some lines in the tax code aren't rates at all but
+      cliffs, where a single dollar costs hundreds.
+    </p>
+  </section>
+
+  <section class="container">
+    <RegionNote>
+      US-focused — this ladder is built around US accounts (employer 401(k) match,
+      HSA, IRA, Roth vs. Traditional). The underlying logic — free money, then
+      guaranteed returns, then tax-advantaged space, then taxable — generalizes
+      anywhere, but the account names and limits are American.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-host">
+    <NextDollarLab client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Why this order?</h2>
+      <ul>
+        <li>
+          <strong>Free money first.</strong> An employer match is an instant,
+          guaranteed return no investment can match. Leaving it on the table to do
+          anything else is almost always a mistake.
+        </li>
+        <li>
+          <strong>Then guaranteed returns.</strong> Paying off high-interest debt
+          earns you a risk-free return equal to its rate. Clearing a 20% card beats
+          any return you can reliably expect from the market.
+        </li>
+        <li>
+          <strong>Then tax-advantaged space.</strong> HSAs, IRAs, and 401(k)s
+          shelter your growth from tax — a durable, compounding edge. That space is
+          limited each year, so it's worth filling before the taxable account.
+        </li>
+        <li>
+          <strong>Then the taxable account.</strong> No limits, fully flexible, and
+          the natural home for anything left once the sheltered space is full.
+        </li>
+      </ul>
+      <p>
+        This is a sensible default, not a personalized plan: a very low-rate
+        mortgage, a Roth 401(k) match, or a specific goal can reshuffle the middle.
+        For the account-choice details, see the
+        <a href="/personal-finance/retirement-accounts">Retirement Accounts tool</a>.
+        Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="next-dollar" />
+
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/personal-finance/money-basics#debt" class="card">
+          <h3>Clear the high-interest debt first</h3>
+          <p>The ladder puts high-rate debt near the top. Compare avalanche vs. snowball and see months to debt-free.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/personal-finance/retirement-accounts" class="card">
+          <h3>Which account, and how much</h3>
+          <p>Once the order is clear, dig into the account choices themselves: Roth vs. Traditional and the employer match.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
+</style>
+
+<style is:global>
+  .nd-ladder {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .nd-step-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0.7rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+  }
+  .nd-step-btn:hover:not(:disabled) { border-color: var(--color-accent); }
+  .nd-step-btn:disabled { cursor: default; }
+  .nd-step-mark {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 50%;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--step--1);
+    background: var(--color-surface-alt);
+    color: var(--color-muted);
+  }
+  .nd-step-body { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+  .nd-step-label { font-family: var(--font-sans); font-weight: 600; font-size: var(--step-0); }
+  .nd-step-tag {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+  .nd-step-detail {
+    margin: 0.3rem 0 0.2rem 2.4rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--color-text-soft);
+  }
+
+  /* Status styling */
+  .nd-step--done .nd-step-mark { background: var(--color-accent-soft); color: var(--color-accent); }
+  .nd-step--done .nd-step-label { color: var(--color-text-soft); }
+  .nd-step--current .nd-step-btn {
+    border-color: var(--color-accent);
+    border-left: 4px solid var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+  .nd-step--current .nd-step-mark { background: var(--color-accent); color: var(--color-surface); }
+  .nd-step--current .nd-step-tag { color: var(--color-accent); font-weight: 700; }
+  .nd-step--upcoming .nd-step-btn { opacity: 0.75; }
+  .nd-step--skipped .nd-step-btn { opacity: 0.5; }
+  .nd-step--skipped .nd-step-label { text-decoration: line-through; }
+</style>

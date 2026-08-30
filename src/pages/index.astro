@@ -1,0 +1,352 @@
+---
+// Homepage: hero, a live tool preview (the site thesis in one slider), three
+// (the curriculum, not a catalog), a featured-tool spotlight, and links to
+// the full tool/reference indexes.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HeroRiskReturn from "../components/HeroRiskReturn.tsx";
+
+const paths = [
+  {
+    eyebrow: "Path 1",
+    title: "Get your footing",
+    blurb: "Everything that comes before the first invested dollar — in order.",
+    steps: [
+      { label: "Money basics: budget, buffer, goals & debt", href: "/personal-finance/money-basics" },
+      { label: "Your next dollar: where it goes & how it's taxed", href: "/personal-finance/next-dollar" },
+      { label: "Compound growth: why any of this matters", href: "/tools/compound-growth" },
+      { label: "Risk tolerance: how much risk is yours to take", href: "/personal-finance/risk-tolerance" },
+    ],
+  },
+  {
+    eyebrow: "Path 2",
+    title: "How markets pay you",
+    blurb: "The evidence-based core: what return is, what erodes it, and who's really in the mirror.",
+    steps: [
+      { label: "Risk & return: CAPM and the factors", href: "/tools/factors" },
+      { label: "Diversification: the only free lunch", href: "/tools/diversification" },
+      { label: "What eats your returns: fees, inflation & taxes", href: "/tools/fees" },
+      { label: "Can you outsmart the market?", href: "/tools/beat-the-market" },
+      { label: "Your own worst enemy — and the Bias Arcade", href: "/tools/behavioral-finance" },
+    ],
+  },
+  {
+    eyebrow: "Path 3",
+    title: "Build it, live with it",
+    blurb: "From ideas to an actual portfolio — and the decades after.",
+    steps: [
+      { label: "Stock-picking: the hard truths", href: "/tools/stock-picking" },
+      { label: "Portfolio, allocation & bonds", href: "/tools/portfolio" },
+      { label: "Global investing: own the whole world", href: "/tools/global" },
+      { label: "Retirement accounts: Social Security, Roth & cheap tax years", href: "/personal-finance/retirement-accounts" },
+      { label: "Will your money last?", href: "/tools/retirement" },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Buy Risk">
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="eyebrow">Investing education, minus the hype</p>
+      <h1 class="hero-title">
+        Learn how <span class="accent">risk</span> and
+        <span class="accent">return</span> really work.
+      </h1>
+      <p class="hero-lede">
+        Buy Risk is a plain-language guide to investing. We explain the
+        <a href="/about#research">evidence-based models</a> that actually move
+        the needle (compounding, diversification, and the price of uncertainty),
+        and give you interactive tools to feel them for yourself. Whenever
+        possible, we pair simplified illustrations with simulations built on
+        <a href="/about#data">historical data</a>.
+      </p>
+      <div class="hero-actions">
+        <a href="/tools" class="btn btn--primary">Explore the tools</a>
+        <a href="/about" class="btn">About Buy Risk</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container demo">
+    <h2 class="demo-heading">See it in ten seconds</h2>
+    <p class="demo-lede">
+      Every tool here works like this one: real data, one thing to drag, and the
+      idea underneath made visible. Try it.
+    </p>
+    <div class="card demo-card">
+      {/* client:load, not client:visible — this is the homepage's "what is this
+          site?" demo, so it must be draggable the moment it is on screen. */}
+      <HeroRiskReturn client:load />
+    </div>
+  </section>
+
+  <section class="container paths">
+    <h2 class="paths-heading">Pick a path</h2>
+    <p class="paths-lede">
+      The tools build on each other. Follow a path in order, or jump straight to
+      whatever question brought you here.
+    </p>
+    <div class="grid grid--3 path-grid">
+      {
+        paths.map((p) => (
+          <div class="card path">
+            <p class="eyebrow">{p.eyebrow}</p>
+            <h3>{p.title}</h3>
+            <p class="path-blurb">{p.blurb}</p>
+            <ol class="path-steps">
+              {p.steps.map((s) => (
+                <li>
+                  <a href={s.href}>{s.label}</a>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))
+      }
+    </div>
+    <p class="paths-more">
+      Prefer to browse? The full catalogs: <a href="/tools">interactive tools</a> ·{" "}
+      <a href="/personal-finance">personal finance</a> · <a href="/info">reference &amp; live data</a> ·{" "}
+      <a href="/blog">essays</a>
+    </p>
+  </section>
+
+  <section class="container spotlight">
+    <div class="spotlight-inner card">
+      <div>
+        <p class="eyebrow">Featured: the Bias Arcade</p>
+        <h2>Test your own biases</h2>
+        <p>
+          Eleven two-minute experiments, adapted from the classic studies of
+          behavioral economics, that measure your anchoring, loss aversion,
+          overconfidence, herding, and more — before telling you what they were
+          measuring. Play first; diagnosis after. Then watch your bias profile
+          take shape.
+        </p>
+        <a href="/tools/behavioral-finance#arcade" class="btn btn--primary">Enter the arcade</a>
+      </div>
+      <div class="spotlight-visual" aria-hidden="true">
+        <svg viewBox="0 0 200 160" role="presentation">
+          <polygon points="100,14 168,45 185,110 140,152 60,152 15,110 32,45" fill="none" stroke="var(--color-border)" stroke-width="1.5"></polygon>
+          <polygon points="100,49 141,68 151,107 124,132 76,132 49,107 59,68" fill="none" stroke="var(--color-border)" stroke-width="1"></polygon>
+          <polygon points="100,30 152,62 148,118 100,140 58,124 42,80 70,48" fill="var(--color-accent-soft)" stroke="var(--color-accent)" stroke-width="2.5" opacity="0.9"></polygon>
+          <circle cx="100" cy="30" r="4" fill="var(--color-accent)"></circle>
+          <circle cx="152" cy="62" r="4" fill="var(--color-accent)"></circle>
+          <circle cx="58" cy="124" r="4" fill="var(--color-accent)"></circle>
+        </svg>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: var(--space-xl) var(--space-lg);
+    border-bottom: var(--border);
+    background: radial-gradient(
+      110% 80% at 15% 0%,
+      var(--color-accent-soft),
+      transparent 60%
+    );
+  }
+  .hero-inner {
+    max-width: 52rem;
+  }
+  .hero-title {
+    font-size: var(--step-3);
+    margin: 0.4rem 0 var(--space-md);
+  }
+  .accent {
+    color: var(--color-accent);
+  }
+  .hero-lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+    max-width: 46rem;
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  /* Live tool preview: the first thing below the hero, so a visitor sees what
+     this site actually is before navigating anywhere. */
+  .demo {
+    margin-top: var(--space-lg);
+  }
+  .demo-heading {
+    font-size: var(--step-2);
+    margin: 0 0 0.3rem;
+  }
+  .demo-lede {
+    color: var(--color-text-soft);
+    margin: 0 0 var(--space-md);
+    max-width: 46rem;
+  }
+  .demo-card {
+    padding: var(--space-md);
+  }
+  /* The ride inset spans the full card width under the chart+controls row. */
+  .demo-card :global(.hrr-ride) {
+    grid-column: 1 / -1;
+  }
+  /* Chart left, control + readout right; stacks on narrow screens. */
+  .demo-card :global(.hrr) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--space-md);
+    align-items: center;
+  }
+  @media (max-width: 720px) {
+    .demo-card :global(.hrr) {
+      grid-template-columns: 1fr;
+    }
+  }
+  .demo-card :global(.hrr-chart) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .demo-card :global(.hrr-slider) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .demo-card :global(.hrr-slider strong) {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-card :global(.hrr-slider input) {
+    width: 100%;
+  }
+  .demo-card :global(.hrr-readout) {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--step-1);
+    line-height: 1.4;
+  }
+  .demo-card :global(.hrr-readout strong) {
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Re-roll control under the ride inset. */
+  .demo-card :global(.hrr-roll) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-sm);
+  }
+  .demo-card :global(.hrr-roll button) {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: var(--border);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    cursor: pointer;
+  }
+  .demo-card :global(.hrr-roll button:hover) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .demo-card :global(.hrr-roll span) {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-card :global(.hrr-note) {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+
+  .paths {
+    margin-top: var(--space-xl);
+  }
+  .paths-heading {
+    font-size: var(--step-2);
+    margin: 0 0 0.3rem;
+  }
+  .paths-lede {
+    color: var(--color-text-soft);
+    margin: 0 0 var(--space-md);
+    max-width: 46rem;
+  }
+  .path-grid > .path {
+    display: flex;
+    flex-direction: column;
+  }
+  .path h3 {
+    font-size: var(--step-1);
+    margin: 0.2rem 0 0.3rem;
+  }
+  .path-blurb {
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
+    margin: 0 0 var(--space-sm);
+  }
+  .path-steps {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    line-height: 1.45;
+  }
+  .path-steps li::marker {
+    color: var(--color-muted);
+    font-weight: 600;
+  }
+  .path-steps a {
+    text-decoration: none;
+  }
+  .path-steps a:hover {
+    text-decoration: underline;
+  }
+  .paths-more {
+    margin-top: var(--space-md);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+
+  .spotlight {
+    margin-top: var(--space-lg);
+  }
+  .spotlight-inner {
+    display: grid;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    align-items: center;
+  }
+  @media (min-width: 780px) {
+    .spotlight-inner {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+  .spotlight-inner h2 {
+    margin: 0.3rem 0 var(--space-sm);
+  }
+  .spotlight-inner p {
+    color: var(--color-text-soft);
+    margin-bottom: var(--space-md);
+  }
+  .spotlight-visual svg {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    margin-inline: auto;
+    display: block;
+  }
+</style>

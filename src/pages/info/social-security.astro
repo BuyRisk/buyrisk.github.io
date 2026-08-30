@@ -1,0 +1,172 @@
+---
+// Info page: Social Security claiming-age effects, from the reduced SSA data
+// in src/data/generated/social-security.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { socialSecurity as ss } from "../../data/generated/social-security";
+import "../../styles/info.css";
+
+// Statutory benefit as a % of the full (PIA) amount by claim age, for a full
+// retirement age (FRA) of 67 — i.e. anyone born in 1960 or later. Derived from
+// the SSA reduction (5/9%/mo for the first 36 months early, 5/12%/mo beyond)
+// and delayed-retirement credits (8%/yr past FRA).
+const CLAIM = [
+  { age: 62, pct: 70 },
+  { age: 63, pct: 75 },
+  { age: 64, pct: 80 },
+  { age: 65, pct: 86.7 },
+  { age: 66, pct: 93.3 },
+  { age: 67, pct: 100, fra: true },
+  { age: 68, pct: 108 },
+  { age: 69, pct: 116 },
+  { age: 70, pct: 124 },
+];
+
+const life = (age: number) => ss.lifeTable.find((r) => r.age === age)!;
+const l67 = life(67);
+const latestCola = ss.cola[ss.cola.length - 1];
+
+const one = (x: number) => x.toFixed(1);
+const sourceNote = `U.S. Social Security Administration, Office of the Chief Actuary. Claim-age percentages are the statutory factors for a full retirement age of 67 (born 1960+). Life expectancy from the SSA period life table; latest COLA ${latestCola.year}.`;
+---
+
+<BaseLayout
+  title="Social Security Claiming Ages"
+  description="How your Social Security benefit changes with the age you claim — from 70% of full at 62 to 124% at 70 — plus life expectancy and the latest COLA. For a full retirement age of 67."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>When to claim Social Security</h1>
+    <p class="ref-lede">
+      The single biggest Social Security decision is <em>when</em> to start. Claim
+      early and each check is permanently smaller; wait, and it grows — by about
+      <strong>8% a year</strong> between your full retirement age and 70. Here's the
+      full trade-off, for anyone whose full retirement age is <strong>67</strong>
+      (born 1960 or later).
+    </p>
+    <p class="ref-asof">
+      Full retirement age 67 · SSA data
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">70%</span>
+        <span class="ref-stat-label">of your full benefit if you claim at the earliest age, 62</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">124%</span>
+        <span class="ref-stat-label">if you wait until 70 — the largest possible check</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{(latestCola.value * 100).toFixed(1)}%</span>
+        <span class="ref-stat-label">latest annual cost-of-living adjustment ({latestCola.year})</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Benefit by claiming age</h2>
+    <p class="ref-prose">
+      Your monthly benefit as a percentage of your <em>full</em> (age-67) amount.
+      The same lifetime earnings can produce a check that differs by nearly
+      <strong>80%</strong> depending only on when you start.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Claim age</th>
+            <th scope="col" class="num">% of full benefit</th>
+            <th scope="col">&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            CLAIM.map((c) => (
+              <tr class:list={[{ hi: c.fra }]}>
+                <td class:list={["strong", { }]}>
+                  {c.age}
+                  {c.fra && <span class="ref-badge" style="margin-left:.4rem">Full age</span>}
+                </td>
+                <td class="num strong">{c.pct}%</td>
+                <td>
+                  <span class="ref-track" aria-hidden="true">
+                    <span
+                      class="ref-fill"
+                      style={`width:${(c.pct / 124) * 100}%;background:${c.fra ? "var(--color-accent)" : "var(--pl-c3)"}`}
+                    />
+                  </span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="ref-caption">
+      Claiming before 67 locks in a reduction for life; delaying past 67 adds
+      delayed-retirement credits up to age 70, after which there's no further gain.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Why longevity is the crux</h2>
+    <p class="ref-prose">
+      Waiting trades smaller-but-earlier checks for larger-but-later ones, so the
+      math turns on how long you live. By the SSA's own life table, a 67-year-old
+      today can expect to live roughly {one(l67.eMale)} more years if male
+      (to about {Math.round(67 + l67.eMale)}) and {one(l67.eFemale)} more if female
+      (to about {Math.round(67 + l67.eFemale)}). The longer your likely lifespan,
+      the more delaying tends to pay off.
+    </p>
+    <div class="ref-callout">
+      <p>
+        <strong>This is general information, not advice about your own claim.</strong>
+        The right age depends on your health, other income, marital status, and
+        whether a spouse's or survivor's benefit is involved — none of which this
+        page knows. It also assumes a full retirement age of 67; for people born
+        1955–1959 it's between 66 and 67.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["ssa"]}
+      studies={["shovenSlavov2014"]}
+      title="Sources &amp; method"
+      intro="Claim-age factors are the statutory SSA formula for a full retirement age of 67. Life expectancy and COLA from SSA data (npm run data:ssa)."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/personal-finance/retirement-accounts" class="card">
+          <h3>Model your own claim</h3>
+          <p>
+            The Retirement Accounts tool weighs claiming ages against your life
+            expectancy to find the break-even and lifetime-benefit picture.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/contribution-limits" class="card">
+          <h3>Save alongside it</h3>
+          <p>
+            Social Security replaces only part of pre-retirement income. See this
+            year's limits for the accounts that fill the gap.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

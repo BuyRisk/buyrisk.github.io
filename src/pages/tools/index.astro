@@ -1,0 +1,142 @@
+---
+// Portfolio Playground index: cards for every interactive tool (from
+// src/data/tools) plus a teaser list of upcoming ones.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { TOOLS } from "../../data/tools";
+
+const upcoming = [
+  {
+    title: "Value vs. Growth: The Style Cycle",
+    blurb:
+      "Like US-vs-world, but for style: value and growth trade the lead in long cycles too. Watch the rolling gap swing, and see why the 'dead' style keeps coming back.",
+  },
+];
+---
+
+<BaseLayout
+  title="Portfolio Playground"
+  description="Interactive investing simulators that make the ideas tangible, from compounding to Modern Portfolio Theory. Play, and the concepts click."
+>
+  <section class="container tools-intro">
+    <p class="eyebrow">Portfolio Playground</p>
+    <h1>See the ideas move</h1>
+    <p class="lede">
+      Reading about compounding, risk, and diversification is one thing. Dragging
+      a slider and watching the numbers respond is another. These simulators turn
+      the core ideas of investing into something you can play with.
+    </p>
+  </section>
+
+  <section class="container">
+    <ul class="grid grid--2 tool-grid">
+      {
+        TOOLS.map((tool) => (
+          <li>
+            <a href={tool.href} class="card tool-card">
+              {tool.tag && <span class="badge">{tool.tag}</span>}
+              <h2>{tool.title}</h2>
+              <p>{tool.blurb}</p>
+              <span class="tool-cta">Open →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="container upcoming-section">
+    <h2 class="section-heading">More tools in the workshop</h2>
+    <ul class="grid grid--3 upcoming-grid">
+      {
+        upcoming.map((tool) => (
+          <li class="card upcoming-card">
+            <span class="badge">Coming soon</span>
+            <h3>{tool.title}</h3>
+            <p>{tool.blurb}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .tools-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .tool-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .tool-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0.4rem;
+    background: linear-gradient(
+      135deg,
+      var(--color-surface),
+      var(--color-accent-soft)
+    );
+  }
+  .tool-card h2 {
+    margin: 0.3rem 0 0;
+    font-size: var(--step-1);
+  }
+  .tool-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+    flex: 1;
+  }
+  .tool-cta {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-top: var(--space-xs);
+  }
+  .upcoming-section {
+    margin-top: var(--space-xl);
+  }
+  .section-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .upcoming-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .upcoming-card {
+    height: 100%;
+  }
+  .upcoming-card h3 {
+    margin: 0.5rem 0 0.4rem;
+    font-size: var(--step-1);
+  }
+  .upcoming-card p {
+    color: var(--color-text-soft);
+    margin: 0;
+  }
+  .badge {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+  }
+</style>

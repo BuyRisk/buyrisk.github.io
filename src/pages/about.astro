@@ -1,0 +1,202 @@
+---
+// About page: what Buy Risk is, the buy-risk thesis, and the full research and
+// dataset citation lists (rendered from src/data/citations).
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Sources from "../components/Sources.astro";
+import { STUDIES, DATASETS } from "../data/citations";
+
+const allStudyIds = Object.keys(STUDIES);
+const allDatasetIds = Object.keys(DATASETS);
+---
+
+<BaseLayout
+  title="About"
+  description="What Buy Risk is, who it's for, and the principles behind the way we teach investing."
+>
+  <section class="container about">
+    <div class="prose">
+      <p class="eyebrow">About</p>
+      <h1>Anyone can learn finance and investing. Much of it is also deeply counterintuitive.</h1>
+
+      <p>
+        <strong>Buy Risk</strong> exists because most investing content is
+        either trying to sell you something or assumes you already have an MBA.
+        We think the core ideas are genuinely learnable by anyone willing to
+        spend an afternoon with them, and that they're far more simple and
+        interesting than the hype makes them sound.
+      </p>
+      <p>
+        A fair note on depth: this is an <em>investing</em> curriculum more than
+        a personal-finance one. <a href="/personal-finance/money-basics">Money
+        Basics</a> starts from the true beginning — budgeting, buffers, debt —
+        but most of the site goes well past it, into territory (factor models,
+        withdrawal math, tax mechanics) usually reserved for textbooks. Every
+        term gets defined before it's used; bring curiosity and the tools do the
+        rest.
+      </p>
+
+      <h2>What we believe</h2>
+      <p>
+        The name is our thesis, with one important qualification: expected
+        return is compensation for bearing risk that <em>cannot be diversified
+        away</em>. Not all risk is paid for.
+      </p>
+      <p>
+        The risk that everyone holds at once — the market falling, inflation
+        arriving, a recession — cannot be avoided by spreading your money
+        around, because it hits everything at the same time. Since someone must
+        hold it, it carries an expected premium. That is
+        <strong>systematic</strong>, or compensated, risk.
+      </p>
+      <p>
+        The risk attached to one company — a failed product, a fraud, a lost
+        lawsuit — is different. It <em>can</em> be diversified away, essentially
+        for free, by owning many companies instead of a few. Because anyone can
+        shed it at no cost, markets don't pay a premium for holding it. That is
+        <strong>idiosyncratic</strong>, or uncompensated, risk. Concentrating in
+        a handful of stocks raises how much your portfolio moves without raising
+        what you should expect to earn. Some concentrated portfolios do beat the
+        market — but that is the spread of outcomes widening, not a premium
+        being collected, and it cuts both ways.
+      </p>
+      <p>
+        So the practical form of the thesis is narrower than the slogan: you
+        earn a premium by holding the uncertainty that can't be diversified
+        away, patiently and cheaply, and by not paying for the uncertainty that
+        can. Our <a href="/tools/stock-picking#count">diversification</a> and
+        <a href="/tools/factors">risk-pricing</a> tools show both halves in
+        motion.
+      </p>
+
+      <h2>How we teach</h2>
+      <ul>
+        <li>
+          <strong>Plain language first.</strong> If a concept needs jargon, we
+          define it before we use it.
+        </li>
+        <li>
+          <strong>Show, don't just tell.</strong> Our <a href="/tools">tools</a>
+          let you manipulate the variables yourself, because intuition comes
+          from playing, not reading.
+        </li>
+        <li>
+          <strong>Evidence over stories.</strong> We lean on the boring,
+          well-supported findings of finance (diversification, compounding, and
+          the cost of fees), not hot tips.
+        </li>
+      </ul>
+
+      <h2 id="built">How this site is built</h2>
+      <p>
+        Buy Risk is a living project, not a finished textbook. Tools are added and
+        revised often, and the newest ones have had the least wear. If you're
+        citing or teaching from something here, it's worth confirming it still
+        says what you expect it to.
+      </p>
+      <p>
+        <strong>Where the numbers come from.</strong> Every simulation runs on real
+        data rather than invented figures: long-run US returns from Aswath
+        Damodaran, daily market and factor returns from the Kenneth French data
+        library, valuations from Robert Shiller, fund data from CRSP, benefit
+        formulas and life tables from the Social Security Administration, and tax
+        parameters from the IRS revenue procedures. Each source is turned into the
+        figures the site needs by a script kept in the repository, so any number
+        here traces back to a published dataset. Licensed data is used under
+        license, and only derived aggregates are ever published.
+      </p>
+      <p>
+        <strong>How the calculations are checked.</strong> Wherever an authoritative
+        reference exists, the engines are tested against it. The Social Security
+        calculator reproduces the SSA's own published benefit examples to the dime.
+        The federal tax engine is checked against hand-computed cases and
+        cross-examined against an independent spreadsheet implementation of the
+        same law. Those tests live in the repository and are run before changes
+        ship. The simpler illustrative tools are ordinary arithmetic you can read
+        for yourself.
+      </p>
+      <p>
+        <strong>How it's written.</strong> The tools and much of the writing here are
+        produced with heavy use of AI assistance, directed, reviewed, and verified
+        by a human. That's why the checks above exist, and why the <a
+          href="https://github.com/BuyRisk/buyrisk.github.io"
+          target="_blank"
+          rel="noopener noreferrer">full source is public</a>: the claim isn't
+        "trust us," it's "check us."
+      </p>
+      <p>
+        <strong>How it's licensed.</strong> The source is public so it can be
+        checked, not so it can be resold. The code is under the <a
+          href="https://polyformproject.org/licenses/noncommercial/1.0.0"
+          target="_blank"
+          rel="noopener noreferrer">PolyForm Noncommercial</a> licence and the
+        writing under <a
+          href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+          target="_blank"
+          rel="noopener noreferrer">CC BY-NC-SA 4.0</a>, which together mean you
+        may read, fork, adapt, and above all <em>teach</em> from any of this,
+        with credit, for free. Classroom and institutional use is explicitly
+        covered — if you're a teacher, this licence was chosen with you in mind.
+        What isn't permitted is selling it, running it with advertising, or
+        putting it behind a paywall. The datasets the tools run on are a
+        separate case: they're aggregates derived from data we hold under
+        licence, so we can publish them here but cannot pass the right to
+        republish them on to anyone else.
+      </p>
+      <p>
+        <strong>Found a mistake?</strong> Please tell us. Corrections take priority
+        over new features, and if you're using this in a classroom we'd genuinely
+        like to know: <a href="mailto:buyriskHQ@gmail.com">buyriskHQ@gmail.com</a>.
+      </p>
+
+      <h2>An important note</h2>
+      <p>
+        Everything on Buy Risk is educational. It is not personalized financial
+        advice, and we don't know your situation. Use it to understand how
+        investing works, then make your own decisions, or talk to a licensed
+        professional who can account for your specific circumstances.
+      </p>
+
+      <p>
+        If you do want personal guidance, the same idea that runs through this
+        site applies to the advice itself: understand what you're paying and what
+        you get for it. Advisors charge in different ways (a flat or hourly fee, a
+        percentage of your assets, or commissions on products), and any of them can
+        be worth it as long as the cost is clear to you. A fee-only, advice-only
+        advisor is one transparent, low-conflict place to start; directories like
+        the <a
+          href="https://adviceonlynetwork.com/#advisors"
+          target="_blank"
+          rel="noopener noreferrer">Advice-Only Network</a> list them.
+      </p>
+
+      <p>
+        Ready to dig in? Jump straight to the
+        <a href="/tools/compound-growth">compound growth explorer</a>, or browse
+        the full <a href="/tools">Portfolio Playground</a>.
+      </p>
+
+      <h2>Get in touch</h2>
+      <p>
+        Questions, corrections, or an idea for a tool? Email us at
+        <a href="mailto:buyriskHQ@gmail.com">buyriskHQ@gmail.com</a>.
+      </p>
+    </div>
+  </section>
+
+  {/* Author bio slots in here when ready. Northwestern faculty; frame as the
+      project's scholarship / academic-service note. */}
+
+  <Sources
+    studies={allStudyIds}
+    datasets={allDatasetIds}
+    grouped
+    title="Data & research"
+    intro="Buy Risk is built on the primary sources of evidence-based finance. Every figure on the site traces back to peer-reviewed research or a public dataset; the works below anchor the tools, grouped by theme."
+  />
+</BaseLayout>
+
+<style>
+  .about {
+    padding-block: var(--space-lg);
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+// Site-wide currency picker. Writes localStorage and fires an event that the
+// React tool islands listen to (see src/lib/currency.ts). Kept dependency-free
+// and inline so the saved choice is applied before the tools hydrate. Options
+// come from the shared CURRENCIES list so adding one there adds it here too.
+import { CURRENCIES } from "../lib/currency";
+---
+
+<label class="currency-select" title="Display currency">
+  <span class="sr-only">Currency</span>
+  <select id="currency-select" aria-label="Display currency">
+    {
+      CURRENCIES.map((c) => (
+        <option value={c.code}>
+          {c.symbol} {c.label}
+        </option>
+      ))
+    }
+  </select>
+</label>
+
+<style>
+  .currency-select {
+    display: inline-flex;
+    align-items: center;
+  }
+  .currency-select select {
+    appearance: none;
+    height: 2.5rem;
+    padding: 0 0.6rem;
+    border-radius: 999px;
+    border: var(--border);
+    background: var(--color-surface);
+    color: var(--color-text-soft);
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--transition), border-color var(--transition);
+  }
+  .currency-select select:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var KEY = "buy-risk-currency";
+    var sel = document.getElementById("currency-select");
+    if (!sel) return;
+    var saved = localStorage.getItem(KEY);
+    // Apply the saved choice only if it matches a currency we actually offer
+    // (reads the rendered options, so it never drifts from the source list).
+    if (saved && sel.querySelector('option[value="' + saved + '"]')) {
+      sel.value = saved;
+    }
+    sel.addEventListener("change", function () {
+      try {
+        localStorage.setItem(KEY, sel.value);
+      } catch (e) {}
+      window.dispatchEvent(new Event("buy-risk-currency-change"));
+    });
+  })();
+</script>

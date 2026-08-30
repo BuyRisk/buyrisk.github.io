@@ -1,0 +1,72 @@
+---
+// Page shell for /tools/global: intro + the GlobalInvestingModule island
+// (home bias, currency risk, leadership cycles) + sources and next-tool link.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GlobalInvestingModule from "../../components/GlobalInvestingModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Global Investing: Home Bias, Currency & Cycles"
+  description="Own the whole world, not just home. See how small a slice your home market really is, why the lead trades between the US and international in long cycles, and when a foreign holding's currency is worth hedging."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Owning the whole world</h1>
+    <p class="lede">
+      Diversification doesn't stop at your border. Own the market in proportion to
+      each country's size and you make no bet on which nation wins next — yet almost
+      everyone piles into home. Three views of investing globally: how much of the
+      world you're skipping, how the lead rotates between regions on an untimeable
+      clock, and when a foreign holding's currency is worth hedging.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <GlobalInvestingModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Three sides of the same idea</h2>
+      <ul>
+        <li>
+          <strong>Home bias.</strong> No country is the whole market — even the US
+          is under two-thirds of global stock value, and most home markets are a few
+          percent or less. Holding only your home market means skipping most of the
+          world's companies for a concentrated bet on one nation's next few decades.
+        </li>
+        <li>
+          <strong>US vs. the world.</strong> The gap between US and international
+          returns doesn't flicker randomly; it trends for years, long enough to
+          convince people the current leader will lead forever — right before it
+          doesn't. The US led the 2010s; international and emerging led the 2000s.
+          Chasing the recent winner is how investors buy high at the country level.
+        </li>
+        <li>
+          <strong>Currency risk.</strong> Buy a foreign fund and you own its
+          currency too. Those swings are enormous next to a calm bond and minor next
+          to a volatile stock — which is why the evidence says hedge your foreign
+          bonds but rarely your foreign stocks.
+        </li>
+      </ul>
+      <p>
+        It all points one way: rather than guess the next winning country, own them
+        all in proportion and rebalance as the map changes. This is the humility of
+        indexing taken global. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="global" />
+
+  <NextTool current="/tools/global" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>

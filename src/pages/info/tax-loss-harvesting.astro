@@ -1,0 +1,210 @@
+---
+// Info page: common tax-loss-harvesting fund pairs, from
+// src/data/tlh-pairs. US-specific.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { TLH_SEGMENTS, TLH_UPDATED } from "../../data/tlh-pairs";
+import "../../styles/info.css";
+
+const updatedLabel = new Date(TLH_UPDATED + "-01T00:00:00Z").toLocaleDateString(
+  "en-US",
+  { year: "numeric", month: "long", timeZone: "UTC" },
+);
+const sourceNote = `Fund-to-index mappings compiled from fund prospectuses; verify against the current prospectus before acting. The wash-sale standard is IRC §1091 / IRS Publication 550. Last reviewed ${updatedLabel}.`;
+---
+
+<BaseLayout
+  title="Tax-Loss Harvesting Partners"
+  description="Index funds and ETFs that track the same slice of the market through a different index — candidate partners for tax-loss harvesting without tripping the wash-sale rule. Educational only, not tax advice."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>Tax-loss harvesting partners</h1>
+    <p class="ref-lede">
+      <strong>Tax-loss harvesting</strong> means selling an investment that's down
+      to book a capital loss (which can offset gains or income), then immediately
+      buying something that fills the same role so your portfolio barely changes.
+      The catch is the <strong>wash-sale rule</strong>: if you buy a
+      "substantially identical" security within 30 days, the loss is disallowed.
+      The common workaround is to swap into a fund that tracks the
+      <em>same slice of the market through a different index</em>. This table lists
+      candidates, grouped by market slice.
+    </p>
+    <p class="ref-asof">
+      Last reviewed <strong>{updatedLabel}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <div class="ref-callout">
+      <p>
+        <strong>This is educational information, not tax or investment advice.</strong>
+        Everyone's situation differs; consider talking to a tax professional before
+        harvesting.
+      </p>
+      <p>
+        <strong>The IRS has never defined "substantially identical" for funds
+        tracking different indexes.</strong> Pairing different-index funds is common
+        practice, not a guarantee. What's clearly risky is swapping between two
+        funds that track the <em>same</em> index (two S&amp;P 500 funds, say) — treat
+        those as identical.
+      </p>
+      <p>
+        <strong>The 30-day window runs both ways</strong> (61 days total), and it's
+        easy to trip by accident: automatic investments, dividend reinvestment
+        (turn it off around a harvest), a purchase in your IRA or 401(k), or a buy
+        in a spouse's account can all trigger a wash sale.
+      </p>
+    </div>
+  </section>
+
+  <section class="container ref-block">
+    <h2>How to read this</h2>
+    <p class="ref-prose">
+      Within each market slice, a candidate partner is any fund whose
+      <strong>Index tracked</strong> differs from the one you're selling. Sell the
+      fund that's at a loss, buy one from the same slice with a different index, and
+      avoid re-buying the original (or anything on its index) for 31 days. Tickers
+      list the ETF and, where it exists, the equivalent mutual fund.
+    </p>
+
+    {
+      TLH_SEGMENTS.map((seg) => (
+        <div class="tlh-seg">
+          <h3>{seg.name}</h3>
+          <p class="ref-sub tlh-blurb">{seg.blurb}</p>
+          <div class="ref-tablewrap">
+            <table class="ref-table">
+              <thead>
+                <tr>
+                  <th scope="col">Ticker(s)</th>
+                  <th scope="col">Fund</th>
+                  <th scope="col">Index tracked</th>
+                </tr>
+              </thead>
+              <tbody>
+                {seg.funds.map((f) => (
+                  <tr>
+                    <td class="ref-mono strong">{f.ticker}</td>
+                    <td>{f.name}</td>
+                    <td class="ref-sub">{f.index}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {seg.note && (
+            <p class="ref-callout tlh-note">
+              <strong>Note.</strong> {seg.note}
+            </p>
+          )}
+        </div>
+      ))
+    }
+  </section>
+
+  <section class="container ref-block">
+    <h2>What about tax-<em>gain</em> harvesting?</h2>
+    <div class="ref-prose">
+      <p>
+        The mirror image — deliberately <em>selling</em> at a gain, often to use up
+        the 0% long-term capital-gains bracket and reset your cost basis higher —
+        is a real strategy too. The key difference:
+        <strong>the wash-sale rule does not apply to gains.</strong> It only
+        disallows losses, so when you harvest a gain you can rebuy the
+        <em>identical</em> fund immediately — no different-index partner needed.
+      </p>
+      <div class="ref-callout">
+        <p>
+          <strong>The catch for custodial accounts.</strong> A child's or student's
+          low income makes 0%-bracket gain harvesting appealing, but a minor's
+          investment income is subject to the <strong>"kiddie tax"</strong>: above a
+          modest annual threshold it's taxed at the parents' rate, not the child's.
+          Long-term rates also require a holding period over a year. As always,
+          this is educational, not tax advice — check the current thresholds and
+          your own situation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container ref-block">
+    <h2>A few practical cautions</h2>
+    <div class="ref-prose">
+      <ul>
+        <li>
+          <strong>Harvesting defers tax; it doesn't erase it.</strong> Buying the
+          replacement at today's lower price lowers your cost basis, so you may owe
+          more later. The benefit is the time value of the deferred tax, plus up to
+          $3,000/year of ordinary income offset.
+        </li>
+        <li>
+          <strong>Only in taxable accounts.</strong> There's nothing to harvest in
+          an IRA or 401(k) — and a buy there can actually spoil a harvest in your
+          taxable account.
+        </li>
+        <li>
+          <strong>Mind the partner's details.</strong> A good partner also has a
+          low expense ratio and similar exposure; you'll often hold it afterward, so
+          it shouldn't be a downgrade. Some people simply swap back after 31 days.
+        </li>
+        <li>
+          <strong>Verify before you act.</strong> Funds occasionally change their
+          benchmark. Confirm the current index in the prospectus.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["irsPub550"]}
+      title="Sources &amp; method"
+      intro="Fund-to-index mappings compiled from fund prospectuses (verify before acting). The wash-sale rule and the “substantially identical” standard are set by IRC §1091 and described in IRS Publication 550."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/info/global-market-cap" class="card">
+          <h3>Which slice is which?</h3>
+          <p>
+            The market-cap breakdown shows how these US, developed, and emerging
+            slices fit together into the whole global market.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/fund-fees" class="card">
+          <h3>Check the cost first</h3>
+          <p>
+            A harvesting partner should be cheap to hold. See how far expense ratios
+            have fallen across the major fund families.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .tlh-seg {
+    margin-top: var(--space-lg);
+  }
+  .tlh-seg h3 {
+    margin-bottom: 0.2rem;
+  }
+  .tlh-blurb {
+    max-width: var(--measure);
+    margin: 0 0 var(--space-xs);
+  }
+  .tlh-note {
+    margin-top: var(--space-sm);
+  }
+</style>

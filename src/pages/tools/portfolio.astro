@@ -1,0 +1,71 @@
+---
+// Page shell for /tools/portfolio: intro + the PortfolioModule island
+// (portfolio lab, allocation, bonds) + sources and next-tool link.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PortfolioModule from "../../components/PortfolioModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Portfolio, Allocation & Bonds"
+  description="Turn diversification into an actual portfolio: mix assets and find the efficient frontier, dial the all-important stock/bond split, and understand why the 'safe' bond sleeve still moves when interest rates change."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Building the actual portfolio</h1>
+    <p class="lede">
+      Once you understand diversification, you have to <em>build</em> something.
+      Mix assets and watch the efficient frontier emerge; dial the single biggest
+      decision you'll make: how much rides in stocks versus bonds; and learn why
+      the "safe" bond half carries its own risk when interest rates move.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <PortfolioModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>From frontier to allocation to bonds — and keeping it there</h2>
+      <ul>
+        <li>
+          <strong>Mix assets.</strong> Combine holdings with different correlations
+          and the efficient frontier appears: the set of best-possible risk/return
+          trade-offs, and the free-lunch benefit of not putting everything in one place.
+        </li>
+        <li>
+          <strong>How much in stocks?</strong> The stock/bond dial is the decision
+          that matters most. More stocks lifts long-run return but deepens the worst
+          drop you must survive, set by your ability, willingness, and need to take
+          risk.
+        </li>
+        <li>
+          <strong>Bonds &amp; rates.</strong> Bonds anchor a portfolio, but when
+          rates rise their prices fall, and longer bonds fall harder (duration).
+          Matching bond maturity to when you need the money is the quiet art of the
+          "safe" sleeve.
+        </li>
+        <li>
+          <strong>Rebalancing.</strong> Left alone, a portfolio drifts: stocks
+          out-grow bonds and a tidy 60/40 quietly becomes a risky 80/20. Rebalancing
+          on a schedule or a threshold pulls it back — controlling the risk you hold
+          rather than chasing extra return.
+        </li>
+      </ul>
+      <p>Educational only, not financial advice.</p>
+    </div>
+  </section>
+
+  <Sources tool="portfolio" />
+
+  <NextTool current="/tools/portfolio" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>

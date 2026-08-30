@@ -1,0 +1,154 @@
+---
+// Page shell for /tools/diversification: intro + the DiversificationModule
+// island + sources and next-tool link.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DiversificationModule from "../../components/DiversificationModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import RegionNote from "../../components/RegionNote.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Diversification"
+  description="Diversification from first principles: how out-of-phase ups and downs cancel to lower risk. Start with the pure idea as interfering waves, then add real, noisy returns and watch the free lunch shrink but not vanish."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>Diversification: the only free lunch</h1>
+    <p class="lede">
+      Mixing assets that don't move in lockstep lowers a portfolio's risk without
+      lowering its expected return: the closest thing investing has to a free
+      lunch. Meet it in four views: first the pure idea, where out-of-phase waves
+      cancel; then the catch, where correlations aren't constant — they spike in
+      the extremes and the free lunch shrinks just when moves are largest; then
+      the messy reality of real, noisy returns; and finally its opposite, where a
+      "500-stock" index turns out to ride on a handful of giants.
+    </p>
+    <div
+      class="intro-formula"
+      role="img"
+      aria-label="Portfolio variance equals w-one squared sigma-one squared plus w-two squared sigma-two squared plus two times w-one w-two rho sigma-one sigma-two"
+    >
+      <span class="intro-formula-eq">σ<sub>p</sub><sup>2</sup> = w<sub>1</sub><sup>2</sup>σ<sub>1</sub><sup>2</sup> + w<sub>2</sub><sup>2</sup>σ<sub>2</sub><sup>2</sup> + 2w<sub>1</sub>w<sub>2</sub> ρ σ<sub>1</sub>σ<sub>2</sub></span>
+      <span class="intro-formula-key">
+        <b>σ<sub>p</sub></b> portfolio risk · <b>w</b> each asset's weight ·
+        <b>σ</b> each asset's own risk · <b>ρ</b> their correlation — the term that
+        <em>shrinks</em> risk when they don't move together.
+      </span>
+    </div>
+  </section>
+
+  <section class="container wl-host">
+    <DiversificationModule client:load />
+  </section>
+
+  <section class="container">
+    <RegionNote kind="data">
+      The <strong>How top-heavy is the market?</strong> tab uses US data — the
+      S&amp;P 500's own constituents (CRSP). The lesson is universal: any
+      cap-weighted index, in any country, can be quietly dominated by a few
+      giants. The specific names are American.
+    </RegionNote>
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Waves: the pure idea</h2>
+      <ul>
+        <li>
+          <strong>Each asset is a wave.</strong> Taller = more volatile; its
+          <strong>correlation</strong> sets its phase. At +1 the waves line up; at
+          −1 they're mirror images.
+        </li>
+        <li>
+          <strong>The portfolio is their sum.</strong> The dashed lines show how
+          big the volatility would be if risk simply stacked; the gap down to the solid
+          wave is the risk that cancelled away. Slide correlation toward −1 and the
+          portfolio flattens toward a straight line: near-perfect cancellation.
+        </li>
+      </ul>
+
+      <h2>Shifting correlations: the catch</h2>
+      <ul>
+        <li>
+          <strong>Correlation isn't a constant.</strong> The single ρ in the
+          variance formula is an <em>average</em>. In the extremes, assets that
+          normally drift apart lurch into lockstep — correlation jumps toward +1
+          and the waves stop cancelling.
+        </li>
+        <li>
+          <strong>It's not inherently good or bad.</strong> Watch the portfolio
+          wave, flat in calm markets, swell to full size inside the shaded
+          episodes — the joint move can be a rally or a sell-off, so the shading
+          stays neutral. The statistics are identical; only the down move hurts.
+          Diversification fades exactly when moves are largest, which is why the
+          tidy average oversells it.
+        </li>
+      </ul>
+
+      <h2>Messy reality</h2>
+      <ul>
+        <li>
+          <strong>Nothing cancels perfectly.</strong> With real, noisy returns the
+          theoretical benefit and what a given run actually delivers rarely match,
+          and there's no truly risk-free blend of risky assets.
+        </li>
+        <li>
+          <strong>Assets sink together.</strong> The higher the correlation, the
+          more often every holding is down at once: exactly when diversification
+          helps least. That's why correlations, not just volatilities, drive
+          portfolio risk.
+        </li>
+      </ul>
+      <h2>Concentration: diversification in reverse</h2>
+      <ul>
+        <li>
+          <strong>"500 stocks" can mean a handful.</strong> A cap-weighted index
+          hands the biggest companies the biggest share, so when a few giants swell,
+          the top 10 names can make up a third or more of the whole. The
+          <strong>effective number of stocks</strong> (1 ÷ the sum of squared
+          weights) shows how few names you're really diversified across.
+        </li>
+        <li>
+          <strong>Concentration is a bet.</strong> Equal-weighting every stock and
+          cap-weighting the same 500 give very different rides: cap weight wins when
+          the giants lead, and lags when they don't. Owning the index is convenient,
+          but it isn't the same as owning 500 things equally.
+        </li>
+      </ul>
+      <p>
+        This is the core idea behind <strong>Modern Portfolio Theory</strong>,
+        introduced by Harry Markowitz in 1952: because correlations, not just
+        volatilities, drive a portfolio's risk, the <em>mix</em> of assets can be
+        engineered for a better risk-and-return trade-off. Formalized, that search
+        is called <strong>mean-variance optimization</strong>: using expected
+        returns, variances, and correlations to find the least-risk portfolio for a
+        given expected return. Both views here are simplified, and real returns have
+        fat tails the model can't capture. To see that optimization drawn as the
+        efficient frontier, with a full range of outcomes, continue to
+        <a href="/tools/portfolio">Portfolio, Allocation &amp; Bonds</a>.
+        Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="diversification" />
+
+  <NextTool current="/tools/diversification" />
+</BaseLayout>
+
+<style>
+  .wl-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+  }
+  .wl-explainer {
+    margin-top: var(--space-lg);
+  }
+</style>

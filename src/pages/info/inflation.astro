@@ -1,0 +1,168 @@
+---
+// Info page: CPI category inflation history, from
+// src/data/generated/inflation.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { inflation } from "../../data/generated/inflation";
+import "../../styles/info.css";
+
+const base = inflation.categories.find((c) => c.baseline)!;
+const bs = base.series;
+const latest = bs[bs.length - 1];
+const prev = bs[bs.length - 2];
+const yoy = latest.index / prev.index - 1;
+const first = bs[0];
+const longRun = (latest.index / first.index) ** (1 / (latest.year - first.year)) - 1;
+
+const B = inflation.commonStart; // common first year across all categories
+const at = (s: { year: number; index: number }[], y: number) =>
+  s.find((p) => p.year === y)!.index;
+const rows = inflation.categories
+  .map((c) => {
+    const i0 = at(c.series, B);
+    const i1 = at(c.series, latest.year);
+    return {
+      name: c.name,
+      baseline: !!c.baseline,
+      change: i1 / i0 - 1,
+      ann: (i1 / i0) ** (1 / (latest.year - B)) - 1,
+    };
+  })
+  .sort((a, b) => b.change - a.change);
+
+const pct = (x: number, dp = 1) => `${x >= 0 ? "" : "−"}${(Math.abs(x) * 100).toFixed(dp)}%`;
+const maxAbs = Math.max(...rows.map((r) => Math.abs(r.change)));
+const sourceNote = `${inflation.source} Each figure is the change in the Consumer Price Index for that category. Latest ${latest.year}.`;
+---
+
+<BaseLayout
+  title="Inflation, by Category"
+  description="How prices have really risen — the headline CPI plus how differently college, healthcare, shelter, cars, and clothing have moved since 1978. The headline rate hides very different stories."
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>Inflation isn't one number</h1>
+    <p class="ref-lede">
+      The headline inflation rate is an <em>average</em> across thousands of
+      prices — and it hides wildly different stories. Since the late 1970s, college
+      and healthcare have raced ahead of the average while clothing and toys got
+      cheaper. Your personal inflation is your own basket, which is why outpacing it
+      is the real job of investing.
+    </p>
+    <p class="ref-asof">
+      Latest data {latest.year}
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(yoy)}</span>
+        <span class="ref-stat-label"
+          >headline CPI, {prev.year}→{latest.year} — the latest year-over-year rise</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{pct(longRun)}</span>
+        <span class="ref-stat-label"
+          >average annual inflation since {first.year} — the long-run backdrop</span
+        >
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{Math.round((latest.index / at(base.series, B)) * 10) / 10}×</span>
+        <span class="ref-stat-label"
+          >higher prices overall since {B}: what cost $10 then costs about ${(
+            (latest.index / at(base.series, B)) *
+            10
+          ).toFixed(0)} now</span
+        >
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>How each category moved since {B}</h2>
+    <p class="ref-prose">
+      Cumulative price change for everyday spending categories, {B} to {latest.year}.
+      The headline "all items" figure is highlighted; notice how far the extremes
+      diverge from it.
+    </p>
+
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col" class="num">Change since {B}</th>
+            <th scope="col" class="num">Per year</th>
+            <th scope="col">Relative move</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr class:list={[{ hi: r.baseline }]}>
+                <td class:list={[{ strong: r.baseline }]}>
+                  {r.name}
+                  {r.baseline && <span class="ref-badge" style="margin-left:.4rem">Headline</span>}
+                </td>
+                <td class="num strong">{pct(r.change, 0)}</td>
+                <td class="num muted">{pct(r.ann)}</td>
+                <td>
+                  <span class="ref-track" aria-hidden="true">
+                    <span
+                      class="ref-fill"
+                      style={`width:${(Math.abs(r.change) / maxAbs) * 100}%;background:${r.change < 0 ? "var(--pl-c6)" : r.baseline ? "var(--color-accent)" : "var(--pl-c1)"}`}
+                    />
+                  </span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="ref-caption">
+      Labor-heavy services (tuition, medical care) climb fastest; manufactured
+      goods (clothing, toys, TVs) have often <em>fallen</em> in price. Two
+      households can feel completely different inflation depending on what they buy.
+    </p>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["bls"]}
+      title="Sources &amp; method"
+      intro="Consumer Price Index by category from the BLS (via FRED). Refresh with npm run data:inflation."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/tools/fees" class="card">
+          <h3>Inflation vs. your returns</h3>
+          <p>
+            The Fees &amp; Inflation tool shows why a positive return still loses
+            ground if it can't outpace rising prices.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/info/historical-returns" class="card">
+          <h3>Real returns</h3>
+          <p>
+            See how much stocks, bonds, and cash returned after subtracting the
+            inflation on this page.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

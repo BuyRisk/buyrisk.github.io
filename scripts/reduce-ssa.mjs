@@ -1,0 +1,168 @@
+/**
+ * Reduce the SSA workbooks → src/data/generated/social-security.ts
+ *
+ * Four public-domain SSA sources → one typed dataset the Social Security tool
+ * consumes to (a) compute a real benefit and (b) longevity-weight the claiming
+ * decision:
+ *   • Period life table  → survival curve (lₓ) by age & sex
+ *   • National AWI       → index a worker's past earnings to today's wage level
+ *   • PIA bend points    → the 90% / 32% / 15% benefit-formula breakpoints
+ *   • COLA history       → grow the benefit with realized inflation
+ *
+ * Each workbook has a prose preamble and footer; we key off the data rows
+ * (numeric year / age) and ignore the rest. The AWI and COLA sheets wrap their
+ * series across several column-pairs per row, which we unwrap.
+ *
+ * Run:  npm run data:ssa
+ */
+import { writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { readWorkbook } from "./lib/read-xlsx.mjs";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const DIR = join(root, "data", "sources", "ssa");
+const OUT = join(root, "src", "data", "generated", "social-security.ts");
+
+const num = (v) => {
+  // Number("") === 0, which would turn blank cells into a phantom 0 — guard it.
+  if (v === null || v === undefined || (typeof v === "string" && v.trim() === "")) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+};
+const isYear = (v) => Number.isInteger(num(v)) && num(v) >= 1900 && num(v) <= 2100;
+const round = (x, dp) => (x === null ? null : Math.round(x * 10 ** dp) / 10 ** dp);
+
+function lifeTable() {
+  const rows = readWorkbook(join(DIR, "2023 (2026 TR) SSA Period Life Table.xlsx")).sheet("Sheet1");
+  const out = [];
+  for (const r of rows) {
+    const age = num((r || [])[0]);
+    if (!Number.isInteger(age) || age < 0 || age > 119) continue;
+    const vals = [num(r[1]), num(r[2]), num(r[3]), num(r[4]), num(r[5]), num(r[6])];
+    if (vals.some((v) => v === null)) continue; // skip header/partial rows
+    const [qMale, lMale, eMale, qFemale, lFemale, eFemale] = vals;
+    out.push({ age, qMale, lMale, eMale, qFemale, lFemale, eFemale });
+  }
+  return out.sort((a, b) => a.age - b.age);
+}
+
+function bendPoints() {
+  const rows = readWorkbook(join(DIR, "SSA Benefit Formula Bend Points.xlsx")).sheet("Sheet1");
+  const out = [];
+  for (const r of rows) {
+    if (!isYear((r || [])[0])) continue;
+    const first = num(r[1]);
+    const second = num(r[2]);
+    if (first !== null && second !== null) out.push({ year: num(r[0]), first, second });
+  }
+  return out.sort((a, b) => a.year - b.year);
+}
+
+/** Unwrap a sheet whose series is laid out as repeating [year, value] column-pairs. */
+function unwrapPairs(rows, pairStarts, scale = 1) {
+  const map = new Map();
+  for (const r of rows || []) {
+    for (const c of pairStarts) {
+      const y = (r || [])[c];
+      const v = (r || [])[c + 1];
+      if (isYear(y) && num(v) !== null) map.set(num(y), num(v) * scale);
+    }
+  }
+  return [...map.entries()].map(([year, value]) => ({ year, value })).sort((a, b) => a.year - b.year);
+}
+
+function awi() {
+  const rows = readWorkbook(join(DIR, "SSA National Average Wage Index.xlsx")).sheet("Sheet1");
+  // Series wraps across three [year, index] column-pairs per row (header row 20).
+  return unwrapPairs(rows, [0, 2, 4]);
+}
+
+function cola() {
+  const rows = readWorkbook(join(DIR, "SSA COLA.xlsx")).sheet("Sheet1");
+  // COLA is in percent (8 = 8%); store as a decimal.
+  return unwrapPairs(rows, [0, 2, 4], 0.01).map((d) => ({ year: d.year, value: round(d.value, 4) }));
+}
+
+function main() {
+  const lt = lifeTable();
+  const bp = bendPoints();
+  const aw = awi();
+  const co = cola();
+  if (!lt.length || !bp.length || !aw.length || !co.length) {
+    throw new Error(`empty series: life=${lt.length} bend=${bp.length} awi=${aw.length} cola=${co.length}`);
+  }
+  const asOf = Math.max(bp[bp.length - 1].year, aw[aw.length - 1].year, co[co.length - 1].year);
+  const out = { asOf, lifeTable: lt, awi: aw, bendPoints: bp, cola: co };
+  writeFileSync(OUT, render(out));
+  console.log(
+    `social-security: life table ${lt.length} ages, AWI ${aw[0].year}-${aw[aw.length - 1].year}, ` +
+      `bend points ${bp[0].year}-${bp[bp.length - 1].year}, COLA ${co[0].year}-${co[co.length - 1].year}\n` +
+      `  e.g. male life expectancy at 65: ${lt.find((r) => r.age === 65)?.eMale} yrs; ` +
+      `latest AWI ${aw[aw.length - 1].value}\n  → ${OUT}`
+  );
+}
+
+function render(o) {
+  const lt = o.lifeTable
+    .map((r) => `  { age: ${r.age}, qMale: ${r.qMale}, lMale: ${r.lMale}, eMale: ${r.eMale}, qFemale: ${r.qFemale}, lFemale: ${r.lFemale}, eFemale: ${r.eFemale} },`)
+    .join("\n");
+  const yv = (arr) => arr.map((d) => `  { year: ${d.year}, value: ${d.value} },`).join("\n");
+  const bp = o.bendPoints.map((d) => `  { year: ${d.year}, first: ${d.first}, second: ${d.second} },`).join("\n");
+  return `// AUTO-GENERATED by scripts/reduce-ssa.mjs — DO NOT EDIT.
+// Re-run: npm run data:ssa
+//
+// U.S. Social Security Administration actuarial + benefit data (public domain).
+// Powers the Social Security claiming tool: real benefit computation (AWI + bend
+// points), inflation growth (COLA), and longevity weighting (life table).
+
+export interface LifeTableRow {
+  age: number;
+  /** Male death probability within the year (qₓ). */
+  qMale: number;
+  /** Male survivors out of 100,000 born (lₓ). */
+  lMale: number;
+  /** Male period life expectancy at this age (eₓ). */
+  eMale: number;
+  qFemale: number;
+  lFemale: number;
+  eFemale: number;
+}
+export interface YearValue { year: number; value: number; }
+export interface BendPoint { year: number; first: number; second: number; }
+
+export interface SocialSecurityData {
+  asOf: number;
+  source: string;
+  citation: string;
+  /** Period life table by exact age (0–119). */
+  lifeTable: LifeTableRow[];
+  /** National Average Wage Index ($), by year — indexes past earnings. */
+  awi: YearValue[];
+  /** PIA-formula bend points ($/month), by year of eligibility. */
+  bendPoints: BendPoint[];
+  /** Cost-of-living adjustment (decimal), by year. */
+  cola: YearValue[];
+}
+
+export const socialSecurity: SocialSecurityData = {
+  asOf: ${o.asOf},
+  source: "U.S. Social Security Administration, Office of the Chief Actuary.",
+  citation: "SSA OACT — period life table (2023), National AWI, PIA bend points, and COLA series.",
+  lifeTable: [
+${lt}
+  ],
+  awi: [
+${yv(o.awi)}
+  ],
+  bendPoints: [
+${bp}
+  ],
+  cola: [
+${yv(o.cola)}
+  ],
+};
+`;
+}
+
+main();

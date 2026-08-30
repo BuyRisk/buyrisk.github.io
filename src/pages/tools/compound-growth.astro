@@ -1,0 +1,77 @@
+---
+// Page shell for /tools/compound-growth: intro + the GrowthModule island
+// (compounding, savings, debt) + sources and next-tool link.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GrowthModule from "../../components/GrowthModule.tsx";
+import NextTool from "../../components/NextTool.astro";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Growth, Savings & Debt"
+  description="Compounding in every direction: how contributions, return, and time build wealth; how your savings rate (not your income) sets your timeline to financial independence; and how the same math runs in reverse as debt."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Interactive Tool</p>
+    <h1>The engine: compounding</h1>
+    <p class="lede">
+      One force runs through all of personal finance (compounding), and it works
+      in every direction. Watch a balance grow from contributions, return, and time;
+      see how the <strong>rate</strong> you save (not the size of your paycheck) sets
+      your timeline to financial independence; then watch the same math turn against
+      you as debt. Three views of one equation.
+    </p>
+    <div class="intro-formula" role="img" aria-label="A equals P times, open paren, 1 plus r, close paren, to the power of n">
+      <span class="intro-formula-eq">A = P (1 + r)<sup>n</sup></span>
+      <span class="intro-formula-key">
+        <b>A</b> final amount &middot; <b>P</b> what you start with &middot;
+        <b>r</b> yearly return &middot; <b>n</b> years.
+      </span>
+    </div>
+  </section>
+
+  <section class="container wl-host">
+    <GrowthModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>Three views of one idea</h2>
+      <ul>
+        <li>
+          <strong>Compound growth.</strong> Money earns a return based on the amount of
+          compensated risk you take, and next year that return earns a return too. Over
+          decades, most of a portfolio's final value comes from growth on growth, not the
+          contributions themselves.
+        </li>
+        <li>
+          <strong>Savings rate.</strong> How fast you reach the point where your
+          investments could cover your life depends on the fraction of income you
+          save, almost regardless of how much you earn, because spending and the
+          nest egg you need scale together.
+        </li>
+        <li>
+          <strong>Debt.</strong> The exact same compounding, pointed the other way. Debt
+          isn't automatically bad. Borrowing for an education or a home can pay off many
+          times over in human capital and stability. But at a credit card's rate, paying
+          only the minimum stretches a small balance into decades, so clearing
+          high-interest debt is usually worth doing before investing.
+        </li>
+      </ul>
+      <p>Educational only, not financial advice.</p>
+    </div>
+  </section>
+
+  <Sources tool="compound-growth" />
+
+  <NextTool current="/tools/compound-growth" />
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  /* .intro-formula* styles now live in simtool.css (shared with the CAPM and
+     diversification pages). */
+  .wl-explainer { margin-top: var(--space-lg); }
+</style>

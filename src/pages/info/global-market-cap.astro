@@ -1,0 +1,646 @@
+---
+// Info page: world equity market-cap breakdown by region/country, from
+// src/data/global-market-cap.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import {
+  GLOBAL_MARKET_CAP as data,
+  slices,
+  usVsExUs,
+  tierTotals,
+} from "../../data/global-market-cap";
+
+const sl = slices(data);
+const twoFund = usVsExUs(data);
+const tierT = tierTotals(data);
+
+// Named figures used in the worked examples.
+const cell = (regionKey: string, tier: string) =>
+  sl.find((s) => s.region.key === regionKey && s.tier.tier === tier)?.ofGlobal ??
+  0;
+// The S&P 500 ≈ 80% of the US market (large + mega + some mid), not the FTSE
+// large-cap size band; an "extended-market" fund covers the ~20% completion.
+const usTotal = cell("us", "Large cap") + cell("us", "Mid cap") + cell("us", "Small cap");
+const usLarge = Math.round(usTotal * 0.8 * 10) / 10;
+const usExtended = Math.round((usTotal - usLarge) * 10) / 10;
+const intl = twoFund.exUs;
+
+// Formatting helpers.
+const pct = (n: number) => `${n.toFixed(1)}%`;
+const asOfDate = new Date(data.asOf + "T00:00:00Z");
+const asOfLabel = asOfDate.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+const sourceNote = `FTSE Global All Cap Index (the index Vanguard's VT tracks), cross-checked against VT's published composition. Data as of ${asOfLabel}. Refreshed monthly.`;
+
+// Visual encoding: region → hue, cap tier → lightness.
+const regionColor: Record<string, string> = {
+  us: "var(--pl-c3)",
+  "developed-ex-us": "var(--pl-c1)",
+  emerging: "var(--pl-c2)",
+};
+const tierOpacity: Record<string, number> = {
+  "Large cap": 1,
+  "Mid cap": 0.66,
+  "Small cap": 0.4,
+};
+---
+
+<BaseLayout
+  title="Global Market-Cap Breakdown"
+  description="How the world's investable stock market splits across the US, developed-ex-US, and emerging markets, and large, mid, and small caps within each — with the funds that cover each slice, for anyone assembling a total-world portfolio across separate accounts."
+>
+  <section class="container gmc-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>The global stock market, slice by slice</h1>
+    <p class="lede">
+      A single global fund like <strong>VT</strong> just holds the whole
+      investable stock market in proportion to each company's size. Holding the
+      world in those market-cap weights is one rational, widely used starting
+      point for a stock portfolio — not a recommendation, and not the only
+      sensible approach. Someone who wants it often can't buy a single such fund
+      in every account, since a 401(k), an IRA, and an HSA each offer a different,
+      limited menu. This page provides the current size of every slice of the
+      market.
+    </p>
+    <p class="gmc-asof">
+      Data as of <strong>{asOfLabel}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="gmc-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <!-- ── The one-line answer: US vs the rest ─────────────────────────────── -->
+  <section class="container gmc-block">
+    <h2>Start here: the US and everything else</h2>
+    <p class="prose">
+      The simplest cut of the world is two pieces. Roughly
+      <strong>{pct(twoFund.us)}</strong> of global stock-market value sits in the
+      United States; the other <strong>{pct(twoFund.exUs)}</strong> is everywhere
+      else. Held in that proportion, those two pieces already have the shape of a
+      total-world portfolio.
+    </p>
+
+    <div class="gmc-bar gmc-bar--two" role="img" aria-label={`United States ${pct(twoFund.us)}, rest of world ${pct(twoFund.exUs)}`}>
+      <div class="gmc-seg" style={`width:${twoFund.us}%;background:var(--pl-c3)`}>
+        <span class="gmc-seg-label">US {pct(twoFund.us)}</span>
+      </div>
+      <div class="gmc-seg" style={`width:${twoFund.exUs}%;background:var(--pl-c8)`}>
+        <span class="gmc-seg-label">Rest of world {pct(twoFund.exUs)}</span>
+      </div>
+    </div>
+    <p class="gmc-caption">
+      This split can be matched with two funds — a US total-market fund and a
+      total-international fund — in roughly {Math.round(twoFund.us)}&nbsp;/&nbsp;{Math.round(
+        twoFund.exUs
+      )} proportion.
+    </p>
+  </section>
+
+  <!-- ── The full map: region × cap tier ─────────────────────────────────── -->
+  <section class="container gmc-block">
+    <h2>The full map</h2>
+    <p class="prose">
+      Go one level deeper and the world splits into three regions, each divided by
+      company size — large, mid, and small cap. Every bar below is sized by its
+      share of the <em>entire</em> world market, so the whole strip adds to 100%.
+    </p>
+
+    <div class="gmc-stack" role="img" aria-label="Global market capitalization by region and company size. The accessible breakdown is in the table below.">
+      {
+        sl.map((s) => (
+          <div
+            class="gmc-stack-seg"
+            style={`width:${s.ofGlobal}%;background:${regionColor[s.region.key]};opacity:${tierOpacity[s.tier.tier]}`}
+            title={`${s.region.name} · ${s.tier.tier}: ${pct(s.ofGlobal)}`}
+          />
+        ))
+      }
+    </div>
+    <ul class="gmc-legend">
+      <li><span class="sw" style="background:var(--pl-c3)"></span>United States</li>
+      <li><span class="sw" style="background:var(--pl-c1)"></span>Developed ex-US</li>
+      <li><span class="sw" style="background:var(--pl-c2)"></span>Emerging markets</li>
+      <li class="gmc-legend-note">
+        Lighter shade = smaller companies (large → mid → small)
+      </li>
+    </ul>
+
+    <div class="gmc-tablewrap">
+      <table class="gmc-table">
+        <thead>
+          <tr>
+            <th scope="col">Slice of the market</th>
+            <th scope="col" class="num">
+              Share of region
+              <InfoNote text="This cap tier's share of its own region's market cap. Based on the index's size-band methodology, which barely changes month to month." />
+            </th>
+            <th scope="col" class="num">Share of world</th>
+            <th scope="col">What it is</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            data.regions.map((region) => (
+              <>
+                <tr class="gmc-region-row">
+                  <th scope="rowgroup" colspan={2}>
+                    <span
+                      class="sw"
+                      style={`background:${regionColor[region.key]}`}
+                    />
+                    {region.name}
+                  </th>
+                  <td class="num strong">{pct(region.ofGlobal)}</td>
+                  <td class="gmc-region-blurb">{region.blurb}</td>
+                </tr>
+                {region.tiers.map((tier) => {
+                  const g =
+                    Math.round(
+                      ((region.ofGlobal * tier.withinRegion) / 100) * 10
+                    ) / 10;
+                  return (
+                    <tr>
+                      <td class="gmc-tier-name">{tier.tier}</td>
+                      <td class="num muted">{tier.withinRegion}%</td>
+                      <td class="num">{pct(g)}</td>
+                      <td class="gmc-tier-note">{tier.note}</td>
+                    </tr>
+                  );
+                })}
+              </>
+            ))
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colspan={2}>Whole market, by company size</th>
+            <td class="num"></td>
+            <td class="gmc-tier-note">
+              Large {pct(tierT["Large cap"])} · Mid {pct(tierT["Mid cap"])} ·
+              Small {pct(tierT["Small cap"])} of the world
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Assemble across accounts ────────────────────────────────────────── -->
+  <section class="container gmc-block">
+    <h2>Piecing it together across accounts</h2>
+    <p class="prose">
+      For anyone who chooses to match this market-cap weighting, the specific
+      funds each account offers shape how it's approximated. A few common
+      combinations people use:
+    </p>
+
+    <div class="grid grid--3 gmc-recipes">
+      <div class="card gmc-recipe">
+        <span class="badge">Two funds</span>
+        <h3>The simplest</h3>
+        <ul>
+          <li><strong>{Math.round(twoFund.us)}%</strong> US total market</li>
+          <li><strong>{Math.round(twoFund.exUs)}%</strong> total international</li>
+        </ul>
+        <p>A US total-market fund plus a total-international fund. Done.</p>
+      </div>
+
+      <div class="card gmc-recipe">
+        <span class="badge">Three funds</span>
+        <h3>Splitting international</h3>
+        <ul>
+          <li><strong>{pct(twoFund.us)}</strong> US total market</li>
+          <li>
+            <strong>
+              {pct(
+                data.regions.find((r) => r.key === "developed-ex-us")
+                  ?.ofGlobal ?? 0
+              )}
+            </strong> developed ex-US
+          </li>
+          <li>
+            <strong>
+              {pct(data.regions.find((r) => r.key === "emerging")?.ofGlobal ?? 0)}
+            </strong> emerging markets
+          </li>
+        </ul>
+        <p>
+          For accounts that only carry developed-international and emerging funds
+          separately.
+        </p>
+      </div>
+
+      <div class="card gmc-recipe">
+        <span class="badge">The 401(k) gap</span>
+        <h3>Only an S&amp;P 500 fund?</h3>
+        <ul>
+          <li>
+            <strong>{pct(usLarge)}</strong> of the world — that's all an S&amp;P
+            500 fund covers (the largest US companies)
+          </li>
+          <li>
+            add <strong>{pct(usExtended)}</strong> for the rest of the US market (an
+            "extended-market" fund)
+          </li>
+          <li>add <strong>{pct(intl)}</strong> international</li>
+        </ul>
+        <p>
+          Fill the two gaps in other accounts and the pieces reassemble into the
+          whole world.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Fund building-block reference ───────────────────────────────────── -->
+  <section class="container gmc-block">
+    <h2>Building blocks: which fund covers which slice</h2>
+    <p class="prose">
+      Common, low-cost index funds that track each slice, grouped by provider so
+      you can match them to whatever your accounts offer. These describe the market
+      — they are examples, not recommendations, and the slices overlap (a
+      total-market fund already contains its large, mid, and small pieces).
+    </p>
+
+    <div class="gmc-tablewrap">
+      <table class="gmc-table gmc-fundtable">
+        <thead>
+          <tr>
+            <th scope="col">Slice of the market</th>
+            <th scope="col" class="num">≈ Share of world</th>
+            <th scope="col">Example funds (by provider)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            data.fundBlocks.map((block) => (
+              <tr>
+                <td class="gmc-tier-name">{block.slice}</td>
+                <td class="num">{pct(block.ofGlobal)}</td>
+                <td class="gmc-funds">
+                  {block.funds.map((f) => (
+                    <span class="gmc-fund">
+                      <span class="gmc-fund-prov">{f.provider}</span>
+                      <span class="gmc-fund-tick">{f.tickers}</span>
+                    </span>
+                  ))}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Method & caveats ────────────────────────────────────────────────── -->
+  <section class="container gmc-block">
+    <h2>How to read this — and what it doesn't say</h2>
+    <div class="prose">
+      <ul>
+        <li>
+          <strong>Weights drift slowly.</strong> The US-vs-rest split moves on the
+          order of a percentage point or two over a <em>year</em>, not a day. That's
+          why this page refreshes monthly, not live — daily precision here would be
+          false precision.
+        </li>
+        <li>
+          <strong>Region weights are the sourced numbers.</strong> They come from
+          the FTSE Global All Cap Index factsheet, cross-checked against VT. The
+          large / mid / small splits within each region come from the index's
+          size-band definitions, which are structural and barely move.
+        </li>
+        <li>
+          <strong>It's float-adjusted and market-cap-weighted.</strong> Slices are
+          sized by the value of shares actually available to public investors —
+          the same rule a global index fund follows.
+        </li>
+        <li>
+          <strong>This is the market's shape, not a recommendation.</strong> Owning
+          the world in cap weight is one well-supported approach; it is not the only
+          one, and nothing here is personalized financial advice. Whether a
+          global-market weighting suits your situation is your call.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["ftseGlobalAllCap", "vanguardVT"]}
+      title="Sources &amp; method"
+      intro="Region weights are refreshed monthly from the first source; the second is used to cross-check. Cap-tier splits follow the index's published size-band methodology."
+    />
+  </div>
+
+  <!-- ── Cross-links ─────────────────────────────────────────────────────── -->
+  <section class="container gmc-related">
+    <h2 class="section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 gmc-related-grid">
+      <li>
+        <a href="/tools/diversification" class="card">
+          <h3>Why hold a broad mix?</h3>
+          <p>
+            The Diversification tool shows how mixing assets that don't move
+            together lowers risk — part of the case for holding a broad, global
+            set of stocks.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/portfolio" class="card">
+          <h3>Where bonds fit in</h3>
+          <p>
+            Whatever stocks you hold, the Portfolio tool shows how a stock/bond
+            split changes a portfolio's risk and return.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .gmc-intro {
+    padding-block: var(--space-lg) var(--space-md);
+    max-width: var(--measure-wide);
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--color-text-soft);
+    line-height: 1.5;
+    max-width: var(--measure);
+  }
+  .gmc-asof {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-muted);
+    margin-top: var(--space-sm);
+  }
+  .gmc-asof a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  .gmc-asof-sep {
+    margin: 0 0.4rem;
+    opacity: 0.5;
+  }
+
+  .gmc-block {
+    margin-top: var(--space-lg);
+  }
+  .gmc-block > h2 {
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .gmc-caption,
+  .gmc-legend-note {
+    font-size: var(--step--1);
+    color: var(--color-muted);
+  }
+  .gmc-caption {
+    margin-top: var(--space-xs);
+  }
+
+  /* Two-piece US / rest bar */
+  .gmc-bar {
+    display: flex;
+    width: 100%;
+    height: 3.2rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: var(--border);
+    margin-top: var(--space-sm);
+  }
+  .gmc-seg {
+    display: flex;
+    align-items: center;
+    padding-inline: 0.75rem;
+    min-width: 0;
+  }
+  .gmc-seg-label {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Nine-slice full-market strip */
+  .gmc-stack {
+    display: flex;
+    width: 100%;
+    height: 2.4rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: var(--border);
+    margin-top: var(--space-sm);
+    background: var(--color-surface-alt);
+  }
+  .gmc-stack-seg {
+    height: 100%;
+    border-right: 1px solid var(--color-bg);
+  }
+  .gmc-stack-seg:last-child {
+    border-right: none;
+  }
+  .gmc-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+  }
+  .gmc-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .sw {
+    display: inline-block;
+    width: 0.85rem;
+    height: 0.85rem;
+    border-radius: 3px;
+    flex: none;
+    vertical-align: middle;
+  }
+
+  /* Tables */
+  .gmc-tablewrap {
+    overflow-x: auto;
+    margin-top: var(--space-md);
+  }
+  .gmc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step-0);
+    min-width: 38rem;
+  }
+  .gmc-table th,
+  .gmc-table td {
+    text-align: left;
+    padding: 0.55rem 0.7rem;
+    border-bottom: var(--border);
+    vertical-align: top;
+  }
+  .gmc-table thead th {
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    color: var(--color-text-soft);
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-border);
+  }
+  .gmc-table .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .gmc-table .muted {
+    color: var(--color-muted);
+  }
+  .gmc-table .strong {
+    font-weight: 700;
+  }
+  .gmc-region-row th {
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: 700;
+    padding-top: 0.9rem;
+  }
+  .gmc-region-row th .sw {
+    margin-right: 0.5rem;
+  }
+  .gmc-region-row td {
+    padding-top: 0.9rem;
+  }
+  .gmc-region-blurb,
+  .gmc-tier-note {
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
+    line-height: 1.45;
+  }
+  .gmc-tier-name {
+    padding-left: 1.6rem;
+    color: var(--color-text);
+  }
+  .gmc-table tfoot th,
+  .gmc-table tfoot td {
+    border-bottom: none;
+    padding-top: 0.8rem;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+  }
+
+  /* Recipe cards */
+  .gmc-recipes {
+    list-style: none;
+    margin-top: var(--space-sm);
+  }
+  .gmc-recipe {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .gmc-recipe h3 {
+    margin: 0.4rem 0 0.2rem;
+    font-size: var(--step-1);
+  }
+  .gmc-recipe ul {
+    margin: 0.2rem 0 0.4rem;
+    padding-left: 1.1rem;
+  }
+  .gmc-recipe li {
+    margin-bottom: 0.25rem;
+  }
+  .gmc-recipe p {
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
+  }
+  .badge {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: var(--font-sans);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+  }
+
+  /* Fund table */
+  .gmc-funds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .gmc-fund {
+    display: inline-flex;
+    flex-direction: column;
+    background: var(--color-surface-alt);
+    border-radius: 7px;
+    padding: 0.2rem 0.5rem;
+    line-height: 1.25;
+  }
+  .gmc-fund-prov {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+  }
+  .gmc-fund-tick {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    color: var(--color-text);
+  }
+
+  /* Related */
+  .gmc-related {
+    margin-top: var(--space-xl);
+  }
+  .section-heading {
+    font-size: var(--step-1);
+    padding-bottom: var(--space-xs);
+    border-bottom: var(--border);
+    margin-bottom: var(--space-md);
+  }
+  .gmc-related-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .gmc-related-grid h3 {
+    margin: 0 0 0.3rem;
+    font-size: var(--step-1);
+  }
+  .gmc-related-grid p {
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: var(--step--1);
+  }
+  .gmc-related-grid a.card {
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+  }
+</style>

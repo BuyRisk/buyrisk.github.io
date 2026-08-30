@@ -1,0 +1,203 @@
+---
+// Info page: US retirement-account contribution limits for the current tax
+// year, from src/data/contribution-limits.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sources from "../../components/Sources.astro";
+import InfoNote from "../../components/InfoNote.astro";
+import { CONTRIBUTION_LIMITS as L } from "../../data/contribution-limits";
+import "../../styles/info.css";
+
+const d = (n: number) => `$${n.toLocaleString("en-US")}`;
+const range = (r: readonly [number, number]) => `${d(r[0])} – ${d(r[1])}`;
+const r = L.retirement;
+const h = L.hsa;
+const sourceNote = `Retirement figures from the IRS annual cost-of-living notice; HSA/HDHP figures from IRS Rev. Proc. 2025-19. Tax year ${L.taxYear}. Verify against the IRS before acting.`;
+---
+
+<BaseLayout
+  title={`${L.taxYear} Contribution Limits`}
+  description={`The ${L.taxYear} IRS contribution limits for 401(k)/403(b)/457, IRAs, and HSAs — including catch-up amounts and income phase-outs — in one place.`}
+>
+  <section class="container ref-intro">
+    <p class="eyebrow">Info · Reference</p>
+    <h1>{L.taxYear} contribution limits</h1>
+    <p class="ref-lede">
+      How much you can put into each tax-advantaged account this year — the numbers
+      most people re-Google every January. All figures are for
+      <strong>tax year {L.taxYear}</strong>, straight from the IRS.
+    </p>
+    <p class="ref-asof">
+      Tax year <strong>{L.taxYear}</strong>
+      <InfoNote text={sourceNote} />
+      <span class="ref-asof-sep">·</span>
+      <a href="#sources">source &amp; method</a>
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <ul class="ref-stats">
+      <li class="ref-stat">
+        <span class="ref-stat-value">{d(r.electiveDeferral)}</span>
+        <span class="ref-stat-label">401(k) / 403(b) / 457 employee contribution</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{d(r.ira)}</span>
+        <span class="ref-stat-label">IRA (traditional + Roth combined)</span>
+      </li>
+      <li class="ref-stat">
+        <span class="ref-stat-value">{d(h.family)}</span>
+        <span class="ref-stat-label">HSA, family coverage ({d(h.selfOnly)} self-only)</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Workplace retirement plans</h2>
+    <p class="ref-prose">
+      Covers 401(k), 403(b), most 457(b) plans, and the federal Thrift Savings
+      Plan. Catch-up contributions are added <em>on top of</em> the base limit.
+    </p>
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr><th scope="col">Who</th><th scope="col" class="num">You can contribute</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Under 50</td>
+            <td class="num strong">{d(r.electiveDeferral)}</td>
+          </tr>
+          <tr>
+            <td>
+              50 and older
+              <InfoNote text={`Base ${d(r.electiveDeferral)} plus a ${d(r.catchUp50)} catch-up.`} />
+            </td>
+            <td class="num strong">{d(r.electiveDeferral + r.catchUp50)}</td>
+          </tr>
+          <tr class="hi">
+            <td>
+              Ages 60–63
+              <InfoNote text={`A SECURE 2.0 "super catch-up" of ${d(r.catchUp6063)} replaces the standard catch-up for these four years only.`} />
+            </td>
+            <td class="num strong">{d(r.electiveDeferral + r.catchUp6063)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ref-caption">
+      These are <em>your</em> contributions. Employer match is on top, up to a much
+      higher combined cap. The 60–63 super catch-up is new under SECURE 2.0.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <h2>IRAs</h2>
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr><th scope="col">Who</th><th scope="col" class="num">Traditional + Roth, combined</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Under 50</td><td class="num strong">{d(r.ira)}</td></tr>
+          <tr>
+            <td>50 and older</td>
+            <td class="num strong">{d(r.ira + r.iraCatchUp)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ref-prose" style="margin-top:var(--space-md)">
+      Whether you can <em>deduct</em> a traditional IRA, or contribute to a Roth at
+      all, phases out over these income (MAGI) ranges:
+    </p>
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr><th scope="col">Phase-out</th><th scope="col">Single</th><th scope="col">Married filing jointly</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Roth IRA eligibility</td>
+            <td>{range(L.phaseOuts.rothSingle)}</td>
+            <td>{range(L.phaseOuts.rothMarried)}</td>
+          </tr>
+          <tr>
+            <td>
+              Traditional IRA deduction
+              <InfoNote text="Applies when you're covered by a workplace plan. Without workplace coverage, the deduction generally isn't phased out." />
+            </td>
+            <td>{range(L.phaseOuts.tradIraDeductionSingle)}</td>
+            <td>{range(L.phaseOuts.tradIraDeductionMarried)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="container ref-block">
+    <h2>Health Savings Accounts (HSA)</h2>
+    <p class="ref-prose">
+      An HSA needs a qualifying high-deductible health plan (HDHP). It's uniquely
+      tax-advantaged — deductible in, tax-free growth, tax-free out for medical
+      costs.
+    </p>
+    <div class="ref-tablewrap">
+      <table class="ref-table">
+        <thead>
+          <tr><th scope="col">HSA / HDHP figure</th><th scope="col" class="num">Self-only</th><th scope="col" class="num">Family</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="strong">HSA contribution limit</td><td class="num strong">{d(h.selfOnly)}</td><td class="num strong">{d(h.family)}</td></tr>
+          <tr><td>HDHP minimum deductible</td><td class="num">{d(h.hdhpMinDeductibleSelf)}</td><td class="num">{d(h.hdhpMinDeductibleFamily)}</td></tr>
+          <tr><td>HDHP out-of-pocket maximum</td><td class="num">{d(h.hdhpOopMaxSelf)}</td><td class="num">{d(h.hdhpOopMaxFamily)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="ref-caption">
+      Age 55 or older? Add a {d(h.catchUp55)} HSA catch-up on top of either limit.
+    </p>
+  </section>
+
+  <section class="container ref-block">
+    <div class="ref-callout">
+      <p>
+        <strong>Educational information, not tax advice.</strong> Eligibility,
+        deductibility, and the right account for you depend on your specific
+        situation. These are the headline federal numbers for {L.taxYear}; verify
+        against the IRS and check with a tax professional for your case.
+      </p>
+    </div>
+  </section>
+
+  <div id="sources">
+    <Sources
+      datasets={["irsRetirementLimits", "irsHsaLimits"]}
+      title="Sources &amp; method"
+      intro="Figures for tax year 2026, transcribed from the IRS retirement cost-of-living notice and Rev. Proc. 2025-19 (HSA). Update once a year when the IRS publishes new figures."
+    />
+  </div>
+
+  <section class="container ref-related">
+    <h2 class="ref-section-heading">Keep exploring</h2>
+    <ul class="grid grid--2 ref-related-grid">
+      <li>
+        <a href="/personal-finance/retirement-accounts" class="card">
+          <h3>Roth vs. traditional</h3>
+          <p>
+            The Retirement Accounts tool helps you weigh paying tax now (Roth) against
+            paying it later (traditional), and shows the value of the employer match.
+          </p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/compound-growth" class="card">
+          <h3>What a year of contributions becomes</h3>
+          <p>
+            Feed a contribution into the Growth tool to see what decades of
+            compounding turn it into.
+          </p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>

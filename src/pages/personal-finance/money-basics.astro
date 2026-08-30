@@ -1,0 +1,108 @@
+---
+// Page shell for /personal-finance/money-basics: the five foundation
+// calculators (budget, emergency fund, savings goal, net worth, debt payoff),
+// consolidated from their former standalone pages into one tabbed module.
+// Old URLs redirect here with a #tab hash (see astro.config.mjs).
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MoneyBasicsModule from "../../components/MoneyBasicsModule.tsx";
+import Sources from "../../components/Sources.astro";
+import "../../styles/simtool.css";
+---
+
+<BaseLayout
+  title="Money Basics: Budget, Buffer, Goals, Net Worth & Debt"
+  description="The five foundations of personal finance in one place: the 50/30/20 budget, sizing an emergency fund, planning a savings goal, tracking net worth, and paying off debt (avalanche vs. snowball). Everything before investing, in learning order."
+>
+  <section class="container wl-intro">
+    <p class="eyebrow">Personal Finance · Interactive Tools</p>
+    <h1>Money basics</h1>
+    <p class="lede">
+      Before a single dollar is invested, five foundations decide whether investing is
+      even possible: know where your money goes, keep a buffer so surprises don't
+      become debt, put numbers and dates on your goals, track the one figure that
+      sums it all up — and clear the debt whose interest outruns any market. Work
+      through the tabs in order, or jump to the one you need.
+    </p>
+  </section>
+
+  <section class="container wl-host">
+    <MoneyBasicsModule client:load />
+  </section>
+
+  <section class="container wl-explainer">
+    <div class="prose">
+      <h2>The foundations, briefly</h2>
+      <ul>
+        <li>
+          <strong>The 50/30/20 budget.</strong> Roughly half of take-home pay on
+          needs, a third on wants, a fifth to saving and debt. The percentages are a
+          guideline, not a law — what matters is that the split is deliberate, and
+          that the save-and-invest slice is automatic. Money you never see is money
+          you don't spend.
+        </li>
+        <li>
+          <strong>The emergency fund.</strong> Months of expenses in boring, instant
+          cash, sized to how steady your income is. It's not an investment — it's the
+          insurance that keeps a car repair from becoming a 25% credit-card balance,
+          and it's what lets the invested money stay invested through a bad month.
+        </li>
+        <li>
+          <strong>The savings goal.</strong> A goal with a number and a date becomes a
+          monthly amount; growth carries part of the load for far-away goals and
+          almost none for near ones — which is why short-term money belongs in cash,
+          not stocks.
+        </li>
+        <li>
+          <strong>Net worth.</strong> Assets minus debts: the single number that
+          captures the whole picture. Income is how fast you're moving; net worth is
+          where you actually are. Tracking it beats tracking any account alone.
+        </li>
+        <li>
+          <strong>Debt payoff.</strong> High-interest debt is a guaranteed negative
+          return — clearing a 22% card beats any bet the market offers except an
+          employer match. Avalanche (highest rate first) wins on the spreadsheet;
+          snowball (smallest balance first) wins on momentum; the one you stick with
+          wins in real life. And if a rate looks extreme, ask first whether
+          refinancing can lower it.
+        </li>
+      </ul>
+      <p>
+        Once the foundations hold, the next question is where each new dollar should
+        go — the <a href="/personal-finance/next-dollar">Next Dollar tool</a> ranks
+        it. Educational only, not financial advice.
+      </p>
+    </div>
+  </section>
+
+  <Sources tool="money-basics" />
+
+  <section class="container pf-related">
+    <h2 class="pf-related-heading">Keep exploring</h2>
+    <ul class="grid grid--2 pf-related-grid">
+      <li>
+        <a href="/personal-finance/next-dollar" class="card">
+          <h3>Where the next dollar goes</h3>
+          <p>Foundations in place? The priority ladder ranks match, debt, Roth, and brokerage — and shows the tax on that dollar.</p>
+        </a>
+      </li>
+      <li>
+        <a href="/tools/compound-growth" class="card">
+          <h3>What the saved slice grows into</h3>
+          <p>Feed your monthly savings into the Growth tool and watch decades of compounding do the work.</p>
+        </a>
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .wl-intro { padding-block: var(--space-lg) var(--space-md); max-width: var(--measure-wide); }
+  .lede { font-size: var(--step-1); color: var(--color-text-soft); line-height: 1.5; }
+  .wl-explainer { margin-top: var(--space-lg); }
+  .pf-related { margin-top: var(--space-xl); }
+  .pf-related-heading { font-size: var(--step-1); padding-bottom: var(--space-xs); border-bottom: var(--border); margin-bottom: var(--space-md); }
+  .pf-related-grid { list-style: none; padding: 0; margin: 0; }
+  .pf-related-grid a.card { height: 100%; text-decoration: none; color: inherit; display: block; }
+  .pf-related-grid h3 { margin: 0 0 0.3rem; font-size: var(--step-1); }
+  .pf-related-grid p { margin: 0; color: var(--color-text-soft); font-size: var(--step--1); }
+</style>
