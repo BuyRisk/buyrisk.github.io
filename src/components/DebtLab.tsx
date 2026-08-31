@@ -180,7 +180,7 @@ export default function DebtLab() {
           <h3>What you owe, over time</h3>
           <BalanceChart min={min} you={you} paysOff={paysOff} />
           <p className="wl-fnote">
-            The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line pays only
+            The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>blue</span> line pays only
             the minimum. It barely descends, because the payment shrinks as fast as the balance
             does. The <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>green</span> line
             is your fixed payment, which actually gets you out.

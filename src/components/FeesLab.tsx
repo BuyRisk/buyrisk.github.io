@@ -243,7 +243,7 @@ function CostView({
         <GrowthChart gross={view.gross} yours={view.yours} index={view.index} years={years} />
         <p className="wl-fnote">
           The <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>green</span> line is the
-          low-cost index fund; the <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line
+          low-cost index fund; the <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>blue</span> line
           is your fund. The shaded gap between them is wealth the higher fee compounds away.
           It widens every year because the fee is charged on a balance that would otherwise
           be growing.

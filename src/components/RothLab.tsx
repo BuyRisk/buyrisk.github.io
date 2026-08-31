@@ -304,7 +304,7 @@ export default function RothLab() {
               <h3>Free money, compounded</h3>
               <MatchBars yourContrib={match.yourContrib} employerAdds={match.employerAdds} />
               <p className="wl-fnote">
-                The blue slice is yours; the gold slice is your employer's, added the moment you contribute. No market
+                The orange slice is yours; the purple slice is your employer's, added the moment you contribute. No market
                 return, no waiting, no risk. You cannot buy that anywhere.
               </p>
             </div>

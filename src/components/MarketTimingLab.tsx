@@ -243,7 +243,7 @@ export default function MarketTimingLab() {
               <h3>Your return as you miss the best (or worst) days</h3>
               <BestDaysChart curve={bestDays.curve} missed={missed} fullAnn={bestDays.fullAnn} />
               <p className="wl-fnote">
-                The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>orange</span> line is what your
+                The <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>blue</span> line is what your
                 yearly return becomes as you sit out the <strong>best</strong> days. It falls off a cliff.
                 The faint line is the mirror image: sitting out the <strong>worst</strong> days would be
                 just as spectacular. The catch is you can't tell which is which in advance.

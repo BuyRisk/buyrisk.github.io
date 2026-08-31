@@ -140,7 +140,7 @@ export default function FundFlowsLab() {
               <>
                 Bars above zero: months the industry took in more than it paid out. Bars{" "}
                 <span style={{ color: "var(--pl-c3)", fontWeight: 700 }}>below zero</span>: months
-                money left. The long positive era ends around 2015; the red cluster in 2016 is the
+                money left. The long positive era ends around 2015; the blue cluster in 2016 is the
                 turn.
               </>
             )}{" "}
