@@ -180,7 +180,7 @@ export default function DebtPayoffLab() {
             <InfoTip text="Money you can put toward debt beyond the minimums. As each debt clears, its old minimum rolls into this pile and accelerates the next one." />{" "}
             <strong>{money(extra)}</strong>
           </span>
-          <input type="range" min={0} max={2000} step={25} value={extra} onChange={(e) => setExtra(Number(e.target.value))} />
+          <input type="range" min={0} max={10_000} step={25} value={extra} onChange={(e) => setExtra(Number(e.target.value))} />
         </label>
         <p className="wl-note">
           You're putting <strong>{money(totalMin + extra)}</strong>/mo toward{" "}

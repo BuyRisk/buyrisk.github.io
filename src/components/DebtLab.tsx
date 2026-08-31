@@ -64,6 +64,16 @@ function amortize(balance: number, aprPct: number, paymentFn: (bal: number, inte
 // Typical credit-card minimum: interest plus 1% of principal, with a $25 floor.
 const minPaymentFn = (bal: number, interest: number) => Math.max(interest + 0.01 * bal, 25);
 
+// Labels are built at render time, not here, so they follow the header's
+// currency picker instead of freezing at import.
+const BALANCE_PRESETS = [
+  { name: "Credit card", v: 6_000 },
+  { name: "Car loan", v: 25_000 },
+  { name: "Student loans", v: 150_000 },
+  { name: "Mortgage", v: 400_000 },
+  { name: "Pro school + home + car", v: 1_000_000 },
+];
+
 const APR_PRESETS = [
   { label: `Credit card · ${pct(CC)}`, v: CC },
   { label: `Auto loan · ${pct(AUTO)}`, v: AUTO },
@@ -96,10 +106,16 @@ export default function DebtLab() {
         <label className="wl-slider">
           <span>
             What you owe
-            <InfoTip text="The balance on the card or loan today." /> <strong>{dollars(balance)}</strong>
+            <InfoTip text="What you owe today — one card or loan, or your whole debt load added together." /> <strong>{dollars(balance)}</strong>
           </span>
-          <input type="range" min={500} max={50_000} step={100} value={balance} onChange={(e) => setBalance(+e.target.value)} />
+          <input type="range" min={500} max={1_000_000} step={100} value={balance} onChange={(e) => setBalance(+e.target.value)} />
         </label>
+        <div className="wl-presets">
+          <span className="wl-presets-label">Typical balances:</span>
+          {BALANCE_PRESETS.map((b) => (
+            <button key={b.name} type="button" className="wl-chip" aria-pressed={balance === b.v} onClick={() => setBalance(b.v)}>{b.name} · {dollars(b.v)}</button>
+          ))}
+        </div>
 
         <label className="wl-slider">
           <span>
@@ -122,7 +138,7 @@ export default function DebtLab() {
             <InfoTip text="A fixed amount you pay every month. Compare it to the shrinking minimum payment. Paying a steady, higher amount is what breaks the trap." />{" "}
             <strong>{dollars(payment)}/mo</strong>
           </span>
-          <input type="range" min={25} max={2_000} step={25} value={payment} onChange={(e) => setPayment(+e.target.value)} />
+          <input type="range" min={25} max={10_000} step={25} value={payment} onChange={(e) => setPayment(+e.target.value)} />
         </label>
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
@@ -137,8 +153,16 @@ export default function DebtLab() {
               <span className="ss-headline-label">Paying {dollars(payment)}/mo clears it in</span>
               <span className="ss-headline-value">{yearsLabel(you.months)}</span>
               <span className="ss-headline-sub">
-                vs <strong>{yearsLabel(min.months)}</strong> on the minimum, saving{" "}
-                <strong>{dollars(interestSaved)}</strong> in interest
+                vs <strong>{yearsLabel(min.months)}</strong> on the minimum,{" "}
+                {interestSaved >= 0 ? (
+                  <>saving <strong>{dollars(interestSaved)}</strong> in interest</>
+                ) : (
+                  <>
+                    costing <strong>{dollars(-interestSaved)}</strong> more in interest — at this
+                    balance the minimum starts at {dollars(firstMin)}/mo, above what you've set, so
+                    the "minimum" actually clears it faster
+                  </>
+                )}
               </span>
             </>
           )}
