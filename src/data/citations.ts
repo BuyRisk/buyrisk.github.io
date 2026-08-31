@@ -442,6 +442,15 @@ export const STUDIES: Record<string, Study> = {
     kind: "paper",
     category: "Market efficiency & active management",
   },
+  christoffersenEvansMusto2013: {
+    authors: "Christoffersen, S. E. K., Evans, R., & Musto, D. K.",
+    year: 2013,
+    title: "What Do Consumers' Fund Flows Maximize? Evidence from Their Brokers' Incentives",
+    venue: "The Journal of Finance 68(1): 201–235",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "Established the standard construction of monthly fund flows from Form N-SAR Item 28 (new sales minus redemptions), the convention the Watch-the-Money tab follows.",
+  },
   malkiel1973: {
     authors: "Malkiel, B. G.",
     year: 1973,
@@ -588,6 +597,12 @@ export const DATASETS: Record<string, Dataset> = {
     name: "Kenneth R. French Data Library",
     publisher: "Tuck School of Business, Dartmouth College",
     url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html",
+  },
+  nsar: {
+    name: "Form N-SAR filings (Item 28 monthly fund flows), 1993–2018",
+    publisher: "US Securities and Exchange Commission, via EDGAR",
+    url: "https://www.sec.gov/about/forms/formn-sar.pdf",
+    note: "Public SEC filings — the retired semi-annual census form for registered funds. Filings parsed into a research database by Kellogg Research Support, Northwestern University; monthly industry aggregates computed by the author. Public data, no license restrictions.",
   },
   aqr: {
     name: "AQR Factor & Quality-Minus-Junk / Betting-Against-Beta datasets",
@@ -817,7 +832,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
   },
   "beat-the-market": {
     method:
-      "Mixed by design. The “predict the next move” game is synthetic — real charts shown against generated random walks. The rest is real: missing-the-best-days uses actual daily US market returns (Fama–French, 1990–present), lump-sum-vs-averaging uses Shiller's monthly series, the active-fund scorecard combines SPIVA with CRSP survivorship records, and closet indexing uses CRSP and Thomson holdings data.",
+      "Mixed by design. The “predict the next move” game is synthetic — real charts shown against generated random walks. The rest is real: missing-the-best-days uses actual daily US market returns (Fama–French, 1990–present), lump-sum-vs-averaging uses Shiller's monthly series, the active-fund scorecard combines SPIVA with CRSP survivorship records, and closet indexing uses CRSP and Thomson holdings data. Watch-the-money aggregates the monthly gross sales and redemptions every US open-end fund reported to the SEC on Form N-SAR Item 28, 1993–2017 — 158,232 filings; net flow follows Christoffersen, Evans & Musto (2013).",
     studies: [
       "samuelson1965",
       "fama1970",
@@ -832,8 +847,9 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "cremersPetajisto2009",
       "petajisto2013",
       "carhart1997",
+      "christoffersenEvansMusto2013",
     ],
-    datasets: ["french", "shiller", "spiva", "petajisto", "crspMf", "thomsonS12", "crspSp500"],
+    datasets: ["french", "shiller", "spiva", "petajisto", "crspMf", "thomsonS12", "crspSp500", "nsar"],
   },
   retirement: {
     method:

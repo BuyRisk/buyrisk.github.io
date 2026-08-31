@@ -56,7 +56,7 @@ export const TOOLS: Tool[] = [
     title: "Can You Outsmart the Market?",
     href: "/tools/beat-the-market",
     blurb:
-      "Four bets against the market (predicting it, timing it, deploying into it, and hiring active managers), and the one answer that keeps appearing. The whole case for indexing.",
+      "Five bets against the market (predicting it, timing it, deploying into it, hiring active managers, and trusting they're really active) — then the industry's own SEC-filed cash register delivering the same verdict. The whole case for indexing.",
   },
   {
     title: "Behavioral Finance: Your Own Worst Enemy",
