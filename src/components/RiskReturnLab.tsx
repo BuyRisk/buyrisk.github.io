@@ -147,7 +147,9 @@ export default function RiskReturnLab() {
         <p className="cl-group" style={{ marginTop: 0 }}>The big idea</p>
         <p className="wl-note" style={{ fontStyle: "normal", color: "var(--color-text-soft)" }}>
           Each dot is a real US asset class, {span}, placed by how much it bounced around (risk) and what it returned.
-          They line up: to earn more, you had to accept more risk. That's not a coincidence — it's the deal.
+          They line up: to earn more, you had to accept more risk. One catch, and it is the whole game — only risk you
+          can't diversify away pays. Every dot here is an entire asset class, so the risk of any single company inside
+          it has already been diversified out. Buying one volatile stock does not put you on this line.
         </p>
 
         <label className="wl-slider" style={{ marginTop: "var(--space-sm)" }}>
@@ -183,7 +185,7 @@ export default function RiskReturnLab() {
             and the figure it drives within sight of each other. The growth chart
             below carries its own Simplified/Historical toggle inline. */}
         <div className="wl-frontier">
-          <h3>More risk, more reward — the century-long pattern</h3>
+          <h3>More risk you can't diversify away, more reward — the century-long pattern</h3>
           <RiskReturnChart risk={risk} expected={expected} showParadox={showParadox} />
           <div className="wl-flegend">
             <span><span className="wl-fdot" style={{ background: "var(--color-accent)" }} /> Asset classes</span>

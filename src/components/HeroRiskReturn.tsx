@@ -194,7 +194,11 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
           {mult(trendEnd - bandEnd)} unlucky
         </text>
         <text x={pad.left} y={H - 6} style={{ ...axisText, fill: "var(--color-text-soft)", fontWeight: 600 }}>
-          The ride behind that average: ten simulated years of $1 at your setting →
+          <tspan>The ride that earns that average: ten simulated years of $1 at your </tspan>
+          <a href="/tools/stock-picking#count">
+            <tspan style={{ textDecoration: "underline", fill: "var(--color-link)" }}>compensated risk</tspan>
+          </a>
+          <tspan> level →</tspan>
         </text>
       </svg>
       <div className="hrr-roll">
@@ -210,12 +214,17 @@ function RideInset({ risk, mu }: { risk: number; mu: number }) {
         </span>
       </div>
       <p className="hrr-note">
-        The luck holds still while you drag, and only changes when you roll. The solid line is
-        one possible decade; the cone is the ±1σ range of destinations. Where the cone is a thread,
-        the ride is smooth and the endings agree. Where it's a funnel, the slope is real but so is
-        the spread. Push the slider up and a second line splits off: volatility drags the{" "}
-        <strong>typical</strong> decade below the <strong>average</strong> one, because a big loss
-        needs a bigger gain to undo it. Both are true at once — an illustration, not a forecast.
+        The wiggly line is one possible decade. The shaded band is where $1 could reasonably
+        end up: a thread when you take little risk, a funnel when you take a lot. Dragging the
+        slider keeps the same run of luck and changes only how hard it hits you;{" "}
+        <strong>New decade</strong> deals a fresh hand.
+      </p>
+      <p className="hrr-note">
+        Turn the risk up and a second line splits off above. The lower line is the{" "}
+        <strong>typical</strong> decade — the middle of the pack, what most people actually get.
+        The upper one is the <strong>average</strong>, pulled up by a few very lucky decades. The
+        gap opens because a 50% loss needs a 100% gain just to break even, so bad luck costs more
+        than good luck pays. Both numbers are true at once. An illustration, not a forecast.
       </p>
     </div>
   );
@@ -290,18 +299,23 @@ export default function HeroRiskReturn() {
             aria-label="Risk level" onChange={(e) => setRisk(+e.target.value)} />
         </label>
         <p className="hrr-readout">
-          Over {SPAN}, that much risk averaged about{" "}
+          Over {SPAN}, that much{" "}
+          <a href="/tools/stock-picking#count">compensated risk</a> averaged about{" "}
           <strong>{pct(expected, 1)}/yr</strong> — through single years anywhere
           from about <strong>{pct(expected - 2 * risk, 0)}</strong> to{" "}
           <strong>+{pct(expected + 2 * risk, 0)}</strong>.
         </p>
         <p className="hrr-note">
           Real US asset classes, {SPAN}. Volatility is the <strong>standard
-          deviation</strong> of annual returns; return is their average, and the
-          range above is the ride that average hides — the slope only pays if
-          you can sit through the left end of it. One more honesty note: this is
-          the US, the century's best-performing major market, so treat these as
-          upper bounds, <a href="/tools/global#us-vs-world">not entitlements</a>.{" "}
+          deviation</strong> of annual returns; return is their average. Only
+          <strong> compensated</strong> risk pays: the kind nobody can sidestep,
+          like the whole market falling at once. The risk that one company fails
+          pays nothing extra, because owning many companies removes it for
+          free — <a href="/tools/stock-picking#count">watch it disappear</a>. The
+          range above is the ride the average hides; the slope only pays if you
+          can sit through the left end of it. And this is the US, the century's
+          best-performing major market, so treat these as upper bounds,{" "}
+          <a href="/tools/global#us-vs-world">not entitlements</a>.{" "}
           <a href="/tools/factors">Open the full tool →</a>
         </p>
       </div>
