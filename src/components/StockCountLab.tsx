@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { mulberry32, makeNormal } from "../lib/portfolio";
 import { crspDiversification } from "../data/generated/crsp-diversification";
+import { assetStats } from "../data/generated/asset-stats";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 
@@ -14,6 +15,17 @@ import ResetButton from "./ResetButton";
  * cloud of noisy stock paths collapsing into a steadier portfolio, and the
  * classic risk-vs-number-of-stocks curve.
  */
+
+/**
+  * Expected return does NOT depend on N. An equally-weighted basket of stocks
+  * each with expected return mu has expected return mu, whether it holds 1 or
+  * 500. That is the entire argument for diversifying: the risk curve below
+  * falls by half while this line does not move, so the risk being removed is
+  * risk nobody was paying you to hold. Plotted on the same axis because both
+  * quantities are percent per year.
+  */
+const MU = assetStats.assets["us-stocks"].mu;
+const MU_SPAN = `${assetStats.span[0]}–${assetStats.span[1]}`;
 
 const MAX_N = 50;
 const SERIES_LEN = 1400;
@@ -305,13 +317,24 @@ export default function StockCountLab() {
           </div>
 
           <div className="wl-frontier">
-            <h3>Risk vs. number of stocks</h3>
+            <h3>Risk falls. Expected return doesn't.</h3>
             <RiskCurve sigma={sigma} rho={rho} n={n} />
             <p className="wl-fnote">
-              Most of the benefit comes early: about 20–30 stocks captures the bulk
-              of it. Beyond that the curve flattens against the floor. The dots are
-              the <strong>actual</strong> curve for US stocks; hit “Real US stocks”
-              to snap the model onto them. {crspDiversification.source}
+              This is the whole argument in one picture. The{" "}
+              <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>green</span> risk curve
+              falls steeply; the <span style={{ color: "var(--pl-c2)", fontWeight: 700 }}>purple</span>{" "}
+              expected-return line sits flat, because a basket of stocks earns the average of what
+              its stocks earn no matter how many it holds. So everything the green line sheds was
+              risk nobody was paying you to carry. Most of it goes early — 20–30 stocks captures
+              the bulk — and past that the curve flattens onto the floor you can't remove.
+            </p>
+            <p className="wl-fnote">
+              Expected return is the <em>average</em> outcome. Your{" "}
+              <em>typical</em> one actually improves as you diversify, because a smoother ride loses
+              less to <a href="/tools/fees#leverage">volatility drag</a>. Return{" "}
+              {pct(MU, 1)}/yr, US stocks {MU_SPAN} ({assetStats.source}). Dots are the{" "}
+              <strong>actual</strong> risk curve; hit “Real US stocks” to snap the model onto them.{" "}
+              {crspDiversification.source}
             </p>
           </div>
         </div>
@@ -335,7 +358,7 @@ function RiskCurve({ sigma, rho, n }: { sigma: number; rho: number; n: number })
   const NMAX = MAX_N;
   const empirical = crspDiversification.curve.filter((p) => p.n <= NMAX);
   const empiricalMax = empirical.length ? empirical[0].volAnnual : 0;
-  const yMax = Math.max(sigma, empiricalMax) * 1.05;
+  const yMax = Math.max(sigma, empiricalMax, MU) * 1.05;
   const floor = sigma * Math.sqrt(rho);
 
   const x = (k: number) => pad.left + ((k - 1) / (NMAX - 1)) * (width - pad.left - pad.right);
@@ -365,6 +388,12 @@ function RiskCurve({ sigma, rho, n }: { sigma: number; rho: number; n: number })
       <text x={width - pad.right} y={y(floor) - 5} textAnchor="end" style={{ ...axisText, fill: "var(--color-warn)", fontWeight: 600 }}>
         floor σ√ρ = {pct(floor, 1)}
       </text>
+      {/* Expected return: flat, because it does not depend on N. */}
+      <line x1={pad.left} x2={width - pad.right} y1={y(MU)} y2={y(MU)}
+        stroke="var(--pl-c2)" strokeWidth={2} />
+      <text x={pad.left + 4} y={y(MU) - 6} style={{ ...axisText, fill: "var(--pl-c2)", fontWeight: 700 }}>
+        expected return {pct(MU, 1)} — unchanged
+      </text>
       {/* curve */}
       <path d={path} fill="none" stroke="var(--color-accent)" strokeWidth={2.5} strokeLinejoin="round" />
       {/* empirical (real CRSP) curve: a fixed reference the model can be fit to */}
@@ -393,7 +422,7 @@ function RiskCurve({ sigma, rho, n }: { sigma: number; rho: number; n: number })
         Number of stocks →
       </text>
       <text x={13} y={(pad.top + height - pad.bottom) / 2} textAnchor="middle" transform={`rotate(-90 13 ${(pad.top + height - pad.bottom) / 2})`} style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
-        Portfolio volatility →
+        Percent per year →
       </text>
     </svg>
   );
