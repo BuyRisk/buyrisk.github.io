@@ -313,8 +313,8 @@ export default function HeroRiskReturn() {
           pays nothing extra, because owning many companies removes it for
           free — <a href="/tools/stock-picking#count">watch it disappear</a>. The
           range above is the ride the average hides; the slope only pays if you
-          can sit through the left end of it. And this is the US, the century's
-          best-performing major market, so treat these as upper bounds,{" "}
+          can sit through the left end of it. And this is the US, one of the century's
+          best-performing major markets, so treat these as upper bounds,{" "}
           <a href="/tools/global#us-vs-world">not entitlements</a>.{" "}
           <a href="/tools/factors">Open the full tool →</a>
         </p>

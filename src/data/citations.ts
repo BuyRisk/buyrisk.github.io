@@ -111,7 +111,7 @@ export const STUDIES: Record<string, Study> = {
     authors: "Treynor, J. L.",
     year: 1962,
     title: "Toward a Theory of Market Value of Risky Assets",
-    venue: "Unpublished manuscript (circulated 1962; published 1999)",
+    venue: "Unpublished manuscript, 1962; published in R. A. Korajczyk (ed.), Asset Pricing and Portfolio Performance, Risk Books, 1999, pp. 15–22",
     kind: "paper",
     category: "Asset pricing & the CAPM",
   },
@@ -293,7 +293,7 @@ export const STUDIES: Record<string, Study> = {
     venue: "in Kahneman, Slovic & Tversky (eds.), Judgment under Uncertainty",
     kind: "paper",
     category: "Behavioral finance",
-    note: "The 90%-confidence-interval calibration test (first circulated 1969): people's '90% sure' ranges trap the truth only about half the time.",
+    note: "The confidence-interval calibration test (first circulated 1969): asked for ranges they were 98% sure of, subjects' ranges missed the truth over 40% of the time. The '90% sure, right about half the time' version is Russo & Schoemaker (1989).",
   },
   asch1955: {
     authors: "Asch, S. E.",
@@ -399,6 +399,42 @@ export const STUDIES: Record<string, Study> = {
     category: "Behavioral finance",
     note: "The more households traded, the worse they did: the most active fifth trailed the market by about 6.5 points a year, mostly from trading costs.",
   },
+  russoSchoemaker1989: {
+    authors: "Russo, J. E., & Schoemaker, P. J. H.",
+    year: 1989,
+    title: "Decision Traps: Ten Barriers to Brilliant Decision-Making and How to Overcome Them",
+    venue: "Doubleday",
+    kind: "book",
+    category: "Behavioral finance",
+    note: "Managers asked for 90%-confidence ranges trapped the true value only about half the time — the calibration result the arcade's quiz reproduces.",
+  },
+  tverskyKahneman1992: {
+    authors: "Tversky, A., & Kahneman, D.",
+    year: 1992,
+    title: "Advances in Prospect Theory: Cumulative Representation of Uncertainty",
+    venue: "Journal of Risk and Uncertainty 5(4): 297–323",
+    kind: "paper",
+    category: "Behavioral finance",
+    note: "Cumulative prospect theory, and the source of the widely quoted loss-aversion coefficient of about 2.25.",
+  },
+  rabin2000: {
+    authors: "Rabin, M.",
+    year: 2000,
+    title: "Risk Aversion and Expected-Utility Theory: A Calibration Theorem",
+    venue: "Econometrica 68(5): 1281–1292",
+    kind: "paper",
+    category: "Behavioral finance",
+    note: "Turning down small favorable gambles is inconsistent with any plausible expected-utility risk aversion over wealth — the argument that loss aversion, not diminishing marginal utility, explains it.",
+  },
+  miller2007: {
+    authors: "Miller, R. M.",
+    year: 2007,
+    title: "Measuring the True Cost of Active Management by Mutual Funds",
+    venue: "Journal of Investment Management 5(1): 29–49",
+    kind: "paper",
+    category: "Market efficiency & active management",
+    note: "The 'fee on the active slice' arithmetic: a fund's expense ratio, charged on the whole portfolio, is a far steeper fee on the part that actually differs from the index.",
+  },
   morningstarMindTheGap2026: {
     authors: "Ptak, J.",
     year: 2026,
@@ -406,7 +442,7 @@ export const STUDIES: Record<string, Study> = {
     venue: "Morningstar Portfolio and Planning Research",
     kind: "paper",
     category: "Behavioral finance",
-    note: "The authoritative investor-return-gap study. Over the 10 years to Dec. 2025, the average dollar earned 8.7%/yr vs. funds' 9.9% total return — a ~1.2pp gap; the US-equity gap was the smallest of any category at ~0.4pp, close to this tool's independently computed ~0.5pp CRSP figure. The gap widens with category volatility (sector and alternative funds worst).",
+    note: "The authoritative investor-return-gap study. Over the 10 years to Dec. 2025, the average dollar earned 8.7%/yr vs. funds' 9.9% total return — a ~1.2pp gap; the US-equity gap was the smallest of any category at ~0.4pp, close to this tool's independently computed CRSP medians (~0.3pp for US-equity funds, ~0.5pp across all funds; asset-weighted, our gap is roughly zero). The gap widens with category volatility (sector and alternative funds worst).",
   },
   cremersPetajisto2009: {
     authors: "Cremers, M., & Petajisto, A.",
@@ -424,7 +460,7 @@ export const STUDIES: Record<string, Study> = {
     venue: "Financial Analysts Journal 69(4): 73–93",
     kind: "paper",
     category: "Market efficiency & active management",
-    note: "Documents the rise of closet indexing and frames the fee on the active slice: a low Active Share turns a modest expense ratio into a steep effective fee on the part that's genuinely active.",
+    note: "Documents the rise of closet indexing (roughly a third of US equity fund assets by 2009). The 'fee on the active slice' arithmetic the tool uses follows Miller (2007).",
   },
   sharpe1991: {
     authors: "Sharpe, W. F.",
@@ -600,7 +636,7 @@ export const DATASETS: Record<string, Dataset> = {
     note: "Data © Eugene F. Fama and Kenneth R. French. The library publishes no formal license; we ship derived series (daily market returns, regional monthly returns, factor summaries) with attribution, not the library's files.",
   },
   nsar: {
-    name: "Form N-SAR filings (Item 28 monthly fund flows), 1993–2018",
+    name: "Form N-SAR filings (Item 28 monthly fund flows), 1993–2017",
     publisher: "US Securities and Exchange Commission, via EDGAR",
     url: "https://www.sec.gov/about/forms/formn-sar.pdf",
     note: "Public SEC filings — the semi-annual census form for registered funds, rescinded June 1, 2018 (replaced by Forms N-CEN and N-PORT), which is why the series ends there. Filings parsed into a research database by Kellogg Research Support, Northwestern University; monthly industry aggregates computed by the author. US government records, public domain.",
@@ -731,12 +767,6 @@ export const DATASETS: Record<string, Dataset> = {
     url: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve",
     note: "The daily CMT par yields, fetched client-side from Treasury's public CSV feed (no API key).",
   },
-  jst: {
-    name: "The Jordà-Schularick-Taylor Macrohistory Database",
-    publisher: "macrohistory.net",
-    url: "https://www.macrohistory.net/database/",
-    note: "CC BY-NC-SA 4.0. Its terms require citing Jordà, Schularick & Taylor (2017, NBER Macroeconomics Annual 31) for any use and Jordà, Knoll, Kuvshinov, Schularick & Taylor (2019) for return data. No figures on this site are computed from the database itself; it is cited as the source of the cross-country evidence discussed.",
-  },
   ssa: {
     name: "Actuarial Life Tables & Benefit Data",
     publisher: "U.S. Social Security Administration, Office of the Chief Actuary",
@@ -785,7 +815,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     method:
       "Computed live in your browser from the numbers you enter. The historical modes use real annual US stock, bond, and inflation returns (Damodaran, 1928–present): resampled in five-year blocks for the Monte Carlo runs, and replayed year by year in Twin Lives. Default borrowing rates in the debt tab come from the FRED consumer-rate series.",
     studies: ["bengen1994", "cooley1998"],
-    datasets: ["shiller", "damodaran", "fred"],
+    datasets: ["damodaran", "fred"],
   },
   fees: {
     method:
@@ -803,13 +833,13 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     method:
       "Mostly deliberate simulation: the waves, shifting-correlation, and messy-reality tabs generate synthetic return series so the mechanism is visible without real-world noise, and the index-weighting tab is an invented five-stock market. Only “How top-heavy is the market?” uses real data — S&P 500 constituent weights and concentration derived from CRSP records, 1928–present.",
     studies: ["markowitz1952", "samuelson1965"],
-    datasets: ["damodaran", "crspSp500"],
+    datasets: ["crspSp500"],
   },
   "stock-picking": {
     method:
       "Two halves. The diversification curve and the lifetime-return distribution behind “why a few win” are computed from real CRSP US common-stock records and shipped as aggregate tables. The fair-price and options tabs use no market data at all: they are a textbook two-stage DCF and the Black–Scholes formula, evaluated live on assumptions you choose.",
     studies: ["markowitz1952", "evansArcher1968", "eltonGruber1977", "statman1987", "bessembinder2018", "bessembinder2023", "black1973", "merton1973"],
-    datasets: ["crsp"],
+    datasets: ["crsp", "damodaran"],
   },
   portfolio: {
     method:
@@ -834,13 +864,13 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "mcleanPontiff2016",
       "dimsonMarshStaunton2002",
     ],
-    datasets: ["french", "aqr", "pastorStambaugh"],
+    datasets: ["french", "aqr", "pastorStambaugh", "damodaran"],
   },
   "beat-the-market": {
     method:
       "Mixed by design. The “predict the next move” game is synthetic — real charts shown against generated random walks. The rest is real: missing-the-best-days uses actual daily US market returns (Fama–French, 1990–present), lump-sum-vs-averaging uses Shiller's monthly series, the active-fund scorecard combines SPIVA with CRSP survivorship records, and closet indexing uses CRSP and Thomson holdings data. Watch-the-money aggregates the monthly gross sales and redemptions every US open-end fund reported to the SEC on Form N-SAR Item 28, 1993–2017 — 158,232 filings; net flow follows Christoffersen, Evans & Musto (2013).",
     studies: [
-      "samuelson1965",
+      "miller2007", "samuelson1965",
       "fama1970",
       "fama1991",
       "grossmanStiglitz1980",
@@ -855,19 +885,19 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
       "carhart1997",
       "christoffersenEvansMusto2013",
     ],
-    datasets: ["french", "shiller", "spiva", "petajisto", "crspMf", "thomsonS12", "crspSp500", "nsar"],
+    datasets: ["french", "shiller", "damodaran", "spiva", "petajisto", "crspMf", "thomsonS12", "crspSp500", "nsar"],
   },
   retirement: {
     method:
       "A live simulator driven by the spending, portfolio, and horizon you set. The stress test resamples real annual US stock, bond, and inflation returns (Damodaran, 1928–present) in five-year blocks to build 1,500 alternate retirements; “Same returns, shuffled” replays one real historical window in different orders.",
     studies: ["bengen1994", "cooley1998", "guytonKlinger2006"],
-    datasets: ["damodaran", "shiller"],
+    datasets: ["damodaran"],
   },
   "retirement-accounts": {
     method:
       "Benefit calculations use the Social Security Administration's own published data — the national wage index, PIA bend points, COLAs, and the period life table — and reproduce the SSA's published worked examples exactly. The Roth and harvest-or-convert tabs run current IRS parameters (brackets, deductions, credit thresholds) against the figures you enter.",
     studies: ["shovenSlavov2014"],
-    datasets: ["ssa", "irsPub915", "cmsIrmaa"],
+    datasets: ["ssa", "irsPub915", "cmsIrmaa", "irsRevProc"],
   },
   "risk-tolerance": {
     method:
@@ -879,7 +909,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     method:
       "The behavior-gap simulation runs on real daily US market returns (Fama–French, 1990–present), and the fund-level gaps are computed from CRSP mutual-fund records. In the arcade, “real or random” shows genuine market history against volatility-matched coin flips, and the quiz answers are computed from the historical return data rather than written by hand; the vignettes are adapted from the published experiments cited above.",
     studies: [
-      "kahnemanTversky1979", "barberOdean2000", "morningstarMindTheGap2026",
+      "kahnemanTversky1979", "tverskyKahneman1992", "rabin2000", "russoSchoemaker1989", "barberOdean2000", "morningstarMindTheGap2026",
       "tverskyKahneman1974", "tverskyKahneman1981", "shefrinStatman1985",
       "odean1998", "arkesBlumer1985", "baronHershey1988", "alpertRaiffa1982",
       "asch1955", "bikhchandaniHirshleiferWelch1992", "kahnemanKnetschThaler1990", "fischhoff1975",

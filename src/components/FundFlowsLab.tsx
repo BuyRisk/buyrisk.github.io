@@ -16,7 +16,7 @@ import {
 /**
  * "Watch the money": the fund industry's own cash register, month by month.
  * Every US open-end mutual fund had to tell the SEC its monthly dollars in
- * (gross sales) and dollars out (redemptions) on Form N-SAR, 1993-2018. Two
+ * (gross sales) and dollars out (redemptions) on Form N-SAR, 1993-2017. Two
  * lessons hide in that ledger. First, the churn: the industry shuffles far
  * more money than it keeps - tens of dollars traded for every net dollar
  * invested, and every shuffled dollar can ring a fee register. Second, the

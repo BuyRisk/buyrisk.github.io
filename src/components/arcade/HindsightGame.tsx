@@ -37,7 +37,7 @@ const EPISODES: Episode[] = [
   {
     id: "2008",
     revealed: true,
-    setup: "January 2008. US house prices have never fallen nationally in the post-war data. The Fed chair assured Congress the previous spring that subprime troubles were 'likely to be contained.' Major banks had just reported record profits.",
+    setup: "January 2008. House prices have slipped from their 2006 peak, but a national decline of the size that followed had never happened in the post-war data. The Fed chair assured Congress the previous spring that subprime troubles were 'likely to be contained'; the big banks have just announced large write-downs, yet the consensus forecast is a mild slowdown, not a crash.",
     outcome: "What happened: US stocks fell ~37% in 2008, and the global financial system nearly failed.",
     ask: "Knowing that, how foreseeable was a 30%-plus crash for a well-informed investor in January 2008?",
   },

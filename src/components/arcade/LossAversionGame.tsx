@@ -60,7 +60,7 @@ export default function LossAversionGame({ onDone }: { onDone: (r: GameResult) =
         </p>
         <p>
           That number is <strong>loss aversion</strong>, the heart of prospect theory (Kahneman
-          &amp; Tversky, 1979). The population average is about <strong>2.25</strong>. There's no
+          &amp; Tversky, 1979). The population average is about <strong>2.25</strong> (Tversky &amp; Kahneman, 1992). There's no
           virtuous score: pure expected-value logic says accept anything over $100, and for small,
           repeatable bets that's the "rational" answer (turning down many small favorable flips adds
           up to a large forfeited edge — Rabin, 2000).
