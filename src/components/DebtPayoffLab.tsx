@@ -209,11 +209,14 @@ export default function DebtPayoffLab() {
       <div className="wl-stage">
         <div className="wl-frontier">
           <h3>Balance over time</h3>
-          <BalanceChart av={av} sn={sn} money={money} />
+          <BalanceChart av={av} sn={sn} debts={valid} money={money} />
           <p className="wl-fnote">
             Both lines pay the same total each month; they differ only in which debt
-            they target first. They usually finish close together — the real gap is
-            the <strong>interest paid</strong> and how fast you clear that first debt.
+            they target first. Each <strong>dot</strong> is a debt cleared — hover one to
+            see which — and the snowball's dots usually come sooner at the start: that early
+            momentum is its whole argument. The <strong>shaded band</strong> between the
+            lines is the extra balance the slower strategy carries, month after month —
+            which is exactly where its extra interest comes from.
           </p>
         </div>
 
@@ -284,7 +287,7 @@ function firstPayoffLabel(sim: SimResult, debts: Debt[]): string {
   return isFinite(min) ? `in ${monthsLabel(min)}` : "soon";
 }
 
-function BalanceChart({ av, sn, money }: { av: SimResult; sn: SimResult; money: (n: number) => string }) {
+function BalanceChart({ av, sn, debts, money }: { av: SimResult; sn: SimResult; debts: Debt[]; money: (n: number) => string }) {
   const width = 720, height = 300;
   const pad = { top: 16, right: 16, bottom: 34, left: 60 };
   const plotW = width - pad.left - pad.right;
@@ -311,8 +314,50 @@ function BalanceChart({ av, sn, money }: { av: SimResult; sn: SimResult; money: 
       {xTicks.map((m) => (
         <text key={m} x={x(m)} y={height - 12} textAnchor="middle" style={axis}>{m === 0 ? "now" : `${Math.round(m / 12)}y`}</text>
       ))}
+      {/* The gap between the curves is the extra balance the slower strategy
+          carries month after month — the visible form of its extra interest. */}
+      {(() => {
+        const n = Math.max(av.history.length, sn.history.length);
+        const at = (h: number[], m: number) => h[Math.min(m, h.length - 1)] ?? 0;
+        const pts = [];
+        for (let m = 0; m < n; m++) pts.push(`${x(m).toFixed(1)},${y(Math.max(at(av.history, m), at(sn.history, m))).toFixed(1)}`);
+        for (let m = n - 1; m >= 0; m--) pts.push(`${x(m).toFixed(1)},${y(Math.min(at(av.history, m), at(sn.history, m))).toFixed(1)}`);
+        // The band is honest but thin (both strategies pay the same total),
+        // so label its widest point in dollars to make it legible.
+        let gapMax = 0, gapAt = 0;
+        for (let m = 0; m < n; m++) {
+          const g = at(sn.history, m) - at(av.history, m);
+          if (Math.abs(g) > Math.abs(gapMax)) { gapMax = g; gapAt = m; }
+        }
+        const mid = y((at(sn.history, gapAt) + at(av.history, gapAt)) / 2);
+        return (
+          <>
+            <polygon points={pts.join(" ")} fill="var(--color-warn)" opacity={0.14} />
+            {Math.abs(gapMax) >= 50 && (
+              <g>
+                <line x1={x(gapAt)} x2={x(gapAt)} y1={y(at(av.history, gapAt))} y2={y(at(sn.history, gapAt))} stroke="var(--color-warn)" strokeWidth={1.4} />
+                <text x={x(gapAt) + 6} y={mid + 4} style={{ fill: "var(--color-warn)", fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700 }}>
+                  {money(Math.abs(gapMax))} apart
+                </text>
+              </g>
+            )}
+          </>
+        );
+      })()}
       <path d={path(sn.history)} fill="none" stroke="var(--pl-c1)" strokeWidth={2} strokeDasharray="5 4" />
       <path d={path(av.history)} fill="none" stroke="var(--color-accent)" strokeWidth={2} />
+      {/* A dot every time a strategy clears a debt — snowball's early wins and
+          avalanche's endgame, both visible. */}
+      {debts.map((d) => {
+        const out = [];
+        const mA = av.paidMonth[d.id];
+        if (mA !== undefined && mA <= maxM)
+          out.push(<circle key={`a${d.id}`} cx={x(mA)} cy={y(av.history[Math.min(mA, av.history.length - 1)])} r={4.5} fill="var(--color-accent)" stroke="var(--color-surface)" strokeWidth={1.5}><title>{`Avalanche clears ${d.name} after ${monthsLabel(mA)}`}</title></circle>);
+        const mS = sn.paidMonth[d.id];
+        if (mS !== undefined && mS <= maxM)
+          out.push(<circle key={`s${d.id}`} cx={x(mS)} cy={y(sn.history[Math.min(mS, sn.history.length - 1)])} r={4.5} fill="var(--pl-c1)" stroke="var(--color-surface)" strokeWidth={1.5}><title>{`Snowball clears ${d.name} after ${monthsLabel(mS)}`}</title></circle>);
+        return out;
+      })}
       <g transform={`translate(${pad.left + 8}, ${pad.top + 4})`} style={{ fontFamily: "var(--font-sans)", fontSize: 11 }}>
         <line x1={0} x2={20} y1={0} y2={0} stroke="var(--color-accent)" strokeWidth={2} />
         <text x={26} y={4} fill="var(--color-text-soft)">Avalanche</text>
