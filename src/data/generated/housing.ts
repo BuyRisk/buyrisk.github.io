@@ -28,8 +28,6 @@ export interface HousingData {
     worstDrawdown: { pct: number; peakYear: number; troughYear: number };
     /** Spread of rolling 10-year annualized appreciation (fractions). */
     rolling10yr: { min: number; median: number; max: number };
-    /** Annual-average index level. */
-    series: IndexPoint[];
   };
 }
 
@@ -48,6 +46,5 @@ export const housing: HousingData = {
     cagr: 0.0431,
     worstDrawdown: { pct: -0.2742, peakYear: 2006, troughYear: 2012 },
     rolling10yr: { min: -0.0035, median: 0.0404, max: 0.0839 },
-    series: [{ year: 1987, index: 66.3 }, { year: 1988, index: 71.1 }, { year: 1989, index: 75.5 }, { year: 1990, index: 76.9 }, { year: 1991, index: 75.9 }, { year: 1992, index: 76.3 }, { year: 1993, index: 77.4 }, { year: 1994, index: 79.5 }, { year: 1995, index: 81 }, { year: 1996, index: 82.8 }, { year: 1997, index: 85.3 }, { year: 1998, index: 90.1 }, { year: 1999, index: 96.4 }, { year: 2000, index: 104.8 }, { year: 2001, index: 113.2 }, { year: 2002, index: 122.3 }, { year: 2003, index: 133.7 }, { year: 2004, index: 150.5 }, { year: 2005, index: 171.8 }, { year: 2006, index: 183.5 }, { year: 2007, index: 179.9 }, { year: 2008, index: 164.1 }, { year: 2009, index: 148.6 }, { year: 2010, index: 144.7 }, { year: 2011, index: 139.2 }, { year: 2012, index: 141 }, { year: 2013, index: 154.5 }, { year: 2014, index: 164.7 }, { year: 2015, index: 172.1 }, { year: 2016, index: 180.9 }, { year: 2017, index: 191.4 }, { year: 2018, index: 202.4 }, { year: 2019, index: 209.4 }, { year: 2020, index: 222.1 }, { year: 2021, index: 260 }, { year: 2022, index: 298.3 }, { year: 2023, index: 305.7 }, { year: 2024, index: 321.4 }, { year: 2025, index: 328.5 }],
   },
 };
