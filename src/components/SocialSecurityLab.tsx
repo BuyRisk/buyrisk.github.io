@@ -171,7 +171,7 @@ export default function SocialSecurityLab() {
                 <InfoTip text="The monthly benefit your late spouse was receiving, or would have received — the basis for your survivor benefit (its full amount at your full retirement age). If they claimed early it may be capped; if late it includes their delayed credits." />{" "}
                 <strong>{currency(deceasedBenefit)}/mo</strong>
               </span>
-              <input type="range" min={800} max={4500} step={50} value={deceasedBenefit} onChange={(e) => setDeceasedBenefit(Number(e.target.value))} />
+              <input type="range" min={200} max={5500} step={50} value={deceasedBenefit} onChange={(e) => setDeceasedBenefit(Number(e.target.value))} />
             </label>
           </>
         ) : mode === "single" ? (
@@ -440,7 +440,7 @@ function PersonFields(props: {
           <InfoTip text="Their Primary Insurance Amount, the monthly check at full retirement age. The real figure is on the Social Security statement (ssa.gov)." />{" "}
           <strong>{currency(props.pia)}/mo</strong>
         </span>
-        <input type="range" min={800} max={4000} step={50} value={props.pia} onChange={(e) => props.setPia(Number(e.target.value))} />
+        <input type="range" min={200} max={4600} step={50} value={props.pia} onChange={(e) => props.setPia(Number(e.target.value))} />
       </label>
       <label className="wl-slider">
         <span>

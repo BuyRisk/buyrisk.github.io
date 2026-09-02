@@ -132,7 +132,7 @@ const MC: { paths: Record<AssetKey, number[][]>; medians: Record<AssetKey, numbe
 })();
 
 export default function RiskReturnLab() {
-  const [risk, setRisk] = useState(0.194); // chosen volatility (default ≈ US stocks)
+  const [risk, setRisk] = useState(0.195); // chosen volatility (default ≈ US stocks)
   const [showParadox, setShowParadox] = useState(true);
   const [growthMode, setGrowthMode] = useState<"simplified" | "historical">("simplified");
 

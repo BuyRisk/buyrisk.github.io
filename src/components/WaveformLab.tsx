@@ -409,7 +409,7 @@ export default function WaveformLab() {
                 </span>
                 <input
                   type="range"
-                  min={0.02}
+                  min={0.01}
                   max={0.3}
                   step={0.01}
                   value={a.amp}

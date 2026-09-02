@@ -192,7 +192,7 @@ export default function OptionsLab() {
           ) : (
             <>
               <h3 style={{ marginTop: 0 }}>The two levers that create value</h3>
-              <div className="wl-lower" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              <div className="wl-lower ol-levers">
                 <LeverChart title={kind === "put" && g.timeValue < 0 ? "More time → less value" : "More time → more value"} xLabel="Months to expiry" xMax={36} sample={(m) => blackScholes(kind, spot, strike, m / 12, sigma, r).price} cur={months} curLabel={`${months}m`} money={money} yRef={curve.yMax} />
                 <LeverChart title="More volatility → more value" xLabel="Volatility (%/yr)" xMax={80} sample={(v) => blackScholes(kind, spot, strike, T, v / 100, r).price} cur={vol} curLabel={`${vol}%`} money={money} yRef={curve.yMax} />
               </div>

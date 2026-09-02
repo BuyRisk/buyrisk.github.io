@@ -365,6 +365,11 @@ a.card:hover {
 }
 
 /* ---------- Info tooltip (InfoTip.tsx) ---------- */
+/* Absolutely-positioned tooltip bubbles (and any stray wide element) must not
+   widen the page on phones. clip keeps vertical scrolling intact. */
+main {
+  overflow-x: clip;
+}
 .infotip {
   position: relative;
   display: inline-flex;

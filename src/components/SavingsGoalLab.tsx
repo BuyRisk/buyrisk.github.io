@@ -51,11 +51,11 @@ export default function SavingsGoalLab() {
 
         <label className="wl-slider">
           <span>Goal amount<InfoTip text="The total you want to have saved by your target date." /> <strong>{money(goal)}</strong></span>
-          <input type="range" min={1000} max={200000} step={1000} value={goal} onChange={(e) => setGoal(Number(e.target.value))} />
+          <input type="range" min={1000} max={1000000} step={1000} value={goal} onChange={(e) => setGoal(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>Already saved <strong>{money(current)}</strong></span>
-          <input type="range" min={0} max={200000} step={1000} value={current} onChange={(e) => setCurrent(Number(e.target.value))} />
+          <input type="range" min={0} max={1000000} step={1000} value={current} onChange={(e) => setCurrent(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>Target timeframe <strong>{timeLabel}</strong></span>

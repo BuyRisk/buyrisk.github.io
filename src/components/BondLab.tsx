@@ -39,7 +39,7 @@ function modDuration(y0: number, maturity: number) {
 
 export default function BondLab() {
   const [mode, setMode] = useState<"risk" | "curve">("risk");
-  const [startYield, setStartYield] = useState(Math.round(bondYields.tenYear.nominal * 10) / 10); // %
+  const [startYield, setStartYield] = useState(Math.round(bondYields.tenYear.nominal * 4) / 4); // %, snapped to the slider's 0.25 step
   const [rateMove, setRateMove] = useState(1); // percentage points
   const [focus, setFocus] = useState(10);
 
@@ -82,7 +82,7 @@ export default function BondLab() {
                 <InfoTip text="The bond's yield today. We price it at par (coupon equals yield), then see what a rate move does to its price." />{" "}
                 <strong>{startYield}%</strong>
               </span>
-              <input type="range" min={1} max={10} step={0.25} value={startYield} onChange={(e) => setStartYield(+e.target.value)} />
+              <input type="range" min={0} max={10} step={0.25} value={startYield} onChange={(e) => setStartYield(+e.target.value)} />
             </label>
             <label className="wl-slider">
               <span>

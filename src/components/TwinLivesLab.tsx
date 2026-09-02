@@ -86,7 +86,7 @@ export default function TwinLivesLab() {
             <InfoTip text="Both twins save the same inflation-adjusted amount every month of their careers, invested identically. Only the calendar differs." />{" "}
             <strong>{currency(monthly)}</strong>
           </span>
-          <input type="range" min={100} max={3_000} step={50} value={monthly} onChange={(e) => setMonthly(+e.target.value)} />
+          <input type="range" min={100} max={10_000} step={50} value={monthly} onChange={(e) => setMonthly(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>Career length <strong>{career} years</strong></span>

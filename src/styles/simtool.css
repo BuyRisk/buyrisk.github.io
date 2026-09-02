@@ -15,6 +15,7 @@
 
 /* Controls */
 .wl-controls {
+  min-width: 0; /* grid item: do not grow to fit a wide child (debt rows scroll instead) */
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -225,6 +226,7 @@
   }
 }
 .wl-readout {
+  min-width: 0;
   background: var(--color-surface);
   border: var(--border);
   border-radius: var(--radius);
@@ -402,7 +404,7 @@
 .nw-fill--debt { background: var(--color-error); }
 
 /* DebtPayoffLab */
-.dp-debts { overflow-x: auto; }
+.dp-debts { overflow-x: auto; min-width: 0; } /* min-width:0 so the flex column, not the page, scrolls on phones */
 .dp-row { display: grid; grid-template-columns: minmax(6rem, 1.3fr) minmax(6.5rem, 1fr) 7rem 5rem 6.5rem 1.7rem; gap: 0.4rem; align-items: center; min-width: 33rem; margin-bottom: 0.4rem; }
 .dp-head { font-family: var(--font-sans); font-size: var(--step--1); font-weight: 700; color: var(--color-muted); margin-bottom: 0.2rem; }
 .dp-in { width: 100%; font-family: var(--font-sans); font-size: var(--step--1); padding: 0.35rem 0.45rem; border: var(--border); border-radius: 7px; background: var(--color-surface); color: var(--color-text); }
@@ -793,6 +795,12 @@
 .intro-formula-eq sup,
 .intro-formula-eq sub {
   font-size: 0.6em;
+}
+@media (max-width: 640px) {
+  .intro-formula-eq {
+    white-space: normal;
+    font-size: var(--step-1);
+  }
 }
 .intro-formula-key {
   font-size: var(--step--1);
@@ -2037,7 +2045,7 @@
   }
   .pl-params {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
     gap: 0.5rem;
   }
   .pl-params label {
@@ -2054,8 +2062,8 @@
     gap: 0.25rem;
   }
   .pl-params input {
-    flex: 1 1 auto;
-    width: 100%;
+    flex: 1 1 0;
+    width: 0; /* let the flex row size it; width:100% + the % suffix overflowed the cell */
     min-width: 0;
     font-family: var(--font-sans);
     font-size: var(--step-0);
@@ -2959,3 +2967,14 @@
     color: var(--color-text-soft);
     text-align: right;
   }
+
+/* Options lab: the two lever charts sit side by side from tablet width up
+   (the generic .wl-lower only splits at 1100px, and forcing two columns on a
+   phone shrank each chart to ~150px). */
+@media (min-width: 700px) {
+  .ol-levers { grid-template-columns: 1fr 1fr; }
+}
+/* Three-column stat grids wrap mid-number on phones; go to two columns. */
+@media (max-width: 480px) {
+  .ss-stats, .sk-stats, .pl-stats, .emh-stats { grid-template-columns: 1fr 1fr; }
+}

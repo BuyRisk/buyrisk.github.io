@@ -876,7 +876,7 @@ export default function PortfolioLab() {
                       step={0.5}
                       disabled={locked}
                       value={+(a.mu * 100).toFixed(2)}
-                      onChange={(e) => updateAsset(i, { mu: Number(e.target.value) / 100 })}
+                      onChange={(e) => { const v = Number(e.target.value); if (Number.isFinite(v)) updateAsset(i, { mu: Math.max(-0.5, Math.min(0.5, v / 100)) }); }}
                     />
                     <em>%</em>
                   </span>
@@ -889,7 +889,7 @@ export default function PortfolioLab() {
                       step={0.5}
                       disabled={locked}
                       value={+(a.sigma * 100).toFixed(2)}
-                      onChange={(e) => updateAsset(i, { sigma: Number(e.target.value) / 100 })}
+                      onChange={(e) => { const v = Number(e.target.value); if (Number.isFinite(v)) updateAsset(i, { sigma: Math.max(0.005, Math.min(1, v / 100)) }); }}
                     />
                     <em>%</em>
                   </span>
@@ -906,7 +906,7 @@ export default function PortfolioLab() {
                       value={+a.marketCorr.toFixed(2)}
                       onChange={(e) =>
                         updateAsset(i, {
-                          marketCorr: Math.max(-1, Math.min(1, Number(e.target.value))),
+                          marketCorr: Math.max(-1, Math.min(1, Number.isFinite(Number(e.target.value)) ? Number(e.target.value) : 0)),
                         })
                       }
                     />

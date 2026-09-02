@@ -124,7 +124,7 @@ export default function ClosetIndexingLab() {
           <span>
             Amount invested <InfoTip text="Used only to translate the fee percentages into dollars per year. Scales linearly." /> <strong>{formatMoney(amount)}</strong>
           </span>
-          <input type="range" min={1000} max={500000} step={1000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
+          <input type="range" min={1000} max={5000000} step={1000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
         </label>
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>

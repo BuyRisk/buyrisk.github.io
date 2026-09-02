@@ -112,7 +112,7 @@ export default function NetWorthLab() {
             <label className="wl-slider"><span>Investment return<InfoTip text="A long-run assumption for the investing side. Historically a diversified stock/bond mix has returned mid-single digits after inflation — never guaranteed." /> <strong>{ret}%</strong></span>
               <input type="range" min={0} max={10} step={0.5} value={ret} onChange={(e) => setRet(Number(e.target.value))} /></label>
             <label className="wl-slider"><span>Over <strong>{years} years</strong></span>
-              <input type="range" min={1} max={40} step={1} value={years} onChange={(e) => setYears(Number(e.target.value))} /></label>
+              <input type="range" min={1} max={50} step={1} value={years} onChange={(e) => setYears(Number(e.target.value))} /></label>
 
             <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
               <span className="ss-headline-label">Projected net worth in {years} years</span>

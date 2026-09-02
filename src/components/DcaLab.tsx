@@ -89,7 +89,7 @@ export default function DcaLab() {
             <InfoTip text="A lump of cash to put to work: an inheritance, bonus, or sale. Do you invest it all today, or spread it out?" />{" "}
             <strong>{dollars(amount)}</strong>
           </span>
-          <input type="range" min={5_000} max={250_000} step={5_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
+          <input type="range" min={5_000} max={2_000_000} step={5_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
         </label>
 
         <div className="wl-field">

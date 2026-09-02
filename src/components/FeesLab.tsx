@@ -65,7 +65,7 @@ export default function FeesLab() {
     const indexFinal = index[index.length - 1].value;
     const gap = indexFinal - yoursFinal; // extra wealth the cheaper fund keeps
     const dragYours = grossFinal - yoursFinal; // total dollars your fund's fee cost
-    const dragShare = dragYours / grossFinal; // fee drag as a share of fee-free wealth
+    const dragShare = grossFinal > 0 ? dragYours / grossFinal : 0; // fee drag as a share of fee-free wealth
     return { gross, yours, index, grossFinal, yoursFinal, indexFinal, gap, dragYours, dragShare };
   }, [amount, contribution, years, grossReturn, yourFee, indexFee]);
 
@@ -102,14 +102,14 @@ export default function FeesLab() {
               <span>
                 Starting balance <strong>{dollars(amount)}</strong>
               </span>
-              <input type="range" min={0} max={100_000} step={1_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
+              <input type="range" min={0} max={2_000_000} step={5_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
             </label>
 
             <label className="wl-slider">
               <span>
                 Monthly contribution <strong>{dollars(contribution)}</strong>
               </span>
-              <input type="range" min={0} max={3_000} step={50} value={contribution} onChange={(e) => setContribution(+e.target.value)} />
+              <input type="range" min={0} max={5_000} step={50} value={contribution} onChange={(e) => setContribution(+e.target.value)} />
             </label>
 
             <label className="wl-slider">
@@ -134,7 +134,7 @@ export default function FeesLab() {
                 <InfoTip text="The expense ratio: the percent of your balance the fund charges every year, whether it beats the market or not. The average active US equity fund charged 0.64% in 2025." />{" "}
                 <strong>{pct(yourFee)}</strong>
               </span>
-              <input type="range" min={0} max={2} step={0.01} value={yourFee} onChange={(e) => setYourFee(+e.target.value)} />
+              <input type="range" min={0} max={3} step={0.01} value={yourFee} onChange={(e) => setYourFee(+e.target.value)} />
             </label>
 
             <label className="wl-slider">

@@ -69,7 +69,7 @@ export default function InflationLab() {
             <InfoTip text="A dollar figure in your start year. We'll show what the same basket of goods costs today." />{" "}
             <strong>{dollars(amount)}</strong>
           </span>
-          <input type="range" min={10} max={1000} step={10} value={amount} onChange={(e) => setAmount(+e.target.value)} />
+          <input type="range" min={10} max={50000} step={10} value={amount} onChange={(e) => setAmount(+e.target.value)} />
         </label>
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>

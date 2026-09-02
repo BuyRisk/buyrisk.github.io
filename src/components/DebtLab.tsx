@@ -84,7 +84,7 @@ const APR_PRESETS = [
 export default function DebtLab() {
   useCurrencyCode(); // re-render when the header currency picker changes
   const [balance, setBalance] = useState(DEFAULTS.balance);
-  const [apr, setApr] = useState(DEFAULTS.apr);
+  const [apr, setApr] = useState(Math.round((DEFAULTS.apr) * 10) / 10);
   const [payment, setPayment] = useState(DEFAULTS.payment);
 
   const view = useMemo(() => {
@@ -123,7 +123,7 @@ export default function DebtLab() {
             <InfoTip text={`The annual interest rate. The average US credit card charges about ${pct(CC)} (Federal Reserve, via FRED), far above what markets reliably return.`} />{" "}
             <strong>{pct(apr)}</strong>
           </span>
-          <input type="range" min={0} max={30} step={0.1} value={apr} onChange={(e) => setApr(+e.target.value)} />
+          <input type="range" min={0} max={100} step={0.1} value={apr} onChange={(e) => setApr(+e.target.value)} />
         </label>
         <div className="wl-presets">
           <span className="wl-presets-label">Typical rates:</span>

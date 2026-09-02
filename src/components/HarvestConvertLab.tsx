@@ -133,7 +133,7 @@ export default function HarvestConvertLab() {
             <InfoTip text="If benefits have started, every converted dollar can drag up to 85¢ of them into taxable income — the tax torpedo makes conversions costlier. Gap years BEFORE claiming are the golden window." />{" "}
             <strong>{currency(ssBenefit)}</strong>
           </span>
-          <input type="range" min={0} max={72_000} step={1_000} value={ssBenefit} onChange={(e) => setSsBenefit(+e.target.value)} />
+          <input type="range" min={0} max={150_000} step={1_000} value={ssBenefit} onChange={(e) => setSsBenefit(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>People 65 or older <strong>{age65}</strong></span>
@@ -147,7 +147,7 @@ export default function HarvestConvertLab() {
             <InfoTip text="Pre-tax money that will be taxed as ordinary income someday — at withdrawal, at RMDs, or by your heirs. Converting moves it to Roth at today's marginal cost." />{" "}
             <strong>{currency(tiraAvail)}</strong>
           </span>
-          <input type="range" min={0} max={2_000_000} step={25_000} value={tiraAvail} onChange={(e) => setTiraAvail(+e.target.value)} />
+          <input type="range" min={0} max={5_000_000} step={25_000} value={tiraAvail} onChange={(e) => setTiraAvail(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>
@@ -165,7 +165,7 @@ export default function HarvestConvertLab() {
             <InfoTip text="What withdrawals would be taxed at if you DIDN'T convert: your bracket once RMDs and Social Security stack up, or your heirs' bracket. The higher this is, the more conversions win." />{" "}
             <strong>{laterOrd}%</strong>
           </span>
-          <input type="range" min={10} max={37} step={1} value={laterOrd} onChange={(e) => setLaterOrd(+e.target.value)} />
+          <input type="range" min={0} max={37} step={1} value={laterOrd} onChange={(e) => setLaterOrd(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>

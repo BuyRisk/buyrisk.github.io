@@ -92,7 +92,7 @@ export default function SavingsRateLab() {
             <InfoTip text="Your spendable income after taxes. With no starting net worth, slide it and the YEARS barely move: income sets how big your numbers are, not how long FI takes. Add a head start below and income starts to matter." />{" "}
             <strong>{currency(income)}/yr</strong>
           </span>
-          <input type="range" min={20_000} max={400_000} step={5_000} value={income} onChange={(e) => setIncome(+e.target.value)} />
+          <input type="range" min={10_000} max={400_000} step={5_000} value={income} onChange={(e) => setIncome(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
@@ -101,7 +101,7 @@ export default function SavingsRateLab() {
             <InfoTip text="Money you've already invested. Leave it at $0 for the classic result where income doesn't matter. Add a balance and it gives you a head start that pulls the finish line closer, and the bigger it is relative to your pay, the more it helps." />{" "}
             <strong>{currency(netWorth)}</strong>
           </span>
-          <input type="range" min={0} max={2_000_000} step={10_000} value={netWorth} onChange={(e) => setNetWorth(+e.target.value)} />
+          <input type="range" min={0} max={5_000_000} step={10_000} value={netWorth} onChange={(e) => setNetWorth(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
@@ -128,7 +128,7 @@ export default function SavingsRateLab() {
             <InfoTip text="Just to translate 'years to FI' into an age. It doesn't affect the math." />{" "}
             <strong>{age}</strong>
           </span>
-          <input type="range" min={18} max={60} step={1} value={age} onChange={(e) => setAge(+e.target.value)} />
+          <input type="range" min={18} max={75} step={1} value={age} onChange={(e) => setAge(+e.target.value)} />
         </label>
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>

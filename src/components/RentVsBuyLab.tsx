@@ -19,7 +19,7 @@ const HIST_APPRECIATION = +(housing.homePrices.cagr * 100).toFixed(1); // ~4.3%
 const DEFAULTS = {
   price: 400_000,
   downPct: 20,
-  rate: housing.mortgage.latest, // latest 30-yr fixed
+  rate: Math.round(housing.mortgage.latest * 20) / 20, // latest 30-yr fixed, snapped to the 0.05 step
   term: 30,
   rent: 2_200,
   years: 7,
@@ -157,7 +157,7 @@ export default function RentVsBuyLab() {
         <ResetButton onReset={() => { setInp(DEFAULTS); setShowCosts(true); }} />
 
         <p className="br-group">The home</p>
-        <Slider label="Home price" tip="The purchase price of the home you're considering." value={inp.price} min={100_000} max={1_500_000} step={10_000} fmt={dollars} onChange={(v) => set("price", v)} />
+        <Slider label="Home price" tip="The purchase price of the home you're considering." value={inp.price} min={100_000} max={3_000_000} step={10_000} fmt={dollars} onChange={(v) => set("price", v)} />
         <Slider label="Down payment" tip="The cash you put down up front. The rest is borrowed. A renter would instead keep this money invested. Its lost growth is the hidden cost of buying." value={inp.downPct} min={0} max={100} step={1} fmt={(v) => pct(v, 0)} onChange={(v) => set("downPct", v)} sub={dollars(inp.price * inp.downPct / 100)} />
         <Slider label="Mortgage rate" tip={`The 30-year fixed rate. Today's average is about ${pct(housing.mortgage.latest, 2)} (Freddie Mac via FRED).`} value={inp.rate} min={2} max={12} step={0.05} fmt={(v) => pct(v, 2)} onChange={(v) => set("rate", v)} />
         <div className="wl-field">
@@ -170,7 +170,7 @@ export default function RentVsBuyLab() {
         </div>
 
         <p className="br-group">Renting instead</p>
-        <Slider label="Monthly rent" tip="What it would cost to rent a comparable place today. This is the number to vary. The tool shows whether buying beats renting at this rent." value={inp.rent} min={500} max={8_000} step={50} fmt={dollars} onChange={(v) => set("rent", v)} />
+        <Slider label="Monthly rent" tip="What it would cost to rent a comparable place today. This is the number to vary. The tool shows whether buying beats renting at this rent." value={inp.rent} min={500} max={15_000} step={50} fmt={dollars} onChange={(v) => set("rent", v)} />
 
         <p className="br-group">Your assumptions</p>
         <Slider label="Years you'll stay" tip="How long before you'd sell and move. Buying has big upfront and selling costs, so the longer you stay, the more likely buying wins." value={inp.years} min={1} max={30} step={1} fmt={(v) => `${v} yr`} onChange={(v) => set("years", v)} />

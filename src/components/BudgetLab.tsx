@@ -61,7 +61,7 @@ export default function BudgetLab() {
             <InfoTip text="Your income after taxes and payroll deductions — what actually hits your account." />{" "}
             <strong>{money(income)}</strong>
           </span>
-          <input type="range" min={1000} max={15000} step={100} value={income} onChange={(e) => setIncome(Number(e.target.value))} />
+          <input type="range" min={1000} max={25000} step={100} value={income} onChange={(e) => setIncome(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>
@@ -69,7 +69,7 @@ export default function BudgetLab() {
             <InfoTip text="Things you truly can't skip: rent/mortgage, groceries, utilities, insurance, minimum loan payments, basic transportation." />{" "}
             <strong>{money(needs)} · {pct(needs).toFixed(0)}%</strong>
           </span>
-          <input type="range" min={0} max={15000} step={50} value={needs} onChange={(e) => setNeeds(Number(e.target.value))} />
+          <input type="range" min={0} max={25000} step={50} value={needs} onChange={(e) => setNeeds(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>
@@ -77,7 +77,7 @@ export default function BudgetLab() {
             <InfoTip text="The nice-to-haves: restaurants, streaming, travel, hobbies, upgrades. Easy to trim when you need to." />{" "}
             <strong>{money(wants)} · {pct(wants).toFixed(0)}%</strong>
           </span>
-          <input type="range" min={0} max={15000} step={50} value={wants} onChange={(e) => setWants(Number(e.target.value))} />
+          <input type="range" min={0} max={25000} step={50} value={wants} onChange={(e) => setWants(Number(e.target.value))} />
         </label>
 
         <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>

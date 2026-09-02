@@ -123,7 +123,7 @@ export default function AssetLocationLab() {
             <InfoTip text="Your whole portfolio, spread across both accounts. Asset location matters most when a meaningful chunk sits in a taxable account." />{" "}
             <strong>{money(total)}</strong>
           </span>
-          <input type="range" min={50_000} max={2_000_000} step={50_000} value={total} onChange={(e) => setTotal(+e.target.value)} />
+          <input type="range" min={50_000} max={5_000_000} step={50_000} value={total} onChange={(e) => setTotal(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>
@@ -145,7 +145,7 @@ export default function AssetLocationLab() {
           <span>
             Years to grow <InfoTip text="How long the portfolio compounds before you sell. Longer horizons let the annual tax drag on the badly-placed asset build into a bigger gap." /> <strong>{years}</strong>
           </span>
-          <input type="range" min={5} max={40} step={1} value={years} onChange={(e) => setYears(+e.target.value)} />
+          <input type="range" min={5} max={50} step={1} value={years} onChange={(e) => setYears(+e.target.value)} />
         </label>
 
         <span className="br-group">Returns</span>
@@ -153,7 +153,7 @@ export default function AssetLocationLab() {
           <span>
             Stock return <InfoTip text="Total annual return on stocks, including dividends." /> <strong>{stockRet}%</strong>
           </span>
-          <input type="range" min={3} max={10} step={0.5} value={stockRet} onChange={(e) => setStockRet(+e.target.value)} />
+          <input type="range" min={0} max={10} step={0.5} value={stockRet} onChange={(e) => setStockRet(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>
@@ -165,7 +165,7 @@ export default function AssetLocationLab() {
           <span>
             Bond yield <InfoTip text="Annual bond return, essentially all interest. In a taxable account this is taxed every year at your full ordinary rate — which is what makes bonds tax-inefficient." /> <strong>{bondYield}%</strong>
           </span>
-          <input type="range" min={1} max={8} step={0.25} value={bondYield} onChange={(e) => setBondYield(+e.target.value)} />
+          <input type="range" min={0} max={8} step={0.25} value={bondYield} onChange={(e) => setBondYield(+e.target.value)} />
         </label>
 
         <span className="br-group">Taxes</span>

@@ -90,19 +90,19 @@ export default function TaxDragLab() {
           <span>
             Lump sum invested <InfoTip text="A one-time investment, held without adding more, so the tax drag is easy to isolate." /> <strong>{money(amount)}</strong>
           </span>
-          <input type="range" min={10_000} max={1_000_000} step={10_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
+          <input type="range" min={10_000} max={5_000_000} step={10_000} value={amount} onChange={(e) => setAmount(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>
             Years held <InfoTip text="Longer holding lets the drag compound, but also lets more gains defer untaxed until sale — the tool shows both effects." /> <strong>{years}</strong>
           </span>
-          <input type="range" min={5} max={40} step={1} value={years} onChange={(e) => setYears(+e.target.value)} />
+          <input type="range" min={5} max={50} step={1} value={years} onChange={(e) => setYears(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>
             Annual return <InfoTip text="Total return including dividends." /> <strong>{ret}%</strong>
           </span>
-          <input type="range" min={3} max={10} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
+          <input type="range" min={0} max={10} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
         </label>
         <label className="wl-slider">
           <span>

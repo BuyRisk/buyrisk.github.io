@@ -183,7 +183,7 @@ export default function MarginalRateLab({ header }: { header?: import("react").R
             <InfoTip text="Earned income. It's what the EIC and the refundable child credit phase IN on — at low incomes, the next earned dollar can have a negative tax rate." />{" "}
             <strong>{money(wages)}</strong>
           </span>
-          <input type="range" min={0} max={250_000} step={1_000} value={wages} onChange={(e) => setWages(+e.target.value)} />
+          <input type="range" min={0} max={1_000_000} step={1_000} value={wages} onChange={(e) => setWages(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
@@ -192,7 +192,7 @@ export default function MarginalRateLab({ header }: { header?: import("react").R
             <InfoTip text="Ordinary income that ISN'T earned: pension, traditional IRA/401(k) withdrawals, Roth conversions. Taxed at bracket rates, but it can't phase in the earned-income credits." />{" "}
             <strong>{money(otherOrdinary)}</strong>
           </span>
-          <input type="range" min={0} max={250_000} step={1_000} value={otherOrdinary} onChange={(e) => setOtherOrdinary(+e.target.value)} />
+          <input type="range" min={0} max={1_000_000} step={1_000} value={otherOrdinary} onChange={(e) => setOtherOrdinary(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
@@ -201,7 +201,7 @@ export default function MarginalRateLab({ header }: { header?: import("react").R
             <InfoTip text="Annual gross benefits. Between the provisional-income thresholds, each extra ordinary dollar drags up to $0.85 of benefits into taxable income — the 'tax torpedo'." />{" "}
             <strong>{money(ssBenefit)}</strong>
           </span>
-          <input type="range" min={0} max={72_000} step={1_000} value={ssBenefit} onChange={(e) => setSsBenefit(+e.target.value)} />
+          <input type="range" min={0} max={150_000} step={1_000} value={ssBenefit} onChange={(e) => setSsBenefit(+e.target.value)} />
         </label>
 
         <label className="wl-slider">

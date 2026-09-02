@@ -1270,7 +1270,7 @@ export default function CompoundGrowthExplorer() {
               Withdraw{" "}
               <input
                 type="range"
-                min={2}
+                min={1}
                 max={10}
                 step={0.25}
                 value={withdrawalRate}
@@ -1374,7 +1374,7 @@ export default function CompoundGrowthExplorer() {
           {showLifecycle && (
             <div className="cge-lifecycle">
               <div className="cge-life-controls">
-                <NumberField label="Current age" info="Your age today, the left edge of the chart. You invest for the horizon set above, so you retire at this age plus that many years." value={currentAge} min={16} max={70} step={1} integer onCommit={setCurrentAge} />
+                <NumberField label="Current age" info="Your age today, the left edge of the chart. You invest for the horizon set above, so you retire at this age plus that many years." value={currentAge} min={16} max={90} step={1} integer onCommit={setCurrentAge} />
                 <NumberField label="Annual income" info="Your labor income today. Human capital is the present value of your future paychecks, in today's dollars." value={income} min={0} max={1_000_000} step={5_000} prefix={symbol} integer onCommit={setIncome} />
                 <NumberField label="Income growth" info="How fast your real pay rises each year, above inflation." value={incomeGrowth} min={0} max={8} step={0.5} suffix="%" onCommit={setIncomeGrowth} />
               </div>

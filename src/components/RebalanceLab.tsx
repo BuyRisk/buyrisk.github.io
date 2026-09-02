@@ -141,7 +141,7 @@ export default function RebalanceLab() {
             <InfoTip text="How many years the portfolio runs. The longer the horizon, the more an un-rebalanced portfolio drifts toward all-stock." />{" "}
             <strong>{horizon} years</strong>
           </span>
-          <input type="range" min={5} max={40} step={1} value={horizon} onChange={(e) => setHorizon(+e.target.value)} />
+          <input type="range" min={5} max={50} step={1} value={horizon} onChange={(e) => setHorizon(+e.target.value)} />
         </label>
 
         <label className="wl-slider">
@@ -198,6 +198,7 @@ export default function RebalanceLab() {
 
         <div className="wl-lower">
           <div className="wl-readout" style={{ gridColumn: "1 / -1" }}>
+            <div style={{ overflowX: "auto" }}>
             <table className="mmm-table">
               <thead>
                 <tr>
@@ -225,6 +226,7 @@ export default function RebalanceLab() {
                 })}
               </tbody>
             </table>
+            </div>
             <p className="wl-saved">
               Notice the trade-off: <strong>never</strong> rebalancing often shows the highest return — but only because it
               quietly became a mostly-stock portfolio, and its volatility and worst drop rise to match.{" "}

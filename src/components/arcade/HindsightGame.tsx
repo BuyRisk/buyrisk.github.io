@@ -135,7 +135,7 @@ export default function HindsightGame({ onDone }: { onDone: (r: GameResult) => v
           <p className="ba-instruction">{ep.ask}</p>
           <label className="wl-slider">
             <span><strong>{val}%</strong></span>
-            <input type="range" min={0} max={100} step={5} value={val} onChange={(e) => setVal(+e.target.value)} />
+            <input type="range" min={0} max={100} step={5} value={val} aria-label="Your answer, percent" onChange={(e) => setVal(+e.target.value)} />
           </label>
           <button type="button" className="wl-btn" onClick={submit}>Lock it in →</button>
         </>

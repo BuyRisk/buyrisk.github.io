@@ -336,7 +336,7 @@ export default function BurnRateLab() {
                 Nest egg at retirement
                 <InfoTip text="The starting portfolio. Every ordering starts from the same pile." /> <strong>{currency(portfolio)}</strong>
               </span>
-              <input type="range" min={100_000} max={5_000_000} step={25_000} value={portfolio} onChange={(e) => setPortfolio(Number(e.target.value))} />
+              <input type="range" min={0} max={5_000_000} step={25_000} value={portfolio} onChange={(e) => setPortfolio(Number(e.target.value))} />
             </label>
             <label className="wl-slider">
               <span>
@@ -344,7 +344,7 @@ export default function BurnRateLab() {
                 <InfoTip text="Withdrawn at the start of each year, constant in real terms — the Bengen setup. Set it to zero (or flip the switch below) and watch order stop mattering." />{" "}
                 <strong>{currency(orderSpend)}</strong>
               </span>
-              <input type="range" min={0} max={150_000} step={2_500} value={orderSpend} onChange={(e) => setOrderSpend(Number(e.target.value))} />
+              <input type="range" min={0} max={400_000} step={2_500} value={orderSpend} onChange={(e) => setOrderSpend(Number(e.target.value))} />
             </label>
             <label className="wl-slider">
               <span>
@@ -391,7 +391,7 @@ export default function BurnRateLab() {
               <span className="br-dot" style={{ background: paletteColor(i) }} /> {c.label}{" "}
               <strong>{currency(c.amount)}</strong>
             </span>
-            <input type="range" min={0} max={8000} step={50} value={c.amount} onChange={(e) => setCat(c.key, Number(e.target.value))} />
+            <input type="range" min={0} max={15000} step={50} value={c.amount} onChange={(e) => setCat(c.key, Number(e.target.value))} />
           </label>
         ))}
 
@@ -402,7 +402,7 @@ export default function BurnRateLab() {
             <InfoTip text="Income that arrives every month no matter what markets do: a pension, Social Security, or an annuity. It covers part of your spending, so your portfolio only has to fund the rest. Assumed here to rise with inflation; Social Security does, but many private pensions are fixed and lose value over time." />{" "}
             <strong>{currency(guaranteed)}/mo</strong>
           </span>
-          <input type="range" min={0} max={12000} step={100} value={guaranteed} onChange={(e) => setGuaranteed(Number(e.target.value))} />
+          <input type="range" min={0} max={20000} step={100} value={guaranteed} onChange={(e) => setGuaranteed(Number(e.target.value))} />
         </label>
 
         <p className="br-group">Your plan</p>

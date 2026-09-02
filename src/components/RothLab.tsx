@@ -135,7 +135,7 @@ export default function RothLab() {
                 <InfoTip text="The pre-tax dollars you're deciding how to shelter. For a fair comparison, Traditional invests all of it; Roth invests what's left after paying tax on it today." />{" "}
                 <strong>{currency(contrib)}</strong>
               </span>
-              <input type="range" min={1_000} max={23_000} step={500} value={contrib} onChange={(e) => setContrib(+e.target.value)} />
+              <input type="range" min={1_000} max={40_000} step={500} value={contrib} onChange={(e) => setContrib(+e.target.value)} />
             </label>
             <label className="wl-slider">
               <span>
@@ -166,7 +166,7 @@ export default function RothLab() {
                 Real return
                 <InfoTip text="Expected return above inflation." /> <strong>{ret}%</strong>
               </span>
-              <input type="range" min={1} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
+              <input type="range" min={0} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
             </label>
 
             <div className="wl-field">
@@ -220,7 +220,7 @@ export default function RothLab() {
               <span>
                 Salary <InfoTip text="Your gross annual salary: the base the match percentages apply to." /> <strong>{currency(salary)}</strong>
               </span>
-              <input type="range" min={30_000} max={300_000} step={5_000} value={salary} onChange={(e) => setSalary(+e.target.value)} />
+              <input type="range" min={15_000} max={500_000} step={5_000} value={salary} onChange={(e) => setSalary(+e.target.value)} />
             </label>
             <label className="wl-slider">
               <span>

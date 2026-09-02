@@ -147,7 +147,7 @@ export default function EmergencyFundLab() {
 
         <label className="wl-slider" style={{ marginTop: "var(--space-sm)" }}>
           <span>Already saved <strong>{money(saved)}</strong></span>
-          <input type="range" min={0} max={60000} step={500} value={saved} onChange={(e) => setSaved(Number(e.target.value))} />
+          <input type="range" min={0} max={250000} step={1000} value={saved} onChange={(e) => setSaved(Number(e.target.value))} />
         </label>
         <label className="wl-slider">
           <span>Monthly contribution <strong>{money(contribution)}</strong></span>
