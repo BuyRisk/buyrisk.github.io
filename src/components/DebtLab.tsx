@@ -203,7 +203,10 @@ export default function DebtLab() {
               Flip it around and paying down a <strong>{pct(apr)}</strong> balance is a{" "}
               <strong>guaranteed {pct(apr)} return</strong>, tax-free{apr > 10 ? ", higher than the stock market's ~10% long-run average," : ","} and with none of the risk. When your debt's rate beats
               what you could earn investing, paying it off is the best "investment" available.
-              Educational only, not advice.
+              Juggling <strong>several debts at different rates?</strong> The{" "}
+              <a href="/personal-finance/money-basics#debt">Debt Payoff planner</a> takes your
+              actual list — each with its own balance, rate, and minimum — and compares avalanche
+              vs. snowball on it. Educational only, not advice.
             </p>
           </div>
         </div>

@@ -185,7 +185,9 @@ export default function DebtPayoffLab() {
         <p className="wl-note">
           You're putting <strong>{money(totalMin + extra)}</strong>/mo toward{" "}
           <strong>{money(totalBalance)}</strong> across {valid.length} debt{valid.length === 1 ? "" : "s"}
-          {" "}({money(totalMin)} in minimums + {money(extra)} extra).
+          {" "}({money(totalMin)} in minimums + {money(extra)} extra). For the deeper lesson on
+          why a single balance is so expensive to carry, see{" "}
+          <a href="/tools/compound-growth#debt">the cost of debt</a>.
         </p>
 
         {flags.length > 0 && (
