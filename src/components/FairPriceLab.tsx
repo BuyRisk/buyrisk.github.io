@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * "What's a fair price?" — a two-stage discounted-cash-flow valuation with the
@@ -101,8 +102,8 @@ export default function FairPriceLab() {
         </label>
         <label className="wl-slider">
           <span>
-            Discount rate
-            <InfoTip text="The return you demand for bearing this risk — buy risk, get paid. Riskier cash flows deserve a higher rate, which means a lower price today." />{" "}
+            Discount rate (nominal)
+            <InfoTip text={`The return you demand for bearing this risk — buy risk, get paid. Riskier cash flows deserve a higher rate, which means a lower price today. ${NOMINAL_TIP} Discount nominal cash flows at a nominal rate; the growth rates above are nominal too.`} />{" "}
             <strong>{r}%</strong>
           </span>
           <input type="range" min={5} max={15} step={0.25} value={r} onChange={(e) => setR(+e.target.value)} />

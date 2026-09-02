@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatUsd } from "../lib/currency";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * "The Tax Drag" — a single lump sum, held in a tax-sheltered account vs. a
@@ -100,7 +101,7 @@ export default function TaxDragLab() {
         </label>
         <label className="wl-slider">
           <span>
-            Annual return <InfoTip text="Total return including dividends." /> <strong>{ret}%</strong>
+            Annual return (nominal) <InfoTip text={`Total return including dividends. ${NOMINAL_TIP} This tool works in nominal terms because tax is levied on nominal gains.`} /> <strong>{ret}%</strong>
           </span>
           <input type="range" min={0} max={10} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
         </label>

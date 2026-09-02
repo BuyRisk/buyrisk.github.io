@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * Savings-goal planner. Given a goal, what you've saved, a timeframe, and an
@@ -63,8 +64,8 @@ export default function SavingsGoalLab() {
         </label>
         <label className="wl-slider">
           <span>
-            Expected return
-            <InfoTip text="For a goal within a few years, keep money safe (a savings account or money-market fund, ~4%). For distant goals you can invest more aggressively — and take on more risk. Returns are never guaranteed." />{" "}
+            Expected return (nominal)
+            <InfoTip text={`For a goal within a few years, keep money safe (a savings account or money-market fund, ~4%). For distant goals you can invest more aggressively — and take on more risk. Returns are never guaranteed. ${NOMINAL_TIP} For a goal years away, raise the target too: the thing you are saving for gets pricier as well.`} />{" "}
             <strong>{ret}%</strong>
           </span>
           <input type="range" min={0} max={10} step={0.5} value={ret} onChange={(e) => setRet(Number(e.target.value))} />

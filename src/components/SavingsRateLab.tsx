@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { REAL_TIP } from "../lib/returnBasis";
 
 /**
  * "Savings Rate & Financial Independence": the punchline of the control-volume
@@ -107,7 +108,7 @@ export default function SavingsRateLab() {
         <label className="wl-slider">
           <span>
             Real return
-            <InfoTip text="Expected investment return above inflation. A globally diversified stock/bond mix has historically returned roughly 4–6% real over long periods. Nothing is guaranteed." />{" "}
+            <InfoTip text={`Expected investment return above inflation. A globally diversified stock/bond mix has historically returned roughly 4–6% real over long periods. Nothing is guaranteed. ${REAL_TIP}`} />{" "}
             <strong>{ret}%</strong>
           </span>
           <input type="range" min={0} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />

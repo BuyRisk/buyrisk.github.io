@@ -3,6 +3,7 @@ import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { housing } from "../data/generated/housing";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * "Rent or Buy?": a fair, opportunity-cost-aware comparison. Instead of pitting
@@ -182,7 +183,7 @@ export default function RentVsBuyLab() {
           ))}
         </div>
         <Slider label="Rent growth / yr" tip="How fast rent rises each year. Historically rents track inflation, roughly 3%." value={inp.rentGrowth} min={0} max={8} step={0.1} fmt={pct} onChange={(v) => set("rentGrowth", v)} />
-        <Slider label="Investment return / yr" tip="What the renter earns by investing the down payment and any monthly savings. A diversified stock/bond portfolio has historically returned around 7%." value={inp.investReturn} min={0} max={12} step={0.1} fmt={pct} onChange={(v) => set("investReturn", v)} />
+        <Slider label="Investment return / yr (nominal)" tip={`What the renter earns by investing the down payment and any monthly savings. A diversified stock/bond portfolio has historically returned around 10% nominal. ${NOMINAL_TIP} Every rate in this tool is nominal, including rent growth and home appreciation, so the comparison is consistent.`} value={inp.investReturn} min={0} max={12} step={0.1} fmt={pct} onChange={(v) => set("investReturn", v)} />
 
         <button type="button" className="wl-disclose" aria-expanded={showCosts} onClick={() => setShowCosts((s) => !s)}>
           {showCosts ? "▾" : "▸"} Ownership costs {showCosts ? "" : "(tax, upkeep, closing…)"}

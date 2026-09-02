@@ -752,7 +752,7 @@ export default function CompoundGrowthExplorer() {
   const [rate, setRate] = useState(10);
   const [inflation, setInflation] = useState(3);
   const [fee, setFee] = useState(0.5);
-  const [years, setYears] = useState(30);
+  const [years, setYears] = useState(40); // start at 25, retire at 65
   const [target, setTarget] = useState(1_000_000);
   const [withdrawalRate, setWithdrawalRate] = useState(4);
   const [retYears, setRetYears] = useState(30);
@@ -760,7 +760,7 @@ export default function CompoundGrowthExplorer() {
   const [phases, setPhases] = useState<Phase[]>([]);
   const phaseCounter = useRef(0);
   const [showLifecycle, setShowLifecycle] = useState(true);
-  const [currentAge, setCurrentAge] = useState(20);
+  const [currentAge, setCurrentAge] = useState(25);
   const [income, setIncome] = useState(70_000);
   const [incomeGrowth, setIncomeGrowth] = useState(2);
   const [simMode, setSimMode] = useState<"simple" | "historical">("simple");
@@ -1030,8 +1030,8 @@ export default function CompoundGrowthExplorer() {
           />
         )}
         <NumberField
-          label="Annual return"
-          info="Your assumed average yearly return before inflation and fees (a nominal return), compounded monthly. US stocks have averaged roughly 10% nominal (about 7% after inflation) over the long run, but real returns are bumpy."
+          label="Annual return (nominal)"
+          info="Your assumed average yearly return before inflation and fees, compounded monthly. Nominal means before inflation: US stocks have averaged roughly 10% nominal, about 7% after inflation. Set the inflation rate below and this tool also shows the result in today's dollars."
           value={rate}
           min={0}
           max={15}
@@ -1126,8 +1126,8 @@ export default function CompoundGrowthExplorer() {
                 />
                 <NumberField
                   key={`rate-${ph.id}`}
-                  label="Return from here"
-                  info="Expected annual return from this phase onward (e.g. if you shift to a more conservative allocation in retirement). Leave it at the base return to keep it unchanged."
+                  label="Return from here (nominal)"
+                  info="Expected annual return from this phase onward, before inflation (e.g. if you shift to a more conservative allocation in retirement). Leave it at the base return to keep it unchanged."
                   value={ph.rate ?? rate}
                   min={0}
                   max={15}

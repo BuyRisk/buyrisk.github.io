@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatUsd } from "../lib/currency";
+import { REAL_TIP } from "../lib/returnBasis";
 
 /**
  * "Roth or Traditional? (+ the employer match)": two of the most consequential,
@@ -164,7 +165,7 @@ export default function RothLab() {
             <label className="wl-slider">
               <span>
                 Real return
-                <InfoTip text="Expected return above inflation." /> <strong>{ret}%</strong>
+                <InfoTip text={`Expected return above inflation. ${REAL_TIP}`} /> <strong>{ret}%</strong>
               </span>
               <input type="range" min={0} max={8} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
             </label>

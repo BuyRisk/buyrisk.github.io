@@ -24,6 +24,7 @@ import { PRESET_ASSETS, DEFAULT_ASSET_IDS } from "../data/assets";
 import { assetStats } from "../data/generated/asset-stats";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * The Portfolio Lab — the playground's centrepiece. Mix up to five asset
@@ -869,7 +870,7 @@ export default function PortfolioLab() {
 
               <div className="pl-params">
                 <label>
-                  <span>Return<InfoTip text="The asset's expected annual return: its reward. In Historical mode this is the actual (nominal) annualized average from Damodaran's data (1928–present), not inflation-adjusted." /></span>
+                  <span>Return<InfoTip text={`The asset's expected annual return: its reward, in nominal terms. In Historical mode this is the actual annualized average from Damodaran's data (1928–present). ${NOMINAL_TIP}`} /></span>
                   <span className="pl-field-row">
                     <input
                       type="number"

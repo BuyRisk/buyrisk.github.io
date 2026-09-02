@@ -2,6 +2,7 @@ import { useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatMoney, currencySymbol, useCurrencyCode } from "../lib/currency";
+import { REAL_TIP } from "../lib/returnBasis";
 
 /**
  * Net-worth snapshot: assets minus liabilities, with a composition view and a
@@ -109,15 +110,15 @@ export default function NetWorthLab() {
             <h3 style={{ marginTop: 0 }}>Where it could go</h3>
             <label className="wl-slider"><span>Invest per month <strong>{money(monthly)}</strong></span>
               <input type="range" min={0} max={5000} step={50} value={monthly} onChange={(e) => setMonthly(Number(e.target.value))} /></label>
-            <label className="wl-slider"><span>Investment return<InfoTip text="A long-run assumption for the investing side. Historically a diversified stock/bond mix has returned mid-single digits after inflation — never guaranteed." /> <strong>{ret}%</strong></span>
+            <label className="wl-slider"><span>Real return<InfoTip text={`A long-run assumption for the investing side. Historically a diversified stock/bond mix has returned mid-single digits after inflation — never guaranteed. ${REAL_TIP}`} /> <strong>{ret}%</strong></span>
               <input type="range" min={0} max={10} step={0.5} value={ret} onChange={(e) => setRet(Number(e.target.value))} /></label>
             <label className="wl-slider"><span>Over <strong>{years} years</strong></span>
               <input type="range" min={1} max={50} step={1} value={years} onChange={(e) => setYears(Number(e.target.value))} /></label>
 
             <div className="ss-headline" style={{ marginTop: "var(--space-sm)" }}>
-              <span className="ss-headline-label">Projected net worth in {years} years</span>
+              <span className="ss-headline-label">Projected net worth in {years} years (today's dollars)</span>
               <span className="ss-headline-value">{money(futureNet)}</span>
-              <span className="ss-headline-sub">investing {money(monthly)}/mo at {ret}%, other assets &amp; debts held flat</span>
+              <span className="ss-headline-sub">investing {money(monthly)}/mo at {ret}% after inflation, other assets &amp; debts held flat</span>
             </div>
             <p className="wl-saved">
               This is a rough sketch, not a forecast: it grows your investments and new contributions

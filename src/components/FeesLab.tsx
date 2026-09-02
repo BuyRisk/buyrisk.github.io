@@ -4,6 +4,7 @@ import ResetButton from "./ResetButton";
 import { fees } from "../data/generated/fees";
 import { fundLoads } from "../data/generated/fund-loads";
 import { formatMoney, useCurrencyCode } from "../lib/currency";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * "The Real Cost of Fees": a small annual expense ratio feels trivial, but over
@@ -121,8 +122,8 @@ export default function FeesLab() {
 
             <label className="wl-slider">
               <span>
-                Return before fees
-                <InfoTip text="The market return your fund earns before its expense ratio is deducted. The fee comes straight off the top, every year." />{" "}
+                Return before fees (nominal)
+                <InfoTip text={`The market return your fund earns before its expense ratio is deducted. The fee comes straight off the top, every year. ${NOMINAL_TIP} A fee is charged on the nominal balance, so the drag shown here is the same either way.`} />{" "}
                 <strong>{pct(grossReturn, 1)}</strong>
               </span>
               <input type="range" min={2} max={12} step={0.5} value={grossReturn} onChange={(e) => setGrossReturn(+e.target.value)} />

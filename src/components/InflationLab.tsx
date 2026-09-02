@@ -81,6 +81,13 @@ export default function InflationLab() {
         </div>
 
         <p className="wl-note" style={{ marginTop: "0.5rem" }}>
+          <strong>Nominal vs. real.</strong> This is why investing has two return numbers.
+          A <strong>nominal</strong> return is the raw headline figure; a <strong>real</strong>{" "}
+          return subtracts inflation and is what your money can actually buy. US stocks have
+          averaged roughly 10% nominal and about 7% real — and it is the 7% that buys groceries.
+          Every tool on this site labels which one it is asking you for.
+        </p>
+        <p className="wl-note" style={{ marginTop: "0.5rem" }}>
           Overall prices rose about <strong>{(view.annualized * 100).toFixed(1)}%</strong> a
           year since {startYear}, but the average hides enormous spread. <strong>Method:</strong> the official
           category price indexes, plotted directly and rebased to your chosen year (no modeling). Data: US

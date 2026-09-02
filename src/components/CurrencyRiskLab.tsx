@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * "Currency Risk: Hedged vs. Unhedged" — when you own foreign assets you own
@@ -92,7 +93,7 @@ export default function CurrencyRiskLab() {
         </label>
         <label className="wl-slider">
           <span>
-            Expected return <InfoTip text="Illustrative expected return. Hedging is roughly return-neutral over the long run, so both versions share this center — hedging changes the spread, not the average." /> <strong>{pct(ret, 0)}</strong>
+            Expected return (nominal) <InfoTip text={`Illustrative expected return. Hedging is roughly return-neutral over the long run, so both versions share this center — hedging changes the spread, not the average. ${NOMINAL_TIP}`} /> <strong>{pct(ret, 0)}</strong>
           </span>
           <input type="range" min={0} max={10} step={0.5} value={ret} onChange={(e) => setRet(+e.target.value)} />
         </label>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
 import { formatUsd } from "../lib/currency";
+import { NOMINAL_TIP } from "../lib/returnBasis";
 
 /**
  * "Asset Location" — same portfolio, same total tax rates, but WHERE you hold
@@ -151,7 +152,7 @@ export default function AssetLocationLab() {
         <span className="br-group">Returns</span>
         <label className="wl-slider">
           <span>
-            Stock return <InfoTip text="Total annual return on stocks, including dividends." /> <strong>{stockRet}%</strong>
+            Stock return (nominal) <InfoTip text={`Total annual return on stocks, including dividends. ${NOMINAL_TIP} This tool works in nominal terms because tax is levied on nominal gains.`} /> <strong>{stockRet}%</strong>
           </span>
           <input type="range" min={0} max={10} step={0.5} value={stockRet} onChange={(e) => setStockRet(+e.target.value)} />
         </label>
@@ -163,7 +164,7 @@ export default function AssetLocationLab() {
         </label>
         <label className="wl-slider">
           <span>
-            Bond yield <InfoTip text="Annual bond return, essentially all interest. In a taxable account this is taxed every year at your full ordinary rate — which is what makes bonds tax-inefficient." /> <strong>{bondYield}%</strong>
+            Bond yield (nominal) <InfoTip text={`Annual bond return, essentially all interest. In a taxable account this is taxed every year at your full ordinary rate — which is what makes bonds tax-inefficient. ${NOMINAL_TIP}`} /> <strong>{bondYield}%</strong>
           </span>
           <input type="range" min={0} max={8} step={0.25} value={bondYield} onChange={(e) => setBondYield(+e.target.value)} />
         </label>

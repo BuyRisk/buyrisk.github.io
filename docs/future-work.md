@@ -338,3 +338,47 @@ reputation; polishing all ~50 labs equally has diminishing returns.
 
 Current baseline worth preserving: hand-rolled SVG = tiny bundles, no
 dependency churn. Add libraries per-flagship, not site-wide.
+
+## Curriculum gaps — from the 2026-09-02 site audit
+
+Logged, not committed to. The audit swept the whole site against a beginner
+investing curriculum: theory coverage is thorough (risk and return, factors,
+diversification, fees, taxes, behavior, retirement spending, Social Security,
+accounts, budgeting). What a reader still can't find, ranked by how often a
+beginner would actually need it. Full audit: `docs/audit-2026-09-02.md`.
+
+1. **What to actually buy.** Target-date funds, glide paths, the three-fund
+   portfolio. One passing mention on the whole site. This is the step right
+   after every lesson the site already teaches, and its absence is the biggest
+   hole in the curriculum: a reader finishes convinced indexing wins and still
+   doesn't know what to type into a brokerage.
+2. **Employer stock concentration.** RSUs, ESPPs, company stock in a 401(k).
+   The site's own thesis — idiosyncratic risk earns no premium — applied to the
+   most common concentrated position real people hold, with the added twist
+   that the job and the stock share one risk factor. `StockCountLab` already
+   has the machinery.
+3. **Speculation vs. investing.** Crypto has zero mentions sitewide; gold and
+   collectibles are barely there. The distinction worth teaching is expected
+   cash flow: a productive asset has one, a speculative asset only has the next
+   buyer. Readers will ask, and the site currently says nothing.
+4. **Mortgage prepayment vs. investing.** Zero mentions. A guaranteed
+   after-tax return equal to the mortgage rate, versus an uncertain market
+   return — a natural extension of the cost-of-debt and rent-vs-buy tools, and
+   a question nearly every homeowner asks.
+5. **Withdrawal order and RMDs.** Which account to draw first in retirement;
+   only a passing mention inside `BurnRateLab`. The tax tools already model
+   brackets, so the engine exists.
+6. **The dividend misconception.** Eleven passing mentions, no dedicated
+   treatment of why a dividend is not free money (price drops by the payout)
+   and why dividend-chasing is a value tilt with a tax drag.
+7. **Scams and "returns without risk."** The corollary of the site's thesis:
+   anything promising return without risk is mispriced or a fraud. Ponzi and
+   affinity-fraud mechanics as a bias-arcade module would fit the existing
+   format.
+8. **Advisors and their fees.** Fee-only vs. AUM vs. commission, fiduciary
+   standard, and what a 1% AUM fee does when dropped into `FeesLab`.
+9. Smaller: 529 plans, annuities and longevity insurance, REITs, credit risk in
+   bonds, insurance as risk transfer.
+
+Sequencing note: 1 and 2 are the two that change what a reader does on Monday
+morning, and both reuse existing machinery rather than needing new data.
