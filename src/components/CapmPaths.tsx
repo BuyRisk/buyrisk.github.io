@@ -55,15 +55,18 @@ export default function CapmPaths({
   }
 
   const width = 440;
+  // Each strip gets a title band above it, so a path that runs high never
+  // collides with the words.
   const rowH = 84;
-  const gap = 14;
-  const pad = { top: 8, right: 52, bottom: 26, left: 44 };
-  const height = pad.top + 3 * rowH + 2 * gap + pad.bottom;
+  const titleH = 22;
+  const gap = 10;
+  const pad = { top: 4, right: 62, bottom: 30, left: 44 };
+  const height = pad.top + 3 * (titleH + rowH) + 2 * gap + pad.bottom;
   const plotW = width - pad.left - pad.right;
 
   const R = Math.max(0.05, ...[market, paid, own, stock].flat().map(Math.abs)) * 1.1;
   const x = (i: number) => pad.left + (i / n) * plotW;
-  const rowTop = (r: number) => pad.top + r * (rowH + gap);
+  const rowTop = (r: number) => pad.top + titleH + r * (titleH + rowH + gap);
   const y = (r: number, v: number) => rowTop(r) + rowH / 2 - (v / R) * (rowH / 2);
   const path = (r: number, s: number[]) => s.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(r, v).toFixed(1)}`).join(" ");
 
@@ -88,7 +91,7 @@ export default function CapmPaths({
     },
   ];
 
-  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 11 } as const;
+  const axisText = { fill: "var(--color-muted)", fontFamily: "var(--font-sans)", fontSize: 13 } as const;
   const years = n / 12;
 
   const lesson =
@@ -109,16 +112,16 @@ export default function CapmPaths({
             {row.series.map((se, k) => (
               <path key={k} d={path(r, se.s)} fill="none" stroke={se.stroke} strokeWidth={se.w} strokeDasharray={se.dash} strokeLinejoin="round" />
             ))}
-            <text x={pad.left + 6} y={rowTop(r) + 12} style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)" }}>
+            <text x={pad.left} y={rowTop(r) - 7} style={{ ...axisText, fontSize: 14, fontWeight: 600, fill: "var(--color-text-soft)" }}>
               {row.title}
             </text>
-            <text x={pad.left + plotW + 6} y={y(r, row.end) + 4} style={{ ...axisText, fontWeight: 700, fill: row.series[row.series.length - 1].stroke, fontVariantNumeric: "tabular-nums" }}>
+            <text x={pad.left + plotW + 6} y={y(r, row.end) + 4} style={{ ...axisText, fontSize: 15, fontWeight: 700, fill: row.series[row.series.length - 1].stroke, fontVariantNumeric: "tabular-nums" }}>
               {signedPct(row.end)}
             </text>
             <text x={pad.left - 6} y={y(r, 0) + 4} textAnchor="end" style={axisText}>0</text>
           </g>
         ))}
-        <text x={pad.left + plotW / 2} y={height - 8} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 12 }}>
+        <text x={pad.left + plotW / 2} y={height - 8} textAnchor="middle" style={{ ...axisText, fontWeight: 600, fill: "var(--color-text-soft)", fontSize: 14 }}>
           {n} months ({years % 1 === 0 ? years : years.toFixed(1)} years), cumulative excess return →
         </text>
       </svg>
