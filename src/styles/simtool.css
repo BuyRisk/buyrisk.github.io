@@ -956,6 +956,12 @@
   .cl-key--fit {
     border-top-color: var(--color-accent);
   }
+  .cl-key--paid {
+    border-top-color: var(--pl-c1);
+  }
+  .cl-key--own {
+    border-top-color: var(--color-warn);
+  }
   .cl-key--true {
     border-top-style: dashed;
     border-top-color: var(--color-muted);

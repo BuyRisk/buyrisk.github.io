@@ -3,6 +3,7 @@ import { mulberry32, makeNormal } from "../lib/portfolio";
 import { capmSml } from "../data/generated/capm-sml";
 import InfoTip from "./InfoTip";
 import ResetButton from "./ResetButton";
+import CapmPaths from "./CapmPaths";
 
 /**
  * CAPM teaching tool with two linked panels:
@@ -11,6 +12,9 @@ import ResetButton from "./ResetButton";
  *     resampling so the estimated beta visibly wiggles around the true beta.
  *  B) the Security Market Line (expected return vs beta); the asset sits off
  *     the line by exactly its alpha: above = underpriced, below = overpriced.
+ * Panel A can also show the SAME sample as paths (CapmPaths): the stock's
+ * cumulative walk split into β × market (paid) and its own jitter (unpaid),
+ * which is what the scatter's slope feels like to live through.
  */
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
@@ -84,6 +88,7 @@ export default function CapmLab() {
   const [seed, setSeed] = useState(1);
   const [mode, setMode] = useState<"static" | "live">("static");
   const [showReal, setShowReal] = useState(false);
+  const [view, setView] = useState<"scatter" | "paths">("scatter");
 
   // Live resampling: bump the seed periodically so the estimate wiggles.
   useEffect(() => {
@@ -121,7 +126,7 @@ export default function CapmLab() {
         <ResetButton
           onReset={() => {
             setRf(0.03); setPremium(0.05); setSigM(0.15); setBeta(1.2); setAlpha(0.01);
-            setIdio(0.1); setN(60); setBlend(1); setSeed(1); setMode("static"); setShowReal(false);
+            setIdio(0.1); setN(60); setBlend(1); setSeed(1); setMode("static"); setShowReal(false); setView("scatter");
           }}
         />
         <p className="cl-group">The market</p>
@@ -169,6 +174,21 @@ export default function CapmLab() {
           </button>
         </div>
 
+        <p className="cl-group">See the sample as</p>
+        <div className="wl-simmode" role="group" aria-label="Left panel view">
+          <button type="button" className={view === "scatter" ? "active" : ""} aria-pressed={view === "scatter"} onClick={() => setView("scatter")} title="Each period as a dot: the regression that defines beta">
+            Scatter
+          </button>
+          <button type="button" className={view === "paths" ? "active" : ""} aria-pressed={view === "paths"} onClick={() => setView("paths")} title="The same periods in order: the stock's walk, split into the part beta pays for and the part it doesn't">
+            Paths
+          </button>
+        </div>
+        <p className="wl-note" style={{ marginTop: "0.4rem" }}>
+          {view === "paths"
+            ? "Same draws as the scatter, cumulated month by month. Drag β and watch only the middle strip change."
+            : "Switch to paths to see what this β would have felt like as a price chart."}
+        </p>
+
         <p className="cl-group">Move along the line</p>
         <label className="wl-slider">
           <span>Cash ⇄ Market blend<InfoTip text="Mix cash (safe) with the market to slide along the line: 0% is all cash, 100% is the market, above 100% means borrowing to invest more." /> <strong>{pct(blend, 0)} market</strong></span>
@@ -205,7 +225,11 @@ export default function CapmLab() {
 
       <div className="wl-stage">
         <div className="cl-stage">
-          <CharacteristicLine sample={sample} beta={beta} alpha={alpha} est={est} />
+          {view === "scatter" ? (
+            <CharacteristicLine sample={sample} beta={beta} alpha={alpha} est={est} />
+          ) : (
+            <CapmPaths sample={sample} beta={beta} alpha={alpha} premium={premium} />
+          )}
           {showReal ? (
             <RealSML />
           ) : (
