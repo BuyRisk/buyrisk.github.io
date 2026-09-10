@@ -382,3 +382,51 @@ beginner would actually need it. Full audit: `docs/audit-2026-09-02.md`.
 
 Sequencing note: 1 and 2 are the two that change what a reader does on Monday
 morning, and both reuse existing machinery rather than needing new data.
+
+## Post-polish: the transport–finance synthesis paper (logged 2026-09-10)
+
+Not until the site is polished and the class is running. The idea: finance
+framed as an engineer would, with the Reynolds Transport Theorem at the
+center, synthesizing the correspondences the two sites already demonstrate.
+
+**The novel identification (not found anywhere in the literature):** RTT's
+system-vs-control-volume split is time-weighted vs dollar-weighted return.
+Follow the same dollars = system = what a fund reports; fixed region with
+money crossing the boundary = control volume = what an investor earns; the
+flux term is the behavior gap. Morningstar's Mind the Gap and Dichev & Yu's
+hedge-fund result are measurements of the RTT surface integral.
+
+**The rest of the mapping** (each already has an interactive figure):
+
+| Transport | Finance | Where it lives |
+|---|---|---|
+| drift v | μ − σ²/2 (the Itô term is volatility drag) | flowandflux walker; fees#leverage |
+| diffusivity D | σ²/2 | walker price face |
+| Péclet vL/D | Sharpe × √T; crossover T* = (σ/μ)² | walker readouts |
+| Lagrangian tracer / Eulerian field | one life / Monte Carlo fan; Peters' ergodicity argument | walker; ride inset; twin lives |
+| bulk flow + molecular diffusion | β × market + idiosyncratic ε | CapmLab paths view |
+| ensemble averaging kills the molecular term | diversification | StockCountLab cloud |
+| fluctuation–dissipation (drift tied to own D) | **inverts**: SML ties drift to coupling β, not own σ | the CAPM lesson |
+
+Caveats the paper must own: money is not conserved (credit), so RTT carries
+a source term and the choice of extensive property is the real work; real
+D clusters (turbulence, not molecular wander); tails are fat; Mirowski's
+*More Heat than Light* (1989) will be cited against it and should be
+engaged first.
+
+**Prior art, so nothing is claimed twice:** Black–Scholes as
+convection–diffusion with r/σ² called the Péclet number is standard in
+numerical finance (Duffy; upwinding literature) but never conceptual.
+Fisher 1891 and the Phillips MONIAC are hydraulic analogies without the
+theorem. Ijiri's momentum accounting borrowed mechanics for bookkeeping.
+Econophysics (Mantegna–Stanley, Bouchaud–Potters, Ilinski) is statistical
+mechanics for researchers. Ole Peters' ergodicity economics is the closest
+in spirit (time vs ensemble averages) without transport language.
+
+**Venue plan:** pedagogy paper first, in a finance/economics-education
+journal — Journal of Economic Education as the primary target, Journal of
+Financial Education as the alternate — with the two sites as the figures.
+A companion piece the other direction (finance as the motivating example
+for teaching transport, i.e. the Lone Walker) fits Chemical Engineering
+Education and costs little extra. Book only post-tenure, and only if the
+paper's reception says the framing carries 250 pages rather than 25.
