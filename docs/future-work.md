@@ -423,10 +423,19 @@ Econophysics (Mantegna–Stanley, Bouchaud–Potters, Ilinski) is statistical
 mechanics for researchers. Ole Peters' ergodicity economics is the closest
 in spirit (time vs ensemble averages) without transport language.
 
-**Venue plan:** pedagogy paper first, in a finance/economics-education
-journal — Journal of Economic Education as the primary target, Journal of
-Financial Education as the alternate — with the two sites as the figures.
-A companion piece the other direction (finance as the motivating example
-for teaching transport, i.e. the Lone Walker) fits Chemical Engineering
-Education and costs little extra. Book only post-tenure, and only if the
-paper's reception says the framing carries 250 pages rather than 25.
+**Venue plan (revised 2026-09-10, BME department):** two papers, in
+this order.
+
+1. *Biomedical Engineering Education* (BMES): the Lone Walker as a
+   teaching module in the BME transport course — the Péclet number as a
+   crossover time, Lagrangian vs Eulerian, the price face as the
+   motivating application. Counts in-field for P&T. Wants evidence: a
+   pre/post concept check on the fall cohort, which means IRB approval
+   before the semester starts (late Sept) — a this-week task if the paper
+   is to be a data paper rather than a teaching tip.
+2. *Journal of Economic Education* (alternate: *Journal of Financial
+   Education*): the finance-facing synthesis carrying the RTT identification,
+   with BuyRisk as the figures. After the site is polished.
+
+Book only post-tenure, and only if the papers' reception says the framing
+carries 250 pages rather than 25.
