@@ -2984,3 +2984,18 @@
 @media (max-width: 480px) {
   .ss-stats, .sk-stats, .pl-stats, .emh-stats { grid-template-columns: 1fr 1fr; }
 }
+
+/* Pain-of-paying scale: a numbered radio row. The 11-point item shows its
+   three anchors under 1, 6 and 11; the 5-point items label every point. */
+.pp-scale { display: flex; gap: 0.35rem; flex-wrap: wrap; font-family: var(--font-sans); }
+.pp-opt { flex: 1 1 3.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: 0.5rem 0.25rem; border: var(--border); border-radius: var(--radius); background: var(--color-surface); cursor: pointer; text-align: center; min-width: 0; }
+.pp-opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pp-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+.pp-opt--on { border-color: var(--color-accent); background: var(--color-accent-soft); }
+.pp-num { font-weight: 700; font-size: var(--step-0); color: var(--color-text); }
+.pp-lab { font-size: 0.72rem; line-height: 1.2; color: var(--color-text-soft); }
+.pp-scale--wide .pp-opt { flex-basis: 2.4rem; padding-inline: 0.1rem; }
+.pp-scale--wide .pp-lab { font-size: 0.72rem; }
+@media (max-width: 560px) {
+  .pp-scale--wide .pp-opt { flex-basis: 1.9rem; }
+}

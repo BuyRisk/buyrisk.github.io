@@ -134,4 +134,11 @@ export const GAMES: GameMeta[] = [
     bias: "Hindsight bias",
     minutes: 3,
   },
+  {
+    id: "painofpaying",
+    title: "Does spending hurt?",
+    teaser: "Four quick questions about you and money — a real published scale, scored the real way. Then what your number costs.",
+    bias: "The pain of paying (tightwad ⇄ spendthrift)",
+    minutes: 2,
+  },
 ];

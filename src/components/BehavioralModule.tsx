@@ -5,7 +5,7 @@ import BehavioralLab from "./BehavioralLab";
  * Behavioral Finance module: the evidence, then the mirror.
  *  • Your own worst enemy: the behavior gap — panic-selling priced over real
  *    history, the CRSP fund-level gaps, and the field guide to the biases.
- *  • The Bias Arcade: eight short experiments that run the classic studies on
+ *  • The Bias Arcade: twelve short experiments that run the classic studies on
  *    YOU — play first, see the bias named after, remedies linked.
  * Non-default tabs are code-split (fetched on first open).
  */

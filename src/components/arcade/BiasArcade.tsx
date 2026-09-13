@@ -8,12 +8,13 @@ import RealOrRandomGame from "./RealOrRandomGame";
 import HerdingGame from "./HerdingGame";
 import EndowmentGame from "./EndowmentGame";
 import HindsightGame from "./HindsightGame";
+import PainOfPayingGame from "./PainOfPayingGame";
 import VignetteGame from "./VignetteGame";
 import { FRAMING, OUTCOME, SUNK_COST } from "./vignettes";
 import ProfileCard from "./ProfileCard";
 
 /**
- * The Bias Arcade: eight short experiments that run the classic studies on
+ * The Bias Arcade: twelve short experiments that run the classic studies on
  * YOU before naming the bias — play first, diagnose second, remedy linked.
  * Results live only in this browser's localStorage and feed the bias-profile
  * radar. Everyone scores imperfectly; that's the finding, not a failing.
@@ -39,6 +40,7 @@ export default function BiasArcade() {
       case "herding": return <HerdingGame key={nonce} onDone={done} />;
       case "endowment": return <EndowmentGame key={nonce} onDone={done} />;
       case "hindsight": return <HindsightGame key={nonce} onDone={done} />;
+      case "painofpaying": return <PainOfPayingGame key={nonce} onDone={done} />;
       case "framing": return <VignetteGame key={nonce} config={FRAMING} onDone={done} />;
       case "sunk": return <VignetteGame key={nonce} config={SUNK_COST} onDone={done} />;
       case "outcome": return <VignetteGame key={nonce} config={OUTCOME} onDone={done} />;
@@ -68,7 +70,7 @@ export default function BiasArcade() {
   return (
     <div className="ba">
       <p className="ba-intro">
-        Eight two-minute experiments, adapted from the classic studies of behavioral economics.
+        Twelve two-minute experiments, adapted from the classic studies of behavioral economics.
         Each one measures a tendency <em>before</em> telling you what it was measuring — so play
         first, read after. There's no passing score: these reflexes are standard human equipment.
         The point is to feel them fire, because the same reflexes move real portfolios. Results

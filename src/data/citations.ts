@@ -435,6 +435,15 @@ export const STUDIES: Record<string, Study> = {
     category: "Market efficiency & active management",
     note: "The 'fee on the active slice' arithmetic: a fund's expense ratio, charged on the whole portfolio, is a far steeper fee on the part that actually differs from the index.",
   },
+  rickCryderLoewenstein2008: {
+    authors: "Rick, S. I., Cryder, C. E., & Loewenstein, G.",
+    year: 2008,
+    title: "Tightwads and Spendthrifts",
+    venue: "Journal of Consumer Research 34(6): 767–782",
+    kind: "paper",
+    category: "Behavioral finance",
+    note: "Introduces and validates the four-item Spendthrift–Tightwad scale, a measure of the pain of paying. Across 13,327 respondents, tightwads outnumbered spendthrifts 3:2, scores tracked credit-card debt and savings but barely income, and a single adjective ('a small $5 fee') nearly erased the tightwad–spendthrift gap in willingness to pay. The arcade's 'Does spending hurt?' reproduces the scale verbatim, scored as published.",
+  },
   morningstarMindTheGap2026: {
     authors: "Ptak, J.",
     year: 2026,
@@ -909,7 +918,7 @@ export const TOOL_SOURCES: Record<string, ToolSources> = {
     method:
       "The behavior-gap simulation runs on real daily US market returns (Fama–French, 1990–present), and the fund-level gaps are computed from CRSP mutual-fund records. In the arcade, “real or random” shows genuine market history against volatility-matched coin flips, and the quiz answers are computed from the historical return data rather than written by hand; the vignettes are adapted from the published experiments cited above.",
     studies: [
-      "kahnemanTversky1979", "tverskyKahneman1992", "rabin2000", "russoSchoemaker1989", "barberOdean2000", "morningstarMindTheGap2026",
+      "kahnemanTversky1979", "tverskyKahneman1992", "rabin2000", "russoSchoemaker1989", "rickCryderLoewenstein2008", "barberOdean2000", "morningstarMindTheGap2026",
       "tverskyKahneman1974", "tverskyKahneman1981", "shefrinStatman1985",
       "odean1998", "arkesBlumer1985", "baronHershey1988", "alpertRaiffa1982",
       "asch1955", "bikhchandaniHirshleiferWelch1992", "kahnemanKnetschThaler1990", "fischhoff1975",
