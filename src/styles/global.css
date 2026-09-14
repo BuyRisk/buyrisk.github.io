@@ -13,6 +13,10 @@
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, Consolas,
     monospace;
 
+  /* --step--2 was referenced in five places before it existed; an undefined
+     token makes the declaration invalid and the text silently inherits the
+     parent size. Same ratio as the rest of the scale (~0.83x per step). */
+  --step--2: clamp(0.7rem, 0.68rem + 0.1vw, 0.76rem);
   --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
   --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.12rem);
   --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
