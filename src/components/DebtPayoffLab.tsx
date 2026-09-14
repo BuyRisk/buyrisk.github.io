@@ -100,10 +100,21 @@ export default function DebtPayoffLab() {
   const symbol = currencySymbol();
   const money = (n: number) => formatMoney(n);
 
+  /**
+   * Defaults are chosen so the two strategies visibly DIVERGE. The expensive
+   * debt must be the LARGEST balance and a cheap one the SMALLEST; otherwise
+   * avalanche and snowball attack the same debt first and differ only on the
+   * tail (the old defaults did exactly that, and showed a $103 gap). Here the
+   * snowball's first win is the small student loan while the 22.9% card keeps
+   * compounding, and avalanche saves ~$2,000 of interest on the same $900/mo.
+   * Minimums use the real formulas: interest + 1% of balance for the card,
+   * a level 48/60-month amortizing payment for the loans. Rates sit at the
+   * DEBT_TYPES benchmarks and under the refinance-flag thresholds.
+   */
   const seed = useRef<Debt[]>([
-    { id: 1, name: "Credit card", typeId: "credit-card", balance: 6000, apr: 22.9, minPayment: 150 },
-    { id: 2, name: "Auto loan", typeId: "auto", balance: 18000, apr: 7.5, minPayment: 360 },
-    { id: 3, name: "Student loan", typeId: "student", balance: 11000, apr: 6.5, minPayment: 120 },
+    { id: 1, name: "Credit card", typeId: "credit-card", balance: 12000, apr: 22.9, minPayment: 350 },
+    { id: 2, name: "Auto loan", typeId: "auto", balance: 9500, apr: 7.5, minPayment: 230 },
+    { id: 3, name: "Student loan", typeId: "student", balance: 3500, apr: 6.5, minPayment: 70 },
   ]);
   const [debts, setDebts] = useState<Debt[]>(seed.current);
   const [extra, setExtra] = useState(250);
@@ -149,26 +160,40 @@ export default function DebtPayoffLab() {
           <strong> snowball</strong> (smallest balance first).
         </p>
 
+        {/* Two lines per debt. The controls column is 320px; a six-column row
+            needs ~530px and hid APR and Min/mo behind a horizontal scrollbar —
+            the two inputs that actually drive the comparison. Each number now
+            carries its own label, so nothing depends on a header row. */}
         <div className="dp-debts">
-          <div className="dp-row dp-head" aria-hidden="true">
-            <span>Debt</span><span>Type</span><span>Balance</span><span>APR</span><span>Min/mo</span><span></span>
-          </div>
           {debts.map((d) => (
-            <div className="dp-row" key={d.id}>
-              <input className="dp-in dp-name" value={d.name} onChange={(e) => update(d.id, { name: e.target.value })} aria-label="Debt name" />
-              <select className="dp-in" value={d.typeId} onChange={(e) => update(d.id, { typeId: e.target.value })} aria-label="Debt type">
-                {DEBT_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-              </select>
-              <label className="dp-money"><span>{symbol}</span>
-                <input className="dp-in" type="number" min={0} value={d.balance} onChange={(e) => update(d.id, { balance: Math.max(0, Number(e.target.value)) })} aria-label="Balance" />
-              </label>
-              <label className="dp-pct">
-                <input className="dp-in" type="number" min={0} step={0.1} value={d.apr} onChange={(e) => update(d.id, { apr: Math.max(0, Number(e.target.value)) })} aria-label="APR" /><span>%</span>
-              </label>
-              <label className="dp-money"><span>{symbol}</span>
-                <input className="dp-in" type="number" min={0} value={d.minPayment} onChange={(e) => update(d.id, { minPayment: Math.max(0, Number(e.target.value)) })} aria-label="Minimum payment" />
-              </label>
-              <button className="dp-del" type="button" onClick={() => remove(d.id)} aria-label={`Remove ${d.name}`} disabled={debts.length <= 1}>×</button>
+            <div className="dp-debt" key={d.id}>
+              <div className="dp-line">
+                <input className="dp-in dp-name" value={d.name} onChange={(e) => update(d.id, { name: e.target.value })} aria-label="Debt name" />
+                <select className="dp-in" value={d.typeId} onChange={(e) => update(d.id, { typeId: e.target.value })} aria-label="Debt type">
+                  {DEBT_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+                </select>
+                <button className="dp-del" type="button" onClick={() => remove(d.id)} aria-label={`Remove ${d.name}`} disabled={debts.length <= 1}>×</button>
+              </div>
+              <div className="dp-line dp-line--nums">
+                <label className="dp-field">
+                  <span className="dp-label">Balance</span>
+                  <span className="dp-money"><span>{symbol}</span>
+                    <input className="dp-in" type="number" min={0} value={d.balance} onChange={(e) => update(d.id, { balance: Math.max(0, Number(e.target.value)) })} />
+                  </span>
+                </label>
+                <label className="dp-field">
+                  <span className="dp-label">APR</span>
+                  <span className="dp-pct">
+                    <input className="dp-in" type="number" min={0} step={0.1} value={d.apr} onChange={(e) => update(d.id, { apr: Math.max(0, Number(e.target.value)) })} /><span>%</span>
+                  </span>
+                </label>
+                <label className="dp-field">
+                  <span className="dp-label">Min / mo</span>
+                  <span className="dp-money"><span>{symbol}</span>
+                    <input className="dp-in" type="number" min={0} value={d.minPayment} onChange={(e) => update(d.id, { minPayment: Math.max(0, Number(e.target.value)) })} />
+                  </span>
+                </label>
+              </div>
             </div>
           ))}
           <button className="dp-add" type="button" onClick={add}>+ Add a debt</button>

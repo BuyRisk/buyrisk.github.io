@@ -404,9 +404,15 @@
 .nw-fill--debt { background: var(--color-error); }
 
 /* DebtPayoffLab */
-.dp-debts { overflow-x: auto; min-width: 0; } /* min-width:0 so the flex column, not the page, scrolls on phones */
-.dp-row { display: grid; grid-template-columns: minmax(6rem, 1.3fr) minmax(6.5rem, 1fr) 7rem 5rem 6.5rem 1.7rem; gap: 0.4rem; align-items: center; min-width: 33rem; margin-bottom: 0.4rem; }
-.dp-head { font-family: var(--font-sans); font-size: var(--step--1); font-weight: 700; color: var(--color-muted); margin-bottom: 0.2rem; }
+/* One stacked card per debt, sized to fit the 320px controls column with no
+   horizontal scroll: name/type/remove on line one, the three numbers on line
+   two, each number labelled on the field so nothing relies on a header row. */
+.dp-debts { display: grid; gap: 0.5rem; min-width: 0; }
+.dp-debt { display: grid; gap: 0.4rem; padding: 0.55rem; border: var(--border); border-radius: var(--radius); background: var(--color-surface-alt); }
+.dp-line { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 1.7rem; gap: 0.4rem; align-items: center; }
+.dp-line--nums { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; }
+.dp-field { display: grid; gap: 0.15rem; min-width: 0; }
+.dp-label { font-family: var(--font-sans); font-size: var(--step--2); font-weight: 700; color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .dp-in { width: 100%; font-family: var(--font-sans); font-size: var(--step--1); padding: 0.35rem 0.45rem; border: var(--border); border-radius: 7px; background: var(--color-surface); color: var(--color-text); }
 .dp-in:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
 .dp-money, .dp-pct { display: inline-flex; align-items: center; gap: 0.2rem; font-family: var(--font-sans); font-size: var(--step--1); color: var(--color-muted); }
