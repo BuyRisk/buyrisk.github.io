@@ -105,3 +105,69 @@ npm run preview  # serve the production build locally
   before committing.
 - Commits are small and logical, present-tense summary line, with a Claude
   co-author trailer.
+
+## Two machines — assume the repo moved without you
+
+**Colin works on two computers** (desktop `Colin-desktop` and laptop `Colin`),
+both mounting the T7 Shield as `E:`. GitHub is the only thing that syncs
+between them, and only for this repo. A session that assumes the working copy
+is where it left it will clobber or duplicate work. Full machine details and
+the drive's gotchas: `E:\Finance\WORKSTATIONS.md` (outside the repo).
+
+**Standing duties for every session — Claude does these unprompted:**
+
+1. **On waking up after a gap.** If it has been more than a day or two since
+   the last session, or you cannot tell, check sync BEFORE touching a file.
+   Work committed on the other machine will not be in the working copy.
+2. **When a session winds down**, and whenever a work session produced
+   commits, remind Colin to push. Do not let a session end with unpushed
+   commits.
+3. **If `git log -1` is more than a week old**, say so and offer the sync
+   block, even if the tree is clean. A week-old local `main` usually means the
+   other machine is ahead.
+
+**Give the commands, don't run them.** Colin's preference: he pastes git
+push/pull into his Anaconda Prompt himself rather than having a session run
+them. So *offer a complete, paste-ready block* — always starting with the
+`cd` line, then a check, then the action. Never a bare `git push`. Claude may
+still run read-only git commands (`fetch`, `status`, `log`, `diff`) to answer
+a question.
+
+The Anaconda Prompt is `cmd`-based, so the directory line uses `cd /d`. In
+PowerShell, drop the `/d`.
+
+**Sync check — start of session, or after any gap:**
+
+```
+cd /d E:\Finance\BuyRisk
+git fetch origin
+git status -sb
+git log --oneline -3
+```
+
+`## main...origin/main` with nothing after it means synced. `[behind N]`
+means the other machine pushed; pull before working:
+
+```
+cd /d E:\Finance\BuyRisk
+git pull --ff-only origin main
+```
+
+**Push — end of session, or before switching machines:**
+
+```
+cd /d E:\Finance\BuyRisk
+git status -sb
+git add -A
+git commit -m "Present-tense summary" -m "Co-Authored-By: Claude <noreply@anthropic.com>"
+git push origin main
+```
+
+If the pull is not fast-forward, both machines have commits. Stop and sort it
+out deliberately rather than merging blind.
+
+Two more cross-machine notes: **the licensed data library never syncs** (it
+lives only on the T7 at `E:\Finance\data\sources`), which is why generated
+outputs under `src/data/generated/` are committed. And **Claude's memory is
+per-machine** (`C:\Users\<user>\.claude\`), so anything durable belongs in
+this file or in `WORKSTATIONS.md`, not in memory alone.
