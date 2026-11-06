@@ -21,6 +21,26 @@ and every script writes to `NSTOCKS_OUT` (default
 
 Python env `capit`. Run in order. Total about 30 minutes on the laptop.
 
+### Global extension (Datastream via WRDS Cloud)
+
+| script | does |
+|---|---|
+| `ds_profile.py` | profiles the month-end pull (aggregates only) and caches it as parquet |
+| `build_global.py` | screens Datastream and writes one panel per universe and currency (developed ex-US, all-country, and a US panel used only to check Datastream against CRSP) |
+| `simulate_bh.py --panel panel_<name> --from 1990-03` | the same simulation on a Datastream panel |
+| `summarize_global.py` | starts from 1990-09, CRSP on the same starts, the US check, tables, charts |
+
+Screens: major security, home-country listing, name keywords, no OTC, trailing
+zero-return padding, the Ince-Porter reversal, a +300% monthly cap and a
+1,000-fold 60-month run-up screen. The last two are calibrated on the US:
+Datastream US against CRSP, linked by CUSIP. Neither materially moves CRSP's
+answer, and together they bring Datastream US close to it. The figures stay in
+the private study notes until the library rules.
+Datastream carries no delisting returns, so the base case uses the last price,
+with -30% and -100% on non-merger deaths as sensitivities. All-country results
+are in USD: in local currency the equal-weighted benchmark mostly measures
+inflation differences.
+
 ## Design choices that decide the answer
 
 - **Benchmark:** equal-weighted *buy-and-hold* of every stock alive at the

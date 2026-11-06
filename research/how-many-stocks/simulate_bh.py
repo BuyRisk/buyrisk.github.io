@@ -43,27 +43,41 @@ def p_any_top(n, k, N):
     return out
 
 
+def arg(flag, default):
+    return sys.argv[sys.argv.index(flag) + 1] if flag in sys.argv else default
+
+
 def main(quick=False):
-    z = np.load(C.CACHE / "panel.npz")
-    CL, cap, prc, listed, death = z["CL"], z["cap"], z["prc"], z["listed"], z["death"]
+    """Options: --panel NAME (CACHE/NAME.npz, default panel), --from / --to YYYY-MM (start-date
+    range), --every K (every K-th start), --draws D, --out NAME (OUTPUT/NAME.parquet)."""
+    pname = arg("--panel", "panel")
+    z = np.load(C.CACHE / f"{pname}.npz")
+    CL, cap, listed, death = z["CL"], z["cap"], z["listed"], z["death"]
+    prc = z["prc"] if "prc" in z.files else None      # Datastream panels: no price test in "liquid"
     imp_flag, imp_exch = z["imp_flag"], z["imp_exch"]
+    m0 = int(z["m0"]) if "m0" in z.files else 0
+    base_imp = str(z["base_impute"]) if "base_impute" in z.files else "shumway"
+    variants = [(v, base_imp if imp == "shumway" else imp, pk, un) for v, imp, pk, un in VARIANTS]
+    lab = lambda t: C.month_label(t + m0)  # noqa: E731
     M = CL.shape[1]
     park = {"tbill": np.r_[0.0, np.cumsum(np.log1p(z["rf"][1:]))],
             "mkt": np.r_[0.0, np.cumsum(np.log1p(z["mkt"][1:]))]}
     imp_lg = {k: np.log(np.maximum(1 + np.array([v[e] for e in imp_exch]), C.LOG_FLOOR)) * imp_flag
               for k, v in C.IMPUTE.items()}
     rng = np.random.default_rng(C.SEED)
-    starts = [t for t in range(6, M - 12) if C.month_label(t)[5:] in ("03", "06", "09", "12")]
-    if quick:
-        starts = starts[::20]
-    draws = 1000 if quick else C.DRAWS
+    lo, hi = arg("--from", "0000-00"), arg("--to", "9999-99")
+    starts = [t for t in range(6, M - 12) if lab(t)[5:] in ("03", "06", "09", "12") and lo <= lab(t) <= hi]
+    starts = starts[::int(arg("--every", 20 if quick else 1))]
+    draws = int(arg("--draws", 1000 if quick else C.DRAWS))
     rows = []
     tic = time.time()
     for j, t in enumerate(starts):
         alive = listed[:, t] & (cap[:, t] > 0) & (death > t)
         coh = {"all": np.flatnonzero(alive)}
         c_all = cap[coh["all"], t]
-        liq = (prc[coh["all"], t] >= 1) & (c_all >= np.percentile(c_all, 5))
+        liq = c_all >= np.percentile(c_all, 5)
+        if prc is not None:
+            liq &= prc[coh["all"], t] >= 1
         coh["liquid"] = coh["all"][liq]
         for uname, idx in coh.items():
             n = len(idx)
@@ -77,7 +91,7 @@ def main(quick=False):
                 order = np.argsort(np.take_along_axis(keys, part, 1), axis=1)
                 sel[c0:c0 + len(keys)] = np.take_along_axis(part, order, 1)
             vw = cap[idx, t] / cap[idx, t].sum()
-            for vname, imp, pk, un in VARIANTS:
+            for vname, imp, pk, un in variants:
                 if un != uname:
                     continue
                 for H in C.HORIZONS:
@@ -99,7 +113,7 @@ def main(quick=False):
                     rel = (Wp / b_ew) ** (1 / H) - 1
                     q = np.percentile(rel, C.PCTS, axis=0)
                     rows.append(pd.DataFrame({
-                        "t": t, "start": C.month_label(t), "H": H, "variant": vname, "n_alive": n, "N": grid,
+                        "t": t + m0, "start": lab(t), "H": H, "variant": vname, "n_alive": n, "N": grid,
                         "p_under_ew": (Wp < b_ew).mean(0), "p_under_vw": (Wp < b_vw).mean(0),
                         "mean_wealth_ratio_ew": Wp.mean(0) / b_ew,
                         **{f"rel_ew_p{p}": q[i] for i, p in enumerate(C.PCTS)},
@@ -109,9 +123,10 @@ def main(quick=False):
                         "share_delisted": died.mean(),
                     }))
         if j % 20 == 0:
-            print(f"{C.month_label(t)}  n={len(coh['all'])}  {time.time() - tic:.0f}s", flush=True)
+            print(f"{lab(t)}  n={len(coh['all'])}  {time.time() - tic:.0f}s", flush=True)
     out = pd.concat(rows, ignore_index=True)
-    name = "bh_stats_quick.parquet" if quick else "bh_stats.parquet"
+    default = "bh_stats" if pname == "panel" else f"bh_stats_{pname.removeprefix('panel_')}"
+    name = arg("--out", default + ("_quick" if quick else "")) + ".parquet"
     out.to_parquet(C.OUTPUT / name)
     print(f"wrote {name}: {len(out):,} rows, {len(starts)} start dates, {time.time() - tic:.0f}s")
 

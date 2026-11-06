@@ -39,6 +39,7 @@ IMPUTE = {
     "shumway": {"N": -0.30, "A": -0.30, "Q": -0.55},
     "m30": {"N": -0.30, "A": -0.30, "Q": -0.30},
     "m100": {"N": -1.00, "A": -1.00, "Q": -1.00},
+    "none": {"N": 0.0, "A": 0.0, "Q": 0.0},     # Datastream base: last price is the exit value
 }
 LOG_FLOOR = 1e-8   # a -100% month leaves wealth at 1e-8 rather than log(0)
 PCTS = (5, 25, 50, 75, 95)

@@ -60,7 +60,12 @@ def aggregate(d, step_months=3, seed=7):
         X = {s: v[Ns].values for s, v in piv.items()}
         T = len(piv["p_under_ew"])
         idx = block_boot(T, H, rng, step_months)
+        # with one block as long as the sample, every rep is a rotation of the same starts and the
+        # interval collapses to the point estimate; report no interval rather than a false zero-width one
+        degenerate = min(max(int(round(12 * max(H, 2) / step_months)), 1), T) >= T
         boot = {s: np.stack([X[s][i].mean(0) for i in idx]) for s in BOOT if s in X}
+        if degenerate:
+            boot = {s: np.full_like(b, np.nan) for s, b in boot.items()}
         no = np.arange(0, T, max(1, 12 * H // step_months))     # non-overlapping starts
         res = pd.DataFrame({"H": H, "N": Ns, "n_starts": T,
                             "first_start": C.month_label(piv["p_under_ew"].index.min()),
@@ -83,7 +88,7 @@ def aggregate(d, step_months=3, seed=7):
                 hit = ~np.isnan(bs)
                 cross.append({"H": H, "benchmark": bench, "level": lvl,
                               "smallest_N": crossing(Ns, X[key].mean(0), lvl),
-                              "share_reps_reached": hit.mean(),
+                              "share_reps_reached": np.nan if degenerate else hit.mean(),
                               "ci_lo": np.percentile(bs[hit], 2.5) if hit.any() else np.nan,
                               "ci_hi": np.percentile(bs[hit], 97.5) if hit.any() else np.nan,
                               "N_max_in_sample": int(Ns.max())})
@@ -109,7 +114,11 @@ def style(ax, ylabel, decimals=0):
     ax.set_facecolor(SURF)
 
 
-def charts(agg, path, title, years):
+CRSP_NOTE = ("Calculated from CRSP data, (c) Center for Research in Security Prices, LLC, via WRDS. "
+             "NOT FOR PUBLICATION pending the library ruling.")
+
+
+def charts(agg, path, title, years, note=CRSP_NOTE):
     fig, axes = plt.subplots(2, 2, figsize=(11, 8), dpi=160)
     fig.patch.set_facecolor(SURF)
     a1, a2, a3, a4 = axes.ravel()
@@ -141,9 +150,7 @@ def charts(agg, path, title, years):
         ax.legend(frameon=False, fontsize=8, loc="best")
     fig.suptitle(title, x=0.01, ha="left", fontsize=12, color=INK)
     fig.text(0.01, 0.005, f"Buy-and-hold, equal dollar amounts, quarterly start dates {years}; shaded bands are 95% "
-             "block-bootstrap intervals over start dates.\nCalculated from CRSP data, (c) Center for Research in "
-             "Security Prices, LLC, via WRDS. NOT FOR PUBLICATION pending the library ruling.",
-             fontsize=6.5, color=INK2)
+             f"block-bootstrap intervals over start dates.\n{note}", fontsize=6.5, color=INK2)
     fig.tight_layout(rect=(0, 0.035, 1, 0.96))
     fig.savefig(path, facecolor=fig.get_facecolor())
     plt.close(fig)
